@@ -14,7 +14,7 @@ npm ci
 npm run dev
 ```
 
-Open the address Vite prints (normally `http://localhost:5173`). The dev command imports your CSV before starting. If `data/cities.csv` is absent, it uses the five-city sample fixture and labels the city list **Sample data**. Restart the dev command after changing CSV inputs. Dependencies and versions are pinned in `package-lock.json`.
+Open the address Vite prints (normally `http://localhost:5173`). The dev command imports your CSV before starting. If `data/cities.csv` is absent, it uses the five-city sample fixture. Restart the dev command after changing CSV inputs. Dependencies and versions are pinned in `package-lock.json`.
 
 The sample includes Moscow and Kyiv's supplied My Maps links and illustrative records for Warsaw, Prague, and Helsinki. Sample visits, dates, notes, and colors are **not your personal travel history**.
 
@@ -38,6 +38,8 @@ The sample includes Moscow and Kyiv's supplied My Maps links and illustrative re
 `npm run build` deliberately fails with an actionable message if `data/cities.csv` is missing. It will never silently publish the sample in place of your data. `build:demo` is the explicit alternative.
 
 ## Add your collection
+
+The city-detail page has an editable **Map status** dropdown. Changes immediately update the list, its status filter, and other open tabs. They are saved in this browser for this site and survive refreshes; they do not sync across devices or change the source CSV or GitHub. Clearing this site's browser storage restores the imported statuses. If the browser cannot save a change, it stays active for the current session and the page reports that it could not be saved.
 
 Put your UTF-8 export in **`data/cities.csv`**. This file is ignored by Git. Keep these headers (case and surrounding whitespace do not matter; `City` is accepted as an alias for `Cities`):
 
@@ -171,11 +173,11 @@ npx playwright install chromium
 CHROMIUM_PATH='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' npm run test:browser
 ```
 
-Coverage includes real WebGL globe startup, camera drag/zoom/reset, cluster expansion and pin selection, search/status filters, exact status/visit text, notes/dates, lazy viewer mounting, canonical links, URL/history handling, camera/filter preservation, keyboard navigation, a 360px layout, and the WebGL-unavailable fallback. Import coverage includes BOM/CSV edge cases, inert iframe HTML, safe/rejected links, stable IDs, duplicate IDs, missing/zero coordinates, visits/dates, and independent country/pin colors. External-provider and real Google embed availability are separate network-dependent checks. A full real-CSV build awaits your export.
+Coverage includes real WebGL globe startup, camera drag/zoom/reset, cluster expansion and pin selection, search/status filters, saved map-status edits across reloads and tabs, corrupt/blocked storage recovery, exact status/visit text, notes/dates, lazy viewer mounting, canonical links, URL/history handling, camera/filter preservation, keyboard navigation, narrow layouts down to 320px, and the WebGL-unavailable fallback. Import coverage includes BOM/CSV edge cases, inert iframe HTML, safe/rejected links, stable IDs, duplicate IDs, missing/zero coordinates, visits/dates, and independent country/pin colors. External-provider and real Google embed availability are separate network-dependent checks. A full real-CSV build awaits your export.
 
 ## Credits
 
 - [Natural Earth](https://www.naturalearthdata.com/), public-domain geographic data.
 - [OpenFreeMap](https://openfreemap.org/) and [OpenStreetMap contributors](https://www.openstreetmap.org/copyright), optional basemap; provider attribution remains visible.
 - [GeoNames](https://www.geonames.org/export/), CC BY 4.0, when using the optional local coordinate resolver.
-- Map label fonts: Noto Serif, Inter, and Roboto Condensed, under the SIL Open Font License. Open Sans glyphs from the MapLibre demo atlas are retained for cluster counts; DM Sans from Fontsource is used in the interface. Fonts and licenses are bundled locally. See `assets/fonts/manifest.json` and `public/fonts/`.
+- Map label fonts: Noto Serif, Inter, and Roboto Condensed, under the SIL Open Font License. Open Sans glyphs from the MapLibre demo atlas are retained for cluster counts; DM Sans and Manrope from Fontsource are used in the interface. Fonts and licenses are bundled locally. See `assets/fonts/manifest.json` and `public/fonts/`.

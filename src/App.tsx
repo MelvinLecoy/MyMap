@@ -3,12 +3,10 @@ import {
   ArrowLeft,
   ArrowRight,
   ArrowUpRight,
-  CheckCheck,
   CircleCheck,
   CircleDashed,
   ChevronDown,
   ChevronRight,
-  Compass,
   Map,
   MapPin,
   Search,
@@ -20,6 +18,12 @@ import {
 import Globe from "./components/Globe";
 import MapViewer from "./components/MapViewer";
 import atlas from "./generated/atlas.json";
+import {
+  MAP_STATUS_STORAGE_KEY,
+  parseStatusOverrides,
+  readStatusOverrides,
+  saveStatusOverrides,
+} from "./lib/status-storage";
 import {
   MAP_STATUSES,
   VISIT_LABELS,
@@ -49,12 +53,17 @@ function Status({ status }: { status: MapStatus }) {
     <span
       className={`status status-${status.toLowerCase().replaceAll(" ", "-")}`}
     >
-      <i />
       {status}
     </span>
   );
 }
-function VisitMarker({ visit }: { visit: VisitStatus }) {
+function VisitMarker({
+  visit,
+  inline = false,
+}: {
+  visit: VisitStatus;
+  inline?: boolean;
+}) {
   const state = visit === "visited" || visit === "planned" ? visit : "not-yet";
   const Icon =
     state === "visited"
@@ -63,15 +72,15 @@ function VisitMarker({ visit }: { visit: VisitStatus }) {
         ? CalendarDays
         : CircleDashed;
   return (
-    <span className={`visit-marker visit-marker-${state}`}>
-      <Icon size={20} strokeWidth={1.6} aria-hidden="true" />
-      <span>
-        {state === "visited"
-          ? "Visited"
-          : state === "planned"
-            ? "Planned"
-            : "Not Yet"}
-      </span>
+    <span
+      className={
+        inline
+          ? `visit-value visit-value-${state}`
+          : `visit-marker visit-marker-${state}`
+      }
+    >
+      <Icon size={inline ? 18 : 20} strokeWidth={1.6} aria-hidden="true" />
+      <span>{VISIT_LABELS[visit]}</span>
     </span>
   );
 }
@@ -80,10 +89,36 @@ export default function App() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("all");
   const [continent, setContinent] = useState("all");
+  const [statusOverrides, setStatusOverrides] = useState(readStatusOverrides);
+  const [saveErrorCity, setSaveErrorCity] = useState<string | null>(null);
+  const cities = useMemo(
+    () =>
+      data.cities.map((city) =>
+        Object.hasOwn(statusOverrides, city.id)
+          ? { ...city, status: statusOverrides[city.id] }
+          : city,
+      ),
+    [statusOverrides],
+  );
   const searchRef = useRef<HTMLInputElement>(null);
   const viewerButton = useRef<HTMLButtonElement>(null);
-  const selected = data.cities.find((c) => c.id === route.city) || null;
+  const selected = cities.find((c) => c.id === route.city) || null;
   const viewer = Boolean(route.view && selected?.map);
+  const updateMapStatus = (id: string, value: MapStatus) => {
+    const next = { ...statusOverrides, [id]: value };
+    setStatusOverrides(next);
+    setSaveErrorCity(saveStatusOverrides(next) ? null : id);
+  };
+  useEffect(() => {
+    const onStorage = (event: StorageEvent) => {
+      if (event.key === MAP_STATUS_STORAGE_KEY || event.key === null) {
+        setStatusOverrides(parseStatusOverrides(event.newValue));
+        setSaveErrorCity(null);
+      }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
   const navigate = useCallback(
     (id: string | null, view = false, replace = false) => {
       const url = new URL(window.location.href);
@@ -128,7 +163,7 @@ export default function App() {
       .replace(/\p{M}/gu, "")
       .toLowerCase()
       .trim();
-    return data.cities
+    return cities
       .filter(
         (c) =>
           `${c.name} ${c.country}`
@@ -140,7 +175,7 @@ export default function App() {
           (continent === "all" || c.continent === continent),
       )
       .sort((a, b) => a.name.localeCompare(b.name));
-  }, [search, status, continent]);
+  }, [search, status, continent, cities]);
   const visited = data.cities.filter((c) => c.visit === "visited").length;
   const countries = data.countries.filter((c) => c.visited).length;
   const closeViewer = useCallback(() => {
@@ -307,80 +342,64 @@ export default function App() {
             <>
               <div className="detail-top">
                 <button
-                  className="text-button back-to-cities"
+                  className="back-to-cities"
                   onClick={() => navigate(null)}
                 >
-                  <ArrowLeft size={17} />
+                  <ArrowLeft size={17} aria-hidden="true" />
                   All cities
                 </button>
-                <span className="detail-index">
-                  {String(
-                    data.cities.findIndex((c) => c.id === selected.id) + 1,
-                  ).padStart(2, "0")}{" "}
-                  / {String(data.cities.length).padStart(2, "0")}
+                <span
+                  className="detail-total"
+                  aria-label={`${data.cities.length} cities in collection`}
+                >
+                  {data.cities.length}
                 </span>
               </div>
               <div className="city-detail" key={selected.id}>
-                <div className="detail-geography">
-                  {[selected.continent, selected.region]
+                <div className="detail-geography" aria-label="Geography">
+                  {[selected.continent, selected.region, selected.subregion]
                     .filter(Boolean)
                     .join(" / ")}
                 </div>
-                <h1>{selected.name}</h1>
-                <p className="detail-country">
-                  <Flag code={selected.countryCode} />
-                  {selected.country}
-                </p>
-                {selected.subregion && (
-                  <span className="subregion-label">{selected.subregion}</span>
-                )}
-                <div className="detail-facts">
+                <div className="detail-identity">
                   <div>
-                    <span>Map status</span>
-                    <Status status={selected.status} />
+                    <h1>{selected.name}</h1>
+                    <p className="detail-country">
+                      <Flag code={selected.countryCode} />
+                      {selected.country}
+                    </p>
                   </div>
-                  <div>
-                    <span>Visit</span>
-                    <strong
-                      className={
-                        selected.visit === "visited" ? "is-visited" : ""
-                      }
+                  {selected.coordinates && (
+                    <div
+                      className="detail-coordinates"
+                      aria-label="City coordinates"
                     >
-                      {selected.visit === "visited" && <CheckCheck size={15} />}{" "}
-                      {VISIT_LABELS[selected.visit]}
-                    </strong>
-                  </div>
-                  {selected.lastVisited && (
-                    <div>
-                      <span>
-                        <CalendarDays size={14} />
-                        Last visit
-                      </span>
-                      <strong>{formatVisitDate(selected.lastVisited)}</strong>
-                    </div>
-                  )}
-                  {!selected.coordinates && (
-                    <div>
-                      <span>Location</span>
-                      <strong>Not yet recorded</strong>
+                      <MapPin size={14} strokeWidth={1.5} aria-hidden="true" />
+                      <div>
+                        <span>
+                          <span className="visually-hidden">Latitude </span>
+                          {Math.abs(selected.coordinates[1]).toFixed(4)}°{" "}
+                          {selected.coordinates[1] >= 0 ? "N" : "S"}
+                        </span>
+                        <span>
+                          <span className="visually-hidden">Longitude </span>
+                          {Math.abs(selected.coordinates[0]).toFixed(4)}°{" "}
+                          {selected.coordinates[0] >= 0 ? "E" : "W"}
+                        </span>
+                      </div>
                     </div>
                   )}
                 </div>
                 {selected.map ? (
-                  <>
-                    <button
-                      className="annotated-button"
-                      ref={viewerButton}
-                      onClick={() => navigate(selected.id, true)}
-                    >
-                      <Map size={18} />
-                      <span>View annotated map</span>
-                      <ArrowUpRight size={19} />
-                    </button>
-                    <p className="map-action-caption">
-                      Your layers, pins, and notes. All in one place.
-                    </p>
-                  </>
+                  <button
+                    className="annotated-button"
+                    ref={viewerButton}
+                    onClick={() => navigate(selected.id, true)}
+                  >
+                    <Map size={18} aria-hidden="true" />
+                    <span>View My Map</span>
+                    <ArrowUpRight size={19} aria-hidden="true" />
+                  </button>
                 ) : (
                   <div className="no-map-card">
                     <Map size={19} />
@@ -394,36 +413,61 @@ export default function App() {
                     </div>
                   </div>
                 )}
+                <div className="detail-facts">
+                  <div className="detail-fact-row">
+                    <label htmlFor="city-map-status">Map status</label>
+                    <span
+                      className={`status-picker status-${selected.status.toLowerCase().replaceAll(" ", "-")}`}
+                    >
+                      <select
+                        id="city-map-status"
+                        value={selected.status}
+                        onChange={(event) => {
+                          const next = MAP_STATUSES.find(
+                            (value) => value === event.target.value,
+                          );
+                          if (next) updateMapStatus(selected.id, next);
+                        }}
+                      >
+                        {MAP_STATUSES.map((value) => (
+                          <option key={value}>{value}</option>
+                        ))}
+                      </select>
+                      <ChevronDown size={15} aria-hidden="true" />
+                    </span>
+                  </div>
+                  <div className="detail-fact-row">
+                    <span>Visit</span>
+                    <VisitMarker visit={selected.visit} inline />
+                  </div>
+                  {selected.lastVisited && (
+                    <div className="detail-fact-row">
+                      <span>Last visit</span>
+                      <strong>{formatVisitDate(selected.lastVisited)}</strong>
+                    </div>
+                  )}
+                  {!selected.coordinates && (
+                    <div className="detail-fact-row">
+                      <span>Location</span>
+                      <strong>Not yet recorded</strong>
+                    </div>
+                  )}
+                </div>
+                {saveErrorCity === selected.id && (
+                  <p className="status-save-error" role="status">
+                    Status changed for this session. Your browser couldn’t save
+                    it for next time.
+                  </p>
+                )}
                 {selected.notes && (
                   <div className="notes-section">
                     <h2>
                       <StickyNote size={14} />
-                      FIELD NOTES
+                      Notes
                     </h2>
                     <p>{selected.notes}</p>
                   </div>
                 )}
-                {selected.coordinates && (
-                  <div className="detail-location">
-                    <span>ON THE GLOBE</span>
-                    <p>
-                      <MapPin size={13} />
-                      {Math.abs(selected.coordinates[1]).toFixed(4)}°{" "}
-                      {selected.coordinates[1] >= 0 ? "N" : "S"}
-                      <b>·</b>
-                      {Math.abs(selected.coordinates[0]).toFixed(4)}°{" "}
-                      {selected.coordinates[0] >= 0 ? "E" : "W"}
-                    </p>
-                  </div>
-                )}
-              </div>
-              <div className="detail-bottom">
-                <Compass size={22} strokeWidth={1.2} />
-                <p>
-                  Every place has a story.
-                  <br />
-                  <span>This one is part of yours.</span>
-                </p>
               </div>
             </>
           )}

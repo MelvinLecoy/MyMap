@@ -36,8 +36,8 @@ export interface AtlasData {
 export const VISIT_LABELS: Record<VisitStatus, string> = {
   visited: "Visited",
   planned: "Planned",
-  "not-visited": "Not visited",
-  unknown: "Visit not recorded",
+  "not-visited": "Not Yet",
+  unknown: "Not Yet",
 };
 export function formatVisitDate(date: string): string {
   const [year, month, day] = date.split("-").map(Number);

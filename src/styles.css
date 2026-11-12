@@ -607,25 +607,6 @@ h2 {
   border-radius: 6px;
   line-height: 1.25;
 }
-.city-row .status i {
-  display: none;
-}
-.city-row .status-complete {
-  color: #28634c !important;
-  background: #e0f1e6;
-}
-.city-row .status-update {
-  color: #805c1c !important;
-  background: #fff0c9;
-}
-.city-row .status-unfinished {
-  color: #9a403e !important;
-  background: #fbe5e2;
-}
-.city-row .status-not-started {
-  color: #56646a !important;
-  background: #e8ebe8;
-}
 .status {
   font-size: 10px;
   padding: 5px 8px;
@@ -637,25 +618,24 @@ h2 {
   border-radius: 4px;
   font-weight: 400;
   line-height: 1.2;
-  color: var(--muted);
-}
-.status i {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: currentColor;
+  color: var(--status-ink);
+  background: var(--status-tint);
 }
 .status-complete {
-  color: var(--visit-text) !important;
+  --status-ink: #28634c;
+  --status-tint: #e0f1e6;
 }
 .status-update {
-  color: #816126 !important;
+  --status-ink: #805c1c;
+  --status-tint: #fff0c9;
 }
 .status-unfinished {
-  color: #716387 !important;
+  --status-ink: #9a403e;
+  --status-tint: #fbe5e2;
 }
 .status-not-started {
-  color: var(--muted) !important;
+  --status-ink: #56646a;
+  --status-tint: #e8ebe8;
 }
 .row-chevron {
   color: var(--muted);
@@ -731,7 +711,40 @@ h2 {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 29px 27px;
+  padding: 24px var(--collection-inset) 22px;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.back-to-cities {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  min-height: 38px;
+  border: 1px solid #d9e9df;
+  border-radius: 8px;
+  background: #e6f0e9;
+  color: var(--text);
+  font-family: "Manrope Variable", sans-serif;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 18px;
+}
+.back-to-cities:hover {
+  background: #d9eadd;
+}
+.detail-total {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+  display: grid;
+  place-items: center;
+  background: #b8dece;
+  color: #24584c;
+  border-radius: 7px;
+  font-size: 15px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
 }
 .text-button {
   display: inline-flex;
@@ -744,101 +757,193 @@ h2 {
 .text-button:hover {
   color: var(--accent);
 }
-.detail-index {
-  font-size: 9px;
-  letter-spacing: 1px;
-  color: var(--muted);
-}
 .city-detail {
-  padding: 21px 27px 25px;
+  padding: 0 var(--collection-inset) 28px;
   overflow-y: auto;
   min-height: 0;
   flex: 1;
   scrollbar-width: thin;
   scrollbar-color: #bacdc4 transparent;
   animation: enter 0.3s ease;
+  font-family: "Manrope Variable", "DM Sans Variable", sans-serif;
 }
 .detail-geography {
   color: var(--muted);
-  font-size: 8px;
-  letter-spacing: 1.6px;
-  text-transform: uppercase;
-  line-height: 1.8;
+  font-size: 11px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+.detail-identity {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: start;
+  margin-top: 22px;
+}
+.detail-identity > div:first-child {
+  min-width: 0;
 }
 .city-detail h1 {
-  font-size: 46px;
-  letter-spacing: -1.9px;
-  font-weight: 550;
-  line-height: 1.15;
-  margin-top: 13px;
+  font-size: 32px;
+  letter-spacing: -1.2px;
+  font-weight: 750;
+  line-height: 1.12;
   overflow-wrap: anywhere;
 }
 .detail-country {
-  font-size: 18px;
+  font-size: 14px;
   color: var(--muted);
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-top: 11px;
-  font-weight: 400;
+  gap: 7px;
+  margin-top: 10px;
+  font-weight: 500;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 .detail-country .country-flag {
-  font-size: 17px;
+  font-size: 15px;
 }
-.subregion-label {
-  display: inline-block;
+.detail-coordinates {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 1px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  color: var(--text);
+  background: var(--panel);
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
   font-size: 10px;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.detail-coordinates > svg {
   color: var(--muted);
-  line-height: 1;
-  margin-top: 16px;
+  flex-shrink: 0;
+}
+.detail-coordinates > div {
+  display: flex;
+  flex-direction: column;
   border-left: 1px solid var(--line);
-  padding: 1px 0 1px 9px;
+  padding-left: 7px;
 }
 .detail-facts {
-  margin-top: 39px;
+  margin-top: 24px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
 }
-.detail-facts > div {
+.detail-fact-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  padding: 17px 0;
-  border-bottom: 1px solid var(--line);
-  min-height: 53px;
+  gap: 12px;
+  padding: 12px 0;
+  min-height: 56px;
   font-size: 12px;
 }
-.detail-facts > div > span {
+.detail-fact-row + .detail-fact-row {
+  border-top: 1px solid var(--line);
+}
+.detail-fact-row > label,
+.detail-fact-row > span:first-child {
   color: var(--muted);
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  font-weight: 500;
 }
-.detail-facts strong {
+.detail-fact-row strong {
   font-size: 11px;
-  font-weight: 400;
-  display: flex;
-  align-items: center;
-  gap: 4px;
+  font-weight: 500;
   text-align: right;
+  overflow-wrap: anywhere;
 }
-.detail-facts .is-visited {
+.status-picker {
+  position: relative;
+  min-width: 124px;
+  flex-shrink: 0;
+  background: var(--status-tint);
+  color: var(--status-ink);
+  border: 1px solid
+    color-mix(in srgb, var(--status-ink) 20%, var(--status-tint));
+  border-radius: 7px;
+}
+.status-picker select {
+  appearance: none;
+  width: 100%;
+  min-height: 36px;
+  padding: 7px 36px 7px 10px;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  color: inherit;
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 20px;
+  cursor: pointer;
+}
+.status-picker select option {
+  background: var(--surface);
+  color: var(--text);
+}
+.status-picker:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 30px;
+  border-left: 1px solid currentColor;
+  opacity: 0.15;
+  pointer-events: none;
+}
+.status-picker > svg {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.status-picker:hover {
+  box-shadow: 0 0 0 1px var(--line);
+}
+.visit-value {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.visit-value-visited {
   color: var(--visit-text);
+}
+.visit-value-planned {
+  color: #765095;
+}
+.status-save-error {
+  margin-top: 12px;
+  color: #805c1c;
+  font-size: 11px;
+  line-height: 1.6;
 }
 .annotated-button {
   background: var(--action);
   color: var(--on-accent);
   width: 100%;
   border-radius: 7px;
-  min-height: 55px;
-  padding: 14px 15px;
+  min-height: 48px;
+  padding: 12px 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  font-size: 12px;
-  font-weight: 500;
-  margin-top: 28px;
-  letter-spacing: 0.1px;
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 20px;
+  margin-top: 24px;
 }
 .annotated-button:hover {
   background: var(--action-hover);
@@ -850,19 +955,13 @@ h2 {
 .annotated-button svg:last-child {
   margin-left: auto;
 }
-.map-action-caption {
-  font-size: 8px;
-  color: var(--muted);
-  text-align: center;
-  margin-top: 11px;
-}
 .no-map-card {
   display: flex;
   gap: 12px;
   padding: 17px 14px;
   border: 1px dashed var(--line);
   border-radius: 7px;
-  margin-top: 28px;
+  margin-top: 24px;
   color: var(--muted);
 }
 .no-map-card > svg {
@@ -880,61 +979,23 @@ h2 {
   color: var(--muted);
 }
 .notes-section {
-  margin-top: 36px;
+  margin-top: 24px;
 }
 .notes-section h2 {
-  font-size: 8px;
-  letter-spacing: 1.6px;
+  font-size: 11px;
+  font-weight: 650;
   color: var(--muted);
   display: flex;
   align-items: center;
   gap: 7px;
 }
 .notes-section p {
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.85;
   color: var(--text);
   margin-top: 13px;
   white-space: pre-wrap;
-}
-.detail-location {
-  margin-top: 39px;
-}
-.detail-location > span {
-  font-size: 7px;
-  letter-spacing: 1.8px;
-  color: var(--muted);
-}
-.detail-location p {
-  font-size: 9px;
-  color: var(--muted);
-  display: flex;
-  gap: 6px;
-  align-items: center;
-  font-variant-numeric: tabular-nums;
-  margin-top: 9px;
-}
-.detail-location b {
-  font-weight: 400;
-  padding: 0 3px;
-  color: var(--muted);
-}
-.detail-bottom {
-  margin: 0 27px;
-  border-top: 1px solid var(--line);
-  padding: 20px 0 24px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: var(--muted);
-}
-.detail-bottom p {
-  font-size: 10px;
-  line-height: 1.7;
-  color: var(--muted);
-}
-.detail-bottom p span {
-  color: var(--muted);
+  overflow-wrap: anywhere;
 }
 .map-viewer {
   position: absolute;
@@ -1063,27 +1124,8 @@ h2 {
   .city-row-name {
     font-size: 16px;
   }
-  .detail-top {
-    padding: 32px;
-  }
-  .city-detail {
-    padding: 25px 32px;
-  }
   .city-detail h1 {
-    font-size: 52px;
-  }
-  .detail-facts > div {
-    font-size: 14px;
-  }
-  .detail-facts strong {
-    font-size: 12px;
-  }
-  .annotated-button {
-    font-size: 14px;
-    min-height: 61px;
-  }
-  .detail-bottom {
-    margin: 0 32px;
+    font-size: 34px;
   }
 }
 @media (max-width: 1100px) {
@@ -1125,21 +1167,6 @@ h2 {
   .coordinates {
     left: 20px;
     font-size: 7px;
-  }
-  .detail-top {
-    padding: 25px 23px;
-  }
-  .city-detail {
-    padding: 22px 23px;
-  }
-  .detail-bottom {
-    margin: 0 23px;
-  }
-  .detail-facts > div {
-    font-size: 11px;
-  }
-  .detail-facts strong {
-    font-size: 10px;
   }
   .viewer-header {
     gap: 14px;
@@ -1229,47 +1256,8 @@ h2 {
   .coordinates {
     display: none;
   }
-  .detail-top {
-    padding: 24px 19px;
-  }
-  .city-detail {
-    padding: 16px 19px 23px;
-  }
   .city-detail h1 {
-    font-size: 41px;
-  }
-  .detail-geography {
-    font-size: 7px;
-  }
-  .detail-country {
-    font-size: 16px;
-  }
-  .detail-facts {
-    margin-top: 30px;
-  }
-  .detail-facts > div {
-    font-size: 10px;
-    gap: 6px;
-  }
-  .detail-facts strong {
-    font-size: 9px;
-  }
-  .detail-facts .status {
-    font-size: 9px;
-    padding: 5px 6px;
-  }
-  .annotated-button {
-    padding: 13px 12px;
-    font-size: 11px;
-  }
-  .annotated-button > svg:first-child {
-    width: 16px;
-  }
-  .detail-bottom {
-    margin: 0 19px;
-  }
-  .map-action-caption {
-    font-size: 7px;
+    font-size: 30px;
   }
   .viewer-title {
     display: none;
@@ -1365,60 +1353,18 @@ h2 {
   .maplibregl-ctrl-attrib {
     font-size: 8px !important;
   }
-  .detail-top {
-    padding: 23px 22px;
-  }
   .city-detail {
-    padding: 10px 22px 30px;
     overflow: visible;
     flex: none;
   }
   .city-detail h1 {
-    font-size: 44px;
-    margin-top: 11px;
-  }
-  .detail-geography {
-    font-size: 8px;
-  }
-  .detail-country {
-    font-size: 18px;
-  }
-  .detail-facts > div {
-    font-size: 12px;
-    padding: 17px 0;
-  }
-  .detail-facts strong {
-    font-size: 12px;
-  }
-  .detail-facts .status {
-    font-size: 10px;
-  }
-  .annotated-button {
-    font-size: 13px;
-    padding: 16px;
-    min-height: 55px;
-  }
-  .map-action-caption {
-    font-size: 9px;
-  }
-  .detail-bottom {
-    margin: 0 22px;
-    margin-top: auto;
-  }
-  .detail-index {
-    font-size: 10px;
+    font-size: 32px;
   }
   .no-map-card strong {
     font-size: 12px;
   }
   .no-map-card p {
     font-size: 11px;
-  }
-  .detail-location > span {
-    font-size: 8px;
-  }
-  .detail-location p {
-    font-size: 10px;
   }
   .viewer-is-open .map-stage {
     position: fixed;
@@ -1465,27 +1411,6 @@ h2 {
 }
 
 @media (min-width: 761px) {
-  .detail-facts > div {
-    font-size: 14px;
-  }
-  .detail-facts strong {
-    font-size: 12px;
-  }
-  .city-detail h1 {
-    font-size: 52px;
-  }
-  .annotated-button {
-    font-size: 14px;
-  }
-  .map-action-caption {
-    font-size: 9px;
-  }
-  .detail-geography {
-    font-size: 9px;
-  }
-  .subregion-label {
-    font-size: 11px;
-  }
   .map-legend span {
     font-size: 11px;
   }

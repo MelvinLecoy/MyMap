@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { MAP_STATUS_STORAGE_KEY } from "../../src/lib/status-storage";
 // Test the complete bundled atlas independently of external services.
 test.beforeEach(async ({ page }) => {
   await page.route("https://tiles.openfreemap.org/**", (r) => r.abort());
@@ -137,14 +138,140 @@ test("selecting a city, notes, visits, links, direct URLs and browser history", 
   await expect(
     page.getByRole("heading", { name: "Kyiv", exact: true }),
   ).toBeVisible();
-  await expect(
-    page.getByRole("button", { name: "View annotated map" }),
-  ).toBeVisible();
+  await expect(page.getByRole("button", { name: "View My Map" })).toBeVisible();
   await page.goto("/?city=not-a-real-city&view=map");
   await expect(
     page.getByRole("heading", { name: "Cities", exact: true }),
   ).toBeVisible();
   await expect(page).not.toHaveURL(/city=/);
+});
+test("detail design keeps coordinates beside the heading and the map action above status", async ({
+  page,
+}) => {
+  for (const width of [1600, 1440, 700, 360, 320]) {
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto("/?city=moscow-russia");
+    await page.evaluate(() => document.fonts.ready);
+    await expect(page.locator(".detail-geography")).toHaveText(
+      "Europe / East Europe / Ruslands",
+    );
+    await expect(page.locator(".detail-total")).toHaveText("5");
+    await expect(page.locator(".detail-coordinates")).toContainText(
+      "55.7522° N",
+    );
+    await expect(page.locator(".detail-coordinates")).toContainText(
+      "37.6156° E",
+    );
+    const heading = await page
+      .getByRole("heading", { name: "Moscow", exact: true })
+      .boundingBox();
+    const coordinates = await page.locator(".detail-coordinates").boundingBox();
+    const action = await page
+      .getByRole("button", { name: "View My Map" })
+      .boundingBox();
+    const facts = await page.locator(".detail-facts").boundingBox();
+    expect(heading!.height).toBeLessThan(42);
+    expect(coordinates!.x).toBeGreaterThanOrEqual(heading!.x + heading!.width);
+    expect(action!.y + action!.height).toBeLessThan(facts!.y);
+    await expect(page.locator(".city-panel")).not.toContainText(
+      /Your layers|ON THE GLOBE|Every place has a story|Visit not recorded/,
+    );
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+  }
+});
+test("status edits survive reloads, synchronize tabs, and update list filters independently of visits", async ({
+  page,
+  context,
+}) => {
+  await page.goto("/?city=moscow-russia");
+  const status = page.getByRole("combobox", {
+    name: "Map status",
+    exact: true,
+  });
+  await expect(status).toHaveValue("Complete");
+  await status.selectOption("Update");
+  const otherTab = await context.newPage();
+  await otherTab.route("https://tiles.openfreemap.org/**", (route) =>
+    route.abort(),
+  );
+  await otherTab.goto("/?city=moscow-russia");
+  await expect(
+    otherTab.getByRole("combobox", { name: "Map status", exact: true }),
+  ).toHaveValue("Update");
+  await status.selectOption("Unfinished");
+  await expect(
+    otherTab.getByRole("combobox", { name: "Map status", exact: true }),
+  ).toHaveValue("Unfinished");
+  await otherTab
+    .getByRole("combobox", { name: "Map status", exact: true })
+    .selectOption("Not Started");
+  await expect(status).toHaveValue("Not Started");
+  await otherTab.close();
+  await status.selectOption("Update");
+  await page.reload();
+  await expect(status).toHaveValue("Update");
+  await expect(page.locator(".visit-value")).toHaveText("Not Yet");
+  await page.getByRole("button", { name: "All cities", exact: true }).click();
+  await expect(
+    page.locator(".city-row").filter({ hasText: "Moscow" }).locator(".status"),
+  ).toHaveText("Update");
+  await expect(
+    page.locator(".city-row").filter({ hasText: "Kyiv" }).locator(".status"),
+  ).toHaveText("Complete");
+  await page.getByLabel("Filter by map status").selectOption("Update");
+  await expect(page.locator(".city-row")).toHaveCount(2);
+  await expect(page.locator(".collection-bottom")).toHaveText(
+    /Visited\s*2\s*countries\s*1\s*city/,
+  );
+  await page.reload();
+  await expect(
+    page.locator(".city-row").filter({ hasText: "Moscow" }).locator(".status"),
+  ).toHaveText("Update");
+});
+test("corrupt saved data recovers and blocked storage keeps edits usable for the session", async ({
+  page,
+}) => {
+  await page.goto("/?city=moscow-russia");
+  await page.evaluate(
+    (key) => localStorage.setItem(key, "{broken"),
+    MAP_STATUS_STORAGE_KEY,
+  );
+  await page.reload();
+  const status = page.getByRole("combobox", {
+    name: "Map status",
+    exact: true,
+  });
+  await expect(status).toHaveValue("Complete");
+  await status.selectOption("Update");
+  await page.reload();
+  await expect(status).toHaveValue("Update");
+  await page.evaluate((key) => {
+    const original = Storage.prototype.setItem;
+    Storage.prototype.setItem = function (name, value) {
+      if (name === key)
+        throw new DOMException("Storage full", "QuotaExceededError");
+      return original.call(this, name, value);
+    };
+  }, MAP_STATUS_STORAGE_KEY);
+  await status.selectOption("Unfinished");
+  await expect(status).toHaveValue("Unfinished");
+  await expect(page.getByRole("status")).toContainText("couldn’t save");
+  await page.getByRole("button", { name: "All cities", exact: true }).click();
+  await expect(
+    page.locator(".city-row").filter({ hasText: "Moscow" }).locator(".status"),
+  ).toHaveText("Unfinished");
+  await page.locator(".city-row").filter({ hasText: "Kyiv" }).click();
+  await page
+    .getByRole("combobox", { name: "Map status", exact: true })
+    .selectOption("Not Started");
+  await page.getByRole("button", { name: "All cities", exact: true }).click();
+  await expect(
+    page.locator(".city-row").filter({ hasText: "Moscow" }).locator(".status"),
+  ).toHaveText("Unfinished");
 });
 test("viewer is lazy, canonical, accessible, and preserves filters and camera", async ({
   page,
@@ -163,7 +290,7 @@ test("viewer is lazy, canonical, accessible, and preserves filters and camera", 
   await expect(page.locator(".map-view-badge")).toContainText("Regional view");
   await page.waitForTimeout(1800);
   const position = await page.locator(".coordinates").textContent();
-  await page.getByRole("button", { name: "View annotated map" }).click();
+  await page.getByRole("button", { name: "View My Map" }).click();
   await expect(page).toHaveURL(/city=kyiv-ukraine&view=map/);
   await expect(page.locator("iframe")).toHaveCount(1);
   await expect(page.locator("iframe")).toHaveAttribute(
@@ -179,9 +306,7 @@ test("viewer is lazy, canonical, accessible, and preserves filters and camera", 
   await page.getByRole("button", { name: "Back to globe" }).click();
   await expect(page.locator("iframe")).toHaveCount(0);
   await expect(page.locator(".coordinates")).toHaveText(position!);
-  await expect(
-    page.getByRole("button", { name: "View annotated map" }),
-  ).toBeFocused();
+  await expect(page.getByRole("button", { name: "View My Map" })).toBeFocused();
   await page.getByRole("button", { name: "All cities" }).click();
   await expect(page.getByRole("textbox")).toHaveValue("Kyiv");
   await expect(page.getByLabel("Filter by map status")).toHaveValue("Complete");
@@ -235,7 +360,7 @@ test("360px layout and keyboard selection", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: "Prague", exact: true }),
   ).toBeVisible();
-  await expect(page.locator(".detail-facts")).toContainText("Not visited");
+  await expect(page.locator(".detail-facts")).toContainText("Not Yet");
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= window.innerWidth,
@@ -261,9 +386,7 @@ test("city list and map links survive unavailable WebGL", async ({ page }) => {
   await expect(page.locator(".city-row")).toHaveCount(5);
   await page.getByRole("textbox").fill("Moscow");
   await page.locator(".city-row").click();
-  await expect(
-    page.getByRole("button", { name: "View annotated map" }),
-  ).toBeVisible();
+  await expect(page.getByRole("button", { name: "View My Map" })).toBeVisible();
 });
 
 test("clusters expand and visible pins select their city", async ({ page }) => {
