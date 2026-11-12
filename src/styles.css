@@ -509,8 +509,8 @@ h2 {
 }
 .city-row {
   width: 100%;
-  min-height: 74px;
-  padding: 10px var(--collection-inset);
+  min-height: 72px;
+  padding: 8px var(--collection-inset);
   display: grid;
   grid-template-columns: 48px minmax(0, 1fr) auto 14px;
   gap: 10px;
@@ -521,8 +521,8 @@ h2 {
 .city-row:after {
   content: "";
   position: absolute;
-  left: var(--collection-inset);
-  right: var(--collection-inset);
+  left: 0;
+  right: 0;
   bottom: 0;
   border-bottom: 1px solid var(--line);
 }
@@ -1059,9 +1059,6 @@ h2 {
   }
   .city-panel {
     --collection-inset: 24px;
-  }
-  .city-row {
-    min-height: 78px;
   }
   .city-row-name {
     font-size: 16px;
