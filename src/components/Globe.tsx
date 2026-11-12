@@ -24,6 +24,7 @@ import {
   MAP_CONFIG,
   simplifyProviderStyle,
 } from "../lib/map-style";
+import { LABEL_FONTS, LABEL_SIZES } from "../lib/map-typography";
 import { MAP_COLORS } from "../lib/palette";
 import type { City, CountryVisit } from "../lib/types";
 import "maplibre-gl/dist/maplibre-gl.css";
@@ -92,6 +93,30 @@ export default function Globe({
     const decorate = () => {
       if (map.getSource("atlas-countries")) return;
       map.setProjection({ type: "globe" });
+      if (!map.hasImage("atlas-city-dot")) {
+        const size = 12;
+        const data = new Uint8Array(size * size * 4);
+        const color = MAP_COLORS.cityLabel
+          .match(/[a-f0-9]{2}/gi)!
+          .map((c) => parseInt(c, 16));
+        for (let y = 0; y < size; y++)
+          for (let x = 0; x < size; x++) {
+            const i = (y * size + x) * 4;
+            const alpha = Math.max(
+              0,
+              Math.min(
+                1,
+                4 - Math.hypot(x - size / 2 + 0.5, y - size / 2 + 0.5),
+              ),
+            );
+            data.set([...color, Math.round(alpha * 255)], i);
+          }
+        map.addImage(
+          "atlas-city-dot",
+          { width: size, height: size, data },
+          { pixelRatio: 2 },
+        );
+      }
       map.setSky({
         "sky-color": MAP_COLORS.sky,
         "horizon-color": MAP_COLORS.horizon,
@@ -210,21 +235,11 @@ export default function Globe({
           filter: filter as unknown as ExpressionSpecification,
           layout: {
             "text-field": ["get", "name"],
-            "text-font": ["Open Sans Semibold"],
-            "text-size": [
-              "interpolate",
-              ["linear"],
-              ["zoom"],
-              0,
-              10,
-              3,
-              12,
-              6,
-              16,
-            ],
+            "text-font": [LABEL_FONTS.country],
+            "text-size": LABEL_SIZES.country,
             "text-max-width": 8,
             "text-padding": 10,
-            "text-letter-spacing": 0.02,
+            "text-letter-spacing": 0.01,
           },
           paint: {
             "text-color": MAP_COLORS.label,
@@ -335,8 +350,8 @@ export default function Globe({
         filter: ["!", ["has", "point_count"]],
         layout: {
           "text-field": ["get", "name"],
-          "text-font": ["Open Sans Semibold"],
-          "text-size": 15,
+          "text-font": [LABEL_FONTS.city],
+          "text-size": LABEL_SIZES.city,
           "text-anchor": "left",
           "text-offset": [1, 0],
           "text-padding": 8,
@@ -345,7 +360,7 @@ export default function Globe({
         paint: {
           "text-color": MAP_COLORS.cityLabel,
           "text-halo-color": MAP_COLORS.cityLabelHalo,
-          "text-halo-width": 3,
+          "text-halo-width": 1.4,
         },
       });
       map.once("idle", () => setReady(true));

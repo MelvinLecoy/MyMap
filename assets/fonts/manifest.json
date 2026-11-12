@@ -1,0 +1,57 @@
+[
+  {
+    "name": "Noto Serif Semibold",
+    "file": "Noto Serif Semibold.ttf",
+    "sha256": "9af52e9084d870892746c9ed58e64c8da01bc24c351e9f97e400a4387851ce68",
+    "license": "Noto Serif Semibold.OFL.txt",
+    "ranges": [
+      0, 256, 512, 768, 1024, 1280, 4096, 6656, 7168, 7424, 7680, 7936, 8192,
+      8448, 8704, 9472, 11264, 11520, 11776, 42496, 42752, 43264, 43776, 64256,
+      65024, 65280
+    ],
+    "source": {
+      "url": "https://raw.githubusercontent.com/google/fonts/c30b221beb0c1da59d563feb91ec8656a1fa972a/ofl/notoserif/NotoSerif%5Bwdth,wght%5D.ttf",
+      "sha256": "4d8e6761424656867019081a1a01336f3cb086982682698714054fc33f782713",
+      "axes": {
+        "wght": 600,
+        "wdth": 100
+      }
+    }
+  },
+  {
+    "name": "Inter Semibold",
+    "file": "Inter Semibold.ttf",
+    "sha256": "845d36e8f66450d1312d760f83deda8b5216a81ecd34015b10f2f9a13c1ee198",
+    "license": "Inter Semibold.OFL.txt",
+    "ranges": [
+      0, 256, 512, 768, 1024, 1280, 3584, 7424, 7680, 7936, 8192, 8448, 8704,
+      8960, 9216, 9472, 9728, 9984, 10496, 10752, 11008, 11264, 11520, 11776,
+      42496, 42752, 43264, 57344, 57600, 57856, 60928, 62976, 65024
+    ],
+    "source": {
+      "url": "https://raw.githubusercontent.com/rsms/inter/353b61b9f4430d5f420d56605a6e7993e0941470/docs/font-files/InterVariable.ttf",
+      "sha256": "4989b125924991b90d05b2d16e0e388c48f7d5bb8b30539bbf9c755278d0ccaf",
+      "axes": {
+        "wght": 600,
+        "opsz": 14
+      }
+    }
+  },
+  {
+    "name": "Roboto Condensed Italic",
+    "file": "Roboto Condensed Italic.ttf",
+    "sha256": "6f62871c9a6ddda18bcf3d6f4b9086bcf022b69ce0948f4f6b0ae9c7d624e459",
+    "license": "Roboto Condensed Italic.OFL.txt",
+    "ranges": [
+      0, 256, 512, 768, 1024, 1280, 7680, 7936, 8192, 8448, 8704, 9472, 60928,
+      62976, 64256, 65024, 65280
+    ],
+    "source": {
+      "url": "https://raw.githubusercontent.com/google/fonts/c30b221beb0c1da59d563feb91ec8656a1fa972a/ofl/robotocondensed/RobotoCondensed-Italic%5Bwght%5D.ttf",
+      "sha256": "78f643b1923008b00dfc9b371a2ecd4d80a017722925f1a3fac9940be56d1b7d",
+      "axes": {
+        "wght": 400
+      }
+    }
+  }
+]

@@ -27,6 +27,7 @@ The sample includes Moscow and Kyiv's supplied My Maps links and illustrative re
 | `npm run data:import -- --demo`    | Import the sample explicitly                                        |
 | `npm run data:resolve-coordinates` | Optional offline GeoNames matching                                  |
 | `npm run atlas:prepare`            | Download, verify, simplify, and regenerate the bundled atlas        |
+| `npm run fonts:prepare`            | Optional: regenerate bundled glyphs from included font sources      |
 | `npm run typecheck`                | Check application, import scripts, and tests                        |
 | `npm test`                         | Run import and coordinate-resolution tests                          |
 | `npm run build`                    | Import real data, type check, and produce `dist/`                   |
@@ -111,6 +112,20 @@ Atlas assets in `public/atlas/` are generated from **Natural Earth 5.1.2** Admin
 
 All clustering and label thresholds live in `src/lib/map-style.ts`: radius 48, clustering through zoom 5, pin labels from zoom 4, and max zoom 10. The single MapLibre instance updates its existing GeoJSON source on filtering, resizes with its container, and cleans up on unmount. The viewer overlays it rather than destroying it, preserving the current camera.
 
+## Map label typography
+
+Geographic levels use separate bundled font families with compact, zoom-dependent sizes:
+
+- **Countries:** Noto Serif Semibold, about 13–18 px at regional and closer views (10.5 px at world scale).
+- **Cities:** Inter Semibold, about 12–14 px, with small locator dots for basemap cities.
+- **Subdivisions:** Roboto Condensed Italic, about 11–12 px, in a softer teal-gray.
+
+Native-language second lines use the same family at 85% size. Identical native/Latin names are shown once; source casing and Cyrillic characters are preserved. The optional basemap supplies its own city/subdivision data; when it is unavailable, the bundled countries and tracked-city labels still use their distinct fonts.
+
+Font families and sizes live in `src/lib/map-typography.ts`. The renderer reads local SDF `.pbf` glyphs in `public/fonts/`, including Latin and Kazakh/Cyrillic ranges. Normal installation, development, and production builds use these committed assets and need no font downloads or fonts installed on your computer.
+
+For maintainers, `npm run fonts:prepare` regenerates the glyphs from the static TTF sources in `assets/fonts/`. It uses a pinned, checksum-verified MapLibre font-maker WebAssembly build, with no native compiler. Its first run downloads the generator from `raw.githubusercontent.com`; subsequent runs use the verified local cache. Source font URLs, checksums, licenses, and variation axes are recorded in `assets/fonts/manifest.json`.
+
 ## Annotated maps and sharing
 
 A valid map's **View annotated map** button opens just that map's iframe in a focused viewer. Back/Escape closes it and restores focus. **Open in Google My Maps** always provides an external viewer link.
@@ -163,4 +178,4 @@ Coverage includes real WebGL globe startup, camera drag/zoom/reset, cluster expa
 - [Natural Earth](https://www.naturalearthdata.com/), public-domain geographic data.
 - [OpenFreeMap](https://openfreemap.org/) and [OpenStreetMap contributors](https://www.openstreetmap.org/copyright), optional basemap; provider attribution remains visible.
 - [GeoNames](https://www.geonames.org/export/), CC BY 4.0, when using the optional local coordinate resolver.
-- Open Sans glyphs from the MapLibre demo atlas; DM Sans from Fontsource. Fonts are bundled locally, with license files in `public/fonts/`.
+- Map label fonts: Noto Serif, Inter, and Roboto Condensed, under the SIL Open Font License. Open Sans glyphs from the MapLibre demo atlas are retained for cluster counts; DM Sans from Fontsource is used in the interface. Fonts and licenses are bundled locally. See `assets/fonts/manifest.json` and `public/fonts/`.

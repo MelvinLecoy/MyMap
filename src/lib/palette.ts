@@ -8,6 +8,7 @@ export const MAP_COLORS = {
   adminBoundary: "#a8bdb0",
   grid: "#a6c1bc",
   label: "#344f54",
+  subdivisionLabel: "#506f70",
   labelHalo: "#f7faf0",
   cityLabel: "#213e4a",
   cityLabelHalo: "#fdfffa",

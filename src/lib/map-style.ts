@@ -1,3 +1,4 @@
+import { bilingualPlaceName, providerTypography } from "./map-typography";
 import { MAP_COLORS } from "./palette";
 import type { StyleSpecification } from "maplibre-gl";
 import type { City, CountryVisit } from "./types";
@@ -47,7 +48,9 @@ export function simplifyProviderStyle(
       if (layer.type === "background") return true;
       if (layer.type === "symbol")
         return (
-          /state|province|city|town|place/.test(id) &&
+          /state|province|region|district|county|prefecture|city|town|place/.test(
+            id,
+          ) &&
           !/country|continent/.test(id) &&
           !/poi|road|water|village|neighbour|suburb|hamlet|island/.test(id)
         );
@@ -76,18 +79,35 @@ export function simplifyProviderStyle(
               : MAP_COLORS.land,
           },
         };
-      if (layer.type === "symbol")
+      if (layer.type === "symbol") {
+        const typography = providerTypography(layer);
         return {
           ...layer,
           minzoom: Math.max(layer.minzoom ?? 0, 5),
-          layout: { ...layer.layout, "text-font": ["Open Sans Semibold"] },
+          layout: {
+            ...layer.layout,
+            ...typography.layout,
+            ...(layer["source-layer"] === "place" ||
+            /name:latin|name:nonlatin/.test(
+              JSON.stringify(layer.layout?.["text-field"]),
+            )
+              ? { "text-field": bilingualPlaceName() }
+              : {}),
+          },
           paint: {
             ...layer.paint,
-            "text-color": MAP_COLORS.label,
+            "text-color": [
+              "case",
+              typography.isSubdivision,
+              MAP_COLORS.subdivisionLabel,
+              MAP_COLORS.cityLabel,
+            ],
             "text-halo-color": MAP_COLORS.labelHalo,
-            "text-halo-width": 1.2,
+            "text-halo-width": 1,
+            "text-opacity": 1,
           },
         };
+      }
       return layer;
     });
   return {
