@@ -1,0 +1,26 @@
+// The Paper palette is shared by the bundled atlas and optional provider style.
+// CSV colors remain explicit overrides of these defaults.
+export const MAP_COLORS = {
+  water: "#dde6e7",
+  land: "#f1e9db",
+  visitedCountry: "#a4ba97",
+  boundary: "#9b876d",
+  adminBoundary: "#b0a08b",
+  grid: "#a7aca0",
+  label: "#49443c",
+  labelHalo: "#fffaf1",
+  cityLabel: "#3d372f",
+  cityLabelHalo: "#fffdf7",
+  clusterFill: "#fffbf2",
+  clusterStroke: "#9e8d78",
+  clusterText: "#493f36",
+  clusterHalo: "#a4ba97",
+  selectionHalo: "#927c63",
+  pinVisited: "#e4a53d",
+  pinNotVisited: "#fffdf8",
+  pinUnknown: "#49443d",
+  pinOutline: "#837766",
+  pinSelectedOutline: "#fffdf8",
+  sky: "#f7f2e9",
+  horizon: "#bdd0d1",
+} as const;

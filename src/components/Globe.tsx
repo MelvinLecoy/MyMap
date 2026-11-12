@@ -24,6 +24,7 @@ import {
   MAP_CONFIG,
   simplifyProviderStyle,
 } from "../lib/map-style";
+import { MAP_COLORS } from "../lib/palette";
 import type { City, CountryVisit } from "../lib/types";
 import "maplibre-gl/dist/maplibre-gl.css";
 interface Props {
@@ -92,8 +93,8 @@ export default function Globe({
       if (map.getSource("atlas-countries")) return;
       map.setProjection({ type: "globe" });
       map.setSky({
-        "sky-color": "#0c1c28",
-        "horizon-color": "#91c8ca",
+        "sky-color": MAP_COLORS.sky,
+        "horizon-color": MAP_COLORS.horizon,
         "sky-horizon-blend": 0.2,
         "atmosphere-blend": ["interpolate", ["linear"], ["zoom"], 0, 0.6, 3, 0],
       });
@@ -138,7 +139,7 @@ export default function Globe({
           type: "line",
           source: "atlas-grid",
           paint: {
-            "line-color": "#9bc1c2",
+            "line-color": MAP_COLORS.grid,
             "line-opacity": 0.12,
             "line-width": 0.7,
           },
@@ -152,7 +153,7 @@ export default function Globe({
           source: "atlas-admin1",
           minzoom: 3.7,
           paint: {
-            "line-color": "#a5b9ad",
+            "line-color": MAP_COLORS.adminBoundary,
             "line-opacity": [
               "interpolate",
               ["linear"],
@@ -175,8 +176,8 @@ export default function Globe({
           type: "line",
           source: "atlas-countries",
           paint: {
-            "line-color": "#9bb6ad",
-            "line-opacity": 0.62,
+            "line-color": MAP_COLORS.boundary,
+            "line-opacity": 0.8,
             "line-width": [
               "interpolate",
               ["linear"],
@@ -226,8 +227,8 @@ export default function Globe({
             "text-letter-spacing": 0.02,
           },
           paint: {
-            "text-color": "#d3e1d9",
-            "text-halo-color": "#294842",
+            "text-color": MAP_COLORS.label,
+            "text-halo-color": MAP_COLORS.labelHalo,
             "text-halo-width": 1.1,
             "text-opacity": [
               "interpolate",
@@ -255,7 +256,7 @@ export default function Globe({
         filter: ["has", "point_count"],
         paint: {
           "circle-radius": 23,
-          "circle-color": "#aadcca",
+          "circle-color": MAP_COLORS.clusterHalo,
           "circle-opacity": 0.12,
         },
       });
@@ -266,9 +267,9 @@ export default function Globe({
         filter: ["has", "point_count"],
         paint: {
           "circle-radius": 16,
-          "circle-color": "#192f3c",
+          "circle-color": MAP_COLORS.clusterFill,
           "circle-stroke-width": 1.5,
-          "circle-stroke-color": "#a5cfbf",
+          "circle-stroke-color": MAP_COLORS.clusterStroke,
         },
       });
       map.addLayer({
@@ -281,7 +282,7 @@ export default function Globe({
           "text-font": ["Open Sans Semibold"],
           "text-size": 12,
         },
-        paint: { "text-color": "#e6f2ec" },
+        paint: { "text-color": MAP_COLORS.clusterText },
       });
       map.addLayer({
         id: "city-selection-halo",
@@ -290,7 +291,7 @@ export default function Globe({
         filter: ["==", ["get", "id"], current.current.selected?.id ?? ""],
         paint: {
           "circle-radius": 19,
-          "circle-color": "#d8f9ec",
+          "circle-color": MAP_COLORS.selectionHalo,
           "circle-opacity": 0.16,
         },
       });
@@ -315,8 +316,8 @@ export default function Globe({
           "circle-stroke-color": [
             "case",
             ["==", ["get", "id"], current.current.selected?.id ?? ""],
-            "#e4fff4",
-            "#b3cecf",
+            MAP_COLORS.pinSelectedOutline,
+            MAP_COLORS.pinOutline,
           ],
           "circle-stroke-width": [
             "case",
@@ -342,8 +343,8 @@ export default function Globe({
           "text-allow-overlap": false,
         },
         paint: {
-          "text-color": "#eff5f4",
-          "text-halo-color": "#112a3b",
+          "text-color": MAP_COLORS.cityLabel,
+          "text-halo-color": MAP_COLORS.cityLabelHalo,
           "text-halo-width": 3,
         },
       });
@@ -470,8 +471,8 @@ export default function Globe({
     map.setPaintProperty("city-pins", "circle-stroke-color", [
       "case",
       ["==", ["get", "id"], id],
-      "#e4fff4",
-      "#b3cecf",
+      MAP_COLORS.pinSelectedOutline,
+      MAP_COLORS.pinOutline,
     ]);
     map.setPaintProperty("city-pins", "circle-stroke-width", [
       "case",

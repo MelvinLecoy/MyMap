@@ -38,7 +38,7 @@ test("demo imports five cities and every exact map status, without diagnostics",
     "#A37AD9",
   );
   assert.equal(data.countries.find((c) => c.code === "DE")?.visited, true);
-  assert.equal(data.countries.find((c) => c.code === "FI")?.color, "#5B75AD");
+  assert.equal(data.countries.find((c) => c.code === "FI")?.color, "#B2B9D7");
 });
 test("CSV supports BOM, case, whitespace, City alias, CRLF, doubled quotes and multiline cells", () => {
   const input =

@@ -1,6 +1,6 @@
 # Elsewhere — a personal travel atlas
 
-A responsive, static travel globe inspired by the supplied reference: navy panels, blue-green geography, colored countries, city pins, a searchable collection, and focused city details. The map and city panel fill the browser window, with no outer header, navigation, footer, or page margins. Built with React, TypeScript, Vite, and MapLibre GL JS. No API key or backend is required.
+A responsive, static travel globe inspired by the supplied reference: a warm Paper palette with ivory panels, parchment land, pale blue-gray water, sage visited countries, and terracotta actions, plus city pins, a searchable collection, and focused city details. The map and city panel fill the browser window, with no outer header, navigation, footer, or page margins. Built with React, TypeScript, Vite, and MapLibre GL JS. No API key or backend is required.
 
 ## Run on a Mac
 

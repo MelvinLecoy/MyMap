@@ -1,3 +1,4 @@
+import { MAP_COLORS } from "./palette";
 import type { StyleSpecification } from "maplibre-gl";
 import type { City, CountryVisit } from "./types";
 import type { FeatureCollection, Point } from "geojson";
@@ -31,7 +32,7 @@ export function localStyle(): StyleSpecification {
       {
         id: "ocean",
         type: "background",
-        paint: { "background-color": "#183b4b" },
+        paint: { "background-color": MAP_COLORS.water },
       },
     ],
     projection: { type: "globe" },
@@ -63,14 +64,16 @@ export function simplifyProviderStyle(
       if (layer.type === "background")
         return {
           ...layer,
-          paint: { ...layer.paint, "background-color": "#183b4b" },
+          paint: { ...layer.paint, "background-color": MAP_COLORS.water },
         };
       if (layer.type === "fill")
         return {
           ...layer,
           paint: {
             ...layer.paint,
-            "fill-color": /water/.test(layer.id) ? "#183b4b" : "#405e5b",
+            "fill-color": /water/.test(layer.id)
+              ? MAP_COLORS.water
+              : MAP_COLORS.land,
           },
         };
       if (layer.type === "symbol")
@@ -80,8 +83,8 @@ export function simplifyProviderStyle(
           layout: { ...layer.layout, "text-font": ["Open Sans Semibold"] },
           paint: {
             ...layer.paint,
-            "text-color": "#d1dfda",
-            "text-halo-color": "#294943",
+            "text-color": MAP_COLORS.label,
+            "text-halo-color": MAP_COLORS.labelHalo,
             "text-halo-width": 1.2,
           },
         };
@@ -110,10 +113,10 @@ export function cityFeatures(cities: City[]): FeatureCollection<Point> {
                 color:
                   c.pinColor ??
                   (c.visit === "visited"
-                    ? "#ffd08a"
+                    ? MAP_COLORS.pinVisited
                     : c.visit === "not-visited"
-                      ? "#a5bbc6"
-                      : "#152c3c"),
+                      ? MAP_COLORS.pinNotVisited
+                      : MAP_COLORS.pinUnknown),
               },
             },
           ]
@@ -122,14 +125,14 @@ export function cityFeatures(cities: City[]): FeatureCollection<Point> {
   };
 }
 export function fillColors(countries: CountryVisit[]): string | unknown[] {
-  if (!countries.length) return "#405e5b";
+  if (!countries.length) return MAP_COLORS.land;
   return [
     "match",
     ["get", "code"],
     ...countries.flatMap((c) => [
       c.code,
-      c.color || (c.visited ? "#4a9384" : "#405e5b"),
+      c.color || (c.visited ? MAP_COLORS.visitedCountry : MAP_COLORS.land),
     ]),
-    "#405e5b",
+    MAP_COLORS.land,
   ];
 }
