@@ -509,8 +509,8 @@ h2 {
 }
 .city-row {
   width: 100%;
-  min-height: 82px;
-  padding: 14px var(--collection-inset);
+  min-height: 74px;
+  padding: 10px var(--collection-inset);
   display: grid;
   grid-template-columns: 48px minmax(0, 1fr) auto 14px;
   gap: 10px;
@@ -549,8 +549,8 @@ h2 {
   white-space: nowrap;
 }
 .visit-marker-planned {
-  background: #e3f0f2;
-  color: #356d7b;
+  background: #efe7f7;
+  color: #765095;
 }
 .visit-marker-not-yet {
   background: #eaf0ec;
@@ -1061,7 +1061,7 @@ h2 {
     --collection-inset: 24px;
   }
   .city-row {
-    min-height: 86px;
+    min-height: 78px;
   }
   .city-row-name {
     font-size: 16px;
