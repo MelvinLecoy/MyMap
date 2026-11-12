@@ -310,6 +310,59 @@ test("names wrap between words while coordinates stay anchored and shrink only w
   }
 });
 
+for (const { name, before, after } of [
+  { name: "Ivano-Frankivsk", before: "Ivano-", after: "Frankivsk" },
+  { name: "Rostov-on-Don", before: "Rostov-", after: "on-Don" },
+  { name: "Yuzhno-Sakhalinsk", before: "Yuzhno-", after: "Sakhalinsk" },
+]) {
+  test(`hyphenated name ${name} wraps as ${before} / ${after}`, async ({
+    page,
+  }) => {
+    for (const width of [1600, 1440, 700, 360, 320, 600]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto(`/?city=${encodeURIComponent(city(name).id)}`);
+      await page.evaluate(() => document.fonts.ready);
+      const heading = page.getByRole("heading", { name, exact: true });
+      await expect(heading).toHaveText(name);
+      const parts = heading.locator(".detail-name-part");
+      await expect(parts).toHaveText([before, after]);
+      const title = (await heading.boundingBox())!;
+      const prefix = (await parts.nth(0).boundingBox())!;
+      const suffix = (await parts.nth(1).boundingBox())!;
+      for (const part of [prefix, suffix]) {
+        expect(part.x).toBeGreaterThanOrEqual(title.x);
+        expect(part.x + part.width).toBeLessThanOrEqual(
+          title.x + title.width + 0.5,
+        );
+        expect(part.height).toBeCloseTo(prefix.height, 0);
+      }
+      if (prefix.width + suffix.width > title.width + 0.5) {
+        expect(suffix.y).toBeGreaterThan(prefix.y);
+        expect(suffix.x).toBeCloseTo(prefix.x, 0);
+      } else {
+        expect(suffix.y).toBeCloseTo(prefix.y, 0);
+      }
+      const coordinates = page.locator(".detail-coordinates");
+      const location = (await coordinates.boundingBox())!;
+      expect(location.x).toBeGreaterThanOrEqual(title.x + title.width);
+      expect(location.y).toBeGreaterThanOrEqual(title.y);
+      expect(location.y).toBeLessThan(title.y + title.height);
+      await expect(page.locator(".detail-identity--stacked")).toHaveCount(0);
+      if (width === 1600 || width === 600)
+        await expect(coordinates).toHaveCSS("font-size", "12px");
+      await expect(heading).toHaveCSS(
+        "font-size",
+        `${width >= 1600 ? 34 : width > 600 && width <= 760 ? 30 : 32}px`,
+      );
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      ).toBe(true);
+    }
+  });
+}
+
 test("coordinate sizing resets when space or the selected city changes", async ({
   page,
 }) => {

@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import Globe from "./components/Globe";
 import MapViewer from "./components/MapViewer";
+import CityName from "./components/CityName";
 import atlas from "./generated/atlas.json";
 import { useCoordinateLayout } from "./lib/use-coordinate-layout";
 import {
@@ -373,7 +374,9 @@ export default function App() {
                     className={`detail-identity detail-identity--${coordinateLayout}`}
                   >
                     <div>
-                      <h1>{selected.name}</h1>
+                      <h1>
+                        <CityName name={selected.name} />
+                      </h1>
                       <p className="detail-country">
                         <Flag code={selected.countryCode} />
                         {selected.country}

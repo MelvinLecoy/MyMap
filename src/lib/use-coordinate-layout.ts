@@ -17,7 +17,7 @@ export function useCoordinateLayout(cityId: string | undefined) {
     const measure = () => {
       if (disposed) return;
       // Measure the original typography independently of the current layout.
-      // Only the longest word needs to fit; spaces remain natural line breaks.
+      // Measure unbreakable words or the two sides of the chosen hyphen break.
       const probe = element.cloneNode(true) as HTMLDivElement;
       probe.className = "detail-identity";
       probe.setAttribute("aria-hidden", "true");
@@ -36,17 +36,19 @@ export function useCoordinateLayout(cityId: string | undefined) {
       heading.style.whiteSpace = "nowrap";
       element.after(probe);
       try {
-        const text = heading.firstChild!;
+        const hyphenParts = [...heading.querySelectorAll(".detail-name-part")];
         const range = document.createRange();
-        const longestWord = Math.max(
-          ...[...heading.textContent!.matchAll(/\S+/g)].map((word) => {
-            range.setStart(text, word.index!);
-            range.setEnd(text, word.index! + word[0].length);
-            return range.getBoundingClientRect().width;
-          }),
+        const longestPart = Math.max(
+          ...(hyphenParts.length
+            ? hyphenParts.map((part) => part.getBoundingClientRect().width)
+            : [...heading.textContent!.matchAll(/\S+/g)].map((word) => {
+                range.setStart(heading.firstChild!, word.index!);
+                range.setEnd(heading.firstChild!, word.index! + word[0].length);
+                return range.getBoundingClientRect().width;
+              })),
         );
         const fits = () =>
-          longestWord +
+          longestPart +
             coordinates.getBoundingClientRect().width +
             parseFloat(getComputedStyle(probe).columnGap) <=
           element.clientWidth;

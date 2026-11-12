@@ -784,6 +784,9 @@ h2 {
   line-height: 1.12;
   overflow-wrap: normal;
 }
+.detail-name-part {
+  white-space: nowrap;
+}
 .detail-country {
   font-size: 15px;
   color: var(--muted);
@@ -813,6 +816,9 @@ h2 {
 }
 .detail-identity--compact {
   column-gap: 8px;
+}
+.detail-identity--compact:has(.detail-name-part) {
+  column-gap: 6px;
 }
 .detail-identity--compact .detail-coordinates {
   padding-left: 8px;
