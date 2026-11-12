@@ -17,8 +17,12 @@ import {
 import Globe from "./components/Globe";
 import MapViewer from "./components/MapViewer";
 import CityName from "./components/CityName";
+import EditorControls from "./components/EditorControls";
 import atlas from "./generated/atlas.json";
 import { useCoordinateLayout } from "./lib/use-coordinate-layout";
+import { useRemoteAtlas } from "./lib/use-remote-atlas";
+import { supabase } from "./lib/supabase";
+import { deriveCountries } from "./lib/cloud-data";
 import {
   COLLECTION_STATUS_STORAGE_KEY,
   MAP_STATUS_STORAGE_KEY,
@@ -90,6 +94,7 @@ function VisitMarker({
   );
 }
 export default function App() {
+  const cloud = useRemoteAtlas(data, data.demo ? null : supabase);
   const [route, setRoute] = useState(readRoute);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("all");
@@ -100,12 +105,14 @@ export default function App() {
   const [saveErrorCity, setSaveErrorCity] = useState<string | null>(null);
   const cities = useMemo(
     () =>
-      data.cities.map((city) =>
-        Object.hasOwn(statusOverrides, city.id)
-          ? { ...city, status: statusOverrides[city.id] }
-          : city,
-      ),
-    [statusOverrides],
+      cloud.enabled
+        ? cloud.cities
+        : data.cities.map((city) =>
+            Object.hasOwn(statusOverrides, city.id)
+              ? { ...city, status: statusOverrides[city.id] }
+              : city,
+          ),
+    [statusOverrides, cloud.enabled, cloud.cities],
   );
   const searchRef = useRef<HTMLInputElement>(null);
   const viewerButton = useRef<HTMLButtonElement>(null);
@@ -115,6 +122,10 @@ export default function App() {
   );
   const viewer = Boolean(route.view && selected?.map);
   const updateMapStatus = (id: string, value: MapStatus) => {
+    if (cloud.enabled) {
+      void cloud.saveStatus(id, value);
+      return;
+    }
     const next = { ...statusOverrides, [id]: value };
     setStatusOverrides(next);
     setSaveErrorCity(saveStatusOverrides(next, statusStorageKey) ? null : id);
@@ -147,10 +158,11 @@ export default function App() {
     return () => window.removeEventListener("popstate", listener);
   }, []);
   useEffect(() => {
+    if (cloud.enabled && !cloud.ready) return;
     if (route.city && !selected) navigate(null, false, true);
     else if (route.view && !selected?.map)
       navigate(selected?.id ?? null, false, true);
-  }, [route.city, route.view, selected, navigate]);
+  }, [route.city, route.view, selected, navigate, cloud.enabled, cloud.ready]);
   useEffect(() => {
     const key = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
@@ -163,9 +175,8 @@ export default function App() {
     return () => window.removeEventListener("keydown", key);
   }, [selected, navigate]);
   const continents = useMemo(
-    () =>
-      [...new Set(data.cities.map((c) => c.continent).filter(Boolean))].sort(),
-    [],
+    () => [...new Set(cities.map((c) => c.continent).filter(Boolean))].sort(),
+    [cities],
   );
   const filtered = useMemo(() => {
     const query = search
@@ -186,8 +197,13 @@ export default function App() {
       )
       .sort((a, b) => a.name.localeCompare(b.name));
   }, [search, status, continent, cities]);
-  const visited = data.cities.filter((c) => c.visit === "visited").length;
-  const countries = data.countries.filter((c) => c.visited).length;
+  const countryData = useMemo(
+    () =>
+      cloud.enabled ? deriveCountries(cities, data.countries) : data.countries,
+    [cloud.enabled, cities],
+  );
+  const visited = cities.filter((c) => c.visit === "visited").length;
+  const countries = countryData.filter((c) => c.visited).length;
   const closeViewer = useCallback(() => {
     navigate(selected?.id ?? null);
     setTimeout(() => viewerButton.current?.focus(), 0);
@@ -198,7 +214,7 @@ export default function App() {
         <div className="map-stage">
           <Globe
             cities={filtered}
-            countries={data.countries}
+            countries={countryData}
             selected={selected}
             onSelect={(id) => navigate(id)}
             geonames={data.geonames}
@@ -222,7 +238,7 @@ export default function App() {
               <div className="panel-intro">
                 <div className="panel-heading">
                   <h1>Cities</h1>
-                  <span className="city-total">{data.cities.length}</span>
+                  <span className="city-total">{cities.length}</span>
                 </div>
               </div>
               <div className="collection-controls">
@@ -356,7 +372,7 @@ export default function App() {
                   onClick={() => navigate(null)}
                 >
                   <ArrowLeft size={17} aria-hidden="true" />
-                  <span>All cities ({data.cities.length})</span>
+                  <span>All cities ({cities.length})</span>
                 </button>
               </div>
               <div className="city-detail" key={selected.id}>
@@ -433,6 +449,18 @@ export default function App() {
                       <select
                         id="city-map-status"
                         value={selected.status}
+                        disabled={
+                          cloud.enabled &&
+                          (!cloud.canEdit ||
+                            !cloud.ready ||
+                            Boolean(cloud.loadError) ||
+                            Boolean(cloud.pending[selected.id]))
+                        }
+                        title={
+                          cloud.enabled && !cloud.canEdit
+                            ? "Sign in as the editor to change map status"
+                            : undefined
+                        }
                         onChange={(event) => {
                           const next = MAP_STATUSES.find(
                             (value) => value === event.target.value,
@@ -464,7 +492,12 @@ export default function App() {
                     </div>
                   )}
                 </div>
-                {saveErrorCity === selected.id && (
+                {cloud.enabled && cloud.saveError?.id === selected.id && (
+                  <p className="status-save-error" role="alert">
+                    {cloud.saveError.message}
+                  </p>
+                )}
+                {!cloud.enabled && saveErrorCity === selected.id && (
                   <p className="status-save-error" role="status">
                     Status changed for this session. Your browser couldn’t save
                     it for next time.
@@ -482,6 +515,7 @@ export default function App() {
               </div>
             </>
           )}
+          {cloud.enabled && <EditorControls cloud={cloud} />}
         </aside>
       </main>
     </div>

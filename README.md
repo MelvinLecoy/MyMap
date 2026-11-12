@@ -1,6 +1,6 @@
 # Elsewhere — a personal travel atlas
 
-A responsive, static travel globe inspired by the supplied reference: an airy Coastal palette with off-white panels, pale blue water, light neutral land, mint visited countries, and mint actions with dark text, plus city pins, a searchable collection, and focused city details. The map and city panel fill the browser window, with no outer header, navigation, footer, or page margins. Built with React, TypeScript, Vite, and MapLibre GL JS. No API key or backend is required.
+A responsive, static travel globe inspired by the supplied reference: an airy Coastal palette with off-white panels, pale blue water, light neutral land, mint visited countries, and mint actions with dark text, plus city pins, a searchable collection, and focused city details. The map and city panel fill the browser window, with no outer header, navigation, footer, or page margins. Built with React, TypeScript, Vite, and MapLibre GL JS. The static CSV version runs without a backend. Optional Supabase integration adds owner sign-in and persistent status saves across devices; see [docs/supabase.md](docs/supabase.md).
 
 The repository includes the reviewed **321-entry collection**, its latest uploaded source CSV, and **319 matched locations**. All visits start as **Not Yet**. Iguazu and Lofoten are intentionally unplaced. See [data/IMPORT_NOTES.md](data/IMPORT_NOTES.md) for matching decisions and provenance.
 
@@ -41,7 +41,7 @@ Five-city fixtures remain in `fixtures/` for explicit demo builds and regression
 
 ## Add your collection
 
-The city-detail page has an editable **Map status** dropdown. Changes immediately update the list, its status filter, and other open tabs. They are saved in this browser for this site and survive refreshes; they do not sync across devices or change the source CSV or GitHub. Clearing this site's browser storage restores the imported statuses. If the browser cannot save a change, it stays active for the current session and the page reports that it could not be saved.
+Without Supabase configured, the city-detail page has an editable **Map status** dropdown. Changes immediately update the list, its status filter, and other open tabs. They are saved in this browser for this site and survive refreshes; they do not sync across devices or change the source CSV or GitHub. Clearing this site's browser storage restores the imported statuses. If the browser cannot save a change, it stays active for the current session and the page reports that it could not be saved.
 
 The ready-to-run **`data/cities.csv`** and **`data/coordinates.csv`** are tracked in Git. The latest uploaded original is preserved in `data/MyMap_Converted_Full.csv`; runtime normalization and approved country-code choices are documented in `data/IMPORT_NOTES.md`. To replace or extend the collection, update the prepared UTF-8 `data/cities.csv`. Keep these headers (case and surrounding whitespace do not matter; `City` is accepted as an alias for `Cities`):
 
@@ -144,6 +144,10 @@ Shareable URLs work without server rewrites:
 Reload and browser Back are supported. Unknown city IDs return to a usable collection. Search and filters remain intact while opening/closing the viewer in the current session (they are not serialized into the URL).
 
 Google controls the embedded content and access. Set the original My Map to **Anyone with the link** / publicly viewable in Google My Maps and verify it in a signed-out or private browser before publishing. An iframe `load` event means navigation finished, not that Google granted access. The two supplied live embeds could not be validated here because this environment blocks `www.google.com`; browser tests use an explicit mock for viewer navigation and verify the actual canonical URL. They do not claim Google's map contents loaded.
+
+## Persistent saving with Supabase
+
+Set both `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` to enable the database-backed collection. In that mode, visitors have read-only access; the configured editor signs in by email link and saves statuses to PostgreSQL. Browser-only overrides are imported only after explicit owner review. Privileged credentials are never bundled. See [docs/supabase.md](docs/supabase.md) for cloud provisioning, permissions, migration, export, and verification.
 
 ## Build and deploy
 
