@@ -39,6 +39,16 @@ function user(id: string) {
     created_at: "2026-01-01T00:00:00Z",
   };
 }
+function session(id: string) {
+  return {
+    access_token: token(id),
+    refresh_token: "fixture-refresh",
+    token_type: "bearer",
+    expires_in: 3600,
+    expires_at: Math.floor(Date.now() / 1000) + 3600,
+    user: user(id),
+  };
+}
 function store() {
   return {
     rows: new Map(
@@ -52,6 +62,17 @@ function store() {
     imports: 0,
     otp: null as null | Record<string, unknown>,
     redirect: "",
+    passwordAttempts: [] as Array<{ email: string; password: string }>,
+    passwordError: null as string | null,
+    passwordStatus: 400,
+    passwordUser: ownerId,
+    passwordGate: null as Promise<void> | null,
+    passwordUpdates: [] as string[],
+    passwordUpdateError: null as string | null,
+    recovery: null as Record<string, unknown> | null,
+    expiredSession: false,
+    refreshError: false,
+    callbackError: false,
   };
 }
 type Store = ReturnType<typeof store>;
@@ -72,7 +93,7 @@ async function backend(
   local?: Record<string, string>,
 ) {
   await context.addInitScript(
-    ({ id, local, sessionKey, localKey, accessToken }) => {
+    ({ id, local, sessionKey, localKey, accessToken, expired }) => {
       if (local && !sessionStorage.getItem("fixture-local-seeded")) {
         localStorage.setItem(localKey, JSON.stringify(local));
         sessionStorage.setItem("fixture-local-seeded", "yes");
@@ -85,7 +106,7 @@ async function backend(
             refresh_token: "fixture-refresh",
             token_type: "bearer",
             expires_in: 3600,
-            expires_at: Math.floor(Date.now() / 1000) + 3600,
+            expires_at: Math.floor(Date.now() / 1000) + (expired ? -60 : 3600),
             user: {
               id,
               aud: "authenticated",
@@ -107,6 +128,7 @@ async function backend(
       sessionKey,
       localKey: COLLECTION_STATUS_STORAGE_KEY,
       accessToken: id ? token(id) : "",
+      expired: state.expiredSession,
     },
   );
   await context.route("https://tiles.openfreemap.org/**", (r) => r.abort());
@@ -135,14 +157,59 @@ async function backend(
           "access-control-allow-origin": "*",
           "access-control-allow-headers": "*",
           "access-control-allow-methods": "GET,POST,PATCH,OPTIONS",
+          "access-control-expose-headers": "x-supabase-api-version",
+          "x-supabase-api-version": "2024-01-01",
         },
       });
     if (method === "OPTIONS") return reply({});
-    if (url.pathname === "/auth/v1/user") return reply(user(caller ?? ownerId));
+    if (url.pathname === "/auth/v1/token") {
+      if (url.searchParams.get("grant_type") === "pkce" && state.callbackError)
+        return reply(
+          { code: "flow_state_expired", message: "Auth code expired" },
+          400,
+        );
+      if (url.searchParams.get("grant_type") === "password") {
+        state.passwordAttempts.push(request.postDataJSON());
+        if (state.passwordGate) await state.passwordGate;
+        if (state.passwordError)
+          return reply(
+            { code: state.passwordError, message: "Invalid login credentials" },
+            state.passwordStatus,
+          );
+      }
+      if (
+        url.searchParams.get("grant_type") === "refresh_token" &&
+        state.refreshError
+      )
+        return reply(
+          { code: "refresh_token_not_found", message: "Invalid Refresh Token" },
+          400,
+        );
+      return reply(session(state.passwordUser));
+    }
+    if (url.pathname === "/auth/v1/user") {
+      if (method === "PUT") {
+        state.passwordUpdates.push(request.postDataJSON().password);
+        if (state.passwordUpdateError)
+          return reply(
+            {
+              code: state.passwordUpdateError,
+              message: "Password update rejected",
+            },
+            422,
+          );
+      }
+      return reply(user(caller ?? ownerId));
+    }
     if (url.pathname === "/auth/v1/logout")
       return route.fulfill({ status: 204 });
     if (url.pathname === "/auth/v1/otp") {
       state.otp = request.postDataJSON();
+      state.redirect = url.searchParams.get("redirect_to") ?? "";
+      return reply({});
+    }
+    if (url.pathname === "/auth/v1/recover") {
+      state.recovery = request.postDataJSON();
       state.redirect = url.searchParams.get("redirect_to") ?? "";
       return reply({});
     }
@@ -414,7 +481,7 @@ test("a stale reviewed import preserves browser data and imports nothing", async
   ).toEqual(local);
 });
 
-test("editor sign-in requests an existing account link and export contains the saved collection", async ({
+test("the email-link fallback requests an existing account without creating a user", async ({
   context,
   page,
 }) => {
@@ -422,6 +489,7 @@ test("editor sign-in requests an existing account link and export contains the s
   await backend(context, state);
   await page.goto("/");
   await page.getByRole("button", { name: "Editor sign in" }).click();
+  await page.getByRole("button", { name: "Use an email link instead" }).click();
   await page.getByLabel("Email address").fill("editor@example.test");
   await page.getByRole("button", { name: "Email sign-in link" }).click();
   await expect(page.getByText(/Check your email/)).toBeVisible();
@@ -451,4 +519,340 @@ test("the editor can export every city with saved statuses and nullable coordina
   expect(rows).toHaveLength(321);
   expect(rows.find((c) => c.CityId === "moscow-russia")!.Status).toBe("Update");
   expect(rows.filter((c) => c.Latitude && c.Longitude)).toHaveLength(319);
+});
+
+test("password sign-in stays on the selected city, shows real loading, and survives reload", async ({
+  context,
+  page,
+}) => {
+  const state = store();
+  let release!: () => void;
+  state.passwordGate = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  await backend(context, state);
+  await page.goto("/?city=moscow-russia");
+  await page
+    .getByRole("button", { name: "Editor sign in", exact: true })
+    .click();
+  await page
+    .getByLabel("Email address", { exact: true })
+    .fill("editor@example.test");
+  await page
+    .getByLabel("Password", { exact: true })
+    .fill("fixture-password-123");
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Signing in…", exact: true }),
+  ).toBeDisabled();
+  await expect(page.getByRole("dialog")).toHaveAttribute("aria-busy", "true");
+  await expect(page.locator(".editor-spinner")).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Close editor dialog" }),
+  ).toBeDisabled();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await expect.poll(() => state.passwordAttempts.length).toBe(1);
+  release();
+  await expect(page.getByRole("dialog")).not.toBeVisible();
+  await expect(page).toHaveURL(/\?city=moscow-russia$/);
+  await expect(page.getByLabel("Map status", { exact: true })).toBeEnabled();
+  expect(state.passwordAttempts).toEqual([
+    {
+      email: "editor@example.test",
+      password: "fixture-password-123",
+      gotrue_meta_security: {},
+    },
+  ]);
+  expect(state.otp).toBeNull();
+  await page.reload();
+  await expect(
+    page.getByRole("button", { name: "Sign out", exact: true }),
+  ).toBeVisible();
+  await expect(page.getByLabel("Map status", { exact: true })).toBeEnabled();
+});
+
+test("incorrect and rate-limited passwords remain read-only and a corrected retry can sign in", async ({
+  context,
+  page,
+}) => {
+  const state = store();
+  state.passwordError = "invalid_credentials";
+  await backend(context, state);
+  await page.goto("/?city=moscow-russia");
+  await page
+    .getByRole("button", { name: "Editor sign in", exact: true })
+    .click();
+  await page
+    .getByLabel("Email address", { exact: true })
+    .fill("editor@example.test");
+  await page
+    .getByLabel("Password", { exact: true })
+    .fill("incorrect-fixture-password");
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await expect(page.getByRole("alert")).toContainText(
+    "Email or password is incorrect",
+  );
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await expect(page.getByLabel("Map status", { exact: true })).toBeDisabled();
+  await expect(
+    page.getByRole("button", { name: "Sign in", exact: true }),
+  ).toBeEnabled();
+  state.passwordError = "over_request_rate_limit";
+  state.passwordStatus = 429;
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await expect(page.getByRole("alert")).toContainText(
+    "Too many sign-in attempts",
+  );
+  await expect(page.getByLabel("Map status", { exact: true })).toBeDisabled();
+  state.passwordError = null;
+  state.passwordStatus = 400;
+  await page
+    .getByLabel("Password", { exact: true })
+    .fill("fixture-password-123");
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await expect(page.getByRole("dialog")).not.toBeVisible();
+  await expect(page.getByLabel("Map status", { exact: true })).toBeEnabled();
+});
+
+test("network failures during password sign-in show an error and never grant editing", async ({
+  context,
+  page,
+}) => {
+  await backend(context, store());
+  await context.route(
+    `${fixtureOrigin}/auth/v1/token?grant_type=password`,
+    (route) => route.abort(),
+  );
+  await page.goto("/?city=moscow-russia");
+  await page
+    .getByRole("button", { name: "Editor sign in", exact: true })
+    .click();
+  await page
+    .getByLabel("Email address", { exact: true })
+    .fill("editor@example.test");
+  await page
+    .getByLabel("Password", { exact: true })
+    .fill("fixture-password-123");
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await expect(page.getByRole("alert")).toContainText("Couldn’t sign in");
+  await expect(page.getByLabel("Map status", { exact: true })).toBeDisabled();
+  await expect(
+    page.getByRole("button", { name: "Sign in", exact: true }),
+  ).toBeEnabled();
+});
+
+test("signed-in password setup validates confirmation and preserves the old password on errors", async ({
+  context,
+  page,
+}) => {
+  const state = store();
+  await backend(context, state, ownerId);
+  await page.goto("/?city=moscow-russia");
+  await page.getByRole("button", { name: "Set or change password" }).click();
+  await page
+    .getByLabel("New password", { exact: true })
+    .fill("fixture-new-password-123");
+  await page
+    .getByLabel("Confirm password", { exact: true })
+    .fill("fixture-different-password");
+  await page
+    .getByRole("button", { name: "Save password", exact: true })
+    .click();
+  await expect(page.getByRole("alert")).toContainText("passwords don’t match");
+  expect(state.passwordUpdates).toHaveLength(0);
+  await page
+    .getByLabel("Confirm password", { exact: true })
+    .fill("fixture-new-password-123");
+  state.passwordUpdateError = "weak_password";
+  await page
+    .getByRole("button", { name: "Save password", exact: true })
+    .click();
+  await expect(page.getByRole("alert")).toContainText(
+    "Your password hasn’t changed",
+  );
+  await expect(page.getByRole("dialog")).toBeVisible();
+  state.passwordUpdateError = null;
+  await page
+    .getByRole("button", { name: "Save password", exact: true })
+    .click();
+  await expect(page.getByRole("dialog")).not.toBeVisible();
+  await expect(page.getByLabel("Map status", { exact: true })).toBeEnabled();
+  await page.getByRole("button", { name: "Set or change password" }).click();
+  await expect(page.getByLabel("New password", { exact: true })).toHaveValue(
+    "",
+  );
+  await expect(
+    page.getByLabel("Confirm password", { exact: true }),
+  ).toHaveValue("");
+  expect(state.passwordUpdates).toEqual([
+    "fixture-new-password-123",
+    "fixture-new-password-123",
+  ]);
+});
+
+test("password recovery requests a PKCE reset link and returns to password sign-in", async ({
+  context,
+  page,
+}) => {
+  const state = store();
+  await backend(context, state);
+  await page.goto("/");
+  await page
+    .getByRole("button", { name: "Editor sign in", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Forgot password?", exact: true })
+    .click();
+  await page
+    .getByLabel("Email address", { exact: true })
+    .fill("editor@example.test");
+  await page
+    .getByRole("button", { name: "Send reset link", exact: true })
+    .click();
+  await expect(page.getByText(/a reset link is on its way/)).toBeVisible();
+  expect(state.recovery?.email).toBe("editor@example.test");
+  expect(state.recovery?.code_challenge_method).toBe("s256");
+  expect(new URL(state.redirect).origin).toBe("http://127.0.0.1:5180");
+  expect(state.otp).toBeNull();
+  await page.getByRole("button", { name: "Back to password sign in" }).click();
+  await expect(page.getByLabel("Password", { exact: true })).toBeVisible();
+});
+
+test("a verified recovery callback opens the new-password form and clears the callback code", async ({
+  context,
+  page,
+}) => {
+  const state = store();
+  await backend(context, state);
+  await context.addInitScript(
+    (key) =>
+      localStorage.setItem(key, JSON.stringify("fixture-verifier/recovery")),
+    `${sessionKey}-code-verifier`,
+  );
+  await page.goto("/?code=fixture-recovery-code");
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Set your password" }),
+  ).toBeVisible();
+  await expect(page).not.toHaveURL(/code=/);
+  await page
+    .getByLabel("New password", { exact: true })
+    .fill("fixture-recovered-password");
+  await page
+    .getByLabel("Confirm password", { exact: true })
+    .fill("fixture-recovered-password");
+  await page
+    .getByRole("button", { name: "Save password", exact: true })
+    .click();
+  await expect(page.getByRole("dialog")).not.toBeVisible();
+  expect(state.passwordUpdates).toEqual(["fixture-recovered-password"]);
+});
+
+test("an expired recovery link shows a useful error without granting access", async ({
+  context,
+  page,
+}) => {
+  const state = store();
+  state.callbackError = true;
+  await backend(context, state);
+  await context.addInitScript(
+    (key) =>
+      localStorage.setItem(key, JSON.stringify("fixture-verifier/recovery")),
+    `${sessionKey}-code-verifier`,
+  );
+  await page.goto("/?code=expired-fixture-code&city=moscow-russia");
+  await expect(
+    page.getByText(/That sign-in link is invalid or expired/),
+  ).toBeVisible();
+  await expect(page.getByLabel("Map status", { exact: true })).toBeDisabled();
+  await expect(
+    page.getByRole("button", { name: "Editor sign in", exact: true }),
+  ).toBeVisible();
+  expect(state.passwordUpdates).toHaveLength(0);
+});
+
+test("sign-out propagates to another tab and removes editing access in both", async ({
+  context,
+  page,
+  baseURL,
+}) => {
+  const state = store();
+  await backend(context, state, ownerId);
+  await page.goto("/?city=moscow-russia");
+  const other = await context.newPage();
+  await other.goto(`${baseURL}/?city=moscow-russia`);
+  await expect(page.getByLabel("Map status", { exact: true })).toBeEnabled();
+  await expect(other.getByLabel("Map status", { exact: true })).toBeEnabled();
+  await page.getByRole("button", { name: "Sign out", exact: true }).click();
+  await expect(page.getByLabel("Map status", { exact: true })).toBeDisabled();
+  await expect(other.getByLabel("Map status", { exact: true })).toBeDisabled();
+  await expect(
+    other.getByRole("button", { name: "Editor sign in", exact: true }),
+  ).toBeVisible();
+});
+
+test("an invalid expired session remains read-only and can sign in again on the same page", async ({
+  context,
+  page,
+}) => {
+  const state = store();
+  state.expiredSession = true;
+  state.refreshError = true;
+  await backend(context, state, ownerId);
+  await page.goto("/?city=moscow-russia");
+  await expect(
+    page.getByRole("button", { name: "Editor sign in", exact: true }),
+  ).toBeVisible();
+  await expect(page.getByLabel("Map status", { exact: true })).toBeDisabled();
+  await page
+    .getByRole("button", { name: "Editor sign in", exact: true })
+    .click();
+  await page
+    .getByLabel("Email address", { exact: true })
+    .fill("editor@example.test");
+  await page
+    .getByLabel("Password", { exact: true })
+    .fill("fixture-password-123");
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await expect(page.getByRole("dialog")).not.toBeVisible();
+  await expect(page.getByLabel("Map status", { exact: true })).toBeEnabled();
+});
+
+test("password controls fit a narrow screen, support reveal, and clear secrets on close", async ({
+  context,
+  page,
+}) => {
+  const state = store();
+  await backend(context, state);
+  await page.setViewportSize({ width: 320, height: 568 });
+  await page.goto("/");
+  await page
+    .getByRole("button", { name: "Editor sign in", exact: true })
+    .click();
+  await expect(page.getByLabel("Email address", { exact: true })).toBeFocused();
+  const password = page.getByLabel("Password", { exact: true });
+  await password.fill("fixture-password-123");
+  await page
+    .getByRole("button", { name: "Show password", exact: true })
+    .click();
+  await expect(password).toHaveAttribute("type", "text");
+  await page
+    .getByRole("button", { name: "Hide password", exact: true })
+    .click();
+  await expect(password).toHaveAttribute("type", "password");
+  await page
+    .getByRole("button", { name: "Show password", exact: true })
+    .click();
+  const size = await page
+    .getByRole("dialog")
+    .evaluate((el) => ({ width: el.clientWidth, scroll: el.scrollWidth }));
+  expect(size.scroll).toBeLessThanOrEqual(size.width);
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog")).not.toBeVisible();
+  await page
+    .getByRole("button", { name: "Editor sign in", exact: true })
+    .click();
+  await expect(password).toHaveValue("");
+  await expect(password).toHaveAttribute("type", "password");
 });

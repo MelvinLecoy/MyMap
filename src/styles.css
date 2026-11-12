@@ -913,6 +913,10 @@ h2 {
   align-items: center;
   gap: 6px;
 }
+.editor-tools > div {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
 .editor-tools button {
   padding: 4px;
   border-radius: 4px;
@@ -938,12 +942,16 @@ h2 {
   position: fixed;
   width: min(420px, calc(100vw - 32px));
   max-height: calc(100dvh - 32px);
+  overflow-y: auto;
   padding: 28px;
   border: 1px solid var(--line);
   border-radius: 12px;
   color: var(--text);
   background: var(--panel);
   box-shadow: 0 15px 60px #253f4c33;
+}
+.editor-dialog[open] {
+  animation: editor-enter 180ms ease-out;
 }
 .editor-dialog::backdrop {
   background: #253f4c66;
@@ -959,19 +967,47 @@ h2 {
   font-size: 13px;
   line-height: 1.6;
 }
-.editor-dialog form > label {
+.editor-dialog form > label,
+.editor-field > label {
   display: block;
   margin: 22px 0 8px;
   font-size: 12px;
   font-weight: 650;
 }
-.editor-dialog input[type="email"] {
+.editor-dialog input[type="email"],
+.editor-password-field input {
   width: 100%;
   padding: 11px 12px;
   border: 1px solid var(--border);
   border-radius: 6px;
   color: var(--text);
   background: var(--surface);
+}
+.editor-password-field {
+  position: relative;
+}
+.editor-password-field input {
+  padding-right: 44px;
+}
+.editor-password-toggle {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 4px;
+  color: var(--muted);
+}
+.editor-password-toggle:hover {
+  background: var(--surface-alt);
+}
+.editor-dialog input:focus-visible,
+.editor-dialog button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
 }
 .editor-close {
   position: absolute;
@@ -980,6 +1016,10 @@ h2 {
   padding: 5px;
 }
 .editor-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   width: 100%;
   margin-top: 20px;
   padding: 12px;
@@ -994,6 +1034,64 @@ h2 {
 }
 .editor-message {
   color: var(--accent) !important;
+}
+.editor-message-error {
+  color: var(--text) !important;
+}
+.editor-auth-options {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+  text-align: center;
+}
+.editor-auth-options button,
+.editor-back {
+  color: var(--accent);
+  font-size: 12px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.editor-auth-options p {
+  margin: 0;
+  font-size: 11px;
+}
+.editor-back {
+  display: block;
+  margin: 20px auto 0;
+}
+.editor-spinner {
+  animation: editor-spin 850ms linear infinite;
+}
+.editor-success {
+  display: grid;
+  place-items: center;
+  padding: 32px 0 16px;
+  text-align: center;
+}
+.editor-success > span {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--action);
+  color: var(--on-accent);
+  animation: editor-enter 220ms ease-out;
+}
+@keyframes editor-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes editor-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 .status-import-list {
   margin-top: 16px;

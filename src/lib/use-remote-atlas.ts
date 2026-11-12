@@ -15,6 +15,8 @@ export interface StatusImport {
   updated_at: string;
 }
 
+export const MIN_PASSWORD_LENGTH = 12;
+
 export function useRemoteAtlas(
   initial: AtlasData,
   client: SupabaseClient | null,
@@ -27,6 +29,8 @@ export function useRemoteAtlas(
   const [user, setUser] = useState<User | null>(null);
   const [canEdit, setCanEdit] = useState(false);
   const [authError, setAuthError] = useState("");
+  const [authVersion, setAuthVersion] = useState(0);
+  const [passwordRecovery, setPasswordRecovery] = useState(false);
   const [pending, setPending] = useState<Record<string, MapStatus>>({});
   const pendingRef = useRef(new Set<string>());
   const [saveError, setSaveError] = useState<{
@@ -97,22 +101,37 @@ export function useRemoteAtlas(
     alive.current = true;
     if (!client) return;
     void refresh();
+    client.auth.initialize().then(({ error }) => {
+      if (alive.current && error)
+        setAuthError(
+          "That sign-in link is invalid or expired. Request a new link and open it in the same browser.",
+        );
+    });
     client.auth
       .getSession()
       .then(({ data, error }) => {
         if (!alive.current) return;
         setUser(data.session?.user ?? null);
         if (error)
-          setAuthError("The sign-in link couldn’t be used. Request a new one.");
+          setAuthError("Your session couldn’t be restored. Sign in again.");
       })
       .catch(() => {
         if (alive.current)
           setAuthError("Couldn’t check your sign-in. Try signing in again.");
       });
     const { data: subscription } = client.auth.onAuthStateChange(
-      (_event, session) => {
+      (event, session) => {
         setCanEdit(false);
         setUser(session?.user ?? null);
+        // Supabase can emit a new event with the same user object. Always
+        // recheck permissions instead of leaving the editor disabled.
+        setAuthVersion((version) => version + 1);
+        if (event === "PASSWORD_RECOVERY") setPasswordRecovery(true);
+        if (event === "SIGNED_OUT") {
+          setPasswordRecovery(false);
+          setAuthError("");
+          setSaved(false);
+        }
       },
     );
     const onFocus = () => {
@@ -148,7 +167,7 @@ export function useRemoteAtlas(
     return () => {
       cancelled = true;
     };
-  }, [client, user]);
+  }, [client, user, authVersion]);
 
   const saveStatus = useCallback(
     async (id: string, status: MapStatus) => {
@@ -298,8 +317,27 @@ export function useRemoteAtlas(
   );
 
   const signIn = useCallback(
+    async (email: string, password: string) => {
+      if (!client) throw new Error("Sign-in is unavailable. Try again later.");
+      const { error } = await client.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
+      if (error)
+        throw new Error(
+          error.code === "invalid_credentials"
+            ? "Email or password is incorrect. Try again or use an email link."
+            : error.status === 429
+              ? "Too many sign-in attempts. Wait a moment and try again."
+              : "Couldn’t sign in. Check your connection and try again.",
+        );
+    },
+    [client],
+  );
+
+  const sendSignInLink = useCallback(
     async (email: string) => {
-      if (!client) return;
+      if (!client) throw new Error("Sign-in is unavailable. Try again later.");
       const { error } = await client.auth.signInWithOtp({
         email: email.trim(),
         options: {
@@ -315,9 +353,49 @@ export function useRemoteAtlas(
     [client],
   );
 
+  const resetPassword = useCallback(
+    async (email: string) => {
+      if (!client) throw new Error("Password recovery is unavailable.");
+      const { error } = await client.auth.resetPasswordForEmail(email.trim(), {
+        redirectTo: `${window.location.origin}/`,
+      });
+      if (error)
+        throw new Error(
+          "Couldn’t send a reset link. Wait a moment and try again.",
+        );
+    },
+    [client],
+  );
+
+  const updatePassword = useCallback(
+    async (password: string) => {
+      if (!client || !user)
+        throw new Error("Sign in again before setting your password.");
+      if (password.length < MIN_PASSWORD_LENGTH)
+        throw new Error(`Use at least ${MIN_PASSWORD_LENGTH} characters.`);
+      const { error } = await client.auth.updateUser({ password });
+      if (error)
+        throw new Error(
+          error.code === "same_password"
+            ? "Choose a password different from your current one."
+            : error.code === "reauthentication_needed" ||
+                error.code === "reauthentication_not_valid"
+              ? "Sign in again with a fresh email link before changing your password."
+              : "Couldn’t save your password. Your password hasn’t changed; try again.",
+        );
+      setPasswordRecovery(false);
+    },
+    [client, user],
+  );
+
+  const dismissPasswordRecovery = useCallback(
+    () => setPasswordRecovery(false),
+    [],
+  );
+
   const signOut = useCallback(async () => {
     if (!client) return;
-    const { error } = await client.auth.signOut();
+    const { error } = await client.auth.signOut({ scope: "local" });
     if (error) throw new Error("Couldn’t sign out. Try again.");
     setCanEdit(false);
     setUser(null);
@@ -333,6 +411,7 @@ export function useRemoteAtlas(
     user,
     canEdit,
     authError,
+    passwordRecovery,
     pending,
     saveError,
     saved,
@@ -340,6 +419,10 @@ export function useRemoteAtlas(
     refresh,
     saveStatus,
     signIn,
+    sendSignInLink,
+    resetPassword,
+    updatePassword,
+    dismissPasswordRecovery,
     signOut,
     importStatuses,
   };

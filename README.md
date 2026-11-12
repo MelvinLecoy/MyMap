@@ -147,7 +147,7 @@ Google controls the embedded content and access. Set the original My Map to **An
 
 ## Persistent saving with Supabase
 
-Set both `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` to enable the database-backed collection. In that mode, visitors have read-only access; the configured editor signs in by email link and saves statuses to PostgreSQL. Browser-only overrides are imported only after explicit owner review. Privileged credentials are never bundled. See [docs/supabase.md](docs/supabase.md) for cloud provisioning, permissions, migration, export, and verification.
+Set both `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` to enable the database-backed collection. In that mode, visitors have read-only access; the configured editor signs in with email and password on the same page and saves statuses to PostgreSQL. Email links remain available for first-time password setup and recovery. Browser-only overrides are imported only after explicit owner review. Privileged credentials are never bundled. See [docs/supabase.md](docs/supabase.md) for cloud provisioning, permissions, migration, export, and verification.
 
 ## Build and deploy
 

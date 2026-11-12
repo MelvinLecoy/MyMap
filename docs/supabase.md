@@ -50,12 +50,25 @@ command performs these steps and verifies them together.
 
 ## Editing and migration
 
-Use **Editor sign in** and enter the configured owner's email. The sign-in link
-must open in the same browser that requested it (PKCE). Supabase's email delivery
-configuration and limits apply; its built-in sender restricts recipient addresses
-to members of the Supabase organization unless a custom SMTP service is set up.
-The owner email must be supported by that sender. Sign-in never creates an
-account automatically. Signing in with an unlisted account grants no edit rights.
+Use **Editor sign in** with your email and password. Authentication happens in
+the dialog: it shows progress, confirms success, and closes without leaving the
+selected city. Supabase retains the session across reloads. Signing out affects
+this browser and its other tabs, without signing out your other devices.
+
+To set your first password, sign in using **Use an email link instead**, then
+choose **Password** in the account controls. Choose at least 12 characters and
+confirm it. Existing signed-in users can use the same control to change their
+password. Passwords go directly to Supabase Auth and are never added to city
+records, browser overrides, source files, or environment settings. No account
+access token or database password is needed for normal website sign-in.
+
+**Forgot password?** sends a recovery link. Open it in the same browser that
+requested it (PKCE); the website opens the new-password form after Supabase
+verifies the callback. Email links are also retained as a fallback. Supabase's
+email delivery configuration and limits apply; its built-in sender restricts
+recipient addresses to organization members unless custom SMTP is configured.
+No sign-in method creates an account automatically. Signing in with an unlisted
+account grants no atlas edit rights, including after changing its own password.
 
 Saving updates the selected city by ID and its previously read `updated_at`.
 A conflict or failed save restores the confirmed value and reports the failure.
@@ -78,10 +91,11 @@ and recovery policies apply; retain periodic exports independently.
 
 - `npm test`: import/export, public-key validation, and real PostgreSQL RLS and
   transaction tests through PGlite, including another authenticated user's denial.
-- `npm run test:cloud`: browser tests with a simulated Supabase API for sign-in,
-  permissions, cross-device reads, persistence, write failures, conflicts,
-  migration review/rollback, and CSV export. These tests send no real email and
-  do not replace live-project verification.
+- `npm run test:cloud`: browser tests with a simulated Supabase API for password
+  sign-in, incorrect credentials/network failures, loading states, reload and
+  cross-tab sessions, password setup/recovery, narrow-screen controls, permissions,
+  cross-device reads, write failures, conflicts, migration review/rollback, and
+  CSV export. These tests send no real email and do not replace live verification.
 - `npm run build` and `npm run test:browser`: the existing real-collection
   production and layout regression checks in static mode.
 
