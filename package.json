@@ -1,0 +1,44 @@
+{
+  "name": "elsewhere-atlas",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "tsx scripts/import-data.ts --demo-fallback && vite --host 0.0.0.0",
+    "data:import": "tsx scripts/import-data.ts",
+    "data:resolve-coordinates": "tsx scripts/resolve-coordinates.ts",
+    "atlas:prepare": "tsx scripts/prepare-atlas.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test tests/*.test.ts",
+    "test:browser": "playwright test",
+    "build": "tsx scripts/import-data.ts && tsc --noEmit && vite build",
+    "build:demo": "tsx scripts/import-data.ts --demo && tsc --noEmit && vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "format": "prettier --write src scripts tests *.ts *.json *.md *.html"
+  },
+  "dependencies": {
+    "@fontsource-variable/dm-sans": "5.3.0",
+    "lucide-react": "0.468.0",
+    "maplibre-gl": "5.12.0",
+    "react": "19.2.0",
+    "react-dom": "19.2.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.1",
+    "@types/geojson": "7946.0.16",
+    "@types/node": "24.10.0",
+    "@types/react": "19.2.2",
+    "@types/react-dom": "19.2.2",
+    "@vitejs/plugin-react": "5.1.0",
+    "csv-parse": "6.1.0",
+    "i18n-iso-countries": "7.14.0",
+    "mapshaper": "0.6.113",
+    "prettier": "3.6.2",
+    "tsx": "4.20.6",
+    "typescript": "5.9.3",
+    "vite": "7.2.2"
+  }
+}

@@ -1,0 +1,1 @@
+Place your private CSV export here as `cities.csv`. It is ignored by Git. See the root README for the accepted columns and optional `coordinates.csv` / `country-visits.csv` files. Demo records live separately in `fixtures/`. Import diagnostics stay in `.cache/`, outside public assets. Imported city notes, visits and links ARE included in your deployed site.

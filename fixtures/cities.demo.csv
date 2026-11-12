@@ -1,0 +1,7 @@
+Cities,Country,Continent,Region,SubRegion,Status,Link,Latitude,Longitude,CountryCode,Visited,LastVisited,PinColor,Notes
+Moscow,Russia,Europe,East Europe,Ruslands,Complete,"<iframe src=""https://www.google.com/maps/d/u/0/embed?mid=1GfnS6h6xxT-iMV2EfQoXMUONSqJJrwg&ehbc=2E312F&noprof=1"" width=""640"" height=""480""></iframe>",55.75222,37.61556,RU,,,,
+Kyiv,Ukraine,Europe,East Europe,Ruslands,Complete,https://www.google.com/maps/d/u/0/embed?mid=1AmeVZIfyequ5-Y5VwsBOZ1dxPBInKJU&ehbc=2E312F&noprof=1,50.45466,30.52380,UA,,,,
+Warsaw,Poland,Europe,Central Europe,,Update,,52.22977,21.01178,PL,Yes,2025-06-18,#A37AD9,"Old Town, river walk.
+A slow afternoon along the Vistula."
+Prague,Czechia,Europe,Central Europe,,Unfinished,,50.08804,14.42076,CZ,No,,,
+Helsinki,Finland,Europe,Northern Europe,,Not Started,,60.16952,24.93545,FI,,,,
