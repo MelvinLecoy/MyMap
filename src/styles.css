@@ -768,21 +768,23 @@ h2 {
   overflow-wrap: anywhere;
 }
 .detail-identity {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 12px;
-  align-items: start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 12px;
+  align-items: flex-start;
   margin-top: 18px;
 }
 .detail-identity > div:first-child {
+  flex: 1 1 auto;
   min-width: 0;
+  max-width: 100%;
 }
 .city-detail h1 {
   font-size: 32px;
   letter-spacing: -1.2px;
   font-weight: 750;
   line-height: 1.12;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 .detail-country {
   font-size: 15px;
@@ -800,8 +802,10 @@ h2 {
 }
 .detail-coordinates {
   display: flex;
+  flex: 0 0 auto;
   flex-direction: column;
   margin-top: 4px;
+  margin-left: auto;
   padding-left: 12px;
   border-left: 1px solid var(--border);
   color: var(--text);

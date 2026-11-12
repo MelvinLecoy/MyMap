@@ -212,6 +212,64 @@ test("long names fit from 320px to desktop without clipped coordinates or dropdo
   }
 });
 
+test("city headings keep complete words and reflow coordinates when space is tight", async ({
+  page,
+}) => {
+  const cases = [
+    { width: 1600, name: "Longyearbyen" },
+    { width: 1440, name: "Longyearbyen" },
+    { width: 700, name: "Longyearbyen" },
+    { width: 360, name: "Longyearbyen" },
+    { width: 320, name: "Longyearbyen" },
+    { width: 700, name: "Yekaterinburg" },
+    { width: 320, name: "Bandar Seri Begawan" },
+    { width: 1600, name: "Moscow" },
+  ];
+  for (const { width, name } of cases) {
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto(`/?city=${encodeURIComponent(city(name).id)}`);
+    await page.evaluate(() => document.fonts.ready);
+    const heading = page.getByRole("heading", { name, exact: true });
+    const words = await heading.evaluate((element) => {
+      const text = element.firstChild!;
+      return [...element.textContent!.matchAll(/\S+/g)].map((word) => {
+        const range = document.createRange();
+        range.setStart(text, word.index!);
+        range.setEnd(text, word.index! + word[0].length);
+        return {
+          word: word[0],
+          lines: [...range.getClientRects()].filter((rect) => rect.width > 0)
+            .length,
+        };
+      });
+    });
+    for (const word of words)
+      expect(word.lines, `${width}px: ${name} / ${word.word}`).toBe(1);
+    const title = (await heading.boundingBox())!;
+    const coordinates = (await page
+      .locator(".detail-coordinates")
+      .boundingBox())!;
+    const card = (await page.locator(".detail-place-card").boundingBox())!;
+    expect(title.x + title.width).toBeLessThanOrEqual(card.x + card.width);
+    expect(coordinates.x + coordinates.width).toBeLessThanOrEqual(
+      card.x + card.width,
+    );
+    const overlapping =
+      title.x < coordinates.x + coordinates.width &&
+      coordinates.x < title.x + title.width &&
+      title.y < coordinates.y + coordinates.height &&
+      coordinates.y < title.y + title.height;
+    expect(overlapping).toBe(false);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    if (name === "Moscow")
+      expect(coordinates.x).toBeGreaterThanOrEqual(title.x + title.width);
+  }
+});
+
 test("real status edits persist and sync separately from demo edits without changing visits", async ({
   page,
   context,
