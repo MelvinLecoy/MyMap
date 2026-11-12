@@ -755,6 +755,7 @@ h2 {
   font-family: "Manrope Variable", "DM Sans Variable", sans-serif;
 }
 .detail-place-card {
+  container-type: inline-size;
   padding: 16px;
   border: 1px solid var(--line);
   border-radius: 10px;
@@ -770,7 +771,7 @@ h2 {
 .detail-identity {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px 12px;
+  gap: 10px 8px;
   align-items: flex-start;
   margin-top: 18px;
 }
@@ -780,7 +781,7 @@ h2 {
   max-width: 100%;
 }
 .city-detail h1 {
-  font-size: 32px;
+  font-size: clamp(24px, calc(15cqi - 10px), 32px);
   letter-spacing: -1.2px;
   font-weight: 750;
   line-height: 1.12;
@@ -806,10 +807,10 @@ h2 {
   flex-direction: column;
   margin-top: 4px;
   margin-left: auto;
-  padding-left: 12px;
+  padding-left: 8px;
   border-left: 1px solid var(--border);
   color: var(--text);
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 500;
   line-height: 1.6;
   font-variant-numeric: tabular-nums;
@@ -1109,7 +1110,7 @@ h2 {
     font-size: 16px;
   }
   .city-detail h1 {
-    font-size: 34px;
+    font-size: clamp(24px, calc(15cqi - 10px), 34px);
   }
 }
 @media (max-width: 1100px) {
@@ -1241,7 +1242,7 @@ h2 {
     display: none;
   }
   .city-detail h1 {
-    font-size: 30px;
+    font-size: clamp(24px, calc(15cqi - 10px), 30px);
   }
   .viewer-title {
     display: none;
@@ -1342,7 +1343,7 @@ h2 {
     flex: none;
   }
   .city-detail h1 {
-    font-size: 32px;
+    font-size: clamp(24px, calc(15cqi - 10px), 32px);
   }
   .no-map-card strong {
     font-size: 12px;

@@ -212,12 +212,13 @@ test("long names fit from 320px to desktop without clipped coordinates or dropdo
   }
 });
 
-test("city headings keep complete words and reflow coordinates when space is tight", async ({
+test("city headings keep complete words and compact coordinates beside Longyearbyen", async ({
   page,
 }) => {
   const cases = [
     { width: 1600, name: "Longyearbyen" },
     { width: 1440, name: "Longyearbyen" },
+    { width: 1000, name: "Longyearbyen" },
     { width: 700, name: "Longyearbyen" },
     { width: 360, name: "Longyearbyen" },
     { width: 320, name: "Longyearbyen" },
@@ -265,8 +266,11 @@ test("city headings keep complete words and reflow coordinates when space is tig
         () => document.documentElement.scrollWidth <= innerWidth,
       ),
     ).toBe(true);
-    if (name === "Moscow")
+    if (name === "Moscow" || name === "Longyearbyen") {
       expect(coordinates.x).toBeGreaterThanOrEqual(title.x + title.width);
+      expect(coordinates.y).toBeGreaterThanOrEqual(title.y);
+      expect(coordinates.y).toBeLessThan(title.y + title.height);
+    }
   }
 });
 
