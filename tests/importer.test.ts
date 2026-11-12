@@ -197,6 +197,23 @@ test("visit is independent of map status; contradictory date and No produce unkn
   assert.match(issues[0].message, /conflicts/);
   assert.equal(data.countries[0].visited, true);
 });
+test("planned visits stay distinct from unknown visits and do not count as visited", () => {
+  const { data, issues } = importCities(
+    csv([
+      "Planned,Finland,Europe,,,Complete,,1,1,FI,pLaNnEd,,,",
+      "Unknown,Finland,Europe,,,Complete,,2,2,FI,,,,",
+      "Conflict,Finland,Europe,,,Update,,3,3,FI,Planned,2025,,",
+    ]),
+  );
+  assert.deepEqual(
+    data.cities.map((c) => c.visit),
+    ["planned", "unknown", "unknown"],
+  );
+  assert.equal(data.countries[0].visited, false);
+  assert.equal(data.cities[2].lastVisited, null);
+  assert.equal(issues.length, 1);
+  assert.match(issues[0].message, /Visited=Planned conflicts with LastVisited/);
+});
 test("country-only records, city visits and custom colors work independently", () => {
   const { data } = importCities(csv([row()]), {
     countryVisits:

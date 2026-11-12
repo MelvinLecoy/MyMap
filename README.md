@@ -52,8 +52,8 @@ Latitude,Longitude,CityId,CountryCode,Visited,LastVisited,PinColor,Notes
 ```
 
 - **Status**: `Complete`, `Update`, `Unfinished`, or `Not Started`. Case and whitespace are normalized; legacy `Done` becomes `Complete`. Missing/unknown statuses stop import with the row number.
-- **Visited**: `Yes`, `No`, or blank → Visited, Not visited, or Visit not recorded. This is independent of map completion.
-- **LastVisited**: `YYYY-MM-DD`, `YYYY-MM`, or `YYYY`. A valid date implies a visit when `Visited` is blank. A valid date paired with `No` produces a warning and an unknown visit (the contradictory date is withheld until corrected). Malformed dates warn and are omitted. Dates display without timezone shifts.
+- **Visited**: `Yes`, `No`, `Planned`, or blank (case-insensitive). The city list uses labeled check, calendar, and dashed-circle markers for **Visited**, **Planned**, and **Not Yet**, independently of the map-status badge on the right. `No` and blank both display as Not Yet in the list; blank remains unknown in the imported data, and never implies a plan. Only `Yes` (or a valid inferred visit) counts toward visited totals. The demo marks Helsinki as Planned.
+- **LastVisited**: `YYYY-MM-DD`, `YYYY-MM`, or `YYYY`. A valid date implies a visit when `Visited` is blank. A valid date paired with `No` or `Planned` produces a warning and an unknown visit (the contradictory date is withheld until corrected). Malformed dates warn and are omitted. The city list shows the last-visit year for visited cities; details show the full date without timezone shifts.
 - **PinColor**: optional `#RRGGBB`; invalid values warn and fall back. The default is amber for visited, filled neutral for not visited, or an outlined dark pin for an unrecorded visit. A separate halo shows selection.
 - **Notes**: plain text, including quoted multiline cells. HTML remains text.
 - **Latitude / Longitude**: valid city-center coordinates; zeros are valid. GeoJSON uses `[longitude, latitude]`. An incomplete/invalid pair warns. Missing coordinates keep the city in the list with a location label.

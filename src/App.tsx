@@ -3,17 +3,16 @@ import {
   ArrowLeft,
   ArrowRight,
   ArrowUpRight,
-  Check,
   CheckCheck,
+  CircleCheck,
+  CircleDashed,
   ChevronDown,
   ChevronRight,
   Compass,
-  Earth,
   Map,
   MapPin,
   Search,
   SlidersHorizontal,
-  Sparkles,
   X,
   CalendarDays,
   StickyNote,
@@ -27,6 +26,7 @@ import {
   formatVisitDate,
   type AtlasData,
   type MapStatus,
+  type VisitStatus,
 } from "./lib/types";
 const data = atlas as AtlasData;
 function readRoute() {
@@ -51,6 +51,27 @@ function Status({ status }: { status: MapStatus }) {
     >
       <i />
       {status}
+    </span>
+  );
+}
+function VisitMarker({ visit }: { visit: VisitStatus }) {
+  const state = visit === "visited" || visit === "planned" ? visit : "not-yet";
+  const Icon =
+    state === "visited"
+      ? CircleCheck
+      : state === "planned"
+        ? CalendarDays
+        : CircleDashed;
+  return (
+    <span className={`visit-marker visit-marker-${state}`}>
+      <Icon size={20} strokeWidth={1.6} aria-hidden="true" />
+      <span>
+        {state === "visited"
+          ? "Visited"
+          : state === "planned"
+            ? "Planned"
+            : "Not Yet"}
+      </span>
     </span>
   );
 }
@@ -154,17 +175,10 @@ export default function App() {
           {!selected ? (
             <>
               <div className="panel-intro">
-                <div className="eyebrow">
-                  <span className="tiny-line" />
-                  YOUR WORLD, COLLECTED
-                </div>
                 <div className="panel-heading">
                   <h1>Cities</h1>
-                  <span className="city-total">
-                    {String(data.cities.length).padStart(2, "0")}
-                  </span>
+                  <span className="city-total">{data.cities.length}</span>
                 </div>
-                <p>Places explored. Places still to come.</p>
               </div>
               <div className="collection-controls">
                 <label className="search-field">
@@ -217,7 +231,7 @@ export default function App() {
                       <ChevronDown size={13} />
                     </label>
                   )}
-                  <span className="results-count" aria-live="polite">
+                  <span className="visually-hidden" aria-live="polite">
                     {filtered.length}{" "}
                     {filtered.length === 1 ? "city" : "cities"}
                   </span>
@@ -230,38 +244,31 @@ export default function App() {
                     className="city-row"
                     onClick={() => navigate(city.id)}
                   >
-                    <span
-                      className={`city-row-icon ${city.visit}`}
-                      style={
-                        city.pinColor
-                          ? ({
-                              "--pin-color": city.pinColor,
-                            } as React.CSSProperties)
-                          : undefined
-                      }
-                    >
-                      <MapPin size={19} strokeWidth={1.5} />
-                      {city.visit === "visited" && (
-                        <span className="visited-check">
-                          <Check size={8} />
-                        </span>
-                      )}
-                    </span>
+                    <VisitMarker visit={city.visit} />
                     <span className="city-row-body">
                       <span className="city-row-name">{city.name}</span>
                       <span className="city-row-country">
                         <Flag code={city.countryCode} />
-                        {city.country}
-                        {!city.coordinates && (
-                          <span className="location-missing">
-                            {" "}
-                            · Location missing
-                          </span>
-                        )}
+                        <span>{city.country}</span>
                       </span>
-                      <Status status={city.status} />
+                      {city.visit === "visited" && city.lastVisited && (
+                        <span className="city-row-year">
+                          <span className="visually-hidden">Last visited </span>
+                          {city.lastVisited.slice(0, 4)}
+                        </span>
+                      )}
+                      {!city.coordinates && (
+                        <span className="location-missing">
+                          Location missing
+                        </span>
+                      )}
                     </span>
-                    <ChevronRight className="row-chevron" size={16} />
+                    <Status status={city.status} />
+                    <ChevronRight
+                      className="row-chevron"
+                      size={14}
+                      aria-hidden="true"
+                    />
                   </button>
                 ))}
                 {!filtered.length && (
@@ -282,32 +289,19 @@ export default function App() {
                   </div>
                 )}
               </div>
-              <div className="collection-bottom">
+              <footer className="collection-bottom" aria-label="Visited places">
                 <div className="journey-stats">
+                  <span className="stats-label">Visited</span>
                   <div>
-                    <span>{String(visited).padStart(2, "0")}</span>
-                    <small>
-                      {visited === 1 ? "city visited" : "cities visited"}
-                    </small>
+                    <strong>{countries}</strong>
+                    <span>{countries === 1 ? "country" : "countries"}</span>
                   </div>
-                  <div className="stats-divider" />
                   <div>
-                    <span>{String(countries).padStart(2, "0")}</span>
-                    <small>
-                      {countries === 1
-                        ? "country visited"
-                        : "countries visited"}
-                    </small>
+                    <strong>{visited}</strong>
+                    <span>{visited === 1 ? "city" : "cities"}</span>
                   </div>
-                  <Earth size={31} strokeWidth={1} />
                 </div>
-                {data.demo && (
-                  <p className="sample-note">
-                    <Sparkles size={12} />
-                    Sample data
-                  </p>
-                )}
-              </div>
+              </footer>
             </>
           ) : (
             <>

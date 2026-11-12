@@ -5,7 +5,7 @@ export const MAP_STATUSES = [
   "Not Started",
 ] as const;
 export type MapStatus = (typeof MAP_STATUSES)[number];
-export type VisitStatus = "visited" | "not-visited" | "unknown";
+export type VisitStatus = "visited" | "planned" | "not-visited" | "unknown";
 export interface City {
   id: string;
   name: string;
@@ -35,6 +35,7 @@ export interface AtlasData {
 }
 export const VISIT_LABELS: Record<VisitStatus, string> = {
   visited: "Visited",
+  planned: "Planned",
   "not-visited": "Not visited",
   unknown: "Visit not recorded",
 };

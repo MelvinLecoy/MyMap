@@ -15,6 +15,24 @@ test("globe, list, search and every status are functional", async ({
     "true",
   );
   await expect(page.locator(".city-row")).toHaveCount(5);
+  await expect(
+    page.locator(".city-row").filter({ hasText: "Helsinki" }),
+  ).toContainText("Planned");
+  await expect(
+    page.locator(".city-row").filter({ hasText: "Kyiv" }),
+  ).toContainText("Not Yet");
+  await expect(
+    page.locator(".city-row").filter({ hasText: "Warsaw" }),
+  ).toContainText("Visited");
+  await expect(
+    page.locator(".city-row").filter({ hasText: "Warsaw" }),
+  ).toContainText("2025");
+  await expect(page.locator(".collection-bottom")).toHaveText(
+    /Visited\s*2\s*countries\s*1\s*city/,
+  );
+  await expect(page.locator(".city-panel")).not.toContainText(
+    /YOUR WORLD|Places explored|Sample data|Visit not recorded/,
+  );
   await page
     .getByRole("textbox", { name: "Search cities and countries" })
     .fill("poland");
@@ -37,6 +55,62 @@ test("globe, list, search and every status are functional", async ({
   ).toBeVisible();
   await page.getByRole("button", { name: "Clear filters" }).click();
   await expect(page.locator(".city-row")).toHaveCount(5);
+});
+test("compact rows keep visits and map status separate at desktop and narrow widths", async ({
+  page,
+}) => {
+  for (const width of [1440, 700, 360, 320]) {
+    await page.setViewportSize({ width, height: 720 });
+    await page.goto("/");
+    await expect(page.locator(".city-row")).toHaveCount(5);
+    const rows = await page.locator(".city-row").evaluateAll((elements) =>
+      elements.map((el) => {
+        const bounds = el.getBoundingClientRect();
+        const marker = el
+          .querySelector(".visit-marker")!
+          .getBoundingClientRect();
+        const body = el
+          .querySelector(".city-row-body")!
+          .getBoundingClientRect();
+        const status = el.querySelector(".status")!.getBoundingClientRect();
+        const chevron = el
+          .querySelector(".row-chevron")!
+          .getBoundingClientRect();
+        return {
+          height: bounds.height,
+          ordered:
+            marker.right <= body.left &&
+            body.right <= status.left &&
+            status.right <= chevron.left &&
+            chevron.right <= bounds.right,
+        };
+      }),
+    );
+    for (const row of rows) {
+      expect(row.ordered).toBe(true);
+      expect(row.height).toBeGreaterThanOrEqual(72);
+      expect(row.height).toBeLessThanOrEqual(90);
+    }
+    const footer = await page.locator(".collection-bottom").boundingBox();
+    expect(footer!.height).toBeLessThanOrEqual(54);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    ).toBe(true);
+    if (width > 600) {
+      expect(footer!.y + footer!.height).toBeLessThanOrEqual(720);
+      await expect(page.locator(".city-row").last()).toBeInViewport();
+    }
+  }
+  await page.setViewportSize({ width: 1024, height: 420 });
+  await page.goto("/");
+  await expect(page.locator(".collection-bottom")).toBeInViewport();
+  await page.locator(".city-row").last().scrollIntoViewIfNeeded();
+  await page.locator(".city-row").last().click();
+  await expect(
+    page.getByRole("heading", { name: "Warsaw", exact: true }),
+  ).toBeVisible();
 });
 test("selecting a city, notes, visits, links, direct URLs and browser history", async ({
   page,

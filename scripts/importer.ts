@@ -248,8 +248,9 @@ export function importCities(
     const flag = (r.visited ?? "").toLowerCase();
     if (flag === "yes") visit = "visited";
     else if (flag === "no") visit = "not-visited";
+    else if (flag === "planned") visit = "planned";
     else if (flag)
-      issue(line, `${r.cities}: Visited must be Yes, No, or blank.`);
+      issue(line, `${r.cities}: Visited must be Yes, No, Planned, or blank.`);
     let date = r.lastvisited || null;
     if (date && !validDate(date)) {
       issue(
@@ -258,10 +259,10 @@ export function importCities(
       );
       date = null;
     }
-    if (date && flag === "no") {
+    if (date && (flag === "no" || flag === "planned")) {
       issue(
         line,
-        `${r.cities}: Visited=No conflicts with LastVisited. Visit set to unknown until corrected.`,
+        `${r.cities}: Visited=${flag === "no" ? "No" : "Planned"} conflicts with LastVisited. Visit set to unknown until corrected.`,
       );
       visit = "unknown";
       date = null;
