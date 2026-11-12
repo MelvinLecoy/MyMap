@@ -1,0 +1,284 @@
+import { test, expect, type Page } from "@playwright/test";
+import { readFileSync } from "node:fs";
+import type { AtlasData } from "../../src/lib/types";
+import {
+  MAP_STATUS_STORAGE_KEY,
+  COLLECTION_STATUS_STORAGE_KEY,
+} from "../../src/lib/status-storage";
+
+const data = JSON.parse(
+  readFileSync("src/generated/atlas.json", "utf8"),
+) as AtlasData;
+const backName = `All cities (${data.cities.length})`;
+function city(name: string) {
+  const found = data.cities.find((record) => record.name === name);
+  if (!found) throw new Error(`Missing collection record: ${name}`);
+  return found;
+}
+async function openCity(page: Page, name: string) {
+  await page
+    .getByRole("textbox", { name: "Search cities and countries" })
+    .fill(name);
+  const exactName = page
+    .locator(".city-row-name")
+    .and(page.getByText(name, { exact: true }));
+  await page.locator(".city-row").filter({ has: exactName }).click();
+  await expect(page.getByRole("heading", { name, exact: true })).toBeVisible();
+}
+async function back(page: Page) {
+  await page.getByRole("button", { name: backName, exact: true }).click();
+}
+
+test.beforeEach(async ({ context, page, baseURL }) => {
+  await context.route("https://tiles.openfreemap.org/**", (route) =>
+    route.abort(),
+  );
+  await context.route("https://www.google.com/**", (route) =>
+    route.fulfill({
+      contentType: "text/html",
+      body: "<p>External map navigation test. Live Google content is not verified here.</p>",
+    }),
+  );
+  await page.addInitScript(
+    ({ key, origin }) => {
+      if (window !== window.top || location.origin !== origin) return;
+      localStorage.setItem(
+        key,
+        JSON.stringify({
+          "moscow-russia": "Update",
+          "warsaw-poland": "Unfinished",
+        }),
+      );
+    },
+    { key: MAP_STATUS_STORAGE_KEY, origin: new URL(baseURL!).origin },
+  );
+});
+
+test("the default globe loads all 321 real entries without demo visits or saved demo statuses", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await expect(page.locator(".city-row")).toHaveCount(321);
+  await expect(page.locator(".city-total")).toHaveText("321");
+  await expect(page.locator(".visit-marker-not-yet")).toHaveCount(321);
+  await expect(
+    page.locator(".visit-marker-visited, .visit-marker-planned"),
+  ).toHaveCount(0);
+  await expect(page.locator(".collection-bottom")).toHaveText(
+    /Visited\s*0\s*countries\s*0\s*cities/,
+  );
+  await expect(page.locator(".city-row .status-complete")).toHaveCount(253);
+  await expect(page.locator(".city-row .status-unfinished")).toHaveCount(7);
+  await expect(page.locator(".city-row .status-not-started")).toHaveCount(61);
+  await expect(page.locator('[data-testid="map-canvas"]')).toHaveAttribute(
+    "data-ready",
+    "true",
+    { timeout: 30000 },
+  );
+});
+
+test("every status and continent filter and country search work on the full collection", async ({
+  page,
+}) => {
+  await page.goto("/");
+  for (const [status, count] of [
+    ["Complete", 253],
+    ["Unfinished", 7],
+    ["Not Started", 61],
+    ["Update", 0],
+  ] as const) {
+    await page.getByLabel("Filter by map status").selectOption(status);
+    await expect(page.locator(".city-row")).toHaveCount(count);
+  }
+  await page.getByLabel("Filter by map status").selectOption("all");
+  for (const continent of [
+    ...new Set(data.cities.map((record) => record.continent)),
+  ]) {
+    await page.getByLabel("Filter by continent").selectOption(continent);
+    await expect(page.locator(".city-row")).toHaveCount(
+      data.cities.filter((record) => record.continent === continent).length,
+    );
+  }
+  await page.getByLabel("Filter by continent").selectOption("all");
+  for (const country of ["Russia", "Ukraine", "Svalbard", "Uganda"]) {
+    await page.getByRole("textbox").fill(country);
+    await expect(page.locator(".city-row")).toHaveCount(
+      data.cities.filter((record) => record.country === country).length,
+    );
+  }
+});
+
+test("updated names and reviewed locations retain correct coordinates and country labels", async ({
+  page,
+}) => {
+  await page.goto("/");
+  for (const name of [
+    "Johannesburg",
+    "Kingstown",
+    "Belize City",
+    "Frankfurt am Main",
+    "Krong Siem Reap",
+    "Longyearbyen",
+    "Sevastopol",
+  ]) {
+    await openCity(page, name);
+    const record = city(name);
+    const [longitude, latitude] = record.coordinates!;
+    await expect(page.locator(".detail-coordinates")).toContainText(
+      `${Math.abs(latitude).toFixed(4)}° ${latitude >= 0 ? "N" : "S"}`,
+    );
+    await expect(page.locator(".detail-coordinates")).toContainText(
+      `${Math.abs(longitude).toFixed(4)}° ${longitude >= 0 ? "E" : "W"}`,
+    );
+    await expect(page.locator(".detail-country")).toContainText(record.country);
+    await expect(page.locator(".visit-value")).toHaveText("Not Yet");
+    await expect(page.locator(".notes-section")).toHaveCount(0);
+    await back(page);
+  }
+});
+
+test("Nice and Vienna open their own correct maps and the viewer stays lazy", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const mapIds: Record<string, string | null> = {};
+  for (const name of ["Nice", "Vienna"]) {
+    await openCity(page, name);
+    await expect(page.locator("iframe")).toHaveCount(0);
+    const record = city(name);
+    await page
+      .getByRole("button", { name: "View My Map", exact: true })
+      .click();
+    await expect(page.locator("iframe")).toHaveAttribute(
+      "src",
+      record.map!.embedUrl,
+    );
+    await expect(
+      page.getByRole("link", { name: "Open in Google My Maps" }),
+    ).toHaveAttribute("href", record.map!.viewerUrl);
+    mapIds[name] = new URL(record.map!.embedUrl).searchParams.get("mid");
+    await page.getByRole("button", { name: "Back to globe" }).click();
+    await expect(page.locator("iframe")).toHaveCount(0);
+    await back(page);
+  }
+  expect(mapIds.Nice).toBe("1VgVwKHS5nWFFAesEvKnpHjZEcn6wa4Y");
+  expect(mapIds.Nice).not.toBe(mapIds.Vienna);
+});
+
+test("the two unplaced regions remain accessible without invented positions", async ({
+  page,
+}) => {
+  await page.goto("/");
+  for (const name of ["Iguazu", "Lofoten"]) {
+    await openCity(page, name);
+    await expect(page.locator(".detail-coordinates")).toHaveCount(0);
+    await expect(
+      page.getByText("Not yet recorded", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "View My Map", exact: true }),
+    ).toBeVisible();
+    await back(page);
+  }
+});
+
+test("long names fit from 320px to desktop without clipped coordinates or dropdowns", async ({
+  page,
+}) => {
+  for (const width of [320, 360, 700, 1600]) {
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto(`/?city=${encodeURIComponent(city("Kingstown").id)}`);
+    await page.evaluate(() => document.fonts.ready);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    const bounds = await page.locator(".city-detail").evaluate((element) => ({
+      scroll: element.scrollWidth,
+      client: element.clientWidth,
+    }));
+    expect(bounds.scroll).toBeLessThanOrEqual(bounds.client);
+    const card = (await page.locator(".detail-place-card").boundingBox())!;
+    const coordinates = (await page
+      .locator(".detail-coordinates")
+      .boundingBox())!;
+    expect(coordinates.x + coordinates.width).toBeLessThanOrEqual(
+      card.x + card.width,
+    );
+    const facts = (await page.locator(".detail-facts").boundingBox())!;
+    const picker = (await page.locator(".status-picker").boundingBox())!;
+    expect(picker.x + picker.width).toBeLessThanOrEqual(facts.x + facts.width);
+  }
+});
+
+test("real status edits persist and sync separately from demo edits without changing visits", async ({
+  page,
+  context,
+}) => {
+  await page.goto("/?city=moscow-russia");
+  const status = page.getByRole("combobox", {
+    name: "Map status",
+    exact: true,
+  });
+  await expect(status).toHaveValue("Complete");
+  await status.selectOption("Unfinished");
+  await page.reload();
+  await expect(status).toHaveValue("Unfinished");
+  const saved = await page.evaluate(
+    ({ demo, collection }) => ({
+      demo: JSON.parse(localStorage.getItem(demo)!),
+      collection: JSON.parse(localStorage.getItem(collection)!),
+    }),
+    { demo: MAP_STATUS_STORAGE_KEY, collection: COLLECTION_STATUS_STORAGE_KEY },
+  );
+  expect(saved.demo["moscow-russia"]).toBe("Update");
+  expect(saved.collection["moscow-russia"]).toBe("Unfinished");
+  await back(page);
+  await page.getByLabel("Filter by map status").selectOption("Unfinished");
+  await expect(page.locator(".city-row")).toHaveCount(8);
+  await expect(page.locator(".collection-bottom")).toHaveText(
+    /Visited\s*0\s*countries\s*0\s*cities/,
+  );
+  await page.getByLabel("Filter by map status").selectOption("all");
+  await openCity(page, "Moscow");
+  const other = await context.newPage();
+  await other.goto("/?city=moscow-russia");
+  await expect(
+    other.getByRole("combobox", { name: "Map status", exact: true }),
+  ).toHaveValue("Unfinished");
+  await status.selectOption("Complete");
+  await expect(
+    other.getByRole("combobox", { name: "Map status", exact: true }),
+  ).toHaveValue("Complete");
+  await other.close();
+  await back(page);
+  await page.getByRole("textbox").fill("");
+  await expect(page.locator(".city-row .status-complete")).toHaveCount(253);
+  await expect(page.locator(".visit-marker-not-yet")).toHaveCount(321);
+});
+
+test("the full collection and corrected map links remain usable without WebGL", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    const original = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (
+      this: HTMLCanvasElement,
+      type: string,
+      ...args: unknown[]
+    ) {
+      if (type.includes("webgl")) return null;
+      return original.apply(this, [type, ...args] as never);
+    } as typeof original;
+  });
+  await page.goto("/");
+  await expect(
+    page.getByText("The interactive globe needs WebGL.", { exact: false }),
+  ).toBeVisible();
+  await expect(page.locator(".city-row")).toHaveCount(321);
+  await openCity(page, "Nice");
+  await expect(
+    page.getByRole("button", { name: "View My Map", exact: true }),
+  ).toBeVisible();
+});

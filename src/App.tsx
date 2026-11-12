@@ -18,6 +18,7 @@ import Globe from "./components/Globe";
 import MapViewer from "./components/MapViewer";
 import atlas from "./generated/atlas.json";
 import {
+  COLLECTION_STATUS_STORAGE_KEY,
   MAP_STATUS_STORAGE_KEY,
   parseStatusOverrides,
   readStatusOverrides,
@@ -32,6 +33,9 @@ import {
   type VisitStatus,
 } from "./lib/types";
 const data = atlas as AtlasData;
+const statusStorageKey = data.demo
+  ? MAP_STATUS_STORAGE_KEY
+  : COLLECTION_STATUS_STORAGE_KEY;
 function readRoute() {
   const p = new URLSearchParams(window.location.search);
   return { city: p.get("city"), view: p.get("view") === "map" };
@@ -88,7 +92,9 @@ export default function App() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("all");
   const [continent, setContinent] = useState("all");
-  const [statusOverrides, setStatusOverrides] = useState(readStatusOverrides);
+  const [statusOverrides, setStatusOverrides] = useState(() =>
+    readStatusOverrides(statusStorageKey),
+  );
   const [saveErrorCity, setSaveErrorCity] = useState<string | null>(null);
   const cities = useMemo(
     () =>
@@ -106,11 +112,11 @@ export default function App() {
   const updateMapStatus = (id: string, value: MapStatus) => {
     const next = { ...statusOverrides, [id]: value };
     setStatusOverrides(next);
-    setSaveErrorCity(saveStatusOverrides(next) ? null : id);
+    setSaveErrorCity(saveStatusOverrides(next, statusStorageKey) ? null : id);
   };
   useEffect(() => {
     const onStorage = (event: StorageEvent) => {
-      if (event.key === MAP_STATUS_STORAGE_KEY || event.key === null) {
+      if (event.key === statusStorageKey || event.key === null) {
         setStatusOverrides(parseStatusOverrides(event.newValue));
         setSaveErrorCity(null);
       }

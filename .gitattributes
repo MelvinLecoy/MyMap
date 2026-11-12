@@ -1,0 +1,4 @@
+# Preserve the uploaded source exactly; keep prepared runtime CSVs consistent.
+data/MyMap_Converted_Full.csv -text whitespace=cr-at-eol
+data/cities.csv text eol=lf
+data/coordinates.csv text eol=lf

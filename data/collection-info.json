@@ -1,0 +1,19 @@
+{
+  "sourceFile": "MyMap_Converted_Full.csv",
+  "sourceSha256": "de5b0a68dd326875ec86cc9a4f7d2754d4dd81f498175c1f70598bdd78fb963c",
+  "records": 321,
+  "locatedRecords": 319,
+  "unplacedByRequest": ["Iguazu", "Lofoten"],
+  "visitDefault": "Not Yet",
+  "countryLabelOverridesApprovedByUser": {
+    "Longyearbyen": "Svalbard",
+    "Sevastopol": "Ukraine"
+  },
+  "coordinateSource": {
+    "provider": "GeoNames",
+    "url": "https://www.geonames.org/",
+    "license": "CC BY 4.0",
+    "distribution": "geonamescache 3.0.2, cities500",
+    "datasetSha256": "1523be8c6f083eeee946e1c27a0916474d0f0de4361a15104fcc70218bc4d55e"
+  }
+}

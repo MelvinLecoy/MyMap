@@ -7,7 +7,7 @@
     "node": ">=22.12.0"
   },
   "scripts": {
-    "dev": "tsx scripts/import-data.ts --demo-fallback && vite --host 0.0.0.0",
+    "dev": "tsx scripts/import-data.ts && vite --host 0.0.0.0",
     "data:import": "tsx scripts/import-data.ts",
     "data:resolve-coordinates": "tsx scripts/resolve-coordinates.ts",
     "atlas:prepare": "tsx scripts/prepare-atlas.ts",

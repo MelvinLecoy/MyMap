@@ -1,7 +1,11 @@
 import { defineConfig, devices } from "@playwright/test";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
+const { demo } = JSON.parse(
+  readFileSync(new URL("./src/generated/atlas.json", import.meta.url), "utf8"),
+) as { demo: boolean };
 export default defineConfig({
   testDir: "./tests/browser",
+  testMatch: demo ? "**/atlas.spec.ts" : "**/collection.spec.ts",
   timeout: 45_000,
   expect: { timeout: 10_000 },
   fullyParallel: false,

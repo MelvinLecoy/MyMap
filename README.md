@@ -2,6 +2,8 @@
 
 A responsive, static travel globe inspired by the supplied reference: an airy Coastal palette with off-white panels, pale blue water, light neutral land, mint visited countries, and mint actions with dark text, plus city pins, a searchable collection, and focused city details. The map and city panel fill the browser window, with no outer header, navigation, footer, or page margins. Built with React, TypeScript, Vite, and MapLibre GL JS. No API key or backend is required.
 
+The repository includes the reviewed **321-entry collection**, its latest uploaded source CSV, and **319 matched locations**. All visits start as **Not Yet**. Iguazu and Lofoten are intentionally unplaced. See [data/IMPORT_NOTES.md](data/IMPORT_NOTES.md) for matching decisions and provenance.
+
 ## Run on a Mac
 
 Tested with **Node 24.22.1** and npm 11.9.0. Use Node 22.12 or newer; `.nvmrc` pins the tested version.
@@ -14,26 +16,26 @@ npm ci
 npm run dev
 ```
 
-Open the address Vite prints (normally `http://localhost:5173`). The dev command imports your CSV before starting. If `data/cities.csv` is absent, it uses the five-city sample fixture. Restart the dev command after changing CSV inputs. Dependencies and versions are pinned in `package-lock.json`.
+Open the address Vite prints (normally `http://localhost:5173`). The dev command imports the included `data/cities.csv` and `data/coordinates.csv` before starting. Missing collection data produces an error instead of silently loading sample records. Restart the dev command after changing CSV inputs. Dependencies and versions are pinned in `package-lock.json`.
 
-The sample includes Moscow and Kyiv's supplied My Maps links and illustrative records for Warsaw, Prague, and Helsinki. Sample visits, dates, notes, and colors are **not your personal travel history**.
+Five-city fixtures remain in `fixtures/` for explicit demo builds and regression tests. They are not used by normal development or production builds.
 
 ## Commands
 
-| Command                            | Purpose                                                             |
-| ---------------------------------- | ------------------------------------------------------------------- |
-| `npm run dev`                      | Import real data, or use the labeled sample when absent; start Vite |
-| `npm run data:import`              | Validate and import your real CSV                                   |
-| `npm run data:import -- --demo`    | Import the sample explicitly                                        |
-| `npm run data:resolve-coordinates` | Optional offline GeoNames matching                                  |
-| `npm run atlas:prepare`            | Download, verify, simplify, and regenerate the bundled atlas        |
-| `npm run fonts:prepare`            | Optional: regenerate bundled glyphs from included font sources      |
-| `npm run typecheck`                | Check application, import scripts, and tests                        |
-| `npm test`                         | Run import and coordinate-resolution tests                          |
-| `npm run build`                    | Import real data, type check, and produce `dist/`                   |
-| `npm run build:demo`               | Explicitly build the labeled sample into `dist/`                    |
-| `npm run preview`                  | Serve the last production build                                     |
-| `npm run test:browser`             | Browser smoke tests against the last build                          |
+| Command                            | Purpose                                                           |
+| ---------------------------------- | ----------------------------------------------------------------- |
+| `npm run dev`                      | Import the included collection and start Vite                     |
+| `npm run data:import`              | Validate and import your real CSV                                 |
+| `npm run data:import -- --demo`    | Import the sample explicitly                                      |
+| `npm run data:resolve-coordinates` | Optional offline GeoNames matching                                |
+| `npm run atlas:prepare`            | Download, verify, simplify, and regenerate the bundled atlas      |
+| `npm run fonts:prepare`            | Optional: regenerate bundled glyphs from included font sources    |
+| `npm run typecheck`                | Check application, import scripts, and tests                      |
+| `npm test`                         | Run collection, import, coordinate, typography, and storage tests |
+| `npm run build`                    | Import real data, type check, and produce `dist/`                 |
+| `npm run build:demo`               | Explicitly build the five-city regression fixture into `dist/`    |
+| `npm run preview`                  | Serve the last production build                                   |
+| `npm run test:browser`             | Browser smoke tests against the last build                        |
 
 `npm run build` deliberately fails with an actionable message if `data/cities.csv` is missing. It will never silently publish the sample in place of your data. `build:demo` is the explicit alternative.
 
@@ -41,7 +43,7 @@ The sample includes Moscow and Kyiv's supplied My Maps links and illustrative re
 
 The city-detail page has an editable **Map status** dropdown. Changes immediately update the list, its status filter, and other open tabs. They are saved in this browser for this site and survive refreshes; they do not sync across devices or change the source CSV or GitHub. Clearing this site's browser storage restores the imported statuses. If the browser cannot save a change, it stays active for the current session and the page reports that it could not be saved.
 
-Put your UTF-8 export in **`data/cities.csv`**. This file is ignored by Git. Keep these headers (case and surrounding whitespace do not matter; `City` is accepted as an alias for `Cities`):
+The ready-to-run **`data/cities.csv`** and **`data/coordinates.csv`** are tracked in Git. The latest uploaded original is preserved in `data/MyMap_Converted_Full.csv`; runtime normalization and approved country-code choices are documented in `data/IMPORT_NOTES.md`. To replace or extend the collection, update the prepared UTF-8 `data/cities.csv`. Keep these headers (case and surrounding whitespace do not matter; `City` is accepted as an alias for `Cities`):
 
 ```csv
 Cities,Country,Continent,Region,SubRegion,Status,Link
@@ -159,9 +161,8 @@ For restricted cloud environments, allow `tiles.openfreemap.org` for the optiona
 ## Verification
 
 ```sh
-npm run typecheck
+npm run build
 npm test
-npm run build:demo
 npm run test:browser
 ```
 
@@ -173,7 +174,9 @@ npx playwright install chromium
 CHROMIUM_PATH='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' npm run test:browser
 ```
 
-Coverage includes real WebGL globe startup, camera drag/zoom/reset, cluster expansion and pin selection, search/status filters, saved map-status edits across reloads and tabs, corrupt/blocked storage recovery, exact status/visit text, notes/dates, lazy viewer mounting, canonical links, URL/history handling, camera/filter preservation, keyboard navigation, narrow layouts down to 320px, and the WebGL-unavailable fallback. Import coverage includes BOM/CSV edge cases, inert iframe HTML, safe/rejected links, stable IDs, duplicate IDs, missing/zero coordinates, visits/dates, and independent country/pin colors. External-provider and real Google embed availability are separate network-dependent checks. A full real-CSV build awaits your export.
+The browser suite selects the included real collection after a normal build. It checks all 321 entries, source statuses, zero initial visit totals, country/continent filters, reviewed coordinates and aliases, Nice and Vienna's distinct map links, intentional missing positions, layouts down to 320px, saved-status isolation and tab synchronization, and the WebGL fallback. For the existing camera, cluster, notes/date, history, and blocked-storage regression suite, run `npm run build:demo` followed by `npm run test:browser`; finish with `npm run build` to restore the real collection.
+
+Unit tests compare the prepared collection with the latest uploaded source and cover coordinate provenance, URL validation, CSV edge cases, stable/duplicate IDs, visits/dates, typography, and independent country/pin colors. External-provider and live Google embed availability remain separate network-dependent checks.
 
 ## Credits
 
