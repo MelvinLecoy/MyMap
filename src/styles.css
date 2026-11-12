@@ -83,112 +83,19 @@ h2 {
   font-weight: 550;
 }
 .app-shell {
-  max-width: 1920px;
-  margin: 0 auto;
-  padding: 0 32px;
-}
-.app-header {
-  height: 100px;
-  display: flex;
-  align-items: center;
-  gap: 26px;
-}
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 29px;
-  font-weight: 600;
-  letter-spacing: -1.4px;
-}
-.brand-mark {
-  width: 35px;
-  height: 35px;
-  display: grid;
-  place-items: center;
-  color: var(--mint);
-  border: 1px solid #395852;
-  border-radius: 50%;
-}
-.brand-period {
-  color: var(--mint);
-}
-.brand-tagline {
-  font-size: 9px;
-  letter-spacing: 2.1px;
-  color: #8c9da8;
-  padding-left: 25px;
-  border-left: 1px solid #31404b;
-  line-height: 23px;
-}
-.main-nav {
-  display: flex;
-  gap: 28px;
-  margin-left: auto;
-  height: 100%;
-  align-items: center;
-}
-.main-nav button {
-  font-size: 12px;
-  display: flex;
-  gap: 7px;
-  align-items: center;
-  color: #9eafb9;
-  height: 100%;
-  position: relative;
-  padding: 0 3px;
-}
-.main-nav button:hover {
-  color: #e6f6ee;
-}
-.main-nav .nav-active {
-  color: #cce9df;
-}
-.nav-active:after {
-  content: "";
-  position: absolute;
-  bottom: 22px;
-  height: 2px;
-  border-radius: 2px;
-  left: 3px;
-  right: 3px;
-  background: var(--mint);
-}
-.collection-label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 11px;
-  color: #b4c2c9;
-  border: 1px solid #30424c;
-  border-radius: 20px;
-  padding: 8px 12px;
-  margin-left: 13px;
-}
-.collection-label i {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: #d8bb78;
-}
-.collection-label svg {
-  color: #738c98;
-  margin-left: 3px;
-}
-.collection-label:hover {
-  background: #1a2b35;
+  width: 100%;
+  height: 100dvh;
+  min-height: 0;
 }
 .atlas-layout {
-  height: calc(100svh - 152px);
-  min-height: 620px;
-  max-height: 1100px;
+  height: 100%;
+  min-height: 0;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 352px;
-  border: 1px solid #354651;
-  border-radius: 18px;
+  border: 0;
+  border-radius: 0;
   overflow: hidden;
   background: var(--panel);
-  box-shadow: 0 15px 65px #00000014;
 }
 .map-stage {
   position: relative;
@@ -318,8 +225,7 @@ h2 {
   padding: 11px 16px;
   white-space: nowrap;
 }
-.map-legend span,
-.about-legend span {
+.map-legend span {
   font-size: 10px;
   display: flex;
   align-items: center;
@@ -340,13 +246,6 @@ h2 {
   height: 10px;
   border-radius: 50%;
   background: #ffd08a;
-}
-.legend-unknown {
-  display: inline-block;
-  width: 11px;
-  height: 11px;
-  border-radius: 50%;
-  border: 2px solid #acc7cb;
 }
 .coordinates {
   position: absolute;
@@ -817,25 +716,6 @@ h2 {
   color: var(--mint);
   padding: 15px;
 }
-.app-footer {
-  height: 52px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: #748b98;
-  font-size: 9px;
-  letter-spacing: 0.1px;
-}
-.app-footer > span:last-child {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  font-size: 8px;
-}
-.footer-star {
-  font-size: 17px;
-  color: #92cbb9;
-}
 .detail-top {
   display: flex;
   align-items: center;
@@ -1143,105 +1023,6 @@ h2 {
   justify-content: space-between;
   line-height: 1.6;
 }
-.about-dialog {
-  padding: 0;
-  max-width: 480px;
-  width: calc(100% - 40px);
-  border: 1px solid #3c555e;
-  border-radius: 16px;
-  background: #162b37;
-  color: #ecf3f1;
-  box-shadow: 0 20px 90px #0005;
-}
-.about-dialog::backdrop {
-  background: #06111ccb;
-  backdrop-filter: blur(7px);
-}
-.about-content {
-  position: relative;
-  padding: 38px;
-}
-.dialog-close {
-  position: absolute;
-  right: 16px;
-  top: 16px;
-  display: grid;
-  place-items: center;
-  width: 30px;
-  height: 30px;
-  color: #9ab0b9;
-  border-radius: 50%;
-}
-.dialog-close:hover {
-  background: #2c454f;
-}
-.about-icon {
-  display: grid;
-  place-items: center;
-  width: 55px;
-  height: 55px;
-  border: 1px solid #4b716b;
-  border-radius: 50%;
-  color: var(--mint);
-  margin-bottom: 25px;
-}
-.about-content .eyebrow {
-  font-size: 8px;
-}
-.about-content h2 {
-  font-size: 30px;
-  letter-spacing: -0.8px;
-  line-height: 1.25;
-  margin: 15px 0 18px;
-}
-.about-content > p {
-  font-size: 12px;
-  line-height: 1.8;
-  color: #a5bdc6;
-}
-.about-sample {
-  display: flex;
-  gap: 10px;
-  padding: 16px;
-  background: #243b42;
-  border: 1px solid #36565a;
-  border-radius: 6px;
-  margin-top: 24px;
-  color: #9ad3c0;
-}
-.about-sample > svg {
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-.about-sample p {
-  font-size: 11px;
-  line-height: 1.8;
-  color: #b4c9cb;
-}
-.about-sample code {
-  font-size: 9px;
-  color: #d0e3dd;
-}
-.about-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 11px 17px;
-  margin: 25px 0;
-}
-.about-legend span {
-  font-size: 9px;
-}
-.about-content .about-credit {
-  font-size: 9px;
-  color: #85a0ac;
-}
-.about-credit a {
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-.about-content .annotated-button {
-  margin-top: 25px;
-}
 .spin {
   animation: spin 1.3s linear infinite;
 }
@@ -1261,18 +1042,8 @@ h2 {
   }
 }
 @media (min-width: 1600px) {
-  .app-shell {
-    padding: 0 48px;
-  }
-  .app-header {
-    height: 112px;
-  }
   .atlas-layout {
-    height: calc(100svh - 172px);
     grid-template-columns: minmax(0, 1fr) 390px;
-  }
-  .app-footer {
-    height: 60px;
   }
   .panel-intro {
     padding: 38px 32px 28px;
@@ -1327,25 +1098,8 @@ h2 {
   }
 }
 @media (max-width: 1100px) {
-  .app-shell {
-    padding: 0 22px;
-  }
-  .app-header {
-    height: 84px;
-    gap: 17px;
-  }
-  .brand-tagline {
-    display: none;
-  }
-  .main-nav {
-    gap: 20px;
-  }
   .atlas-layout {
-    height: calc(100svh - 132px);
     grid-template-columns: minmax(0, 1fr) 320px;
-  }
-  .app-footer {
-    height: 48px;
   }
   .panel-intro {
     padding: 29px 22px 22px;
@@ -1428,52 +1182,8 @@ h2 {
   }
 }
 @media (max-width: 760px) {
-  .app-shell {
-    padding: 0 14px;
-  }
-  .app-header {
-    height: 76px;
-    gap: 12px;
-  }
-  .brand {
-    font-size: 25px;
-  }
-  .brand-mark {
-    width: 30px;
-    height: 30px;
-  }
-  .brand-mark svg {
-    width: 22px;
-  }
-  .main-nav {
-    gap: 15px;
-  }
-  .main-nav button {
-    font-size: 10px;
-  }
-  .main-nav button:first-child svg {
-    display: none;
-  }
-  .main-nav button:nth-child(2) {
-    display: none;
-  }
-  .nav-active:after {
-    bottom: 15px;
-  }
-  .collection-label {
-    margin-left: 0;
-    font-size: 9px;
-    padding: 7px 9px;
-    gap: 6px;
-  }
-  .collection-label svg {
-    display: none;
-  }
   .atlas-layout {
     grid-template-columns: minmax(0, 1fr) 285px;
-    height: calc(100svh - 120px);
-    min-height: 590px;
-    border-radius: 12px;
   }
   .panel-intro {
     padding: 25px 19px 21px;
@@ -1622,13 +1332,6 @@ h2 {
   .map-action-caption {
     font-size: 7px;
   }
-  .app-footer {
-    height: 44px;
-    font-size: 8px;
-  }
-  .app-footer > span:last-child {
-    font-size: 7px;
-  }
   .viewer-title {
     display: none;
   }
@@ -1654,31 +1357,15 @@ h2 {
 }
 @media (max-width: 600px) {
   .app-shell {
-    padding: 0 12px;
-  }
-  .app-header {
-    height: 72px;
-  }
-  .brand {
-    font-size: 25px;
-  }
-  .main-nav {
-    margin-left: auto;
-  }
-  .main-nav button {
-    font-size: 10px;
-  }
-  .collection-label {
-    font-size: 8px;
+    height: auto;
+    min-height: 100dvh;
   }
   .atlas-layout {
     display: flex;
     flex-direction: column;
-    height: auto;
-    min-height: 0;
-    max-height: none;
-    border-radius: 13px;
     overflow: hidden;
+    height: auto;
+    min-height: 100dvh;
   }
   .map-stage {
     height: 53svh;
@@ -1891,24 +1578,6 @@ h2 {
     gap: 3px;
     padding: 13px 15px;
   }
-  .app-footer {
-    height: 53px;
-    font-size: 8px;
-    padding: 0 3px;
-  }
-  .app-footer > span:last-child {
-    font-size: 0;
-    gap: 0;
-  }
-  .footer-star {
-    font-size: 18px !important;
-  }
-  .about-content {
-    padding: 30px 25px;
-  }
-  .about-content h2 {
-    font-size: 27px;
-  }
   .notes-section p {
     font-size: 13px;
   }
@@ -1962,9 +1631,6 @@ h2 {
   }
   .subregion-label {
     font-size: 11px;
-  }
-  .main-nav button {
-    font-size: 13px;
   }
   .map-legend span {
     font-size: 11px;

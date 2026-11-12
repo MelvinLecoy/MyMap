@@ -9,8 +9,6 @@ import {
   ChevronRight,
   Compass,
   Earth,
-  Globe2,
-  Info,
   Map,
   MapPin,
   Search,
@@ -28,7 +26,6 @@ import {
   VISIT_LABELS,
   formatVisitDate,
   type AtlasData,
-  type City,
   type MapStatus,
 } from "./lib/types";
 const data = atlas as AtlasData;
@@ -62,10 +59,8 @@ export default function App() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("all");
   const [continent, setContinent] = useState("all");
-  const [about, setAbout] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
   const viewerButton = useRef<HTMLButtonElement>(null);
-  const aboutDialog = useRef<HTMLDialogElement>(null);
   const selected = data.cities.find((c) => c.id === route.city) || null;
   const viewer = Boolean(route.view && selected?.map);
   const navigate = useCallback(
@@ -101,10 +96,6 @@ export default function App() {
     window.addEventListener("keydown", key);
     return () => window.removeEventListener("keydown", key);
   }, [selected, navigate]);
-  useEffect(() => {
-    if (about) aboutDialog.current?.showModal();
-    else aboutDialog.current?.close();
-  }, [about]);
   const continents = useMemo(
     () =>
       [...new Set(data.cities.map((c) => c.continent).filter(Boolean))].sort(),
@@ -137,42 +128,6 @@ export default function App() {
   }, [navigate, selected]);
   return (
     <div className="app-shell">
-      <header className="app-header">
-        <a
-          className="brand"
-          href={import.meta.env.BASE_URL}
-          onClick={(e) => {
-            e.preventDefault();
-            navigate(null);
-            setSearch("");
-            setStatus("all");
-          }}
-          aria-label="Elsewhere home"
-        >
-          <span className="brand-mark">
-            <Compass size={25} strokeWidth={1.45} />
-          </span>
-          <span>
-            elsewhere<span className="brand-period">.</span>
-          </span>
-        </a>
-        <div className="brand-tagline">A PERSONAL ATLAS</div>
-        <nav className="main-nav" aria-label="Main navigation">
-          <button className="nav-active" onClick={() => navigate(null)}>
-            <Globe2 size={15} />
-            Explore
-          </button>
-          <button onClick={() => setAbout(true)}>
-            About the atlas
-            <ArrowUpRight size={13} />
-          </button>
-        </nav>
-        <button className="collection-label" onClick={() => setAbout(true)}>
-          <i />
-          {data.demo ? "Sample collection" : "Your collection"}
-          <Info size={13} />
-        </button>
-      </header>
       <main className={`atlas-layout ${viewer ? "viewer-is-open" : ""}`}>
         <div className="map-stage">
           <Globe
@@ -348,8 +303,8 @@ export default function App() {
                 </div>
                 {data.demo && (
                   <p className="sample-note">
-                    <Sparkles size={12} />A few places to begin. Make this atlas
-                    yours.
+                    <Sparkles size={12} />
+                    Sample data
                   </p>
                 )}
               </div>
@@ -480,88 +435,6 @@ export default function App() {
           )}
         </aside>
       </main>
-      <footer className="app-footer">
-        <span>A little closer to everywhere.</span>
-        <span>
-          Made for the places that stay with you.
-          <span className="footer-star">✳</span>
-        </span>
-      </footer>
-      <dialog
-        ref={aboutDialog}
-        className="about-dialog"
-        onCancel={() => setAbout(false)}
-        onClick={(e) => {
-          if (e.target === aboutDialog.current) setAbout(false);
-        }}
-      >
-        <div className="about-content">
-          <button
-            className="dialog-close"
-            aria-label="Close about"
-            onClick={() => setAbout(false)}
-          >
-            <X size={19} />
-          </button>
-          <span className="about-icon">
-            <Compass size={31} strokeWidth={1.2} />
-          </span>
-          <div className="eyebrow">A PERSONAL ATLAS</div>
-          <h2>
-            A world of places.
-            <br />A collection of memories.
-          </h2>
-          <p>
-            Elsewhere is a quiet home for your travels. Explore the globe, find
-            a city, and open the maps that tell its story.
-          </p>
-          {data.demo && (
-            <div className="about-sample">
-              <Sparkles size={17} />
-              <p>
-                You’re exploring a <strong>sample collection</strong>. The
-                visits, notes, and colors are illustrative. Add your export to{" "}
-                <code>data/cities.csv</code> and rebuild to make it yours.
-              </p>
-            </div>
-          )}
-          <div className="about-legend">
-            <span>
-              <i className="legend-country" />
-              Visited country
-            </span>
-            <span>
-              <i className="legend-pin" />
-              Visited city
-            </span>
-            <span>
-              <i className="legend-unknown" />
-              Visit not recorded
-            </span>
-          </div>
-          <p className="about-credit">
-            Geography by{" "}
-            <a
-              href="https://www.naturalearthdata.com/"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Natural Earth
-            </a>
-            . Basemap by{" "}
-            <a href="https://openfreemap.org/" target="_blank" rel="noreferrer">
-              OpenFreeMap
-            </a>{" "}
-            / OpenStreetMap when available.
-            {data.geonames && " Coordinates from GeoNames (CC BY 4.0)."} Built
-            with MapLibre.
-          </p>
-          <button className="annotated-button" onClick={() => setAbout(false)}>
-            <span>Back to exploring</span>
-            <ArrowRight size={18} />
-          </button>
-        </div>
-      </dialog>
     </div>
   );
 }

@@ -145,7 +145,7 @@ test("camera supports dragging, continuous zoom and reset", async ({
   await expect(page.locator(".map-view-badge")).toContainText("Globe view");
   await expect(page.locator(".coordinates")).toHaveText(initial!);
 });
-test("360px layout, keyboard selection and about dialog", async ({ page }) => {
+test("360px layout and keyboard selection", async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 800 });
   await page.goto("/");
   expect(
@@ -162,10 +162,6 @@ test("360px layout, keyboard selection and about dialog", async ({ page }) => {
     page.getByRole("heading", { name: "Prague", exact: true }),
   ).toBeVisible();
   await expect(page.locator(".detail-facts")).toContainText("Not visited");
-  await page.getByRole("button", { name: "Sample collection" }).click();
-  await expect(page.getByRole("dialog")).toBeVisible();
-  await page.keyboard.press("Escape");
-  await expect(page.getByRole("dialog")).not.toBeVisible();
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= window.innerWidth,
@@ -208,8 +204,8 @@ test("clusters expand and visible pins select their city", async ({ page }) => {
   const initialPosition = await page.locator(".coordinates").textContent();
   // The Central European demo cluster in the documented initial camera.
   await page.mouse.click(
-    box.x + box.width * 0.4883,
-    box.y + box.height * 0.4362,
+    box.x + box.width / 2 - 13,
+    box.y + box.height / 2 - 54,
   );
   await expect(page.locator(".coordinates")).not.toHaveText(initialPosition!);
   await page.locator(".city-row").filter({ hasText: "Kyiv" }).click();

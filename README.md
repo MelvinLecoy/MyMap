@@ -1,6 +1,6 @@
 # Elsewhere — a personal travel atlas
 
-A responsive, static travel globe inspired by the supplied reference: navy panels, blue-green geography, colored countries, city pins, a searchable collection, and focused city details. Built with React, TypeScript, Vite, and MapLibre GL JS. No API key or backend is required.
+A responsive, static travel globe inspired by the supplied reference: navy panels, blue-green geography, colored countries, city pins, a searchable collection, and focused city details. The map and city panel fill the browser window, with no outer header, navigation, footer, or page margins. Built with React, TypeScript, Vite, and MapLibre GL JS. No API key or backend is required.
 
 ## Run on a Mac
 
@@ -14,7 +14,7 @@ npm ci
 npm run dev
 ```
 
-Open the address Vite prints (normally `http://localhost:5173`). The dev command imports your CSV before starting. If `data/cities.csv` is absent, it uses the five-city sample fixture and labels the app **Sample collection**. Restart the dev command after changing CSV inputs. Dependencies and versions are pinned in `package-lock.json`.
+Open the address Vite prints (normally `http://localhost:5173`). The dev command imports your CSV before starting. If `data/cities.csv` is absent, it uses the five-city sample fixture and labels the city list **Sample data**. Restart the dev command after changing CSV inputs. Dependencies and versions are pinned in `package-lock.json`.
 
 The sample includes Moscow and Kyiv's supplied My Maps links and illustrative records for Warsaw, Prague, and Helsinki. Sample visits, dates, notes, and colors are **not your personal travel history**.
 
