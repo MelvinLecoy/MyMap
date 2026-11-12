@@ -128,7 +128,7 @@ test("selecting a city, notes, visits, links, direct URLs and browser history", 
     "A slow afternoon along the Vistula.",
   );
   await expect(page.getByText("A map in the making")).toBeVisible();
-  await page.getByRole("button", { name: "All cities" }).click();
+  await page.getByRole("button", { name: "All cities (5)" }).click();
   await expect(page.locator(".city-row")).toHaveCount(5);
   await page.goBack();
   await expect(
@@ -155,7 +155,9 @@ test("detail design keeps coordinates beside the heading and the map action abov
     await expect(page.locator(".detail-geography")).toHaveText(
       "Europe / East Europe / Ruslands",
     );
-    await expect(page.locator(".detail-total")).toHaveText("5");
+    await expect(
+      page.getByRole("button", { name: "All cities (5)", exact: true }),
+    ).toBeVisible();
     await expect(page.locator(".detail-coordinates")).toContainText(
       "55.7522° N",
     );
@@ -166,13 +168,24 @@ test("detail design keeps coordinates beside the heading and the map action abov
       .getByRole("heading", { name: "Moscow", exact: true })
       .boundingBox();
     const coordinates = await page.locator(".detail-coordinates").boundingBox();
+    const place = await page.locator(".detail-place-card").boundingBox();
     const action = await page
       .getByRole("button", { name: "View My Map" })
       .boundingBox();
     const facts = await page.locator(".detail-facts").boundingBox();
+    const visitRow = await page
+      .locator(".detail-fact-row")
+      .nth(1)
+      .boundingBox();
     expect(heading!.height).toBeLessThan(42);
     expect(coordinates!.x).toBeGreaterThanOrEqual(heading!.x + heading!.width);
+    expect(heading!.x).toBeGreaterThan(place!.x);
+    expect(coordinates!.x + coordinates!.width).toBeLessThan(
+      place!.x + place!.width,
+    );
     expect(action!.y + action!.height).toBeLessThan(facts!.y);
+    expect(visitRow!.x - facts!.x).toBeLessThanOrEqual(1);
+    expect(facts!.width - visitRow!.width).toBeLessThanOrEqual(2);
     await expect(page.locator(".city-panel")).not.toContainText(
       /Your layers|ON THE GLOBE|Every place has a story|Visit not recorded/,
     );
@@ -215,7 +228,9 @@ test("status edits survive reloads, synchronize tabs, and update list filters in
   await page.reload();
   await expect(status).toHaveValue("Update");
   await expect(page.locator(".visit-value")).toHaveText("Not Yet");
-  await page.getByRole("button", { name: "All cities", exact: true }).click();
+  await page
+    .getByRole("button", { name: "All cities (5)", exact: true })
+    .click();
   await expect(
     page.locator(".city-row").filter({ hasText: "Moscow" }).locator(".status"),
   ).toHaveText("Update");
@@ -260,7 +275,9 @@ test("corrupt saved data recovers and blocked storage keeps edits usable for the
   await status.selectOption("Unfinished");
   await expect(status).toHaveValue("Unfinished");
   await expect(page.getByRole("status")).toContainText("couldn’t save");
-  await page.getByRole("button", { name: "All cities", exact: true }).click();
+  await page
+    .getByRole("button", { name: "All cities (5)", exact: true })
+    .click();
   await expect(
     page.locator(".city-row").filter({ hasText: "Moscow" }).locator(".status"),
   ).toHaveText("Unfinished");
@@ -268,7 +285,9 @@ test("corrupt saved data recovers and blocked storage keeps edits usable for the
   await page
     .getByRole("combobox", { name: "Map status", exact: true })
     .selectOption("Not Started");
-  await page.getByRole("button", { name: "All cities", exact: true }).click();
+  await page
+    .getByRole("button", { name: "All cities (5)", exact: true })
+    .click();
   await expect(
     page.locator(".city-row").filter({ hasText: "Moscow" }).locator(".status"),
   ).toHaveText("Unfinished");
@@ -307,7 +326,7 @@ test("viewer is lazy, canonical, accessible, and preserves filters and camera", 
   await expect(page.locator("iframe")).toHaveCount(0);
   await expect(page.locator(".coordinates")).toHaveText(position!);
   await expect(page.getByRole("button", { name: "View My Map" })).toBeFocused();
-  await page.getByRole("button", { name: "All cities" }).click();
+  await page.getByRole("button", { name: "All cities (5)" }).click();
   await expect(page.getByRole("textbox")).toHaveValue("Kyiv");
   await expect(page.getByLabel("Filter by map status")).toHaveValue("Complete");
   await expect(page.locator(".city-row")).toHaveCount(1);
@@ -407,7 +426,7 @@ test("clusters expand and visible pins select their city", async ({ page }) => {
   await expect(page.locator(".coordinates")).not.toHaveText(initialPosition!);
   await page.locator(".city-row").filter({ hasText: "Kyiv" }).click();
   await expect(page.locator(".coordinates")).toHaveText(/50.5° N.*30.5° E/);
-  await page.getByRole("button", { name: "All cities" }).click();
+  await page.getByRole("button", { name: "All cities (5)" }).click();
   await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
   await expect(
     page.getByRole("heading", { name: "Kyiv", exact: true }),

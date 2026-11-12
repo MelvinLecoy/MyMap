@@ -8,7 +8,6 @@ import {
   ChevronDown,
   ChevronRight,
   Map,
-  MapPin,
   Search,
   SlidersHorizontal,
   X,
@@ -346,36 +345,32 @@ export default function App() {
                   onClick={() => navigate(null)}
                 >
                   <ArrowLeft size={17} aria-hidden="true" />
-                  All cities
+                  <span>All cities ({data.cities.length})</span>
                 </button>
-                <span
-                  className="detail-total"
-                  aria-label={`${data.cities.length} cities in collection`}
-                >
-                  {data.cities.length}
-                </span>
               </div>
               <div className="city-detail" key={selected.id}>
-                <div className="detail-geography" aria-label="Geography">
-                  {[selected.continent, selected.region, selected.subregion]
-                    .filter(Boolean)
-                    .join(" / ")}
-                </div>
-                <div className="detail-identity">
-                  <div>
-                    <h1>{selected.name}</h1>
-                    <p className="detail-country">
-                      <Flag code={selected.countryCode} />
-                      {selected.country}
-                    </p>
+                <section
+                  className="detail-place-card"
+                  aria-label={`${selected.name} location`}
+                >
+                  <div className="detail-geography" aria-label="Geography">
+                    {[selected.continent, selected.region, selected.subregion]
+                      .filter(Boolean)
+                      .join(" / ")}
                   </div>
-                  {selected.coordinates && (
-                    <div
-                      className="detail-coordinates"
-                      aria-label="City coordinates"
-                    >
-                      <MapPin size={14} strokeWidth={1.5} aria-hidden="true" />
-                      <div>
+                  <div className="detail-identity">
+                    <div>
+                      <h1>{selected.name}</h1>
+                      <p className="detail-country">
+                        <Flag code={selected.countryCode} />
+                        {selected.country}
+                      </p>
+                    </div>
+                    {selected.coordinates && (
+                      <div
+                        className="detail-coordinates"
+                        aria-label="City coordinates"
+                      >
                         <span>
                           <span className="visually-hidden">Latitude </span>
                           {Math.abs(selected.coordinates[1]).toFixed(4)}°{" "}
@@ -387,9 +382,9 @@ export default function App() {
                           {selected.coordinates[0] >= 0 ? "E" : "W"}
                         </span>
                       </div>
-                    </div>
-                  )}
-                </div>
+                    )}
+                  </div>
+                </section>
                 {selected.map ? (
                   <button
                     className="annotated-button"

@@ -710,7 +710,7 @@ h2 {
 .detail-top {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   padding: 24px var(--collection-inset) 22px;
   gap: 12px;
   flex-shrink: 0;
@@ -719,32 +719,19 @@ h2 {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 9px 12px;
-  min-height: 38px;
+  padding: 10px 13px;
+  min-height: 40px;
   border: 1px solid #d9e9df;
   border-radius: 8px;
   background: #e6f0e9;
   color: var(--text);
   font-family: "Manrope Variable", sans-serif;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 650;
   line-height: 18px;
 }
 .back-to-cities:hover {
   background: #d9eadd;
-}
-.detail-total {
-  min-width: 32px;
-  height: 32px;
-  padding: 0 8px;
-  display: grid;
-  place-items: center;
-  background: #b8dece;
-  color: #24584c;
-  border-radius: 7px;
-  font-size: 15px;
-  font-weight: 650;
-  font-variant-numeric: tabular-nums;
 }
 .text-button {
   display: inline-flex;
@@ -767,10 +754,17 @@ h2 {
   animation: enter 0.3s ease;
   font-family: "Manrope Variable", "DM Sans Variable", sans-serif;
 }
+.detail-place-card {
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-alt);
+}
 .detail-geography {
   color: var(--muted);
-  font-size: 11px;
-  line-height: 1.7;
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.6;
   overflow-wrap: anywhere;
 }
 .detail-identity {
@@ -778,7 +772,7 @@ h2 {
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 12px;
   align-items: start;
-  margin-top: 22px;
+  margin-top: 18px;
 }
 .detail-identity > div:first-child {
   min-width: 0;
@@ -791,7 +785,7 @@ h2 {
   overflow-wrap: anywhere;
 }
 .detail-country {
-  font-size: 14px;
+  font-size: 15px;
   color: var(--muted);
   display: flex;
   align-items: center;
@@ -806,33 +800,19 @@ h2 {
 }
 .detail-coordinates {
   display: flex;
-  align-items: center;
-  gap: 7px;
-  margin-top: 1px;
-  padding: 8px;
-  border: 1px solid var(--line);
-  border-radius: 7px;
+  flex-direction: column;
+  margin-top: 4px;
+  padding-left: 12px;
+  border-left: 1px solid var(--border);
   color: var(--text);
-  background: var(--panel);
-  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
-  font-size: 10px;
-  line-height: 1.5;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.6;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
-.detail-coordinates > svg {
-  color: var(--muted);
-  flex-shrink: 0;
-}
-.detail-coordinates > div {
-  display: flex;
-  flex-direction: column;
-  border-left: 1px solid var(--line);
-  padding-left: 7px;
-}
 .detail-facts {
-  margin-top: 24px;
-  padding: 0 12px;
+  margin-top: 20px;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--surface);
@@ -842,9 +822,9 @@ h2 {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 12px 0;
+  padding: 12px 14px;
   min-height: 56px;
-  font-size: 12px;
+  font-size: 14px;
 }
 .detail-fact-row + .detail-fact-row {
   border-top: 1px solid var(--line);
@@ -852,10 +832,10 @@ h2 {
 .detail-fact-row > label,
 .detail-fact-row > span:first-child {
   color: var(--muted);
-  font-weight: 500;
+  font-weight: 650;
 }
 .detail-fact-row strong {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 500;
   text-align: right;
   overflow-wrap: anywhere;
@@ -879,7 +859,7 @@ h2 {
   border-radius: inherit;
   background: transparent;
   color: inherit;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 650;
   line-height: 20px;
   cursor: pointer;
@@ -912,8 +892,8 @@ h2 {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  font-size: 12px;
-  font-weight: 500;
+  font-size: 13px;
+  font-weight: 550;
   color: var(--muted);
   white-space: nowrap;
 }
@@ -940,10 +920,10 @@ h2 {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 650;
   line-height: 20px;
-  margin-top: 24px;
+  margin-top: 20px;
 }
 .annotated-button:hover {
   background: var(--action-hover);
