@@ -755,7 +755,6 @@ h2 {
   font-family: "Manrope Variable", "DM Sans Variable", sans-serif;
 }
 .detail-place-card {
-  container-type: inline-size;
   padding: 16px;
   border: 1px solid var(--line);
   border-radius: 10px;
@@ -769,23 +768,21 @@ h2 {
   overflow-wrap: anywhere;
 }
 .detail-identity {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px 8px;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: start;
   margin-top: 18px;
 }
 .detail-identity > div:first-child {
-  flex: 1 1 auto;
   min-width: 0;
-  max-width: 100%;
 }
 .city-detail h1 {
-  font-size: clamp(24px, calc(15cqi - 10px), 32px);
+  font-size: 32px;
   letter-spacing: -1.2px;
   font-weight: 750;
   line-height: 1.12;
-  overflow-wrap: break-word;
+  overflow-wrap: normal;
 }
 .detail-country {
   font-size: 15px;
@@ -803,18 +800,33 @@ h2 {
 }
 .detail-coordinates {
   display: flex;
-  flex: 0 0 auto;
   flex-direction: column;
   margin-top: 4px;
-  margin-left: auto;
-  padding-left: 8px;
+  padding-left: 12px;
   border-left: 1px solid var(--border);
   color: var(--text);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 500;
   line-height: 1.6;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+}
+.detail-identity--compact {
+  column-gap: 8px;
+}
+.detail-identity--compact .detail-coordinates {
+  padding-left: 8px;
+  font-size: 10px;
+}
+.detail-identity--stacked {
+  grid-template-columns: minmax(0, 1fr);
+}
+.detail-identity--stacked > div:first-child {
+  grid-row: 2;
+}
+.detail-identity--stacked .detail-coordinates {
+  grid-row: 1;
+  justify-self: end;
 }
 .detail-facts {
   margin-top: 20px;
@@ -1110,7 +1122,7 @@ h2 {
     font-size: 16px;
   }
   .city-detail h1 {
-    font-size: clamp(24px, calc(15cqi - 10px), 34px);
+    font-size: 34px;
   }
 }
 @media (max-width: 1100px) {
@@ -1242,7 +1254,7 @@ h2 {
     display: none;
   }
   .city-detail h1 {
-    font-size: clamp(24px, calc(15cqi - 10px), 30px);
+    font-size: 30px;
   }
   .viewer-title {
     display: none;
@@ -1343,7 +1355,7 @@ h2 {
     flex: none;
   }
   .city-detail h1 {
-    font-size: clamp(24px, calc(15cqi - 10px), 32px);
+    font-size: 32px;
   }
   .no-map-card strong {
     font-size: 12px;

@@ -1,0 +1,77 @@
+import { useLayoutEffect, useRef, useState } from "react";
+
+type CoordinateLayout = "regular" | "compact" | "stacked";
+
+export function useCoordinateLayout(cityId: string | undefined) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [layout, setLayout] = useState<CoordinateLayout>("regular");
+
+  useLayoutEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+    if (!element.querySelector(".detail-coordinates")) {
+      setLayout("regular");
+      return;
+    }
+    let disposed = false;
+    const measure = () => {
+      if (disposed) return;
+      // Measure the original typography independently of the current layout.
+      // Only the longest word needs to fit; spaces remain natural line breaks.
+      const probe = element.cloneNode(true) as HTMLDivElement;
+      probe.className = "detail-identity";
+      probe.setAttribute("aria-hidden", "true");
+      probe.inert = true;
+      Object.assign(probe.style, {
+        position: "fixed",
+        visibility: "hidden",
+        pointerEvents: "none",
+        width: "max-content",
+        gridTemplateColumns: "max-content max-content",
+      });
+      const heading = probe.querySelector("h1")!;
+      const coordinates = probe.querySelector<HTMLElement>(
+        ".detail-coordinates",
+      )!;
+      heading.style.whiteSpace = "nowrap";
+      element.after(probe);
+      try {
+        const text = heading.firstChild!;
+        const range = document.createRange();
+        const longestWord = Math.max(
+          ...[...heading.textContent!.matchAll(/\S+/g)].map((word) => {
+            range.setStart(text, word.index!);
+            range.setEnd(text, word.index! + word[0].length);
+            return range.getBoundingClientRect().width;
+          }),
+        );
+        const fits = () =>
+          longestWord +
+            coordinates.getBoundingClientRect().width +
+            parseFloat(getComputedStyle(probe).columnGap) <=
+          element.clientWidth;
+        let next: CoordinateLayout = "regular";
+        if (!fits()) {
+          probe.classList.add("detail-identity--compact");
+          // Keep whole words and readable type at very narrow panel widths.
+          next = fits() ? "compact" : "stacked";
+        }
+        setLayout((previous) => (previous === next ? previous : next));
+      } finally {
+        probe.remove();
+      }
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    document.fonts.ready.then(measure);
+    document.fonts.addEventListener("loadingdone", measure);
+    return () => {
+      disposed = true;
+      observer.disconnect();
+      document.fonts.removeEventListener("loadingdone", measure);
+    };
+  }, [cityId]);
+
+  return { ref, layout };
+}

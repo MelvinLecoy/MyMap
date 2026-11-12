@@ -17,6 +17,7 @@ import {
 import Globe from "./components/Globe";
 import MapViewer from "./components/MapViewer";
 import atlas from "./generated/atlas.json";
+import { useCoordinateLayout } from "./lib/use-coordinate-layout";
 import {
   COLLECTION_STATUS_STORAGE_KEY,
   MAP_STATUS_STORAGE_KEY,
@@ -108,6 +109,9 @@ export default function App() {
   const searchRef = useRef<HTMLInputElement>(null);
   const viewerButton = useRef<HTMLButtonElement>(null);
   const selected = cities.find((c) => c.id === route.city) || null;
+  const { ref: identityRef, layout: coordinateLayout } = useCoordinateLayout(
+    selected?.id,
+  );
   const viewer = Boolean(route.view && selected?.map);
   const updateMapStatus = (id: string, value: MapStatus) => {
     const next = { ...statusOverrides, [id]: value };
@@ -364,7 +368,10 @@ export default function App() {
                       .filter(Boolean)
                       .join(" / ")}
                   </div>
-                  <div className="detail-identity">
+                  <div
+                    ref={identityRef}
+                    className={`detail-identity detail-identity--${coordinateLayout}`}
+                  >
                     <div>
                       <h1>{selected.name}</h1>
                       <p className="detail-country">

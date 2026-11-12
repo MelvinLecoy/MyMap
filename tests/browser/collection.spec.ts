@@ -212,7 +212,7 @@ test("long names fit from 320px to desktop without clipped coordinates or dropdo
   }
 });
 
-test("city headings keep complete words and compact coordinates beside Longyearbyen", async ({
+test("names wrap between words while coordinates stay anchored and shrink only when needed", async ({
   page,
 }) => {
   const cases = [
@@ -223,8 +223,14 @@ test("city headings keep complete words and compact coordinates beside Longyearb
     { width: 360, name: "Longyearbyen" },
     { width: 320, name: "Longyearbyen" },
     { width: 700, name: "Yekaterinburg" },
+    { width: 1600, name: "Krong Siem Reap" },
+    { width: 700, name: "Krong Siem Reap" },
+    { width: 320, name: "Krong Siem Reap" },
+    { width: 1600, name: "Bandar Seri Begawan" },
+    { width: 700, name: "Bandar Seri Begawan" },
     { width: 320, name: "Bandar Seri Begawan" },
     { width: 1600, name: "Moscow" },
+    { width: 700, name: "Moscow" },
   ];
   for (const { width, name } of cases) {
     await page.setViewportSize({ width, height: 800 });
@@ -241,12 +247,21 @@ test("city headings keep complete words and compact coordinates beside Longyearb
           word: word[0],
           lines: [...range.getClientRects()].filter((rect) => rect.width > 0)
             .length,
+          left: range.getBoundingClientRect().left,
+          right: range.getBoundingClientRect().right,
         };
       });
     });
-    for (const word of words)
-      expect(word.lines, `${width}px: ${name} / ${word.word}`).toBe(1);
     const title = (await heading.boundingBox())!;
+    for (const word of words) {
+      expect(word.lines, `${width}px: ${name} / ${word.word}`).toBe(1);
+      expect(word.left).toBeGreaterThanOrEqual(title.x);
+      expect(word.right).toBeLessThanOrEqual(title.x + title.width + 0.5);
+    }
+    await expect(heading).toHaveCSS(
+      "font-size",
+      `${width >= 1600 ? 34 : width > 600 && width <= 760 ? 30 : 32}px`,
+    );
     const coordinates = (await page
       .locator(".detail-coordinates")
       .boundingBox())!;
@@ -266,12 +281,57 @@ test("city headings keep complete words and compact coordinates beside Longyearb
         () => document.documentElement.scrollWidth <= innerWidth,
       ),
     ).toBe(true);
-    if (name === "Moscow" || name === "Longyearbyen") {
+    expect(coordinates.x + coordinates.width).toBeCloseTo(
+      card.x + card.width - 17,
+      0,
+    );
+    const stacked = await page.locator(".detail-identity--stacked").count();
+    if (stacked) {
+      expect(coordinates.y + coordinates.height).toBeLessThanOrEqual(title.y);
+    } else {
       expect(coordinates.x).toBeGreaterThanOrEqual(title.x + title.width);
       expect(coordinates.y).toBeGreaterThanOrEqual(title.y);
       expect(coordinates.y).toBeLessThan(title.y + title.height);
     }
+    if (["Moscow", "Krong Siem Reap", "Bandar Seri Begawan"].includes(name)) {
+      expect(stacked).toBe(0);
+      await expect(page.locator(".detail-coordinates")).toHaveCSS(
+        "font-size",
+        "12px",
+      );
+    }
+    if (name === "Longyearbyen" && [1600, 1440, 360].includes(width)) {
+      expect(stacked).toBe(0);
+      await expect(page.locator(".detail-coordinates")).toHaveCSS(
+        "font-size",
+        "10px",
+      );
+    }
   }
+});
+
+test("coordinate sizing resets when space or the selected city changes", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1600, height: 900 });
+  await page.goto(`/?city=${encodeURIComponent(city("Longyearbyen").id)}`);
+  const coordinates = page.locator(".detail-coordinates");
+  for (const { width, size } of [
+    { width: 1600, size: "10px" },
+    { width: 600, size: "12px" },
+    { width: 1440, size: "10px" },
+    { width: 600, size: "12px" },
+  ]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.evaluate(() => document.fonts.ready);
+    await expect(coordinates).toHaveCSS("font-size", size);
+  }
+  await page.setViewportSize({ width: 1600, height: 900 });
+  await expect(coordinates).toHaveCSS("font-size", "10px");
+  await back(page);
+  await openCity(page, "Bandar Seri Begawan");
+  await expect(coordinates).toHaveCSS("font-size", "12px");
+  await expect(page.locator(".detail-identity--regular")).toBeVisible();
 });
 
 test("real status edits persist and sync separately from demo edits without changing visits", async ({
