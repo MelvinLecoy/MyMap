@@ -593,6 +593,11 @@ h2 {
   background: #dff1e6;
   color: #28654e;
 }
+.country-row .visit-marker-visited {
+  background: #ace0c0;
+  color: #165b37;
+  box-shadow: inset 0 0 0 1px #7bbf98;
+}
 .city-row-body {
   display: flex;
   flex-direction: column;
@@ -1951,6 +1956,7 @@ h2 {
   font-size: 28px;
 }
 .country-detail h1 {
+  flex: 1 1 auto;
   min-width: 0;
   margin: 0;
   font-family: "Manrope Variable", sans-serif;
@@ -1958,7 +1964,31 @@ h2 {
   font-weight: 750;
   letter-spacing: -1px;
   line-height: 1.2;
-  overflow-wrap: anywhere;
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
+}
+.country-name-word {
+  white-space: nowrap;
+}
+.country-visit-rank {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: baseline;
+  align-self: center;
+  gap: 1px;
+  color: #287451;
+  font-family: "Manrope Variable", sans-serif;
+  font-size: 24px;
+  font-weight: 750;
+  line-height: 1;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.country-order-hash {
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0.65;
 }
 .country-detail-visit {
   display: flex;
@@ -1978,7 +2008,7 @@ h2 {
 }
 .country-statistics {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   margin: 14px 0 22px;
   padding-block: 14px;
   border: 1px solid var(--line);

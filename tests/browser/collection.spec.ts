@@ -524,7 +524,7 @@ test("countries open their own details and keep their tab through city details a
   await expect(
     page.getByRole("heading", { name: "Algeria", exact: true }),
   ).toBeVisible();
-  await expect(page.getByLabel("Country visit statistics")).toContainText(
+  await expect(page.getByLabel("Country visit statistics")).not.toContainText(
     "Visit order",
   );
   await expect(page.getByLabel("Country visit statistics")).toContainText(
@@ -752,9 +752,7 @@ test("the real country data supports 195 and 197 ranks without inventing missing
   await expect(
     page.getByRole("heading", { name: "Honduras", exact: true }),
   ).toBeVisible();
-  await expect(page.getByLabel("Country visit statistics")).toContainText(
-    "#97",
-  );
+  await expect(page.locator(".country-visit-rank")).toHaveText("#97");
   await expect(
     page.locator(".country-statistics .country-value-missing"),
   ).toHaveCount(2);
@@ -767,13 +765,9 @@ test("the real country data supports 195 and 197 ranks without inventing missing
   await listSize.selectOption("197");
   await expect(page).toHaveURL(/countrySet=197/);
   await page.locator(".country-row").click();
-  await expect(page.getByLabel("Country visit statistics")).toContainText(
-    "#98",
-  );
+  await expect(page.locator(".country-visit-rank")).toHaveText("#98");
   await page.reload();
-  await expect(page.getByLabel("Country visit statistics")).toContainText(
-    "#98",
-  );
+  await expect(page.locator(".country-visit-rank")).toHaveText("#98");
   await page
     .getByRole("button", { name: "All countries (197)", exact: true })
     .click();
@@ -784,9 +778,7 @@ test("the real country data supports 195 and 197 ranks without inventing missing
   );
   await page.getByLabel("Search countries", { exact: true }).fill("Kosovo");
   await page.locator(".country-row").click();
-  await expect(page.getByLabel("Country visit statistics")).toContainText(
-    "#74",
-  );
+  await expect(page.locator(".country-visit-rank")).toHaveText("#74");
   await page
     .getByRole("button", { name: "All countries (197)", exact: true })
     .click();
@@ -794,7 +786,8 @@ test("the real country data supports 195 and 197 ranks without inventing missing
   await page.locator(".country-row").click();
   await expect(
     page.locator(".country-statistics .country-value-missing"),
-  ).toHaveCount(3);
+  ).toHaveCount(2);
+  await expect(page.locator(".country-visit-rank")).toHaveCount(0);
   await expect(page.locator(".country-visit-list")).toHaveCount(0);
   await page
     .getByRole("button", { name: "All countries (197)", exact: true })
@@ -805,4 +798,94 @@ test("the real country data supports 195 and 197 ranks without inventing missing
   await page.goBack();
   await expect(listSize).toHaveValue("197");
   await expect(page.locator(".country-row")).toHaveCount(197);
+});
+
+test("country title ranks stay beside wrapped names without splitting words", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    const original = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (
+      this: HTMLCanvasElement,
+      type: string,
+      ...args: unknown[]
+    ) {
+      if (type.includes("webgl")) return null;
+      return original.apply(this, [type, ...args] as never);
+    } as typeof original;
+  });
+  let checkedWrappedRank = false;
+  for (const width of [1600, 1440, 740, 320]) {
+    await page.setViewportSize({ width, height: 1000 });
+    for (const code of ["AL", "LI", "DO", "GB", "BA", "CD"]) {
+      await page.goto(`/?panel=countries&country=${code}`);
+      await page.evaluate(() => document.fonts.ready);
+      const layout = await page
+        .locator(".country-detail-heading")
+        .evaluate((element) => {
+          const heading = element.querySelector("h1")!;
+          const rect = (node: Element) => {
+            const r = node.getBoundingClientRect();
+            return {
+              left: r.left,
+              right: r.right,
+              top: r.top,
+              bottom: r.bottom,
+              height: r.height,
+            };
+          };
+          return {
+            heading: rect(heading),
+            card: rect(element.closest(".detail-place-card")!),
+            lineHeight: parseFloat(getComputedStyle(heading).lineHeight),
+            badge: element.querySelector(".country-visit-rank")
+              ? rect(element.querySelector(".country-visit-rank")!)
+              : null,
+            words: [...heading.querySelectorAll(".country-name-word")].map(
+              (word) => {
+                const range = document.createRange();
+                range.selectNodeContents(word);
+                return {
+                  text: word.textContent,
+                  lines: range.getClientRects().length,
+                  ...rect(word),
+                };
+              },
+            ),
+          };
+        });
+      for (const word of layout.words) {
+        expect(word.lines, `${width}px: ${code} / ${word.text}`).toBe(1);
+        expect(word.left).toBeGreaterThanOrEqual(layout.heading.left - 0.5);
+        expect(word.right).toBeLessThanOrEqual(layout.heading.right + 0.5);
+      }
+      if (layout.badge) {
+        expect(layout.badge.left).toBeGreaterThanOrEqual(
+          layout.heading.right + 10,
+        );
+        expect(layout.badge.left - layout.heading.right).toBeLessThanOrEqual(
+          14,
+        );
+        expect(layout.badge.right).toBeCloseTo(layout.card.right - 17, 0);
+        expect((layout.badge.top + layout.badge.bottom) / 2).toBeCloseTo(
+          (layout.heading.top + layout.heading.bottom) / 2,
+          0,
+        );
+        if (layout.heading.height > layout.lineHeight * 1.5)
+          checkedWrappedRank = true;
+      }
+      await expect(page.locator(".country-statistics dt")).toHaveText([
+        "Times visited",
+        "Days spent",
+      ]);
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      ).toBe(true);
+      if (code === "AL")
+        await expect(page.locator(".country-visit-rank")).toHaveText("#82");
+    }
+  }
+  expect(checkedWrappedRank).toBe(true);
 });

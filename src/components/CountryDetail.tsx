@@ -1,6 +1,7 @@
 import { ArrowLeft, CalendarDays, StickyNote } from "lucide-react";
 import type { CountryRecord, CountrySet, CountryTrip } from "../lib/countries";
 import { formatVisitDate, type City } from "../lib/types";
+import { useCountryHeading } from "../lib/use-country-heading";
 import { CityRow, Flag, VisitMarker } from "./CollectionItems";
 
 function VisitDates({ visit }: { visit: CountryTrip }) {
@@ -40,6 +41,7 @@ export default function CountryDetail({
   visitOrder?: number | null;
   countrySet?: CountrySet;
 }) {
+  const headingRef = useCountryHeading(country.name, visitOrder);
   const visits = [...(country.visits ?? [])].sort(
     (a, b) => a.number - b.number,
   );
@@ -57,9 +59,32 @@ export default function CountryDetail({
           aria-label={`${country.name} information`}
         >
           <p className="detail-geography">{country.continent || "Country"}</p>
-          <div className="country-detail-heading">
+          <div className="country-detail-heading" ref={headingRef}>
             <Flag code={country.code} />
-            <h1>{country.name}</h1>
+            <h1>
+              {country.name.split(/(\s+)/).map((part, index) =>
+                /^\s+$/.test(part) ? (
+                  part
+                ) : (
+                  <span key={index} className="country-name-word">
+                    {part}
+                  </span>
+                ),
+              )}
+            </h1>
+            {visitOrder != null && (
+              <span
+                className="country-visit-rank"
+                role="note"
+                aria-label={`Visit order ${visitOrder}${countrySet ? ` in the ${countrySet}-country view` : ""}`}
+                title={`Visit order${countrySet ? ` (${countrySet} countries)` : ""}`}
+              >
+                <span className="country-order-hash" aria-hidden="true">
+                  #
+                </span>
+                {visitOrder}
+              </span>
+            )}
           </div>
           <div className="country-detail-visit">
             <span>Visit status</span>
@@ -77,11 +102,6 @@ export default function CountryDetail({
         >
           {(
             [
-              [
-                countrySet ? `Visit order (${countrySet})` : "Visit order",
-                visitOrder,
-                "order",
-              ],
               ["Times visited", country.timesVisited, "visits"],
               ["Days spent", country.totalDaysSpent, "days"],
             ] as const
@@ -92,10 +112,7 @@ export default function CountryDetail({
                 {value == null ? (
                   <span className="country-value-missing">Not recorded</span>
                 ) : (
-                  <>
-                    {kind === "order" ? "#" : ""}
-                    {value}
-                  </>
+                  value
                 )}
               </dd>
             </div>
