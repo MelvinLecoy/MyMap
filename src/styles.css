@@ -2151,6 +2151,74 @@ h2 {
   border-radius: 8px;
   background: var(--surface);
 }
+.city-statistics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 16px 0 20px;
+  padding-block: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+.city-statistics > div {
+  padding-inline: 12px;
+}
+.city-statistics > div + div {
+  border-left: 1px solid var(--line);
+}
+.city-statistics dt {
+  color: var(--muted);
+  font-size: 11px;
+}
+.city-statistics dd {
+  margin: 5px 0 0;
+  color: var(--visit-text);
+  font-size: 22px;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+}
+.city-history h2 {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 14px;
+  font-weight: 650;
+}
+.city-visit-list {
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+.city-visit-list > li {
+  padding: 12px;
+  font-size: 12px;
+}
+.city-visit-list > li + li {
+  border-top: 1px solid var(--line);
+}
+.city-visit-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px;
+}
+.city-visit-title span {
+  color: var(--accent);
+}
+.city-visit-list p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.editor-export-options {
+  display: grid;
+  gap: 10px;
+  margin-top: 20px;
+}
 .country-statistics > div {
   padding-inline: 10px;
 }

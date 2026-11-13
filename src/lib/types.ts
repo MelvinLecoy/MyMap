@@ -6,6 +6,12 @@ export const MAP_STATUSES = [
 ] as const;
 export type MapStatus = (typeof MAP_STATUSES)[number];
 export type VisitStatus = "visited" | "planned" | "not-visited" | "unknown";
+export interface CityVisit {
+  number: number;
+  arrival: string;
+  departure: string;
+  daysSpent: number;
+}
 export interface City {
   id: string;
   name: string;
@@ -18,6 +24,7 @@ export interface City {
   status: MapStatus;
   visit: VisitStatus;
   lastVisited: string | null;
+  visits?: CityVisit[];
   notes: string;
   pinColor: string | null;
   map: { embedUrl: string; viewerUrl: string } | null;

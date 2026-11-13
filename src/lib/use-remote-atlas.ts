@@ -2,6 +2,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
 import { fromCityRow, type CityRow } from "./cloud-data";
 import {
+  attachCityVisits,
+  readCitySnapshot,
+  type CityVisitRow,
+} from "./city-cloud-data";
+import {
   COLLECTION_STATUS_STORAGE_KEY,
   readStatusOverrides,
 } from "./status-storage";
@@ -22,6 +27,7 @@ export function useRemoteAtlas(
   client: SupabaseClient | null,
 ) {
   const [rows, setRows] = useState<CityRow[]>([]);
+  const [visits, setVisits] = useState<CityVisitRow[]>([]);
   const rowsRef = useRef(rows);
   const [ready, setReady] = useState(false);
   const [loading, setLoading] = useState(Boolean(client));
@@ -57,23 +63,12 @@ export function useRemoteAtlas(
     fetching.current = true;
     const version = writeVersion.current;
     try {
-      const next: CityRow[] = [];
-      for (let offset = 0; ; offset += 1000) {
-        const result = await client
-          .from("cities")
-          .select("*")
-          .order("id")
-          .range(offset, offset + 999);
-        if (result.error) throw result.error;
-        const batch = result.data as CityRow[];
-        batch.forEach(fromCityRow);
-        next.push(...batch);
-        if (batch.length < 1000) break;
-      }
-      if (!next.length || new Set(next.map((c) => c.id)).size !== next.length)
-        throw new Error("The collection is empty or has duplicate IDs.");
+      const result = await client.rpc("atlas_city_snapshot");
+      if (result.error) throw result.error;
+      const snapshot = readCitySnapshot(result.data);
       if (alive.current && version === writeVersion.current) {
-        replaceRows(next);
+        replaceRows(snapshot.cities);
+        setVisits(snapshot.visits);
         setReady(true);
         setLoadError("");
       }
@@ -227,10 +222,13 @@ export function useRemoteAtlas(
 
   const cities = useMemo(
     () =>
-      (ready ? rows.map(fromCityRow) : initial.cities).map((city) =>
+      (ready
+        ? attachCityVisits(rows.map(fromCityRow), visits)
+        : initial.cities
+      ).map((city) =>
         pending[city.id] ? { ...city, status: pending[city.id] } : city,
       ),
-    [initial, ready, rows, pending],
+    [initial, ready, rows, visits, pending],
   );
 
   const migration = useMemo<StatusImport[]>(() => {

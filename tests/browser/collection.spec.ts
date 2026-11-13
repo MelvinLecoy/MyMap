@@ -15,6 +15,52 @@ function city(name: string) {
   if (!found) throw new Error(`Missing collection record: ${name}`);
   return found;
 }
+
+test("approved city histories show corrected dates and half-days on a narrow screen", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.addInitScript(() => {
+    const get = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (
+      this: HTMLCanvasElement,
+      type: string,
+      ...args: unknown[]
+    ) {
+      return type.includes("webgl")
+        ? null
+        : get.apply(this, [type, ...args] as never);
+    } as typeof get;
+  });
+  for (const [id, text, total] of [
+    ["london-uk", "1 – 3 May 2026", "6.5"],
+    ["seoul-south-korea", "17 – 20 July 2025", "3.5"],
+    ["auckland-new-zealand", "5 – 8 August 2025", "4.5"],
+    ["singapore-singapore", "11 – 12 September 2026", "7.5"],
+    ["prague-czechia", "5 – 6 May 2024", "4"],
+    ["panama-city-panama", "24 March 2025", "2"],
+    ["boston-usa", "20 August 2021", "5"],
+    ["rome-italy", "16 – 17 August 2024", "3"],
+    ["vatican-city-vatican-city", "17 August 2024", "2"],
+  ]) {
+    await page.goto(`/?city=${id}`);
+    await expect(page.locator(".city-visit-list")).toContainText(text);
+    await expect(page.locator(".city-statistics dd").nth(1)).toHaveText(total);
+    expect(
+      await page
+        .locator(".city-detail")
+        .evaluate((el) => el.scrollWidth <= el.clientWidth),
+    ).toBe(true);
+  }
+  await page.goto("/?city=auckland-new-zealand");
+  await expect(page.locator(".city-visit-list")).toContainText("28 July 2025");
+  await expect(page.locator(".city-visit-list")).toContainText("3.5 days");
+  await page.goto("/?panel=countries&country=GB");
+  await expect(page.locator(".country-visit-list")).toContainText(
+    "1 – 2 May 2026",
+  );
+  await expect(page.locator(".country-statistics")).toContainText("12");
+});
 async function openCity(page: Page, name: string) {
   await page
     .getByRole("textbox", { name: "Search cities and countries" })
@@ -54,22 +100,22 @@ test.beforeEach(async ({ context, page, baseURL }) => {
   );
 });
 
-test("the default globe loads all 321 real entries without demo city visits or saved demo statuses", async ({
+test("the default globe loads all 323 entries with approved city visits and no saved demo statuses", async ({
   page,
 }) => {
   await page.goto("/");
-  await expect(page.locator(".city-row")).toHaveCount(321);
-  await expect(page.locator(".city-total")).toHaveText("321");
-  await expect(page.locator(".visit-marker-not-yet")).toHaveCount(321);
+  await expect(page.locator(".city-row")).toHaveCount(323);
+  await expect(page.locator(".city-total")).toHaveText("323");
+  await expect(page.locator(".visit-marker-not-yet")).toHaveCount(266);
   await expect(
     page.locator(".visit-marker-visited, .visit-marker-planned"),
-  ).toHaveCount(0);
+  ).toHaveCount(57);
   await expect(page.locator(".collection-bottom")).toHaveText(
-    /Visited\s*97\s*countries\s*0\s*cities/,
+    /Visited\s*97\s*countries\s*57\s*cities/,
   );
   await expect(page.locator(".city-row .status-complete")).toHaveCount(253);
   await expect(page.locator(".city-row .status-unfinished")).toHaveCount(7);
-  await expect(page.locator(".city-row .status-not-started")).toHaveCount(61);
+  await expect(page.locator(".city-row .status-not-started")).toHaveCount(63);
   await expect(page.locator('[data-testid="map-canvas"]')).toHaveAttribute(
     "data-ready",
     "true",
@@ -84,7 +130,7 @@ test("every status and continent filter and country search work on the full coll
   for (const [status, count] of [
     ["Complete", 253],
     ["Unfinished", 7],
-    ["Not Started", 61],
+    ["Not Started", 63],
     ["Update", 0],
   ] as const) {
     await page.getByLabel("Filter by map status").selectOption(status);
@@ -133,7 +179,9 @@ test("updated names and reviewed locations retain correct coordinates and countr
     await expect(page.locator(".detail-country")).toContainText(
       record.country.replace(/\band\b/gi, "&"),
     );
-    await expect(page.locator(".visit-value")).toHaveText("Not Yet");
+    await expect(page.locator(".visit-value")).toHaveText(
+      record.visit === "visited" ? "Visited" : "Not Yet",
+    );
     await expect(page.locator(".notes-section")).toHaveCount(0);
     await back(page);
   }
@@ -415,7 +463,7 @@ test("real status edits persist and sync separately from demo edits without chan
   await page.getByLabel("Filter by map status").selectOption("Unfinished");
   await expect(page.locator(".city-row")).toHaveCount(8);
   await expect(page.locator(".collection-bottom")).toHaveText(
-    /Visited\s*97\s*countries\s*0\s*cities/,
+    /Visited\s*97\s*countries\s*57\s*cities/,
   );
   await page.getByLabel("Filter by map status").selectOption("all");
   await openCity(page, "Moscow");
@@ -432,7 +480,7 @@ test("real status edits persist and sync separately from demo edits without chan
   await back(page);
   await page.getByRole("textbox").fill("");
   await expect(page.locator(".city-row .status-complete")).toHaveCount(253);
-  await expect(page.locator(".visit-marker-not-yet")).toHaveCount(321);
+  await expect(page.locator(".visit-marker-not-yet")).toHaveCount(266);
 });
 
 test("the full collection and corrected map links remain usable without WebGL", async ({
@@ -453,7 +501,7 @@ test("the full collection and corrected map links remain usable without WebGL", 
   await expect(
     page.getByText("The interactive globe needs WebGL.", { exact: false }),
   ).toBeVisible();
-  await expect(page.locator(".city-row")).toHaveCount(321);
+  await expect(page.locator(".city-row")).toHaveCount(323);
   await openCity(page, "Nice");
   await expect(
     page.getByRole("button", { name: "View My Map", exact: true }),
@@ -465,7 +513,7 @@ test("the Countries tab has labelled counts, independent filters, and reloadable
 }) => {
   await page.goto("/");
   const tabs = page.getByRole("tablist", { name: "Collection view" });
-  await expect(page.locator(".collection-count")).toHaveText("321 cities");
+  await expect(page.locator(".collection-count")).toHaveText("323 cities");
   await page.getByLabel("Search cities and countries").fill("Adelaide");
   await expect(page.locator(".collection-count")).toHaveText("1 city");
   await tabs.getByRole("tab", { name: "Countries", exact: true }).click();
@@ -747,7 +795,7 @@ test("the real country data supports 195 and 197 ranks without inventing missing
   await expect(listSize).toHaveValue("195");
   await expect(page.locator(".country-row")).toHaveCount(195);
   await expect(page.locator(".collection-bottom")).toHaveText(
-    /Visited\s*97\s*countries\s*0\s*cities/,
+    /Visited\s*97\s*countries\s*57\s*cities/,
   );
   await page.getByLabel("Search countries", { exact: true }).fill("Honduras");
   await page.locator(".country-row").click();
@@ -776,7 +824,7 @@ test("the real country data supports 195 and 197 ranks without inventing missing
   await expect(listSize).toHaveValue("197");
   await expect(page.locator(".country-row")).toHaveCount(197);
   await expect(page.locator(".collection-bottom")).toHaveText(
-    /Visited\s*98\s*countries\s*0\s*cities/,
+    /Visited\s*98\s*countries\s*57\s*cities/,
   );
   await page.getByLabel("Search countries", { exact: true }).fill("Kosovo");
   await page.locator(".country-row").click();

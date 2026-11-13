@@ -4,6 +4,7 @@ import {
   type MapStatus,
   type CountryVisit,
 } from "./types";
+import { cityVisitSummary } from "./city-visits";
 
 export interface CityRow {
   id: string;
@@ -137,6 +138,8 @@ export const CITY_EXPORT_HEADERS = [
   "Status",
   "Visited",
   "LastVisited",
+  "RecordedVisits",
+  "RecordedDaysSpent",
   "Link",
   "Notes",
   "PinColor",
@@ -167,6 +170,8 @@ export function exportCitiesCsv(cities: City[]): string {
               ? "No"
               : "",
         c.lastVisited,
+        c.visits?.length ? cityVisitSummary(c.visits).visits : null,
+        c.visits?.length ? cityVisitSummary(c.visits).days : null,
         c.map?.embedUrl,
         c.notes,
         c.pinColor,

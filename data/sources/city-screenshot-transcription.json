@@ -1,0 +1,1610 @@
+[
+  {
+    "city": "New York",
+    "country_code": "US",
+    "total_days": 23,
+    "visit_count": 6,
+    "excluded": false,
+    "card_order": 1,
+    "visits": [
+      {
+        "city": "New York",
+        "country_code": "US",
+        "start": "2026-06-08",
+        "days": 1,
+        "end": "2026-06-08",
+        "excluded": false,
+        "card_order": 1
+      },
+      {
+        "city": "New York",
+        "country_code": "US",
+        "start": "2026-04-10",
+        "days": 3,
+        "end": "2026-04-12",
+        "excluded": false,
+        "card_order": 1
+      },
+      {
+        "city": "New York",
+        "country_code": "US",
+        "start": "2025-12-12",
+        "days": 1,
+        "end": "2025-12-12",
+        "excluded": false,
+        "card_order": 1
+      },
+      {
+        "city": "New York",
+        "country_code": "US",
+        "start": "2025-11-26",
+        "days": 4,
+        "end": "2025-11-29",
+        "excluded": false,
+        "card_order": 1
+      },
+      {
+        "city": "New York",
+        "country_code": "US",
+        "start": "2025-03-18",
+        "days": 1,
+        "end": "2025-03-18",
+        "excluded": false,
+        "card_order": 1
+      },
+      {
+        "city": "New York",
+        "country_code": "US",
+        "start": "2021-12-20",
+        "days": 13,
+        "end": "2022-01-01",
+        "excluded": false,
+        "card_order": 1
+      }
+    ]
+  },
+  {
+    "city": "Vancouver",
+    "country_code": "CA",
+    "total_days": 18,
+    "visit_count": 1,
+    "excluded": false,
+    "card_order": 2,
+    "visits": [
+      {
+        "city": "Vancouver",
+        "country_code": "CA",
+        "start": "2022-06-29",
+        "days": 18,
+        "end": "2022-07-16",
+        "excluded": false,
+        "card_order": 2
+      }
+    ]
+  },
+  {
+    "city": "Chicago",
+    "country_code": "US",
+    "total_days": 12,
+    "visit_count": 3,
+    "excluded": false,
+    "card_order": 3,
+    "visits": [
+      {
+        "city": "Chicago",
+        "country_code": "US",
+        "start": "2022-12-20",
+        "days": 7,
+        "end": "2022-12-26",
+        "excluded": false,
+        "card_order": 3
+      },
+      {
+        "city": "Chicago",
+        "country_code": "US",
+        "start": "2022-11-11",
+        "days": 2,
+        "end": "2022-11-12",
+        "excluded": false,
+        "card_order": 3
+      },
+      {
+        "city": "Chicago",
+        "country_code": "US",
+        "start": "2022-05-09",
+        "days": 3,
+        "end": "2022-05-11",
+        "excluded": false,
+        "card_order": 3
+      }
+    ]
+  },
+  {
+    "city": "Dubai",
+    "country_code": "AE",
+    "total_days": 10,
+    "visit_count": 4,
+    "excluded": false,
+    "card_order": 4,
+    "visits": [
+      {
+        "city": "Dubai",
+        "country_code": "AE",
+        "start": "2026-08-17",
+        "days": 1,
+        "end": "2026-08-17",
+        "excluded": false,
+        "card_order": 4
+      },
+      {
+        "city": "Dubai",
+        "country_code": "AE",
+        "start": "2026-08-12",
+        "days": 3,
+        "end": "2026-08-14",
+        "excluded": false,
+        "card_order": 4
+      },
+      {
+        "city": "Dubai",
+        "country_code": "AE",
+        "start": "2026-07-27",
+        "days": 1,
+        "end": "2026-07-27",
+        "excluded": false,
+        "card_order": 4
+      },
+      {
+        "city": "Dubai",
+        "country_code": "AE",
+        "start": "2025-05-27",
+        "days": 5,
+        "end": "2025-05-31",
+        "excluded": false,
+        "card_order": 4
+      }
+    ]
+  },
+  {
+    "city": "Singapore",
+    "country_code": "SG",
+    "total_days": 8,
+    "visit_count": 5,
+    "excluded": false,
+    "card_order": 5,
+    "visits": [
+      {
+        "city": "Singapore",
+        "country_code": "SG",
+        "start": "2026-09-11",
+        "days": 2,
+        "end": "2026-09-12",
+        "excluded": false,
+        "card_order": 5
+      },
+      {
+        "city": "Singapore",
+        "country_code": "SG",
+        "start": "2026-09-03",
+        "days": 1,
+        "end": "2026-09-03",
+        "excluded": false,
+        "card_order": 5
+      },
+      {
+        "city": "Singapore",
+        "country_code": "SG",
+        "start": "2026-08-25",
+        "days": 1,
+        "end": "2026-08-25",
+        "excluded": false,
+        "card_order": 5
+      },
+      {
+        "city": "Singapore",
+        "country_code": "SG",
+        "start": "2026-08-18",
+        "days": 3,
+        "end": "2026-08-20",
+        "excluded": false,
+        "card_order": 5
+      },
+      {
+        "city": "Singapore",
+        "country_code": "SG",
+        "start": "2025-07-22",
+        "days": 1,
+        "end": "2025-07-22",
+        "excluded": false,
+        "card_order": 5
+      }
+    ]
+  },
+  {
+    "city": "Sydney",
+    "country_code": "AU",
+    "total_days": 7,
+    "visit_count": 2,
+    "excluded": false,
+    "card_order": 6,
+    "visits": [
+      {
+        "city": "Sydney",
+        "country_code": "AU",
+        "start": "2026-08-21",
+        "days": 4,
+        "end": "2026-08-24",
+        "excluded": false,
+        "card_order": 6
+      },
+      {
+        "city": "Sydney",
+        "country_code": "AU",
+        "start": "2025-07-29",
+        "days": 3,
+        "end": "2025-07-31",
+        "excluded": false,
+        "card_order": 6
+      }
+    ]
+  },
+  {
+    "city": "London",
+    "country_code": "GB",
+    "total_days": 7,
+    "visit_count": 5,
+    "excluded": false,
+    "card_order": 7,
+    "visits": [
+      {
+        "city": "London",
+        "country_code": "GB",
+        "start": "2026-05-01",
+        "days": 3,
+        "end": "2026-05-03",
+        "excluded": false,
+        "card_order": 7
+      },
+      {
+        "city": "London",
+        "country_code": "GB",
+        "start": "2025-05-07",
+        "days": 1,
+        "end": "2025-05-07",
+        "excluded": false,
+        "card_order": 7
+      },
+      {
+        "city": "London",
+        "country_code": "GB",
+        "start": "2023-12-23",
+        "days": 1,
+        "end": "2023-12-23",
+        "excluded": false,
+        "card_order": 7
+      },
+      {
+        "city": "London",
+        "country_code": "GB",
+        "start": "2023-12-16",
+        "days": 1,
+        "end": "2023-12-16",
+        "excluded": false,
+        "card_order": 7
+      },
+      {
+        "city": "London",
+        "country_code": "GB",
+        "start": "2023-12-14",
+        "days": 1,
+        "end": "2023-12-14",
+        "excluded": false,
+        "card_order": 7
+      }
+    ]
+  },
+  {
+    "city": "Istanbul",
+    "country_code": "TR",
+    "total_days": 7,
+    "visit_count": 3,
+    "excluded": false,
+    "card_order": 8,
+    "visits": [
+      {
+        "city": "Istanbul",
+        "country_code": "TR",
+        "start": "2026-05-17",
+        "days": 2,
+        "end": "2026-05-18",
+        "excluded": false,
+        "card_order": 8
+      },
+      {
+        "city": "Istanbul",
+        "country_code": "TR",
+        "start": "2026-05-13",
+        "days": 2,
+        "end": "2026-05-14",
+        "excluded": false,
+        "card_order": 8
+      },
+      {
+        "city": "Istanbul",
+        "country_code": "TR",
+        "start": "2025-05-20",
+        "days": 3,
+        "end": "2025-05-22",
+        "excluded": false,
+        "card_order": 8
+      }
+    ]
+  },
+  {
+    "city": "Los Angeles",
+    "country_code": "US",
+    "total_days": 7,
+    "visit_count": 4,
+    "excluded": false,
+    "card_order": 9,
+    "visits": [
+      {
+        "city": "Los Angeles",
+        "country_code": "US",
+        "start": "2026-04-07",
+        "days": 2,
+        "end": "2026-04-08",
+        "excluded": false,
+        "card_order": 9
+      },
+      {
+        "city": "Los Angeles",
+        "country_code": "US",
+        "start": "2025-05-06",
+        "days": 1,
+        "end": "2025-05-06",
+        "excluded": false,
+        "card_order": 9
+      },
+      {
+        "city": "Los Angeles",
+        "country_code": "US",
+        "start": "2023-05-03",
+        "days": 1,
+        "end": "2023-05-03",
+        "excluded": false,
+        "card_order": 9
+      },
+      {
+        "city": "Los Angeles",
+        "country_code": "US",
+        "start": "2022-01-30",
+        "days": 3,
+        "end": "2022-02-01",
+        "excluded": false,
+        "card_order": 9
+      }
+    ]
+  },
+  {
+    "city": "Miami",
+    "country_code": "US",
+    "total_days": 6,
+    "visit_count": 2,
+    "excluded": false,
+    "card_order": 10,
+    "visits": [
+      {
+        "city": "Miami",
+        "country_code": "US",
+        "start": "2025-03-27",
+        "days": 1,
+        "end": "2025-03-27",
+        "excluded": false,
+        "card_order": 10
+      },
+      {
+        "city": "Miami",
+        "country_code": "US",
+        "start": "2022-02-25",
+        "days": 5,
+        "end": "2022-03-01",
+        "excluded": false,
+        "card_order": 10
+      }
+    ]
+  },
+  {
+    "city": "Bern",
+    "country_code": "CH",
+    "total_days": 6,
+    "visit_count": 5,
+    "excluded": false,
+    "card_order": 11,
+    "visits": [
+      {
+        "city": "Bern",
+        "country_code": "CH",
+        "start": "2024-08-19",
+        "days": 1,
+        "end": "2024-08-19",
+        "excluded": false,
+        "card_order": 11
+      },
+      {
+        "city": "Bern",
+        "country_code": "CH",
+        "start": "2024-08-15",
+        "days": 1,
+        "end": "2024-08-15",
+        "excluded": false,
+        "card_order": 11
+      },
+      {
+        "city": "Bern",
+        "country_code": "CH",
+        "start": "2024-08-07",
+        "days": 2,
+        "end": "2024-08-08",
+        "excluded": false,
+        "card_order": 11
+      },
+      {
+        "city": "Bern",
+        "country_code": "CH",
+        "start": "2024-08-05",
+        "days": 1,
+        "end": "2024-08-05",
+        "excluded": false,
+        "card_order": 11
+      },
+      {
+        "city": "Bern",
+        "country_code": "CH",
+        "start": "2023-12-20",
+        "days": 1,
+        "end": "2023-12-20",
+        "excluded": false,
+        "card_order": 11
+      }
+    ]
+  },
+  {
+    "city": "Skopje",
+    "country_code": "MK",
+    "total_days": 6,
+    "visit_count": 1,
+    "excluded": false,
+    "card_order": 12,
+    "visits": [
+      {
+        "city": "Skopje",
+        "country_code": "MK",
+        "start": "2026-05-07",
+        "days": 6,
+        "end": "2026-05-12",
+        "excluded": false,
+        "card_order": 12
+      }
+    ]
+  },
+  {
+    "city": "Orlando",
+    "country_code": "US",
+    "total_days": 5,
+    "visit_count": 1,
+    "excluded": false,
+    "card_order": 13,
+    "visits": [
+      {
+        "city": "Orlando",
+        "country_code": "US",
+        "start": "2022-03-01",
+        "days": 5,
+        "end": "2022-03-05",
+        "excluded": false,
+        "card_order": 13
+      }
+    ]
+  },
+  {
+    "city": "Paris",
+    "country_code": "FR",
+    "total_days": 5,
+    "visit_count": 2,
+    "excluded": false,
+    "card_order": 14,
+    "visits": [
+      {
+        "city": "Paris",
+        "country_code": "FR",
+        "start": "2025-10-07",
+        "days": 2,
+        "end": "2025-10-08",
+        "excluded": false,
+        "card_order": 14
+      },
+      {
+        "city": "Paris",
+        "country_code": "FR",
+        "start": "2024-07-29",
+        "days": 3,
+        "end": "2024-07-31",
+        "excluded": false,
+        "card_order": 14
+      }
+    ]
+  },
+  {
+    "city": "Southampton",
+    "country_code": "GB",
+    "total_days": 5,
+    "visit_count": 1,
+    "excluded": true,
+    "card_order": 15,
+    "visits": [
+      {
+        "city": "Southampton",
+        "country_code": "GB",
+        "start": "2023-12-22",
+        "days": 5,
+        "end": "2023-12-26",
+        "excluded": true,
+        "card_order": 15
+      }
+    ]
+  },
+  {
+    "city": "Budapest",
+    "country_code": "HU",
+    "total_days": 5,
+    "visit_count": 3,
+    "excluded": false,
+    "card_order": 16,
+    "visits": [
+      {
+        "city": "Budapest",
+        "country_code": "HU",
+        "start": "2025-10-12",
+        "days": 2,
+        "end": "2025-10-13",
+        "excluded": false,
+        "card_order": 16
+      },
+      {
+        "city": "Budapest",
+        "country_code": "HU",
+        "start": "2025-10-09",
+        "days": 1,
+        "end": "2025-10-09",
+        "excluded": false,
+        "card_order": 16
+      },
+      {
+        "city": "Budapest",
+        "country_code": "HU",
+        "start": "2024-05-09",
+        "days": 2,
+        "end": "2024-05-10",
+        "excluded": false,
+        "card_order": 16
+      }
+    ]
+  },
+  {
+    "city": "Boston",
+    "country_code": "US",
+    "total_days": 5,
+    "visit_count": 3,
+    "excluded": false,
+    "card_order": 17,
+    "visits": [
+      {
+        "city": "Boston",
+        "country_code": "US",
+        "start": "2022-06-26",
+        "days": 3,
+        "end": "2022-06-28",
+        "excluded": false,
+        "card_order": 17
+      },
+      {
+        "city": "Boston",
+        "country_code": "US",
+        "start": "2021-08-21",
+        "days": 1,
+        "end": "2021-08-21",
+        "excluded": false,
+        "card_order": 17
+      },
+      {
+        "city": "Boston",
+        "country_code": "US",
+        "start": "2021-08-15",
+        "days": 1,
+        "end": "2021-08-15",
+        "excluded": false,
+        "card_order": 17
+      }
+    ]
+  },
+  {
+    "city": "Auckland",
+    "country_code": "NZ",
+    "total_days": 5,
+    "visit_count": 2,
+    "excluded": false,
+    "card_order": 18,
+    "visits": [
+      {
+        "city": "Auckland",
+        "country_code": "NZ",
+        "start": "2025-08-05",
+        "days": 4,
+        "end": "2025-08-08",
+        "excluded": false,
+        "card_order": 18
+      },
+      {
+        "city": "Auckland",
+        "country_code": "NZ",
+        "start": "2025-07-28",
+        "days": 1,
+        "end": "2025-07-28",
+        "excluded": false,
+        "card_order": 18
+      }
+    ]
+  },
+  {
+    "city": "Vienna",
+    "country_code": "AT",
+    "total_days": 4,
+    "visit_count": 2,
+    "excluded": false,
+    "card_order": 19,
+    "visits": [
+      {
+        "city": "Vienna",
+        "country_code": "AT",
+        "start": "2025-10-10",
+        "days": 2,
+        "end": "2025-10-11",
+        "excluded": false,
+        "card_order": 19
+      },
+      {
+        "city": "Vienna",
+        "country_code": "AT",
+        "start": "2024-05-10",
+        "days": 2,
+        "end": "2024-05-11",
+        "excluded": false,
+        "card_order": 19
+      }
+    ]
+  },
+  {
+    "city": "Seoul",
+    "country_code": "KR",
+    "total_days": 4,
+    "visit_count": 1,
+    "excluded": false,
+    "card_order": 20,
+    "visits": [
+      {
+        "city": "Seoul",
+        "country_code": "KR",
+        "start": "2025-07-17",
+        "days": 4,
+        "end": "2025-07-20",
+        "excluded": false,
+        "card_order": 20
+      }
+    ]
+  },
+  {
+    "city": "Cusco",
+    "country_code": "PE",
+    "total_days": 4,
+    "visit_count": 1,
+    "excluded": false,
+    "card_order": 21,
+    "visits": [
+      {
+        "city": "Cusco",
+        "country_code": "PE",
+        "start": "2025-12-18",
+        "days": 4,
+        "end": "2025-12-21",
+        "excluded": false,
+        "card_order": 21
+      }
+    ]
+  },
+  {
+    "city": "Brisbane",
+    "country_code": "AU",
+    "total_days": 4,
+    "visit_count": 1,
+    "excluded": false,
+    "card_order": 22,
+    "visits": [
+      {
+        "city": "Brisbane",
+        "country_code": "AU",
+        "start": "2025-07-24",
+        "days": 4,
+        "end": "2025-07-27",
+        "excluded": false,
+        "card_order": 22
+      }
+    ]
+  },
+  {
+    "city": "Prague",
+    "country_code": "CZ",
+    "total_days": 4,
+    "visit_count": 3,
+    "excluded": false,
+    "card_order": 23,
+    "visits": [
+      {
+        "city": "Prague",
+        "country_code": "CZ",
+        "start": "2026-07-26",
+        "days": 1,
+        "end": "2026-07-26",
+        "excluded": false,
+        "card_order": 23
+      },
+      {
+        "city": "Prague",
+        "country_code": "CZ",
+        "start": "2024-05-24",
+        "days": 2,
+        "end": "2024-05-25",
+        "excluded": false,
+        "card_order": 23
+      },
+      {
+        "city": "Prague",
+        "country_code": "CZ",
+        "start": "2024-05-13",
+        "days": 1,
+        "end": "2024-05-13",
+        "excluded": false,
+        "card_order": 23
+      }
+    ]
+  },
+  {
+    "city": "San Francisco",
+    "country_code": "US",
+    "total_days": 4,
+    "visit_count": 2,
+    "excluded": false,
+    "card_order": 24,
+    "visits": [
+      {
+        "city": "San Francisco",
+        "country_code": "US",
+        "start": "2025-11-01",
+        "days": 1,
+        "end": "2025-11-01",
+        "excluded": false,
+        "card_order": 24
+      },
+      {
+        "city": "San Francisco",
+        "country_code": "US",
+        "start": "2022-01-27",
+        "days": 3,
+        "end": "2022-01-29",
+        "excluded": false,
+        "card_order": 24
+      }
+    ]
+  },
+  {
+    "city": "Tokyo",
+    "country_code": "JP",
+    "total_days": 3,
+    "visit_count": 1,
+    "excluded": false,
+    "card_order": 25,
+    "visits": [
+      {
+        "city": "Tokyo",
+        "country_code": "JP",
+        "start": "2026-07-31",
+        "days": 3,
+        "end": "2026-08-02",
+        "excluded": false,
+        "card_order": 25
+      }
+    ]
+  },
+  {
+    "city": "Kuala Lumpur",
+    "country_code": "MY",
+    "total_days": 3,
+    "visit_count": 2,
+    "excluded": false,
+    "card_order": 26,
+    "visits": [
+      {
+        "city": "Kuala Lumpur",
+        "country_code": "MY",
+        "start": "2026-09-07",
+        "days": 2,
+        "end": "2026-09-08",
+        "excluded": false,
+        "card_order": 26
+      },
+      {
+        "city": "Kuala Lumpur",
+        "country_code": "MY",
+        "start": "2025-07-21",
+        "days": 1,
+        "end": "2025-07-21",
+        "excluded": false,
+        "card_order": 26
+      }
+    ]
+  },
+  {
+    "city": "Toronto",
+    "country_code": "CA",
+    "total_days": 3,
+    "visit_count": 1,
+    "excluded": false,
+    "card_order": 27,
+    "visits": [
+      {
+        "city": "Toronto",
+        "country_code": "CA",
+        "start": "2026-04-17",
+        "days": 3,
+        "end": "2026-04-19",
+        "excluded": false,
+        "card_order": 27
+      }
+    ]
+  },
+  {
+    "city": "Rome",
+    "country_code": "IT",
+    "total_days": 3,
+    "visit_count": 2,
+    "excluded": false,
+    "card_order": 28,
+    "visits": [
+      {
+        "city": "Rome",
+        "country_code": "IT",
+        "start": "2024-08-16",
+        "days": 2,
+        "end": "2024-08-17",
+        "excluded": false,
+        "card_order": 28
+      },
+      {
+        "city": "Rome",
+        "country_code": "IT",
+        "start": "2024-01-14",
+        "days": 1,
+        "end": "2024-01-14",
+        "excluded": false,
+        "card_order": 28
+      }
+    ]
+  },
+  {
+    "city": "Geneva",
+    "country_code": "CH",
+    "total_days": 3,
+    "visit_count": 2,
+    "excluded": false,
+    "card_order": 29,
+    "visits": [
+      {
+        "city": "Geneva",
+        "country_code": "CH",
+        "start": "2024-08-06",
+        "days": 2,
+        "end": "2024-08-07",
+        "excluded": false,
+        "card_order": 29
+      },
+      {
+        "city": "Geneva",
+        "country_code": "CH",
+        "start": "2023-12-17",
+        "days": 1,
+        "end": "2023-12-17",
+        "excluded": false,
+        "card_order": 29
+      }
+    ]
+  },
+  {
+    "city": "Mexico City",
+    "country_code": "MX",
+    "total_days": 3,
+    "visit_count": 1,
+    "excluded": false,
+    "card_order": 30,
+    "visits": [
+      {
+        "city": "Mexico City",
+        "country_code": "MX",
+        "start": "2025-03-10",
+        "days": 3,
+        "end": "2025-03-12",
+        "excluded": false,
+        "card_order": 30
+      }
+    ]
+  },
+  {
+    "city": "Melbourne",
+    "country_code": "AU",
+    "total_days": 3,
+    "visit_count": 1,
+    "excluded": false,
+    "card_order": 31,
+    "visits": [
+      {
+        "city": "Melbourne",
+        "country_code": "AU",
+        "start": "2025-08-01",
+        "days": 3,
+        "end": "2025-08-03",
+        "excluded": false,
+        "card_order": 31
+      }
+    ]
+  },
+  {
+    "city": "Houston",
+    "country_code": "US",
+    "total_days": 3,
+    "visit_count": 2,
+    "excluded": false,
+    "card_order": 32,
+    "visits": [
+      {
+        "city": "Houston",
+        "country_code": "US",
+        "start": "2025-04-02",
+        "days": 1,
+        "end": "2025-04-02",
+        "excluded": false,
+        "card_order": 32
+      },
+      {
+        "city": "Houston",
+        "country_code": "US",
+        "start": "2024-12-16",
+        "days": 2,
+        "end": "2024-12-17",
+        "excluded": false,
+        "card_order": 32
+      }
+    ]
+  },
+  {
+    "city": "Abu Dhabi",
+    "country_code": "AE",
+    "total_days": 3,
+    "visit_count": 2,
+    "excluded": false,
+    "card_order": 33,
+    "visits": [
+      {
+        "city": "Abu Dhabi",
+        "country_code": "AE",
+        "start": "2026-08-15",
+        "days": 2,
+        "end": "2026-08-16",
+        "excluded": false,
+        "card_order": 33
+      },
+      {
+        "city": "Abu Dhabi",
+        "country_code": "AE",
+        "start": "2025-06-01",
+        "days": 1,
+        "end": "2025-06-01",
+        "excluded": false,
+        "card_order": 33
+      }
+    ]
+  },
+  {
+    "city": "Copenhagen",
+    "country_code": "DK",
+    "total_days": 3,
+    "visit_count": 1,
+    "excluded": false,
+    "card_order": 34,
+    "visits": [
+      {
+        "city": "Copenhagen",
+        "country_code": "DK",
+        "start": "2023-12-30",
+        "days": 3,
+        "end": "2024-01-01",
+        "excluded": false,
+        "card_order": 34
+      }
+    ]
+  },
+  {
+    "city": "Lisbon",
+    "country_code": "PT",
+    "total_days": 3,
+    "visit_count": 1,
+    "excluded": false,
+    "card_order": 35,
+    "visits": [
+      {
+        "city": "Lisbon",
+        "country_code": "PT",
+        "start": "2024-01-05",
+        "days": 3,
+        "end": "2024-01-07",
+        "excluded": false,
+        "card_order": 35
+      }
+    ]
+  },
+  {
+    "city": "Shanghai",
+    "country_code": "CN",
+    "total_days": 3,
+    "visit_count": 2,
+    "excluded": false,
+    "card_order": 36,
+    "visits": [
+      {
+        "city": "Shanghai",
+        "country_code": "CN",
+        "start": "2026-09-01",
+        "days": 1,
+        "end": "2026-09-01",
+        "excluded": false,
+        "card_order": 36
+      },
+      {
+        "city": "Shanghai",
+        "country_code": "CN",
+        "start": "2026-08-30",
+        "days": 2,
+        "end": "2026-08-31",
+        "excluded": false,
+        "card_order": 36
+      }
+    ]
+  },
+  {
+    "city": "Lausanne",
+    "country_code": "CH",
+    "total_days": 3,
+    "visit_count": 3,
+    "excluded": false,
+    "card_order": 37,
+    "visits": [
+      {
+        "city": "Lausanne",
+        "country_code": "CH",
+        "start": "2024-08-19",
+        "days": 1,
+        "end": "2024-08-19",
+        "excluded": false,
+        "card_order": 37
+      },
+      {
+        "city": "Lausanne",
+        "country_code": "CH",
+        "start": "2024-08-06",
+        "days": 1,
+        "end": "2024-08-06",
+        "excluded": false,
+        "card_order": 37
+      },
+      {
+        "city": "Lausanne",
+        "country_code": "CH",
+        "start": "2023-12-20",
+        "days": 1,
+        "end": "2023-12-20",
+        "excluded": false,
+        "card_order": 37
+      }
+    ]
+  },
+  {
+    "city": "Busan",
+    "country_code": "KR",
+    "total_days": 3,
+    "visit_count": 1,
+    "excluded": false,
+    "card_order": 38,
+    "visits": [
+      {
+        "city": "Busan",
+        "country_code": "KR",
+        "start": "2025-07-15",
+        "days": 3,
+        "end": "2025-07-17",
+        "excluded": false,
+        "card_order": 38
+      }
+    ]
+  },
+  {
+    "city": "Washington",
+    "country_code": "US",
+    "total_days": 3,
+    "visit_count": 3,
+    "excluded": false,
+    "card_order": 39,
+    "visits": [
+      {
+        "city": "Washington",
+        "country_code": "US",
+        "start": "2026-07-11",
+        "days": 1,
+        "end": "2026-07-11",
+        "excluded": false,
+        "card_order": 39
+      },
+      {
+        "city": "Washington",
+        "country_code": "US",
+        "start": "2026-07-08",
+        "days": 1,
+        "end": "2026-07-08",
+        "excluded": false,
+        "card_order": 39
+      },
+      {
+        "city": "Washington",
+        "country_code": "US",
+        "start": "2026-06-24",
+        "days": 1,
+        "end": "2026-06-24",
+        "excluded": false,
+        "card_order": 39
+      }
+    ]
+  },
+  {
+    "city": "Belize City",
+    "country_code": "BZ",
+    "total_days": 3,
+    "visit_count": 1,
+    "excluded": false,
+    "card_order": 40,
+    "visits": [
+      {
+        "city": "Belize City",
+        "country_code": "BZ",
+        "start": "2025-03-19",
+        "days": 3,
+        "end": "2025-03-21",
+        "excluded": false,
+        "card_order": 40
+      }
+    ]
+  },
+  {
+    "city": "Amsterdam",
+    "country_code": "NL",
+    "total_days": 3,
+    "visit_count": 1,
+    "excluded": false,
+    "card_order": 41,
+    "visits": [
+      {
+        "city": "Amsterdam",
+        "country_code": "NL",
+        "start": "2023-12-27",
+        "days": 3,
+        "end": "2023-12-29",
+        "excluded": false,
+        "card_order": 41
+      }
+    ]
+  },
+  {
+    "city": "Panama City",
+    "country_code": "PA",
+    "total_days": 2,
+    "visit_count": 2,
+    "excluded": false,
+    "card_order": 42,
+    "visits": [
+      {
+        "city": "Panama City",
+        "country_code": "PA",
+        "start": "2025-05-24",
+        "days": 1,
+        "end": "2025-05-24",
+        "excluded": false,
+        "card_order": 42
+      },
+      {
+        "city": "Panama City",
+        "country_code": "PA",
+        "start": "2025-03-21",
+        "days": 1,
+        "end": "2025-03-21",
+        "excluded": false,
+        "card_order": 42
+      }
+    ]
+  },
+  {
+    "city": "Ljubljana",
+    "country_code": "SI",
+    "total_days": 2,
+    "visit_count": 1,
+    "excluded": false,
+    "card_order": 43,
+    "visits": [
+      {
+        "city": "Ljubljana",
+        "country_code": "SI",
+        "start": "2026-06-06",
+        "days": 2,
+        "end": "2026-06-07",
+        "excluded": false,
+        "card_order": 43
+      }
+    ]
+  },
+  {
+    "city": "Colombo",
+    "country_code": "LK",
+    "total_days": 2,
+    "visit_count": 1,
+    "excluded": false,
+    "card_order": 44,
+    "visits": [
+      {
+        "city": "Colombo",
+        "country_code": "LK",
+        "start": "2026-09-10",
+        "days": 2,
+        "end": "2026-09-11",
+        "excluded": false,
+        "card_order": 44
+      }
+    ]
+  },
+  {
+    "city": "Bangkok",
+    "country_code": "TH",
+    "total_days": 2,
+    "visit_count": 1,
+    "excluded": false,
+    "card_order": 45,
+    "visits": [
+      {
+        "city": "Bangkok",
+        "country_code": "TH",
+        "start": "2025-06-08",
+        "days": 2,
+        "end": "2025-06-09",
+        "excluded": false,
+        "card_order": 45
+      }
+    ]
+  },
+  {
+    "city": "Osaka",
+    "country_code": "JP",
+    "total_days": 2,
+    "visit_count": 1,
+    "excluded": false,
+    "card_order": 46,
+    "visits": [
+      {
+        "city": "Osaka",
+        "country_code": "JP",
+        "start": "2026-07-28",
+        "days": 2,
+        "end": "2026-07-29",
+        "excluded": false,
+        "card_order": 46
+      }
+    ]
+  },
+  {
+    "city": "Zurich",
+    "country_code": "CH",
+    "total_days": 2,
+    "visit_count": 2,
+    "excluded": false,
+    "card_order": 47,
+    "visits": [
+      {
+        "city": "Zurich",
+        "country_code": "CH",
+        "start": "2024-08-15",
+        "days": 1,
+        "end": "2024-08-15",
+        "excluded": false,
+        "card_order": 47
+      },
+      {
+        "city": "Zurich",
+        "country_code": "CH",
+        "start": "2024-08-04",
+        "days": 1,
+        "end": "2024-08-04",
+        "excluded": false,
+        "card_order": 47
+      }
+    ]
+  },
+  {
+    "city": "Vatican City",
+    "country_code": "VA",
+    "total_days": 2,
+    "visit_count": 2,
+    "excluded": false,
+    "card_order": 48,
+    "visits": [
+      {
+        "city": "Vatican City",
+        "country_code": "VA",
+        "start": "2024-08-17",
+        "days": 1,
+        "end": "2024-08-17",
+        "excluded": false,
+        "card_order": 48
+      },
+      {
+        "city": "Vatican City",
+        "country_code": "VA",
+        "start": "2024-01-14",
+        "days": 1,
+        "end": "2024-01-14",
+        "excluded": false,
+        "card_order": 48
+      }
+    ]
+  },
+  {
+    "city": "Astana",
+    "country_code": "KZ",
+    "total_days": 2,
+    "visit_count": 1,
+    "excluded": false,
+    "card_order": 49,
+    "visits": [
+      {
+        "city": "Astana",
+        "country_code": "KZ",
+        "start": "2026-05-26",
+        "days": 2,
+        "end": "2026-05-27",
+        "excluded": false,
+        "card_order": 49
+      }
+    ]
+  },
+  {
+    "city": "Krakow",
+    "country_code": "PL",
+    "total_days": 2,
+    "visit_count": 1,
+    "excluded": false,
+    "card_order": 50,
+    "visits": [
+      {
+        "city": "Krakow",
+        "country_code": "PL",
+        "start": "2024-05-07",
+        "days": 2,
+        "end": "2024-05-08",
+        "excluded": false,
+        "card_order": 50
+      }
+    ]
+  },
+  {
+    "city": "Zagreb",
+    "country_code": "HR",
+    "total_days": 2,
+    "visit_count": 1,
+    "excluded": false,
+    "card_order": 51,
+    "visits": [
+      {
+        "city": "Zagreb",
+        "country_code": "HR",
+        "start": "2024-08-13",
+        "days": 2,
+        "end": "2024-08-14",
+        "excluded": false,
+        "card_order": 51
+      }
+    ]
+  },
+  {
+    "city": "Aqtau",
+    "country_code": "KZ",
+    "total_days": 2,
+    "visit_count": 1,
+    "excluded": false,
+    "card_order": 52,
+    "visits": [
+      {
+        "city": "Aqtau",
+        "country_code": "KZ",
+        "start": "2026-05-28",
+        "days": 2,
+        "end": "2026-05-29",
+        "excluded": false,
+        "card_order": 52
+      }
+    ]
+  },
+  {
+    "city": "Kingston",
+    "country_code": "JM",
+    "total_days": 2,
+    "visit_count": 1,
+    "excluded": false,
+    "card_order": 53,
+    "visits": [
+      {
+        "city": "Kingston",
+        "country_code": "JM",
+        "start": "2026-07-13",
+        "days": 2,
+        "end": "2026-07-14",
+        "excluded": false,
+        "card_order": 53,
+        "transcription_note": "Duration comes from the 2-day / 1-visit card header; Add City button obscures the row duration."
+      }
+    ]
+  },
+  {
+    "city": "Philadelphia",
+    "country_code": "US",
+    "total_days": 2,
+    "visit_count": 1,
+    "excluded": false,
+    "card_order": 54,
+    "visits": [
+      {
+        "city": "Philadelphia",
+        "country_code": "US",
+        "start": "2026-07-09",
+        "days": 2,
+        "end": "2026-07-10",
+        "excluded": false,
+        "card_order": 54
+      }
+    ]
+  },
+  {
+    "city": "Lucerne",
+    "country_code": "CH",
+    "total_days": 2,
+    "visit_count": 2,
+    "excluded": false,
+    "card_order": 55,
+    "visits": [
+      {
+        "city": "Lucerne",
+        "country_code": "CH",
+        "start": "2024-08-06",
+        "days": 1,
+        "end": "2024-08-06",
+        "excluded": false,
+        "card_order": 55
+      },
+      {
+        "city": "Lucerne",
+        "country_code": "CH",
+        "start": "2023-12-20",
+        "days": 1,
+        "end": "2023-12-20",
+        "excluded": false,
+        "card_order": 55
+      }
+    ]
+  },
+  {
+    "city": "Kathmandu",
+    "country_code": "NP",
+    "total_days": 2,
+    "visit_count": 1,
+    "excluded": false,
+    "card_order": 56,
+    "visits": [
+      {
+        "city": "Kathmandu",
+        "country_code": "NP",
+        "start": "2026-09-09",
+        "days": 2,
+        "end": "2026-09-10",
+        "excluded": false,
+        "card_order": 56
+      }
+    ]
+  },
+  {
+    "city": "Antigua Guatemala",
+    "country_code": "GT",
+    "total_days": 2,
+    "visit_count": 2,
+    "excluded": false,
+    "card_order": 57,
+    "visits": [
+      {
+        "city": "Antigua Guatemala",
+        "country_code": "GT",
+        "start": "2026-01-01",
+        "days": 1,
+        "end": "2026-01-01",
+        "excluded": false,
+        "card_order": 57
+      },
+      {
+        "city": "Antigua Guatemala",
+        "country_code": "GT",
+        "start": "2025-12-30",
+        "days": 1,
+        "end": "2025-12-30",
+        "excluded": false,
+        "card_order": 57
+      }
+    ]
+  },
+  {
+    "city": "Reykjavik",
+    "country_code": "IS",
+    "total_days": 2,
+    "visit_count": 1,
+    "excluded": true,
+    "card_order": 58,
+    "visits": [
+      {
+        "city": "Reykjavik",
+        "country_code": "IS",
+        "start": "2025-10-14",
+        "days": 2,
+        "end": "2025-10-15",
+        "excluded": true,
+        "card_order": 58
+      }
+    ]
+  },
+  {
+    "city": "Doha",
+    "country_code": "QA",
+    "total_days": 2,
+    "visit_count": 1,
+    "excluded": false,
+    "card_order": 59,
+    "visits": [
+      {
+        "city": "Doha",
+        "country_code": "QA",
+        "start": "2025-06-04",
+        "days": 2,
+        "end": "2025-06-05",
+        "excluded": false,
+        "card_order": 59
+      }
+    ]
+  }
+]

@@ -5,6 +5,7 @@ import { toCityRow, type CityRow } from "../../src/lib/cloud-data";
 import type { AtlasData } from "../../src/lib/types";
 import { COLLECTION_STATUS_STORAGE_KEY } from "../../src/lib/status-storage";
 import { toCountrySnapshot } from "../../src/lib/country-cloud-data";
+import { toCityVisitRows } from "../../src/lib/city-cloud-data";
 import type { CountrySeed } from "../../src/lib/countries";
 
 const atlas = JSON.parse(
@@ -63,6 +64,7 @@ function store() {
       ]),
     ),
     failRead: false,
+    cityVisits: toCityVisitRows(atlas.cities),
     countrySnapshot: toCountrySnapshot(countrySeeds),
     failCountryRead: false,
     failWrite: false,
@@ -186,6 +188,15 @@ async function backend(
       return state.failCountryRead
         ? reply({ message: "unavailable" }, 503)
         : reply(state.countrySnapshot);
+    if (url.pathname === "/rest/v1/rpc/atlas_city_snapshot")
+      return state.failRead
+        ? reply({ message: "unavailable" }, 503)
+        : reply({
+            cities: [...state.rows.values()].sort((a, b) =>
+              a.id.localeCompare(b.id),
+            ),
+            visits: state.cityVisits,
+          });
     if (url.pathname === "/auth/v1/token") {
       if (url.searchParams.get("grant_type") === "pkce" && state.callbackError)
         return reply(
@@ -355,7 +366,10 @@ test("a city added to the database can be opened directly without rebuilding the
     page.getByRole("heading", { name: "New Place", exact: true }),
   ).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "All cities (322)", exact: true }),
+    page.getByRole("button", {
+      name: `All cities (${atlas.cities.length + 1})`,
+      exact: true,
+    }),
   ).toBeVisible();
   await expect(page).toHaveURL(/city=new-place-test/);
 });
@@ -463,19 +477,22 @@ test("a refresh that started before a save cannot replace the confirmed status",
     started = resolve;
   });
   let intercepted = false;
-  await page.route(`${fixtureOrigin}/rest/v1/cities?*`, async (route) => {
-    if (route.request().method() !== "GET" || intercepted)
-      return route.fallback();
-    intercepted = true;
-    const old = [...state.rows.values()].map((row) => ({ ...row }));
-    started();
-    await held;
-    return route.fulfill({
-      contentType: "application/json",
-      body: JSON.stringify(old),
-      headers: { "access-control-allow-origin": "*" },
-    });
-  });
+  await page.route(
+    `${fixtureOrigin}/rest/v1/rpc/atlas_city_snapshot`,
+    async (route) => {
+      if (route.request().method() !== "POST" || intercepted)
+        return route.fallback();
+      intercepted = true;
+      const old = [...state.rows.values()].map((row) => ({ ...row }));
+      started();
+      await held;
+      return route.fulfill({
+        contentType: "application/json",
+        body: JSON.stringify({ cities: old, visits: state.cityVisits }),
+        headers: { "access-control-allow-origin": "*" },
+      });
+    },
+  );
   await page.evaluate(() => window.dispatchEvent(new Event("focus")));
   await requested;
   await picker.selectOption("Update");
@@ -485,8 +502,8 @@ test("a refresh that started before a save cannot replace the confirmed status",
   await expect(picker).toBeEnabled();
   const response = page.waitForResponse(
     (r) =>
-      r.url().startsWith(`${fixtureOrigin}/rest/v1/cities?`) &&
-      r.request().method() === "GET",
+      r.url() === `${fixtureOrigin}/rest/v1/rpc/atlas_city_snapshot` &&
+      r.request().method() === "POST",
   );
   release();
   await (await response).finished();
@@ -581,16 +598,78 @@ test("the editor can export every city with saved statuses and nullable coordina
   );
   await backend(context, state, ownerId);
   await page.goto("/");
-  const download = page.waitForEvent("download");
   await page.getByRole("button", { name: "Export collection CSV" }).click();
+  const download = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Cities CSV", exact: true }).click();
   const path = await (await download).path();
   const rows = parse(readFileSync(path!, "utf8"), {
     columns: true,
     bom: true,
   }) as Array<Record<string, string>>;
-  expect(rows).toHaveLength(321);
+  expect(rows).toHaveLength(323);
   expect(rows.find((c) => c.CityId === "moscow-russia")!.Status).toBe("Update");
-  expect(rows.filter((c) => c.Latitude && c.Longitude)).toHaveLength(319);
+  expect(rows.filter((c) => c.Latitude && c.Longitude)).toHaveLength(321);
+  expect(rows.find((c) => c.CityId === "london-uk")!.RecordedDaysSpent).toBe(
+    "6.5",
+  );
+  const historyDownload = page.waitForEvent("download");
+  await page
+    .getByRole("button", { name: "City visit history CSV", exact: true })
+    .click();
+  const historyPath = await (await historyDownload).path();
+  const visits = parse(readFileSync(historyPath!, "utf8"), {
+    columns: true,
+    bom: true,
+  }) as Array<Record<string, string>>;
+  expect(visits).toHaveLength(111);
+  expect(new Set(visits.map((v) => v.CityId)).size).toBe(57);
+  expect(visits.reduce((n, v) => n + Number(v.DaysSpent), 0)).toBe(249);
+  expect(
+    visits.find(
+      (v) =>
+        v.CityId === "singapore-singapore" && v.ArrivalDate === "2026-09-11",
+    )!.DaysSpent,
+  ).toBe("1.5");
+});
+
+test("live city history survives saves and reloads, refreshes coherently, and remains available during an outage", async ({
+  context,
+  page,
+}) => {
+  const state = store();
+  await backend(context, state, ownerId);
+  await page.goto("/?city=london-uk");
+  const history = page.locator(".city-visit-list");
+  await expect(history.locator("li")).toHaveCount(5);
+  await expect(history).toContainText("2.5 days");
+  const picker = page.getByLabel("Map status", { exact: true });
+  await expect(picker).toBeEnabled();
+  await picker.selectOption("Update");
+  await expect(picker).toBeEnabled();
+  await expect(history).toContainText("2.5 days");
+  await page.reload();
+  await expect(picker).toHaveValue("Update");
+  await expect(history).toContainText("2.5 days");
+  state.cityVisits.find(
+    (v) => v.city_id === "london-uk" && v.visit_number === 5,
+  )!.days_spent = 1.5;
+  await page.evaluate(() => window.dispatchEvent(new Event("focus")));
+  await expect(history).toContainText("1.5 days");
+  await expect(page.locator(".city-statistics")).toContainText("5.5");
+  state.failRead = true;
+  await page.evaluate(() => window.dispatchEvent(new Event("focus")));
+  await expect(
+    page.getByText(/Couldn’t refresh the saved collection/),
+  ).toBeVisible();
+  await expect(picker).toBeDisabled();
+  await expect(history).toContainText("1.5 days");
+  state.failRead = false;
+  state.cityVisits.find(
+    (v) => v.city_id === "london-uk" && v.visit_number === 5,
+  )!.days_spent = 2.5;
+  await page.getByRole("button", { name: "Retry", exact: true }).click();
+  await expect(picker).toBeEnabled();
+  await expect(history).toContainText("2.5 days");
 });
 
 test("password sign-in stays on the selected city, shows real loading, and survives reload", async ({

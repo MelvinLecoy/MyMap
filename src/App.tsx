@@ -15,6 +15,7 @@ import Globe from "./components/Globe";
 import MapViewer from "./components/MapViewer";
 import CityName from "./components/CityName";
 import CountryDetail from "./components/CountryDetail";
+import CityVisitHistory from "./components/CityVisitHistory";
 import {
   CityRow,
   CountryVisitMarker,
@@ -649,6 +650,7 @@ export default function App() {
                       </div>
                     )}
                   </div>
+                  <CityVisitHistory visits={selected.visits} />
                   {cloud.enabled && cloud.saveError?.id === selected.id && (
                     <p className="status-save-error" role="alert">
                       {cloud.saveError.message}

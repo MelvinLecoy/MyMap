@@ -9,6 +9,7 @@ const normalized = readCSV(readFileSync("data/cities.csv", "utf8"));
 const coordinates = readCSV(readFileSync("data/coordinates.csv", "utf8"));
 const { data, issues } = importCities(readFileSync("data/cities.csv", "utf8"), {
   coordinates: readFileSync("data/coordinates.csv", "utf8"),
+  cityVisits: readFileSync("data/city-visit-history.csv", "utf8"),
 });
 
 test("the published collection preserves all rows and links from the updated CSV", () => {
@@ -22,7 +23,10 @@ test("the published collection preserves all rows and links from the updated CSV
     metadata.sourceSha256,
   );
   assert.equal(raw.length, 321);
-  assert.equal(normalized.length, raw.length);
+  assert.equal(normalized.length, raw.length + 2);
+  const approved = new Set(
+    data.cities.filter((c) => c.visits?.length).map((c) => c.id),
+  );
   const countryOverrides: Record<string, string> = {
     Longyearbyen: "Svalbard",
     Sevastopol: "Ukraine",
@@ -41,15 +45,27 @@ test("the published collection preserves all rows and links from the updated CSV
     const sourceUrl = /^src="([^"]+)"$/.exec(original.link)?.[1];
     assert.ok(sourceUrl, original.cities);
     assert.deepEqual(parseMapLink(prepared.link), parseMapLink(sourceUrl));
-    assert.equal(prepared.visited, "No");
+    assert.equal(
+      prepared.visited,
+      approved.has(prepared.cityid) ? "Yes" : "No",
+    );
   }
   assert.equal(data.demo, false);
-  assert.equal(new Set(data.cities.map((city) => city.id)).size, 321);
-  const mapIds = data.cities.map((city) => {
-    assert.ok(city.map);
-    return new URL(city.map.embedUrl).searchParams.get("mid");
-  });
+  assert.equal(new Set(data.cities.map((city) => city.id)).size, 323);
+  const mapIds = data.cities
+    .filter((c) => c.map)
+    .map((city) => {
+      assert.ok(city.map);
+      return new URL(city.map.embedUrl).searchParams.get("mid");
+    });
   assert.equal(new Set(mapIds).size, 321);
+  assert.deepEqual(
+    data.cities
+      .filter((c) => !c.map)
+      .map((c) => c.id)
+      .sort(),
+    ["rome-italy", "vatican-city-vatican-city"],
+  );
   const nice = data.cities.find((city) => city.name === "Nice")!;
   assert.equal(
     new URL(nice.map!.embedUrl).searchParams.get("mid"),
@@ -98,16 +114,14 @@ test("reviewed coordinates cover 319 distinct places and leave only the two requ
   assert.equal(data.geonames, true);
 });
 
-test("the real collection contains no sample visits, notes, dates, or colors", () => {
-  assert.ok(data.cities.every((city) => city.visit === "not-visited"));
-  assert.ok(
-    data.cities.every(
-      (city) => !city.lastVisited && !city.notes && !city.pinColor,
-    ),
+test("the real collection contains only approved city visits and no sample notes or colors", () => {
+  assert.equal(
+    data.cities.filter((city) => city.visit === "visited").length,
+    57,
   );
-  assert.ok(
-    data.countries.every((country) => !country.visited && !country.color),
-  );
+  assert.equal(data.cities.filter((city) => city.lastVisited).length, 57);
+  assert.ok(data.cities.every((city) => !city.notes && !city.pinColor));
+  assert.ok(data.countries.every((country) => !country.color));
   assert.equal(
     data.cities.filter((city) => city.status === "Complete").length,
     253,
@@ -118,6 +132,6 @@ test("the real collection contains no sample visits, notes, dates, or colors", (
   );
   assert.equal(
     data.cities.filter((city) => city.status === "Not Started").length,
-    61,
+    63,
   );
 });

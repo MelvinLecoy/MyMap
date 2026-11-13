@@ -13,16 +13,17 @@ import { importCities } from "../scripts/importer.js";
 test("the database collection and CSV exports preserve IDs, links, statuses and missing positions", () => {
   const rows = collectionRows();
   const cities = rows.map(fromCityRow);
-  assert.equal(cities.length, 321);
-  assert.equal(cities.filter((c) => c.coordinates).length, 319);
+  assert.equal(cities.length, 323);
+  assert.equal(cities.filter((c) => c.coordinates).length, 321);
   assert.deepEqual(cities.map(toCityRow), rows);
-  cities[0].status = "Update";
-  cities[0].visit = "visited";
-  cities[0].lastVisited = "2025";
-  cities[0].notes = 'A note, with "quotes"\nand a new line.';
+  const edited = cities.find((c) => c.id === "moscow-russia")!;
+  edited.status = "Update";
+  edited.visit = "visited";
+  edited.lastVisited = "2025";
+  edited.notes = 'A note, with "quotes"\nand a new line.';
   const result = importCities(exportCitiesCsv(cities)).data;
   assert.deepEqual(result.cities, cities);
-  assert.equal(deriveCountries(cities, []).filter((c) => c.visited).length, 1);
+  assert.equal(deriveCountries(cities, []).filter((c) => c.visited).length, 38);
   assert.equal(cities.find((c) => c.name === "Iguazu")?.coordinates, null);
 });
 

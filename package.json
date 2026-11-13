@@ -9,6 +9,10 @@
   "scripts": {
     "dev": "tsx scripts/import-data.ts && vite --host 0.0.0.0",
     "data:import": "tsx scripts/import-data.ts",
+    "city:prepare-data": "tsx scripts/prepare-city-history.ts",
+    "city:prepare": "tsx scripts/prepare-city-database.ts",
+    "city:verify-live": "NODE_USE_ENV_PROXY=1 tsx scripts/prepare-city-database.ts --dry-run",
+    "city:apply": "NODE_USE_ENV_PROXY=1 tsx scripts/prepare-city-database.ts --apply",
     "country:prepare": "tsx scripts/prepare-country-database.ts",
     "country:verify-live": "NODE_USE_ENV_PROXY=1 tsx scripts/prepare-country-database.ts --dry-run",
     "country:apply": "NODE_USE_ENV_PROXY=1 tsx scripts/prepare-country-database.ts --apply",

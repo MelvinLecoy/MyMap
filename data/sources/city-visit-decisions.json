@@ -1,0 +1,44 @@
+{
+  "approvedOn": "2026-11-13",
+  "source": "City screenshots, checked against Travel Yearbook.xlsx, then corrected by the owner in chat",
+  "excludedCities": ["Southampton", "Reykjavik"],
+  "keepScreenshotValues": [
+    "Kuala Lumpur",
+    "Brisbane",
+    "Skopje",
+    "Aqtau",
+    "Miami",
+    "San Francisco",
+    "Vancouver",
+    "Chicago",
+    "Orlando"
+  ],
+  "corrections": [
+    {
+      "city": "Prague",
+      "originalStart": "2024-05-24",
+      "start": "2024-05-05",
+      "end": "2024-05-06"
+    },
+    {
+      "city": "Panama City",
+      "originalStart": "2025-05-24",
+      "start": "2025-03-24",
+      "end": "2025-03-24"
+    },
+    {
+      "city": "Boston",
+      "originalStart": "2021-08-21",
+      "start": "2021-08-20",
+      "end": "2021-08-20"
+    },
+    { "city": "London", "originalStart": "2026-05-01", "days": 2.5 },
+    { "city": "Seoul", "originalStart": "2025-07-17", "days": 3.5 },
+    { "city": "Auckland", "originalStart": "2025-08-05", "days": 3.5 },
+    { "city": "Singapore", "originalStart": "2026-09-11", "days": 1.5 }
+  ],
+  "retainedEntries": [{ "city": "Auckland", "start": "2025-07-28", "days": 1 }],
+  "halfDays": "Keep the screenshot date bounds; a fractional duration does not identify which date was a half-day.",
+  "visitCounting": "Each approved screenshot entry is a city stay; the country 14-day grouping rule is not applied.",
+  "expected": { "cities": 57, "stays": 111, "days": 249 }
+}

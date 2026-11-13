@@ -1,6 +1,8 @@
 import { parse } from "csv-parse/sync";
 import iso from "i18n-iso-countries";
 import en from "i18n-iso-countries/langs/en.json";
+import { importCityHistory } from "./city-importer.js";
+import { cityVisitSummary } from "../src/lib/city-visits.js";
 import {
   MAP_STATUSES,
   type AtlasData,
@@ -172,6 +174,7 @@ export function importCities(
     demo?: boolean;
     coordinates?: string;
     countryVisits?: string;
+    cityVisits?: string;
   } = {},
 ): { data: AtlasData; issues: Issue[] } {
   const issues: Issue[] = [];
@@ -289,6 +292,21 @@ export function importCities(
       map,
     };
   });
+  const preparedCities = options.cityVisits
+    ? importCityHistory(options.cityVisits, cities)
+    : cities;
+  if (options.cityVisits)
+    for (const { values: r } of readCSV(csv)) {
+      const city = preparedCities.find(
+        (c) => c.id === (r.cityid || slug(r.cities, r.country)),
+      )!;
+      const summary = cityVisitSummary(city.visits ?? []);
+      if (
+        (r.recordedvisits && Number(r.recordedvisits) !== summary.visits) ||
+        (r.recordeddaysspent && Number(r.recordeddaysspent) !== summary.days)
+      )
+        throw new Error(`City CSV totals differ from history: ${city.id}`);
+    }
   const countryMap = new Map<string, CountryVisit>();
   for (const city of cities)
     if (city.countryCode) {
@@ -344,7 +362,7 @@ export function importCities(
   return {
     data: {
       demo: options.demo ?? false,
-      cities,
+      cities: preparedCities,
       countries: [...countryMap.values()].sort((a, b) =>
         a.code.localeCompare(b.code),
       ),

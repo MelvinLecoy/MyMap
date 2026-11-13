@@ -5,6 +5,7 @@ import { toCityRow, type CityRow } from "../src/lib/cloud-data.js";
 export function collectionRows(): CityRow[] {
   const { data } = importCities(readFileSync("data/cities.csv", "utf8"), {
     coordinates: readFileSync("data/coordinates.csv", "utf8"),
+    cityVisits: readFileSync("data/city-visit-history.csv", "utf8"),
   });
   return data.cities.map(toCityRow);
 }

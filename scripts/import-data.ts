@@ -22,6 +22,9 @@ try {
       countryVisits: optional(
         demo ? "fixtures/country-visits.demo.csv" : "data/country-visits.csv",
       ),
+      cityVisits: demo
+        ? undefined
+        : readFileSync("data/city-visit-history.csv", "utf8"),
     },
   );
   mkdirSync("src/generated", { recursive: true });

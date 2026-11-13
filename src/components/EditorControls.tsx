@@ -16,13 +16,14 @@ import {
 } from "lucide-react";
 import CollectionFooter from "./CollectionFooter";
 import { exportCitiesCsv } from "../lib/cloud-data";
+import { exportCityVisitsCsv } from "../lib/city-cloud-data";
 import {
   MIN_PASSWORD_LENGTH,
   type RemoteAtlas,
   type StatusImport,
 } from "../lib/use-remote-atlas";
 
-type View = "login" | "link" | "reset" | "password" | "import";
+type View = "login" | "link" | "reset" | "password" | "import" | "export";
 
 export interface EditorControlsHandle {
   openSignIn: () => void;
@@ -151,22 +152,32 @@ export default function EditorControls({
     return () => window.clearTimeout(timer);
   }, [success]);
   const heading =
-    view === "password"
-      ? "Set your password"
-      : view === "reset"
-        ? "Reset your password"
-        : view === "import"
-          ? "Import saved statuses"
-          : "Editor sign in";
-  const download = () => {
+    view === "export"
+      ? "Export collection"
+      : view === "password"
+        ? "Set your password"
+        : view === "reset"
+          ? "Reset your password"
+          : view === "import"
+            ? "Import saved statuses"
+            : "Editor sign in";
+  const download = (history = false) => {
     const url = URL.createObjectURL(
-      new Blob(["\ufeff", exportCitiesCsv(cloud.cities)], {
-        type: "text/csv;charset=utf-8",
-      }),
+      new Blob(
+        [
+          "\ufeff",
+          history
+            ? exportCityVisitsCsv(cloud.cities)
+            : exportCitiesCsv(cloud.cities),
+        ],
+        {
+          type: "text/csv;charset=utf-8",
+        },
+      ),
     );
     const link = document.createElement("a");
     link.href = url;
-    link.download = `ciudad-mundo-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.download = `ciudad-mundo-${history ? "city-visits-" : ""}${new Date().toISOString().slice(0, 10)}.csv`;
     link.click();
     window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
@@ -205,7 +216,7 @@ export default function EditorControls({
               aria-label="Collection tools"
             >
               <button
-                onClick={download}
+                onClick={() => open("export")}
                 disabled={!cloud.ready || saving}
                 aria-label="Export collection CSV"
                 title="Export collection CSV"
@@ -251,6 +262,17 @@ export default function EditorControls({
               <Check size={28} aria-hidden="true" />
             </span>
             <p>{success}</p>
+          </div>
+        ) : view === "export" ? (
+          <div className="editor-export-options">
+            <button className="editor-primary" onClick={() => download()}>
+              <Download size={16} aria-hidden="true" />
+              Cities CSV
+            </button>
+            <button className="editor-primary" onClick={() => download(true)}>
+              <Download size={16} aria-hidden="true" />
+              City visit history CSV
+            </button>
           </div>
         ) : view !== "import" ? (
           <form
