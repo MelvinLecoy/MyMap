@@ -1,0 +1,791 @@
+{
+  "sample": true,
+  "countries": [
+    {
+      "code": "AL",
+      "name": "Albania",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "DZ",
+      "name": "Algeria",
+      "continent": "Africa",
+      "visit": "unknown"
+    },
+    {
+      "code": "AD",
+      "name": "Andorra",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "AO",
+      "name": "Angola",
+      "continent": "Africa",
+      "visit": "unknown"
+    },
+    {
+      "code": "AG",
+      "name": "Antigua and Barbuda",
+      "continent": "America",
+      "visit": "unknown"
+    },
+    {
+      "code": "AR",
+      "name": "Argentina",
+      "continent": "America",
+      "visit": "unknown"
+    },
+    {
+      "code": "AM",
+      "name": "Armenia",
+      "continent": "Asia",
+      "visit": "unknown"
+    },
+    {
+      "code": "AU",
+      "name": "Australia",
+      "continent": "Oceania",
+      "visit": "unknown"
+    },
+    {
+      "code": "AT",
+      "name": "Austria",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "AZ",
+      "name": "Azerbaijan",
+      "continent": "Asia",
+      "visit": "unknown"
+    },
+    {
+      "code": "BS",
+      "name": "Bahamas",
+      "continent": "America",
+      "visit": "unknown"
+    },
+    {
+      "code": "BH",
+      "name": "Bahrain",
+      "continent": "Asia",
+      "visit": "unknown"
+    },
+    {
+      "code": "BB",
+      "name": "Barbados",
+      "continent": "America",
+      "visit": "unknown"
+    },
+    {
+      "code": "BY",
+      "name": "Belarus",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "BE",
+      "name": "Belgium",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "BZ",
+      "name": "Belize",
+      "continent": "America",
+      "visit": "unknown"
+    },
+    {
+      "code": "BO",
+      "name": "Bolivia",
+      "continent": "America",
+      "visit": "unknown"
+    },
+    {
+      "code": "BA",
+      "name": "Bosnia",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "BW",
+      "name": "Botswana",
+      "continent": "Africa",
+      "visit": "unknown"
+    },
+    {
+      "code": "BR",
+      "name": "Brazil",
+      "continent": "America",
+      "visit": "unknown"
+    },
+    {
+      "code": "BN",
+      "name": "Brunei",
+      "continent": "Asia",
+      "visit": "unknown"
+    },
+    {
+      "code": "BG",
+      "name": "Bulgaria",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "KH",
+      "name": "Cambodia",
+      "continent": "Asia",
+      "visit": "unknown"
+    },
+    {
+      "code": "CA",
+      "name": "Canada",
+      "continent": "America",
+      "visit": "unknown"
+    },
+    {
+      "code": "CL",
+      "name": "Chile",
+      "continent": "America",
+      "visit": "unknown"
+    },
+    {
+      "code": "CN",
+      "name": "China",
+      "continent": "Asia",
+      "visit": "unknown"
+    },
+    {
+      "code": "CO",
+      "name": "Colombia",
+      "continent": "America",
+      "visit": "unknown"
+    },
+    {
+      "code": "CR",
+      "name": "Costa Rica",
+      "continent": "America",
+      "visit": "unknown"
+    },
+    {
+      "code": "HR",
+      "name": "Croatia",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "CU",
+      "name": "Cuba",
+      "continent": "America",
+      "visit": "unknown"
+    },
+    {
+      "code": "CZ",
+      "name": "Czechia",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "DK",
+      "name": "Denmark",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "DM",
+      "name": "Dominica",
+      "continent": "America",
+      "visit": "unknown"
+    },
+    {
+      "code": "DO",
+      "name": "Dominican Republic",
+      "continent": "America",
+      "visit": "unknown"
+    },
+    {
+      "code": "EC",
+      "name": "Ecuador",
+      "continent": "America",
+      "visit": "unknown"
+    },
+    {
+      "code": "EG",
+      "name": "Egypt",
+      "continent": "Africa",
+      "visit": "unknown"
+    },
+    {
+      "code": "SV",
+      "name": "El Salvador",
+      "continent": "America",
+      "visit": "unknown"
+    },
+    {
+      "code": "EE",
+      "name": "Estonia",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "FJ",
+      "name": "Fiji",
+      "continent": "Oceania",
+      "visit": "unknown"
+    },
+    {
+      "code": "FI",
+      "name": "Finland",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "FR",
+      "name": "France",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "GE",
+      "name": "Georgia",
+      "continent": "Asia",
+      "visit": "unknown"
+    },
+    {
+      "code": "DE",
+      "name": "Germany",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "GR",
+      "name": "Greece",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "GD",
+      "name": "Grenada",
+      "continent": "America",
+      "visit": "unknown"
+    },
+    {
+      "code": "GT",
+      "name": "Guatemala",
+      "continent": "America",
+      "visit": "unknown"
+    },
+    {
+      "code": "GY",
+      "name": "Guyana",
+      "continent": "America",
+      "visit": "unknown"
+    },
+    {
+      "code": "HN",
+      "name": "Honduras",
+      "continent": "America",
+      "visit": "unknown"
+    },
+    {
+      "code": "HU",
+      "name": "Hungary",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "ID",
+      "name": "Indonesia",
+      "continent": "Asia",
+      "visit": "unknown"
+    },
+    {
+      "code": "IR",
+      "name": "Iran",
+      "continent": "Asia",
+      "visit": "unknown"
+    },
+    {
+      "code": "IQ",
+      "name": "Iraq",
+      "continent": "Asia",
+      "visit": "unknown"
+    },
+    {
+      "code": "IE",
+      "name": "Ireland",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "IL",
+      "name": "Israel",
+      "continent": "Asia",
+      "visit": "unknown"
+    },
+    {
+      "code": "IT",
+      "name": "Italy",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "JM",
+      "name": "Jamaica",
+      "continent": "America",
+      "visit": "unknown"
+    },
+    {
+      "code": "JP",
+      "name": "Japan",
+      "continent": "Asia",
+      "visit": "unknown"
+    },
+    {
+      "code": "JO",
+      "name": "Jordan",
+      "continent": "Asia",
+      "visit": "unknown"
+    },
+    {
+      "code": "KZ",
+      "name": "Kazakhstan",
+      "continent": "Asia",
+      "visit": "unknown"
+    },
+    {
+      "code": "KE",
+      "name": "Kenya",
+      "continent": "Africa",
+      "visit": "unknown"
+    },
+    {
+      "code": "XK",
+      "name": "Kosovo",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "KW",
+      "name": "Kuwait",
+      "continent": "Asia",
+      "visit": "unknown"
+    },
+    {
+      "code": "KG",
+      "name": "Kyrgyzstan",
+      "continent": "Asia",
+      "visit": "unknown"
+    },
+    {
+      "code": "LA",
+      "name": "Laos",
+      "continent": "Asia",
+      "visit": "unknown"
+    },
+    {
+      "code": "LV",
+      "name": "Latvia",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "LB",
+      "name": "Lebanon",
+      "continent": "Asia",
+      "visit": "unknown"
+    },
+    {
+      "code": "LI",
+      "name": "Liechtenstein",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "LT",
+      "name": "Lithuania",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "LU",
+      "name": "Luxembourg",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "MY",
+      "name": "Malaysia",
+      "continent": "Asia",
+      "visit": "unknown"
+    },
+    {
+      "code": "MT",
+      "name": "Malta",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "MR",
+      "name": "Mauritania",
+      "continent": "Africa",
+      "visit": "unknown"
+    },
+    {
+      "code": "MX",
+      "name": "Mexico",
+      "continent": "America",
+      "visit": "unknown"
+    },
+    {
+      "code": "MD",
+      "name": "Moldova",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "MC",
+      "name": "Monaco",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "MN",
+      "name": "Mongolia",
+      "continent": "Asia",
+      "visit": "unknown"
+    },
+    {
+      "code": "ME",
+      "name": "Montenegro",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "MA",
+      "name": "Morocco",
+      "continent": "Africa",
+      "visit": "unknown"
+    },
+    {
+      "code": "MM",
+      "name": "Myanmar",
+      "continent": "Asia",
+      "visit": "unknown"
+    },
+    {
+      "code": "NP",
+      "name": "Nepal",
+      "continent": "Asia",
+      "visit": "unknown"
+    },
+    {
+      "code": "NL",
+      "name": "Netherlands",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "NZ",
+      "name": "New Zealand",
+      "continent": "Oceania",
+      "visit": "unknown"
+    },
+    {
+      "code": "NI",
+      "name": "Nicaragua",
+      "continent": "America",
+      "visit": "unknown"
+    },
+    {
+      "code": "MK",
+      "name": "North Macedonia",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "NO",
+      "name": "Norway",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "OM",
+      "name": "Oman",
+      "continent": "Asia",
+      "visit": "unknown"
+    },
+    {
+      "code": "PA",
+      "name": "Panama",
+      "continent": "America",
+      "visit": "unknown"
+    },
+    {
+      "code": "PY",
+      "name": "Paraguay",
+      "continent": "America",
+      "visit": "unknown"
+    },
+    {
+      "code": "PE",
+      "name": "Peru",
+      "continent": "America",
+      "visit": "unknown"
+    },
+    {
+      "code": "PH",
+      "name": "Philippines",
+      "continent": "Asia",
+      "visit": "unknown"
+    },
+    {
+      "code": "PL",
+      "name": "Poland",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "PT",
+      "name": "Portugal",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "QA",
+      "name": "Qatar",
+      "continent": "Asia",
+      "visit": "unknown"
+    },
+    {
+      "code": "RO",
+      "name": "Romania",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "RU",
+      "name": "Russia",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "RW",
+      "name": "Rwanda",
+      "continent": "Africa",
+      "visit": "unknown"
+    },
+    {
+      "code": "SM",
+      "name": "San Marino",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "SA",
+      "name": "Saudi Arabia",
+      "continent": "Asia",
+      "visit": "unknown"
+    },
+    {
+      "code": "RS",
+      "name": "Serbia",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "SG",
+      "name": "Singapore",
+      "continent": "Asia",
+      "visit": "unknown"
+    },
+    {
+      "code": "SK",
+      "name": "Slovakia",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "SI",
+      "name": "Slovenia",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "ZA",
+      "name": "South Africa",
+      "continent": "Africa",
+      "visit": "unknown"
+    },
+    {
+      "code": "KR",
+      "name": "South Korea",
+      "continent": "Asia",
+      "visit": "unknown"
+    },
+    {
+      "code": "ES",
+      "name": "Spain",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "LK",
+      "name": "Sri Lanka",
+      "continent": "Asia",
+      "visit": "unknown"
+    },
+    {
+      "code": "KN",
+      "name": "St. Kitts and Nevis",
+      "continent": "America",
+      "visit": "unknown"
+    },
+    {
+      "code": "LC",
+      "name": "St. Lucia",
+      "continent": "America",
+      "visit": "unknown"
+    },
+    {
+      "code": "VC",
+      "name": "St. Vincent and the Grenadines",
+      "continent": "America",
+      "visit": "unknown"
+    },
+    {
+      "code": "SR",
+      "name": "Suriname",
+      "continent": "America",
+      "visit": "unknown"
+    },
+    {
+      "code": "SJ",
+      "name": "Svalbard",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "SE",
+      "name": "Sweden",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "CH",
+      "name": "Switzerland",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "SY",
+      "name": "Syria",
+      "continent": "Asia",
+      "visit": "unknown"
+    },
+    {
+      "code": "TJ",
+      "name": "Tajikistan",
+      "continent": "Asia",
+      "visit": "unknown"
+    },
+    {
+      "code": "TH",
+      "name": "Thailand",
+      "continent": "Asia",
+      "visit": "unknown"
+    },
+    {
+      "code": "TL",
+      "name": "Timor Leste",
+      "continent": "Asia",
+      "visit": "unknown"
+    },
+    {
+      "code": "TT",
+      "name": "Trinidad and Tobago",
+      "continent": "America",
+      "visit": "unknown"
+    },
+    {
+      "code": "TN",
+      "name": "Tunisia",
+      "continent": "Africa",
+      "visit": "unknown"
+    },
+    {
+      "code": "TR",
+      "name": "Turkey",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "AE",
+      "name": "UAE",
+      "continent": "Asia",
+      "visit": "unknown"
+    },
+    {
+      "code": "UG",
+      "name": "Uganda",
+      "continent": "Africa",
+      "visit": "unknown"
+    },
+    {
+      "code": "GB",
+      "name": "UK",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "UA",
+      "name": "Ukraine",
+      "continent": "Europe",
+      "visit": "unknown"
+    },
+    {
+      "code": "UY",
+      "name": "Uruguay",
+      "continent": "America",
+      "visit": "unknown"
+    },
+    {
+      "code": "US",
+      "name": "USA",
+      "continent": "America",
+      "visit": "unknown"
+    },
+    {
+      "code": "UZ",
+      "name": "Uzbekistan",
+      "continent": "Asia",
+      "visit": "unknown"
+    },
+    {
+      "code": "VE",
+      "name": "Venezuela",
+      "continent": "America",
+      "visit": "unknown"
+    },
+    {
+      "code": "VN",
+      "name": "Vietnam",
+      "continent": "Asia",
+      "visit": "unknown"
+    },
+    {
+      "code": "ZM",
+      "name": "Zambia",
+      "continent": "Africa",
+      "visit": "unknown"
+    },
+    {
+      "code": "ZW",
+      "name": "Zimbabwe",
+      "continent": "Africa",
+      "visit": "unknown"
+    }
+  ]
+}

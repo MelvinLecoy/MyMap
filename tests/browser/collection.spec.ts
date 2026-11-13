@@ -457,3 +457,117 @@ test("the full collection and corrected map links remain usable without WebGL", 
     page.getByRole("button", { name: "View My Map", exact: true }),
   ).toBeVisible();
 });
+
+test("the Countries tab has labelled counts, independent filters, and reloadable navigation", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const tabs = page.getByRole("tablist", { name: "Collection view" });
+  await expect(page.locator(".collection-count")).toHaveText("321 cities");
+  await page.getByLabel("Search cities and countries").fill("Adelaide");
+  await expect(page.locator(".collection-count")).toHaveText("1 city");
+  await tabs.getByRole("tab", { name: "Countries", exact: true }).click();
+  await expect(page).toHaveURL(/panel=countries/);
+  await expect(page.locator(".country-row")).toHaveCount(131);
+  await expect(page.locator(".collection-count")).toHaveText("131 countries");
+  await expect(
+    page.getByText("Sample country data", { exact: true }),
+  ).toBeVisible();
+  await page.getByLabel("Search countries", { exact: true }).fill("Australia");
+  await expect(page.locator(".country-row")).toHaveCount(1);
+  await expect(page.locator(".country-row")).toContainText("6 cities");
+  await expect(page.locator(".collection-count")).toHaveText("1 country");
+  await tabs.getByRole("tab", { name: "Cities", exact: true }).click();
+  await expect(page.getByLabel("Search cities and countries")).toHaveValue(
+    "Adelaide",
+  );
+  await tabs.getByRole("tab", { name: "Countries", exact: true }).click();
+  await expect(
+    page.getByLabel("Search countries", { exact: true }),
+  ).toHaveValue("Australia");
+  await page.getByRole("button", { name: "Clear search", exact: true }).click();
+  await page
+    .getByLabel("Filter by visit status", { exact: true })
+    .selectOption("visited");
+  await expect(
+    page.getByRole("heading", { name: "No countries found" }),
+  ).toBeVisible();
+  await expect(page.locator(".collection-count")).toHaveText("0 countries");
+  await page
+    .getByRole("button", { name: "Clear filters", exact: true })
+    .click();
+  await expect(page.locator(".country-row")).toHaveCount(131);
+  await page.reload();
+  await expect(
+    tabs.getByRole("tab", { name: "Countries", exact: true }),
+  ).toHaveAttribute("aria-selected", "true");
+  await page.goBack();
+  await expect(
+    tabs.getByRole("tab", { name: "Cities", exact: true }),
+  ).toHaveAttribute("aria-selected", "true");
+});
+
+test("opening a country scopes the city list and survives city details and reload", async ({
+  page,
+}) => {
+  await page.goto("/?panel=countries");
+  await page.getByLabel("Search countries", { exact: true }).fill("Algeria");
+  await page.locator(".country-row").click();
+  await expect(page).toHaveURL(/country=DZ/);
+  await expect(page.locator(".city-row")).toHaveCount(3);
+  await expect(page.locator(".country-scope")).toContainText("Algeria");
+  await expect(page.locator(".collection-count")).toHaveText("3 cities");
+  await page
+    .locator(".city-row")
+    .filter({ has: page.getByText("Algiers", { exact: true }) })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "Algiers", exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Algeria (3 cities)", exact: true })
+    .click();
+  await expect(page.locator(".city-row")).toHaveCount(3);
+  await page.reload();
+  await expect(page.locator(".city-row")).toHaveCount(3);
+  await page.getByRole("button", { name: "Clear country filter" }).click();
+  await expect(page.locator(".city-row")).toHaveCount(321);
+  await expect(page).not.toHaveURL(/country=/);
+});
+
+test("collection tabs work with a keyboard and the compact header fits narrow panels", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const tabs = page.getByRole("tablist", { name: "Collection view" });
+  await tabs.getByRole("tab", { name: "Cities", exact: true }).focus();
+  await page.keyboard.press("ArrowRight");
+  await expect(
+    tabs.getByRole("tab", { name: "Countries", exact: true }),
+  ).toBeFocused();
+  await expect(
+    page.getByLabel("Search countries", { exact: true }),
+  ).toBeVisible();
+  await page.keyboard.press("Home");
+  await expect(
+    tabs.getByRole("tab", { name: "Cities", exact: true }),
+  ).toBeFocused();
+  for (const width of [1440, 740, 320]) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const view of ["Countries", "Cities"]) {
+      await tabs.getByRole("tab", { name: view, exact: true }).click();
+      const sizes = await page
+        .locator(".collection-controls")
+        .evaluate((el) => ({
+          width: el.clientWidth,
+          scroll: el.scrollWidth,
+          height: el.getBoundingClientRect().height,
+        }));
+      expect(sizes.scroll).toBeLessThanOrEqual(sizes.width);
+      expect(sizes.height).toBeLessThanOrEqual(80);
+      await expect(page.locator(".collection-count")).toContainText(
+        view === "Countries" ? "countries" : "cities",
+      );
+    }
+  }
+});

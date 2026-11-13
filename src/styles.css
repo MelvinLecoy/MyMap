@@ -432,34 +432,6 @@ h2 {
   background: var(--panel);
   z-index: 2;
 }
-.panel-intro {
-  padding: 24px var(--collection-inset) 18px;
-  flex-shrink: 0;
-}
-.panel-heading {
-  display: flex;
-  gap: 11px;
-  align-items: center;
-}
-.panel-heading h1 {
-  font-size: 30px;
-  font-weight: 650;
-  letter-spacing: -1.1px;
-  line-height: 1.2;
-}
-.city-total {
-  background: var(--surface-alt);
-  border-radius: 7px;
-  font-size: 13px;
-  font-weight: 650;
-  font-variant-numeric: tabular-nums;
-  color: var(--visit-text);
-  min-width: 28px;
-  height: 28px;
-  padding: 0 7px;
-  display: grid;
-  place-items: center;
-}
 .collection-controls {
   padding: 0 var(--collection-inset) 14px;
   flex-shrink: 0;
@@ -568,7 +540,7 @@ h2 {
   min-height: 0;
   border-top: 1px solid var(--line);
 }
-.city-row {
+:is(.city-row, .country-row) {
   width: 100%;
   min-height: 72px;
   padding: 8px var(--collection-inset);
@@ -579,7 +551,7 @@ h2 {
   text-align: left;
   position: relative;
 }
-.city-row:after {
+:is(.city-row, .country-row):after {
   content: "";
   position: absolute;
   left: 0;
@@ -587,10 +559,10 @@ h2 {
   bottom: 0;
   border-bottom: 1px solid var(--line);
 }
-.city-row:hover {
+:is(.city-row, .country-row):hover {
   background: var(--hover);
 }
-.city-row:focus-visible {
+:is(.city-row, .country-row):focus-visible {
   outline-offset: -4px;
   background: var(--hover);
 }
@@ -660,7 +632,7 @@ h2 {
   display: inline-flex;
   align-items: center;
 }
-.city-row .status {
+:is(.city-row, .country-row) .status {
   font-size: 10px;
   font-weight: 600;
   padding: 5px 7px;
@@ -702,7 +674,7 @@ h2 {
   color: var(--muted);
   flex-shrink: 0;
 }
-.city-row:hover .row-chevron {
+:is(.city-row, .country-row):hover .row-chevron {
   color: var(--accent);
   transform: translateX(3px);
 }
@@ -1569,7 +1541,7 @@ h2 {
   .search-field kbd {
     display: none;
   }
-  .city-row {
+  :is(.city-row, .country-row) {
     column-gap: 8px;
   }
   .journey-stats:not(.journey-stats--compact) {
@@ -1688,7 +1660,7 @@ h2 {
     overflow: visible;
     flex: 1;
   }
-  .city-row {
+  :is(.city-row, .country-row) {
     column-gap: 10px;
   }
   .city-row-name {
@@ -1792,4 +1764,190 @@ h2 {
   pointer-events: none;
   background: var(--surface-alt);
   color: var(--text);
+}
+
+/* Compact Cities / Countries collection navigation. */
+.collection-navigation {
+  padding: 12px 16px 10px;
+  flex-shrink: 0;
+}
+.collection-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  padding: 2px;
+  background: var(--surface-alt);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+}
+.collection-tabs button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 3px 8px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 550;
+}
+.collection-tabs [aria-selected="true"] {
+  background: var(--surface);
+  border-color: #d3e0d7;
+  color: var(--accent);
+  font-weight: 650;
+  box-shadow: 0 1px 3px #254d3d09;
+}
+.collection-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+}
+.collection-controls {
+  padding: 0 16px 10px;
+}
+.collection-controls .search-field {
+  height: 36px;
+  padding: 0 10px;
+  gap: 8px;
+}
+.collection-controls .filter-row {
+  flex-wrap: nowrap;
+  gap: 8px;
+  margin-top: 8px;
+  min-height: 18px;
+}
+.collection-controls .status-filter,
+.collection-controls .continent-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  font-size: 10px;
+  line-height: 17px;
+}
+.collection-controls .status-filter select,
+.collection-controls .continent-filter select {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  padding: 0;
+  font: inherit;
+}
+.collection-controls .status-filter > svg:last-child,
+.collection-controls .continent-filter > svg {
+  position: static;
+  flex-shrink: 0;
+}
+.filter-display {
+  white-space: nowrap;
+}
+.filter-short {
+  display: none;
+}
+.collection-controls label:has(select):focus-within {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+.collection-count {
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  margin-left: auto;
+  padding-left: 9px;
+  border-left: 1px solid var(--line);
+  gap: 4px;
+  color: var(--muted);
+  font-size: 10.5px;
+  line-height: 18px;
+  white-space: nowrap;
+}
+.collection-count strong {
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: -0.2px;
+  font-variant-numeric: tabular-nums;
+}
+.country-city-count {
+  padding: 5px 7px;
+  border-radius: 6px;
+  background: #edf2ee;
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 550;
+  line-height: 12px;
+  white-space: nowrap;
+}
+.country-sample-note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px var(--collection-inset);
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 16px;
+}
+.country-scope {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  padding: 4px 16px;
+  background: var(--surface-alt);
+  font-size: 11px;
+  line-height: 20px;
+}
+.country-scope button {
+  display: grid;
+  place-items: center;
+  margin-left: auto;
+  min-width: 24px;
+  min-height: 24px;
+  border-radius: 4px;
+}
+@container (max-width: 330px) {
+  .collection-controls .status-filter,
+  .collection-controls .continent-filter {
+    font-size: 9.5px;
+  }
+  .collection-count {
+    padding-left: 7px;
+    gap: 3px;
+    font-size: 10px;
+  }
+}
+@container (max-width: 300px) {
+  .collection-navigation {
+    padding-inline: 12px;
+  }
+  .collection-controls {
+    padding-inline: 12px;
+  }
+  .filter-full {
+    display: none;
+  }
+  .filter-short {
+    display: inline;
+  }
+  .collection-controls .filter-row {
+    gap: 7px;
+  }
+}
+@media (max-width: 600px) {
+  .collection-content {
+    flex: none;
+  }
 }
