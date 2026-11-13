@@ -15,8 +15,10 @@ console.log(
     days: snapshot.periods.reduce(
       (n, p) =>
         n +
-        (Date.parse(p.departure_date) - Date.parse(p.arrival_date)) / 86400000 +
-        1,
+        (p.days_spent ??
+          (Date.parse(p.departure_date) - Date.parse(p.arrival_date)) /
+            86400000 +
+            1),
       0,
     ),
   }),

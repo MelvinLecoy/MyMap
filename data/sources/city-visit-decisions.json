@@ -32,13 +32,44 @@
       "start": "2021-08-20",
       "end": "2021-08-20"
     },
-    { "city": "London", "originalStart": "2026-05-01", "days": 2.5 },
-    { "city": "Seoul", "originalStart": "2025-07-17", "days": 3.5 },
-    { "city": "Auckland", "originalStart": "2025-08-05", "days": 3.5 },
-    { "city": "Singapore", "originalStart": "2026-09-11", "days": 1.5 }
+    {
+      "city": "London",
+      "originalStart": "2026-05-01",
+      "days": 2.5
+    },
+    {
+      "city": "Seoul",
+      "originalStart": "2025-07-17",
+      "days": 3.5
+    },
+    {
+      "city": "Auckland",
+      "originalStart": "2025-08-05",
+      "days": 3.5
+    },
+    {
+      "city": "Singapore",
+      "originalStart": "2026-09-11",
+      "days": 1
+    },
+    {
+      "city": "Shanghai",
+      "originalStart": "2026-08-30",
+      "days": 1.5
+    }
   ],
-  "retainedEntries": [{ "city": "Auckland", "start": "2025-07-28", "days": 1 }],
+  "retainedEntries": [
+    {
+      "city": "Auckland",
+      "start": "2025-07-28",
+      "days": 1
+    }
+  ],
   "halfDays": "Keep the screenshot date bounds; a fractional duration does not identify which date was a half-day.",
   "visitCounting": "Each approved screenshot entry is a city stay; the country 14-day grouping rule is not applied.",
-  "expected": { "cities": 57, "stays": 111, "days": 249 }
+  "expected": {
+    "cities": 57,
+    "stays": 111,
+    "days": 248
+  }
 }

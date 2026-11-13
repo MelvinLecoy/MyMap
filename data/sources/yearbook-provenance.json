@@ -15,11 +15,15 @@
       "UKDaysAfter": 12,
       "OverallCountryDaysBefore": 271,
       "OverallCountryDaysAfter": 270
+    },
+    {
+      "source": "country-duration-corrections.json",
+      "rule": "Approved half-day durations and additional Singapore stays supersede earlier yearbook date bounds, including the earlier UK May 3 exclusion."
     }
   ],
   "countries_with_dated_evidence": 92,
   "recorded_visits": 114,
-  "actual_contiguous_stay_periods": 125,
-  "recorded_country_days": 270,
+  "actual_contiguous_stay_periods": 127,
+  "recorded_country_days": 273.5,
   "new_visit_rule": "Next period's first date minus previous period's last date >= 14 days"
 }

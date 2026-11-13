@@ -39,12 +39,16 @@ end $check$;`;
 }
 export function countryDatabaseSql() {
   const snapshot = toCountrySnapshot(countryCollection());
-  const migration = readFileSync(
-    "supabase/migrations/202611130001_country_history.sql",
-    "utf8",
-  )
-    .replace(/^begin;\s*/i, "")
-    .replace(/commit;\s*$/i, "");
+  const migration = [
+    "202611130001_country_history.sql",
+    "202611130003_country_half_days.sql",
+  ]
+    .map((file) =>
+      readFileSync(`supabase/migrations/${file}`, "utf8")
+        .replace(/^begin;\s*/i, "")
+        .replace(/commit;\s*$/i, ""),
+    )
+    .join("\n");
   return {
     snapshot,
     sql: `begin;\nselect pg_advisory_xact_lock(202611130001);\n${migration}\n${countrySeedSql(snapshot)}\nset constraints all immediate;\ncommit;\n`,

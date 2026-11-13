@@ -1,6 +1,7 @@
 import { CalendarDays } from "lucide-react";
 import { cityVisitSummary, formatCityVisitRange } from "../lib/city-visits";
 import type { CityVisit } from "../lib/types";
+import { visitDurationAnnotation } from "../lib/visit-duration";
 
 export default function CityVisitHistory({ visits }: { visits?: CityVisit[] }) {
   if (!visits?.length) return null;
@@ -32,7 +33,14 @@ export default function CityVisitHistory({ visits }: { visits?: CityVisit[] }) {
                   {visit.daysSpent} {visit.daysSpent === 1 ? "day" : "days"}
                 </span>
               </div>
-              <p>{formatCityVisitRange(visit)}</p>
+              <p>
+                {formatCityVisitRange(visit)}
+                {visitDurationAnnotation(
+                  visit.arrival,
+                  visit.departure,
+                  visit.daysSpent,
+                )}
+              </p>
             </li>
           ))}
       </ol>

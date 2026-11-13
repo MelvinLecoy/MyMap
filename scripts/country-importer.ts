@@ -1,7 +1,10 @@
 import type { CountrySeed, CountryTrip } from "../src/lib/countries.js";
 import type { VisitStatus } from "../src/lib/types.js";
 import { countryCode, readCSV, validDate } from "./importer.js";
-import { calculateRecordedHistory } from "../src/lib/country-history.js";
+import {
+  calculateRecordedHistory,
+  validHalfDays,
+} from "../src/lib/country-history.js";
 
 function integer(
   value: string | undefined,
@@ -18,6 +21,22 @@ function integer(
       `${name} must be a whole number of at least ${minimum}, or blank.`,
     );
   }
+  return Number(value);
+}
+
+function duration(
+  value: string | undefined,
+  name: string,
+  minimum = 0,
+): number | null {
+  if (!value) return null;
+  if (
+    !/^\d+(?:\.0|\.5)?$/.test(value) ||
+    !validHalfDays(Number(value), minimum)
+  )
+    throw new Error(
+      `${name} must use half-day increments of at least ${minimum}, or blank.`,
+    );
   return Number(value);
 }
 
@@ -90,7 +109,10 @@ export function importCountryHistory(
       aliases: previous && previous.name !== row.country ? [previous.name] : [],
       firstVisitOrder,
       timesVisited: integer(row.timesvisited, `${context}: TimesVisited`),
-      totalDaysSpent: integer(row.totaldaysspent, `${context}: TotalDaysSpent`),
+      totalDaysSpent: duration(
+        row.totaldaysspent,
+        `${context}: TotalDaysSpent`,
+      ),
       visitHistoryComplete: row.visithistorycomplete === "1",
       notes: row.notes || "",
       visits: [],
@@ -98,7 +120,7 @@ export function importCountryHistory(
     complete.set(code, row.visithistorycomplete === "1");
     expectedRecorded.set(code, [
       integer(row.recordedvisits, `${context}: RecordedVisits`),
-      integer(row.recordeddaysspent, `${context}: RecordedDaysSpent`),
+      duration(row.recordeddaysspent, `${context}: RecordedDaysSpent`),
     ]);
   }
   const seen = new Set<string>();
@@ -147,7 +169,7 @@ export function importCountryHistory(
       if (latestDeparture < Date.UTC(arrivalYear, arrivalMonth - 1, arrivalDay))
         throw new Error(`${context}: departure is before arrival.`);
     }
-    let daysSpent = integer(row.daysspent, `${context}: DaysSpent`, 1);
+    let daysSpent = duration(row.daysspent, `${context}: DaysSpent`, 0.5);
     if (
       !stayPeriods &&
       daysSpent === null &&
@@ -198,6 +220,15 @@ export function importCountryHistory(
         number,
         arrival: row.arrivaldate,
         departure: row.departuredate,
+        ...(row.daysspent
+          ? {
+              daysSpent: duration(
+                row.daysspent,
+                `Stay period row ${line}: DaysSpent`,
+                0.5,
+              )!,
+            }
+          : {}),
         sourceRefs: row.sourcerefs || "",
         notes: row.notes || "",
       });

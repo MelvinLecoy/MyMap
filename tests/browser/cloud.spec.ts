@@ -313,6 +313,48 @@ test("visitors see saved data and cannot use browser overrides to change the pub
   await expect(page.getByText("Loading latest…")).toHaveCount(0);
 });
 
+test("saving a city's map status updates progress and filters while retaining its visit stats", async ({
+  context,
+  page,
+}) => {
+  const state = store();
+  await backend(context, state, ownerId);
+  await page.goto("/?city=shanghai-china");
+  const picker = page.getByLabel("Map status", { exact: true });
+  await expect(picker).toBeEnabled();
+  await picker.selectOption("Complete");
+  await expect(picker).toBeEnabled();
+  await expect(page.locator(".city-statistics dd")).toHaveText(["2", "2.5"]);
+  await page
+    .getByRole("button", {
+      name: `All cities (${atlas.cities.length})`,
+      exact: true,
+    })
+    .click();
+  await expect(page.locator(".city-map-progress-heading")).toContainText(
+    "254 / 323 complete",
+  );
+  await expect(page.locator(".city-overview-totals dd")).toHaveText([
+    "57",
+    "111",
+    "248",
+  ]);
+  await page
+    .getByRole("group", { name: "Map progress filters" })
+    .getByRole("button", { name: "Complete 254", exact: true })
+    .click();
+  await page.getByLabel("Search cities and countries").fill("Shanghai");
+  const row = page.locator(".city-row");
+  await expect(row.locator(".status")).toHaveText("Complete");
+  await expect(row.locator(".city-row-duration")).toHaveText("2.5 days");
+  await expect(row.locator(".city-count-badge")).toContainText("2");
+  expect(
+    state.cityVisits.find(
+      (v) => v.city_id === "shanghai-china" && v.visit_number === 1,
+    )!.days_spent,
+  ).toBe(1.5);
+});
+
 test("country details retain editor saves and viewer permissions in their nested cities", async ({
   context,
   page,
@@ -623,13 +665,13 @@ test("the editor can export every city with saved statuses and nullable coordina
   }) as Array<Record<string, string>>;
   expect(visits).toHaveLength(111);
   expect(new Set(visits.map((v) => v.CityId)).size).toBe(57);
-  expect(visits.reduce((n, v) => n + Number(v.DaysSpent), 0)).toBe(249);
+  expect(visits.reduce((n, v) => n + Number(v.DaysSpent), 0)).toBe(248);
   expect(
     visits.find(
       (v) =>
         v.CityId === "singapore-singapore" && v.ArrivalDate === "2026-09-11",
     )!.DaysSpent,
-  ).toBe("1.5");
+  ).toBe("1");
 });
 
 test("live city history survives saves and reloads, refreshes coherently, and remains available during an outage", async ({

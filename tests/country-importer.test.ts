@@ -47,13 +47,13 @@ test("the verified yearbook imports 114 dated visits and six undated known visit
   );
   assert.equal(
     visited.reduce((n, c) => n + (c.recordedDaysSpent ?? 0), 0),
-    270,
+    273.5,
   );
   assert.equal(visited.flatMap((c) => c.visits ?? []).length, 120);
   assert.equal(
     visited.flatMap((c) => c.visits?.flatMap((v) => v.periods ?? []) ?? [])
       .length,
-    125,
+    127,
   );
   for (const code of ["CA", "DO", "HN", "IS", "JM", "US"]) {
     const country = visited.find((c) => c.code === code)!;

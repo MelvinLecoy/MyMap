@@ -38,6 +38,7 @@ export interface CountryStayPeriod {
   number: number;
   arrival: string;
   departure: string;
+  daysSpent?: number | null;
   sourceRefs?: string;
   notes?: string;
 }

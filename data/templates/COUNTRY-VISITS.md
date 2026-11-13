@@ -42,11 +42,14 @@ to the yearbook's recorded totals.
 ## Actual stays
 
 `country-visit-periods-template.csv` corresponds to `data/country-visit-periods.csv`.
-Columns: `CountryCode,Country,VisitNumber,PeriodNumber,ArrivalDate,DepartureDate,SourceRefs,Notes`.
+Columns: `CountryCode,Country,VisitNumber,PeriodNumber,ArrivalDate,DepartureDate,DaysSpent,SourceRefs,Notes`.
 Each row is an uninterrupted stay with exact YYYY-MM-DD dates. Numbers start
 at 1 within each visit. SourceRefs identifies the original date cells.
 
-Arrival and departure count inclusively. A next stay starts a new counted visit
+Arrival and departure count inclusively unless an explicit DaysSpent overrides
+the calendar span. Durations support positive half-day increments for every
+country. Exceptions such as 12–13 May 2024 (1 day) appear beside their dates.
+A next stay starts a new counted visit
 when its first date minus the previous stay's last date is at least 14 days.
 Shorter gaps merge visits but add no days. Actual stays cannot overlap.
 Visit start/end must match its first/last stay, and DaysSpent must equal the sum
@@ -54,8 +57,8 @@ of its actual stays, not the enclosing calendar span.
 
 Example: Australia's first recorded visit spans 24 July–3 August 2025 but has
 actual stays of 24–27 July and 29 July–3 August: 10 days, not 11.
-New Zealand's two 2025 stays count as one visit and five actual days.
-The UK May 2026 stay is 1–2 May; 3 May counts only for Bosnia & Herzegovina.
+New Zealand's two 2025 stays count as one visit and 5.5 days. The UK May
+2026 stay is 1–3 May and lasts 2.5 days. Its other two visits are unchanged.
 
 ## Sources and regeneration
 
@@ -71,7 +74,7 @@ the live CSV inputs and templates. It preserves membership, lifetime order,
 reported lifetime totals and history completeness. Run `npm run data:import`
 then `npm test` and the browser checks after changes.
 
-The corrected dataset has 114 dated visits, 125 actual stays and 270 country-days.
+The corrected dataset has 114 dated visits, 127 actual stays and 273.5 country-days.
 Border-crossing dates may count for both countries. Coverage is incomplete
 lifetime history; six countries have no yearbook date evidence.
 
@@ -84,3 +87,6 @@ The country panel reads one consistent database snapshot when Supabase is
 configured and retains a bundled/last-confirmed snapshot during outages.
 The existing website editor still saves city map status; country history is
 managed through validated imports, not a new country-editing form.
+
+Later owner corrections are recorded in `data/sources/country-duration-corrections.json`.
+They supersede the corresponding original workbook date bounds and durations.

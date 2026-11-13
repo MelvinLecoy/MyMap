@@ -44,7 +44,7 @@ test("every verified country date, visit count and day total round-trips through
   assert.equal(roundtrip.filter((c) => c.is195 !== undefined).length, 197);
   assert.equal(
     roundtrip.find((c) => c.code === "GB")?.visits?.at(-1)?.departure,
-    "2026-05-02",
+    "2026-05-03",
   );
 });
 

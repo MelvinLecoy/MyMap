@@ -16,6 +16,7 @@ import MapViewer from "./components/MapViewer";
 import CityName from "./components/CityName";
 import CountryDetail from "./components/CountryDetail";
 import CityVisitHistory from "./components/CityVisitHistory";
+import CityCollectionSummary from "./components/CityCollectionSummary";
 import {
   CityRow,
   CountryVisitMarker,
@@ -232,18 +233,22 @@ export default function App() {
         (countryContinent === "all" || country.continent === countryContinent),
     );
   }, [countriesInView, countrySearch, countryVisit, countryContinent]);
-  const filtered = useMemo(() => {
+  const cityScope = useMemo(() => {
     const query = searchText(search);
     return cities
       .filter(
         (city) =>
           searchText(`${city.name} ${city.country}`).includes(query) &&
-          (status === "all" || city.status === status) &&
           (continent === "all" || city.continent === continent) &&
           (!scopedCountry || countryKey(city) === scopedCountry.code),
       )
       .sort((a, b) => a.name.localeCompare(b.name));
-  }, [search, status, continent, cities, scopedCountry]);
+  }, [search, continent, cities, scopedCountry]);
+  const filtered = useMemo(
+    () =>
+      cityScope.filter((city) => status === "all" || city.status === status),
+    [cityScope, status],
+  );
   const mapCities = useMemo(() => {
     if (countryView && scopedCountry) return countryCities;
     if (!countryView) return filtered;
@@ -417,6 +422,14 @@ export default function App() {
               />
             ) : !selected ? (
               <>
+                {!countryView && (
+                  <CityCollectionSummary
+                    cities={filtered}
+                    scope={cityScope}
+                    status={status}
+                    onStatus={setStatus}
+                  />
+                )}
                 <CollectionHeader
                   view={route.panel}
                   search={countryView ? countrySearch : search}

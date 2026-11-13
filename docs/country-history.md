@@ -71,8 +71,9 @@ rollback with an export/review error rather than overwriting user edits.
 Future country-history editing should use one transaction for related rows and
 review exported data before replacing a dataset.
 
-Apply the additive database change before the website release. The previous
-website ignores the new tables, so it remains compatible. The bundled corrected
+The initial table creation was additive. For the subsequent half-day update,
+release the compatible reader before fractional live data; see
+[duration updates](duration-updates.md). The bundled corrected
 snapshot supplies fallback data to the new website. Environment publication,
 website deployment and database migration are separate actions.
 
@@ -81,7 +82,7 @@ website deployment and database migration are separate actions.
 See `data/sources/yearbook-provenance.json` and
 `data/templates/COUNTRY-VISITS.md`. Current totals: 198 database country/territory
 rows (197 canonical plus existing Svalbard), 120 visit rows (114 dated + six
-undated), 125 actual stays and 270 country-days. There are 98 known visited
+undated), 127 actual stays and 273.5 country-days. There are 98 known visited
 countries; 92 have dated yearbook records. Lifetime ordering and unknown lifetime
 totals are retained. The 21 July 2025 Malaysia flag ambiguity remains documented.
 

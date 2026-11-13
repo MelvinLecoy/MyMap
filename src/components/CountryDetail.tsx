@@ -10,6 +10,7 @@ import type { CountryRecord, CountrySet, CountryTrip } from "../lib/countries";
 import { formatVisitDate, VISIT_LABELS, type City } from "../lib/types";
 import { useCountryHeading } from "../lib/use-country-heading";
 import { CityRow, Flag } from "./CollectionItems";
+import { visitDurationAnnotation } from "../lib/visit-duration";
 
 function VisitDates({
   visit,
@@ -18,6 +19,11 @@ function VisitDates({
   visit: CountryTrip;
   compact?: boolean;
 }) {
+  const duration = visitDurationAnnotation(
+    visit.arrival,
+    visit.departure,
+    visit.daysSpent,
+  );
   if (visit.arrival && visit.departure && visit.arrival !== visit.departure) {
     let arrival = formatVisitDate(visit.arrival);
     if (visit.arrival.length === 10 && visit.departure.length === 10) {
@@ -32,6 +38,7 @@ function VisitDates({
     return (
       <>
         {arrival} – {formatVisitDate(visit.departure)}
+        {duration}
       </>
     );
   }
@@ -39,6 +46,7 @@ function VisitDates({
     return (
       <>
         {formatVisitDate(visit.arrival)}
+        {duration}
         {!visit.departure && " · Departure not recorded"}
       </>
     );
@@ -242,7 +250,7 @@ export default function CountryDetail({
                               number: period.number,
                               arrival: period.arrival,
                               departure: period.departure,
-                              daysSpent: null,
+                              daysSpent: period.daysSpent ?? null,
                             }}
                           />
                         </li>

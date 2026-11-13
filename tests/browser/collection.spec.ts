@@ -10,6 +10,143 @@ const data = JSON.parse(
   readFileSync("src/generated/atlas.json", "utf8"),
 ) as AtlasData;
 const backName = `All cities (${data.cities.length})`;
+
+test("city overview, compact visit rows, map progress filters and city details use the same history", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    const get = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (
+      this: HTMLCanvasElement,
+      type: string,
+      ...args: unknown[]
+    ) {
+      return type.includes("webgl")
+        ? null
+        : get.apply(this, [type, ...args] as never);
+    } as typeof get;
+  });
+  await page.goto("/");
+  await expect(page.locator(".city-overview-totals dd")).toHaveText([
+    "57",
+    "111",
+    "248",
+  ]);
+  await expect(page.locator(".city-map-progress-heading")).toContainText(
+    "253 / 323 complete",
+  );
+  const filters = page.getByRole("group", { name: "Map progress filters" });
+  await filters
+    .getByRole("button", { name: "Unfinished 7", exact: true })
+    .click();
+  await expect(page.getByLabel("Filter by map status")).toHaveValue(
+    "Unfinished",
+  );
+  await expect(page.locator(".city-row")).toHaveCount(7);
+  await page.getByLabel("Search cities and countries").fill("Shanghai");
+  await expect(page.locator(".city-overview-totals dd")).toHaveText([
+    "1",
+    "2",
+    "2.5",
+  ]);
+  const row = page.locator(".city-row");
+  await expect(row.locator(".city-count-badge")).toContainText("2");
+  await expect(row.locator(".city-row-duration")).toHaveText("2.5 days");
+  await expect(row.locator(".city-last-visit")).toContainText("Sep 26");
+  await expect(row.locator(".status")).toHaveText("Unfinished");
+  expect((await row.boundingBox())!.height).toBeLessThanOrEqual(73);
+  await row.click();
+  await expect(page.locator(".city-statistics dd")).toHaveText(["2", "2.5"]);
+  await expect(page.locator(".city-visit-list")).toContainText(
+    "30 – 31 August 2026 (1.5 days)",
+  );
+  for (const width of [320, 390, 1440]) {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.goto("/");
+    await expect(page.locator(".city-overview-totals dd")).toHaveText([
+      "57",
+      "111",
+      "248",
+    ]);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+  }
+});
+
+test("country and city duration exceptions are explicit while normal stays remain uncluttered", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    const original = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (
+      this: HTMLCanvasElement,
+      type: string,
+      ...args: unknown[]
+    ) {
+      return type.includes("webgl")
+        ? null
+        : original.apply(this, [type, ...args] as never);
+    } as typeof original;
+  });
+  for (const [code, count, days, text] of [
+    ["SG", "2", "7", "11 – 12 September 2026 (1 day)"],
+    ["KR", "1", "6.5", "15 – 21 July 2025 (6.5 days)"],
+    ["GB", "3", "12.5", "1 – 3 May 2026 (2.5 days)"],
+    ["NZ", "1", "5.5", "5 – 8 August 2025 (3.5 days)"],
+    ["CZ", "2", "4", "12 – 13 May 2024 (1 day)"],
+  ]) {
+    await page.goto(`/?panel=countries&country=${code}`);
+    await expect(page.locator(".country-statistics dd")).toHaveText([
+      count,
+      days,
+    ]);
+    await expect(page.locator(".country-visit-list")).toContainText(text);
+    if (code === "GB") {
+      await expect(page.locator(".country-visit-title").nth(0)).toContainText(
+        "9 days",
+      );
+      await expect(page.locator(".country-visit-title").nth(1)).toContainText(
+        "1 day",
+      );
+      await expect(
+        page.getByLabel("Actual stays for visit 1"),
+      ).not.toContainText("(");
+    }
+    if (code === "NZ")
+      await expect(
+        page.getByLabel("Actual stays for visit 1").locator("li").first(),
+      ).not.toContainText("(");
+    if (code === "SG") {
+      const stays = page.getByLabel("Actual stays for visit 2").locator("li");
+      await expect(stays).toHaveCount(4);
+      await expect(stays.nth(2)).toHaveText("3 September 2026");
+      await expect(stays.nth(0)).not.toContainText("(");
+    }
+  }
+  await page.goto("/?city=shanghai-china");
+  await expect(page.locator(".city-statistics dd")).toHaveText(["2", "2.5"]);
+  await expect(page.locator(".city-visit-list")).toContainText(
+    "30 – 31 August 2026 (1.5 days)",
+  );
+  await expect(
+    page.locator(".city-visit-list li").first().locator("p"),
+  ).toHaveText("1 September 2026");
+  await page.setViewportSize({ width: 320, height: 900 });
+  await page.goto("/?panel=countries&country=NZ");
+  await expect(page.locator(".country-visit-list")).toContainText("(3.5 days)");
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await page.goto("/?panel=countries");
+  await expect(
+    page.locator('.country-last-visit[data-year="2025"]').first(),
+  ).toHaveCSS("color", "rgb(136, 114, 0)");
+});
 function city(name: string) {
   const found = data.cities.find((record) => record.name === name);
   if (!found) throw new Error(`Missing collection record: ${name}`);
@@ -36,7 +173,7 @@ test("approved city histories show corrected dates and half-days on a narrow scr
     ["london-uk", "1 – 3 May 2026", "6.5"],
     ["seoul-south-korea", "17 – 20 July 2025", "3.5"],
     ["auckland-new-zealand", "5 – 8 August 2025", "4.5"],
-    ["singapore-singapore", "11 – 12 September 2026", "7.5"],
+    ["singapore-singapore", "11 – 12 September 2026", "7"],
     ["prague-czechia", "5 – 6 May 2024", "4"],
     ["panama-city-panama", "24 March 2025", "2"],
     ["boston-usa", "20 August 2021", "5"],
@@ -57,9 +194,9 @@ test("approved city histories show corrected dates and half-days on a narrow scr
   await expect(page.locator(".city-visit-list")).toContainText("3.5 days");
   await page.goto("/?panel=countries&country=GB");
   await expect(page.locator(".country-visit-list")).toContainText(
-    "1 – 2 May 2026",
+    "1 – 3 May 2026",
   );
-  await expect(page.locator(".country-statistics")).toContainText("12");
+  await expect(page.locator(".country-statistics")).toContainText("12.5");
 });
 async function openCity(page: Page, name: string) {
   await page
@@ -1001,8 +1138,8 @@ test("country history shows stays and corrected dates without explanatory copy o
     ["AT", 1, 3],
     ["DK", 1, 3],
     ["AU", 2, 14],
-    ["NZ", 1, 5],
-    ["GB", 3, 12],
+    ["NZ", 1, 5.5],
+    ["GB", 3, 12.5],
   ] as const) {
     await page.goto(`/?panel=countries&country=${code}`);
     await expect(page.locator(".country-statistics dd")).toHaveText([
@@ -1049,7 +1186,7 @@ test("country history shows stays and corrected dates without explanatory copy o
       ).toHaveCount(0);
       await expect(
         page.locator(".country-visit-list > li").last(),
-      ).toContainText("1 – 2 May 2026");
+      ).toContainText("1 – 3 May 2026");
     }
   }
   await page.setViewportSize({ width: 320, height: 700 });

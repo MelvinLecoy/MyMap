@@ -53,10 +53,10 @@ test("country schema, import, snapshot, permissions, integrity and reimport work
     assert.deepEqual(
       (
         await db.query(
-          "select count(*)::int as n,sum(departure_date-arrival_date+1)::int as days from country_visit_periods",
+          "select count(*)::int as n,sum(coalesce(days_spent,departure_date-arrival_date+1))::float8 as days from country_visit_periods",
         )
       ).rows[0],
-      { n: 125, days: 270 },
+      { n: 127, days: 273.5 },
     );
     await db.exec(sql); // Full migration and seed are repeatable.
     await db.exec("set role anon;");
@@ -132,7 +132,7 @@ test("country schema, import, snapshot, permissions, integrity and reimport work
     await db.exec(sql);
     assert.equal(
       (await fetch()).find((c) => c.code === "GB")!.recordedDaysSpent,
-      12,
+      12.5,
     );
   } finally {
     await db.close();

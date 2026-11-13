@@ -56,3 +56,9 @@ export function formatVisitDate(date: string): string {
   }).format(new Date(Date.UTC(year, month - 1, 15)));
   return day ? `${day} ${formatted} ${year}` : `${formatted} ${year}`;
 }
+
+export function formatShortVisitDate(date: string): string {
+  const [year, month] = date.split("-");
+  if (!month) return year;
+  return `${["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][Number(month) - 1]} ${year.slice(2)}`;
+}

@@ -28,7 +28,7 @@ const cities = cityCollection(),
   history = toCityVisitRows(cities);
 const find = (id: string) => cities.find((c) => c.id === id)!;
 
-test("all approved screenshot entries survive, with only the seven requested corrections", () => {
+test("all approved screenshot entries survive, with only the approved corrections", () => {
   const cards = JSON.parse(
     readFileSync("data/sources/city-screenshot-transcription.json", "utf8"),
   ) as Array<{
@@ -52,7 +52,8 @@ test("all approved screenshot entries survive, with only the seven requested cor
     "London:2026-05-01": 2.5,
     "Seoul:2025-07-17": 3.5,
     "Auckland:2025-08-05": 3.5,
-    "Singapore:2026-09-11": 1.5,
+    "Singapore:2026-09-11": 1,
+    "Shanghai:2026-08-30": 1.5,
   };
   for (const card of cards) {
     const city = cities.find(
@@ -84,7 +85,7 @@ test("all approved screenshot entries survive, with only the seven requested cor
   assert.equal(history.length, 111);
   assert.equal(
     history.reduce((n, v) => n + v.days_spent, 0),
-    249,
+    248,
   );
   assert.equal(cities.length, 323);
   assert.equal(cities.filter((c) => c.visit === "visited").length, 57);
@@ -94,7 +95,7 @@ test("all approved screenshot entries survive, with only the seven requested cor
     lastVisited: "2025-08-08",
   });
   assert.equal(find("auckland-new-zealand").visits![0].arrival, "2025-07-28");
-  assert.equal(cityVisitSummary(find("singapore-singapore").visits!).days, 7.5);
+  assert.equal(cityVisitSummary(find("singapore-singapore").visits!).days, 7);
   assert.equal(cityVisitSummary(find("london-uk").visits!).days, 6.5);
   assert.equal(find("boston-usa").visits!.at(-1)!.departure, "2022-06-28");
 });
@@ -258,7 +259,7 @@ test("PostgreSQL imports city history atomically, preserves countries and edits,
     assert.equal(imported.visits.length, 111);
     assert.equal(
       imported.visits.reduce((n, v) => n + v.days_spent, 0),
-      249,
+      248,
     );
     assert.deepEqual(await countries(), countryBefore);
     for (const before of originalRows) {

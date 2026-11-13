@@ -1,5 +1,5 @@
 import type { CountrySeed } from "./countries";
-import { calculateRecordedHistory } from "./country-history";
+import { calculateRecordedHistory, validHalfDays } from "./country-history";
 
 export interface CountrySnapshot {
   countries: {
@@ -29,6 +29,7 @@ export interface CountrySnapshot {
     period_number: number;
     arrival_date: string;
     departure_date: string;
+    days_spent?: number | null;
     source_refs: string;
     notes: string;
   }[];
@@ -66,6 +67,7 @@ export function toCountrySnapshot(countries: CountrySeed[]): CountrySnapshot {
           period_number: p.number,
           arrival_date: p.arrival,
           departure_date: p.departure,
+          days_spent: p.daysSpent ?? null,
           source_refs: p.sourceRefs ?? "",
           notes: p.notes ?? "",
         })),
@@ -110,7 +112,7 @@ export function fromCountrySnapshot(value: unknown): CountrySeed[] {
       ) ||
       !whole(c.first_visit_order, 1) ||
       !whole(c.times_visited) ||
-      !whole(c.total_days_spent) ||
+      !(c.total_days_spent === null || validHalfDays(c.total_days_spent)) ||
       typeof c.visit_history_complete !== "boolean" ||
       typeof c.notes !== "string" ||
       !Array.isArray(c.aliases) ||
@@ -149,7 +151,7 @@ export function fromCountrySnapshot(value: unknown): CountrySeed[] {
       visits.has(key) ||
       !date(v.arrival_date) ||
       !date(v.departure_date) ||
-      !whole(v.days_spent, 1) ||
+      !(v.days_spent === null || validHalfDays(v.days_spent, 0.5)) ||
       typeof v.notes !== "string"
     )
       throw new Error("Invalid saved country visit.");
@@ -173,6 +175,7 @@ export function fromCountrySnapshot(value: unknown): CountrySeed[] {
       seen.has(key) ||
       !whole(p.period_number, 1) ||
       p.period_number === null ||
+      !(p.days_spent == null || validHalfDays(p.days_spent, 0.5)) ||
       typeof p.source_refs !== "string" ||
       typeof p.notes !== "string"
     )
@@ -182,6 +185,7 @@ export function fromCountrySnapshot(value: unknown): CountrySeed[] {
       number: p.period_number,
       arrival: p.arrival_date,
       departure: p.departure_date,
+      ...(p.days_spent != null ? { daysSpent: p.days_spent } : {}),
       sourceRefs: p.source_refs,
       notes: p.notes,
     });

@@ -1,0 +1,66 @@
+{
+  "approvedOn": "2026-11-13",
+  "source": "Owner corrections in chat; these supersede the matching yearbook durations and date bounds.",
+  "changes": [
+    {
+      "code": "SG",
+      "arrival": "2026-09-03",
+      "departure": "2026-09-03",
+      "days": 1,
+      "added": true
+    },
+    {
+      "code": "SG",
+      "arrival": "2026-09-11",
+      "departure": "2026-09-12",
+      "days": 1,
+      "added": true
+    },
+    {
+      "code": "KR",
+      "arrival": "2025-07-15",
+      "departure": "2025-07-21",
+      "days": 6.5,
+      "previousDeparture": "2025-07-20",
+      "previousDays": 6
+    },
+    {
+      "code": "GB",
+      "arrival": "2026-05-01",
+      "departure": "2026-05-03",
+      "days": 2.5,
+      "previousDeparture": "2026-05-02",
+      "previousDays": 2
+    },
+    {
+      "code": "NZ",
+      "arrival": "2025-08-05",
+      "departure": "2025-08-08",
+      "days": 3.5,
+      "previousDeparture": "2025-08-07",
+      "previousDays": 3
+    },
+    {
+      "code": "CZ",
+      "arrival": "2024-05-12",
+      "departure": "2024-05-13",
+      "days": 1,
+      "previousArrival": "2024-05-13",
+      "previousDeparture": "2024-05-13",
+      "previousDays": 1
+    }
+  ],
+  "expectedCountryDays": {
+    "SG": 7,
+    "KR": 6.5,
+    "GB": 12.5,
+    "NZ": 5.5,
+    "CZ": 4
+  },
+  "expected": {
+    "datedVisits": 114,
+    "periods": 127,
+    "days": 273.5
+  },
+  "notes": "Singapore's Sep 11 entry spans Sep 11\u201312 and lasts 1 day. Half-day allocation within a date span is unspecified. Other country stays, including UK visits 1 and 2, retain their existing values."
+}

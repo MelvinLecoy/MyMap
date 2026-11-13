@@ -16,6 +16,8 @@ import {
   type CountryRecord,
 } from "../lib/countries";
 import { VISIT_YEAR_COLORS } from "../lib/palette";
+import { cityVisitSummary } from "../lib/city-visits";
+import { formatShortVisitDate } from "../lib/types";
 
 export function Flag({ code }: { code: string | null }) {
   return (
@@ -113,6 +115,37 @@ export function CountryVisitMarker({ country }: { country: CountryRecord }) {
   );
 }
 
+function CityVisitMarker({ city }: { city: City }) {
+  if (city.visit !== "visited") return <VisitMarker visit={city.visit} />;
+  const summary = cityVisitSummary(city.visits ?? []),
+    date = summary.lastVisited ?? city.lastVisited;
+  const count = summary.visits;
+  const year = date?.slice(0, 4);
+  return (
+    <span className="city-visit-summary">
+      <span className="visit-marker visit-marker-visited city-count-badge">
+        {count ? (
+          <strong>{count}</strong>
+        ) : (
+          <CircleCheck size={18} aria-hidden="true" />
+        )}
+        <span>{count ? (count === 1 ? "Visit" : "Visits") : "Visited"}</span>
+      </span>
+      <span
+        className="city-last-visit"
+        style={{
+          color: year
+            ? VISIT_YEAR_COLORS[Number(year) <= 2023 ? "2023" : year]
+            : undefined,
+        }}
+      >
+        <span className="visually-hidden">Last visited </span>
+        {date ? formatShortVisitDate(date) : ""}
+      </span>
+    </span>
+  );
+}
+
 export function CityRow({
   city,
   onSelect,
@@ -120,30 +153,33 @@ export function CityRow({
   city: City;
   onSelect: (id: string) => void;
 }) {
+  const summary = cityVisitSummary(city.visits ?? []);
   return (
     <button
       type="button"
       className="city-row"
       onClick={() => onSelect(city.id)}
     >
-      <VisitMarker visit={city.visit} />
+      <CityVisitMarker city={city} />
       <span className="city-row-body">
         <span className="city-row-name">{city.name}</span>
         <span className="city-row-country">
           <Flag code={city.countryCode} />
           <span>{countryDisplayName(city.country, city.countryCode)}</span>
         </span>
-        {city.visit === "visited" && city.lastVisited && (
-          <span className="city-row-year">
-            <span className="visually-hidden">Last visited </span>
-            {city.lastVisited.slice(0, 4)}
-          </span>
-        )}
         {!city.coordinates && (
           <span className="location-missing">Location missing</span>
         )}
       </span>
-      <Status status={city.status} />
+      <span className="city-row-metrics">
+        <Status status={city.status} />
+        {summary.visits > 0 && (
+          <span className="city-row-duration">
+            <strong>{summary.days}</strong>{" "}
+            {summary.days === 1 ? "day" : "days"}
+          </span>
+        )}
+      </span>
       <ChevronRight className="row-chevron" size={14} aria-hidden="true" />
     </button>
   );

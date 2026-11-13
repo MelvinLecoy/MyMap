@@ -12,11 +12,25 @@ export function exactDay(value: string): number {
   return day / 86400000;
 }
 export function stayDays(
-  period: Pick<CountryStayPeriod, "arrival" | "departure">,
+  period: Pick<CountryStayPeriod, "arrival" | "departure" | "daysSpent">,
 ) {
   const days = exactDay(period.departure) - exactDay(period.arrival) + 1;
   if (days < 1) throw new Error("Stay period departure is before arrival.");
-  return days;
+  if (period.daysSpent == null) return days;
+  if (!validHalfDays(period.daysSpent, 0.5) || period.daysSpent > days)
+    throw new Error(
+      "Stay duration must be positive half-days within its date range.",
+    );
+  return period.daysSpent;
+}
+
+export function validHalfDays(value: unknown, minimum = 0): value is number {
+  return (
+    typeof value === "number" &&
+    Number.isFinite(value) &&
+    Number.isSafeInteger(value * 2) &&
+    value >= minimum
+  );
 }
 
 /** Validate actual stays independently of the enclosing visit's calendar span. */

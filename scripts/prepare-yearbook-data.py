@@ -4,9 +4,13 @@ Run from the repository root. Existing membership, first-visit order and known
 lifetime totals are preserved. Source CSVs and workbook hashes live in data/sources.
 """
 import csv
+import json
+from decimal import Decimal
+from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+provenance = json.loads((ROOT / 'data/sources/yearbook-provenance.json').read_text())
 
 
 def read(path):
@@ -50,20 +54,21 @@ for visit in visits:
                         Notes="Recorded yearbook visit; actual stay periods exclude intervening gaps."))
 stay_rows = [dict(CountryCode=p["CountryCode"], Country=p["Country"], VisitNumber=p["VisitNumber"],
                   PeriodNumber="", ArrivalDate=p["ArrivalDate"], DepartureDate=p["DepartureDate"],
-                  SourceRefs=";".join("Organized!" + c for c in p["SourceDateCells"].split(";")), Notes="") for p in periods]
+                  DaysSpent=p['DaysSpent'] if Decimal(p['DaysSpent']) != (date.fromisoformat(p['DepartureDate']) - date.fromisoformat(p['ArrivalDate'])).days + 1 else '',
+                  SourceRefs=";".join("Organized!" + c for c in p["SourceDateCells"].split(";") if c) or p.get('ApprovedSource', ''), Notes="") for p in periods]
 numbers = {}
 for p in stay_rows:
     key = (p["CountryCode"], p["VisitNumber"])
     numbers[key] = numbers.get(key, 0) + 1
     p["PeriodNumber"] = str(numbers[key])
 history.sort(key=lambda r: (r["Country"], int(r["VisitNumber"])))
-assert sum(int(r["RecordedDaysSpent"] or 0) for r in overview) == 270
+assert sum(Decimal(r["RecordedDaysSpent"] or 0) for r in overview) == Decimal(str(provenance['recorded_country_days']))
 assert sum(int(r["RecordedVisits"] or 0) for r in overview) == 114
-assert len(history) == 120 and len(stay_rows) == 125
+assert len(history) == 120 and len(stay_rows) == provenance['actual_contiguous_stay_periods']
 write("data/countries.csv", overview)
 write("data/country-visit-history.csv", history)
 write("data/country-visit-periods.csv", stay_rows)
 write("data/templates/countries-template.csv", overview)
 write("data/templates/country-visits-template.csv", history)
 write("data/templates/country-visit-periods-template.csv", stay_rows)
-print("Prepared 197 country rows, 114 dated visits + 6 undated known visits, 125 actual stays and 270 country-days.")
+print(f"Prepared {len(overview)} country rows, 114 dated visits + 6 undated known visits, {len(stay_rows)} actual stays and {provenance['recorded_country_days']} country-days.")
