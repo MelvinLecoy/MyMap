@@ -50,7 +50,15 @@ command performs these steps and verifies them together.
 
 ## Editing and migration
 
-Use **Editor sign in** with your email and password. Authentication happens in
+Use the **Viewer / Editor** switch at the top left of the map. **Viewer** is
+read-only. Selecting **Editor** opens the existing sign-in dialog; the switch
+only shows Editor after the account's database editing permission is confirmed.
+Selecting Viewer signs out this browser and its other tabs. The city selection,
+collection filters, and map camera stay in place. Switching modes is disabled
+while a status save or sign-out is pending. Other authenticated accounts remain
+in Viewer and cannot gain atlas edit rights through the switch.
+
+Sign in with your email and password. Authentication happens in
 the dialog: it shows progress, confirms success, and closes without leaving the
 selected city. Supabase retains the session across reloads. Signing out affects
 this browser and its other tabs, without signing out your other devices.

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import maplibregl, {
   type GeoJSONSource,
   type Map as MapInstance,
@@ -34,6 +34,7 @@ interface Props {
   selected: City | null;
   onSelect: (id: string) => void;
   geonames: boolean;
+  viewControl?: ReactNode;
 }
 export default function Globe({
   cities,
@@ -41,6 +42,7 @@ export default function Globe({
   selected,
   onSelect,
   geonames,
+  viewControl,
 }: Props) {
   const container = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapInstance | null>(null);
@@ -548,10 +550,12 @@ export default function Globe({
         data-ready={ready}
       />
       <div className="map-topline">
-        <span className="map-view-badge">
-          <Globe2 size={15} />
-          {regional ? "Regional view" : "Globe view"}
-        </span>
+        {viewControl ?? (
+          <span className="map-view-badge">
+            <Globe2 size={15} />
+            {regional ? "Regional view" : "Globe view"}
+          </span>
+        )}
         <span
           className="map-live-dot"
           title={provider ? "OpenFreeMap atlas" : "Bundled Natural Earth atlas"}

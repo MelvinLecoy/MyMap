@@ -17,7 +17,10 @@ import {
 import Globe from "./components/Globe";
 import MapViewer from "./components/MapViewer";
 import CityName from "./components/CityName";
-import EditorControls from "./components/EditorControls";
+import EditorControls, {
+  type EditorControlsHandle,
+} from "./components/EditorControls";
+import AccessModeSwitch from "./components/AccessModeSwitch";
 import atlas from "./generated/atlas.json";
 import { useCoordinateLayout } from "./lib/use-coordinate-layout";
 import { useRemoteAtlas } from "./lib/use-remote-atlas";
@@ -116,6 +119,7 @@ export default function App() {
   );
   const searchRef = useRef<HTMLInputElement>(null);
   const viewerButton = useRef<HTMLButtonElement>(null);
+  const editorControls = useRef<EditorControlsHandle>(null);
   const selected = cities.find((c) => c.id === route.city) || null;
   const { ref: identityRef, layout: coordinateLayout } = useCoordinateLayout(
     selected?.id,
@@ -218,6 +222,19 @@ export default function App() {
             selected={selected}
             onSelect={(id) => navigate(id)}
             geonames={data.geonames}
+            viewControl={
+              cloud.enabled ? (
+                <AccessModeSwitch
+                  editing={cloud.canEdit}
+                  busy={
+                    cloud.signingOut || Object.keys(cloud.pending).length > 0
+                  }
+                  signingOut={cloud.signingOut}
+                  onEditor={() => editorControls.current?.openSignIn()}
+                  onViewer={cloud.signOut}
+                />
+              ) : undefined
+            }
           />
           {viewer && selected && (
             <MapViewer
@@ -515,7 +532,9 @@ export default function App() {
               </div>
             </>
           )}
-          {cloud.enabled && <EditorControls cloud={cloud} />}
+          {cloud.enabled && (
+            <EditorControls ref={editorControls} cloud={cloud} />
+          )}
         </aside>
       </main>
     </div>

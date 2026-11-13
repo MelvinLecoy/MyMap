@@ -137,6 +137,66 @@ h2 {
   align-items: center;
   justify-content: space-between;
   pointer-events: none;
+  z-index: 5;
+}
+.access-mode-control {
+  position: relative;
+  pointer-events: auto;
+  flex-shrink: 0;
+}
+.access-mode-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--surface);
+  box-shadow: 0 2px 8px #214d4114;
+}
+.access-mode-switch button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 36px;
+  min-width: 78px;
+  padding: 7px 10px;
+  border-radius: 6px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 20px;
+}
+.access-mode-switch button:hover:not(:disabled) {
+  color: var(--text);
+  background: var(--hover);
+}
+.access-mode-switch button[aria-pressed="true"] {
+  color: var(--text);
+  background: var(--surface-alt);
+}
+.access-mode-switch button:last-child[aria-pressed="true"] {
+  color: var(--on-accent);
+  background: var(--action);
+}
+.access-mode-switch button:disabled {
+  opacity: 0.65;
+}
+.access-mode-error {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: min(260px, calc(100vw - 28px));
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--surface);
+  box-shadow: 0 2px 8px #214d4114;
+  color: var(--text);
+  font-size: 12px;
+  line-height: 1.5;
 }
 .map-view-badge {
   display: flex;

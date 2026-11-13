@@ -31,6 +31,7 @@ export function useRemoteAtlas(
   const [authError, setAuthError] = useState("");
   const [authVersion, setAuthVersion] = useState(0);
   const [passwordRecovery, setPasswordRecovery] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
   const [pending, setPending] = useState<Record<string, MapStatus>>({});
   const pendingRef = useRef(new Set<string>());
   const [saveError, setSaveError] = useState<{
@@ -174,6 +175,7 @@ export function useRemoteAtlas(
       if (
         !client ||
         !canEdit ||
+        signingOut ||
         !ready ||
         loadError ||
         pendingRef.current.has(id)
@@ -224,7 +226,7 @@ export function useRemoteAtlas(
           });
       }
     },
-    [client, canEdit, ready, loadError, refresh, replaceRows],
+    [client, canEdit, signingOut, ready, loadError, refresh, replaceRows],
   );
 
   const cities = useMemo(
@@ -258,6 +260,7 @@ export function useRemoteAtlas(
       if (
         !client ||
         !canEdit ||
+        signingOut ||
         loadError ||
         !changes.length ||
         pendingRef.current.size
@@ -313,7 +316,7 @@ export function useRemoteAtlas(
         if (alive.current) setPending({});
       }
     },
-    [client, canEdit, loadError, refresh, replaceRows],
+    [client, canEdit, signingOut, loadError, refresh, replaceRows],
   );
 
   const signIn = useCallback(
@@ -395,11 +398,23 @@ export function useRemoteAtlas(
 
   const signOut = useCallback(async () => {
     if (!client) return;
-    const { error } = await client.auth.signOut({ scope: "local" });
-    if (error) throw new Error("Couldn’t sign out. Try again.");
-    setCanEdit(false);
-    setUser(null);
-    setSaved(false);
+    setSigningOut(true);
+    try {
+      const { error } = await client.auth.signOut({ scope: "local" });
+      if (error) {
+        // Local sign-out clears this browser before remote session revocation.
+        // A network failure must not report that an already read-only browser
+        // is still in Editor mode.
+        const current = await client.auth.getSession();
+        if (current.error || current.data.session)
+          throw new Error("Couldn’t sign out. Try again.");
+      }
+      setCanEdit(false);
+      setUser(null);
+      setSaved(false);
+    } finally {
+      setSigningOut(false);
+    }
   }, [client]);
 
   return {
@@ -409,7 +424,8 @@ export function useRemoteAtlas(
     loading,
     loadError,
     user,
-    canEdit,
+    canEdit: canEdit && !signingOut,
+    signingOut,
     authError,
     passwordRecovery,
     pending,

@@ -1,4 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import {
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+  type Ref,
+} from "react";
 import {
   Check,
   Download,
@@ -18,6 +24,10 @@ import {
 } from "../lib/use-remote-atlas";
 
 type View = "login" | "link" | "reset" | "password" | "import";
+
+export interface EditorControlsHandle {
+  openSignIn: () => void;
+}
 
 function PasswordField({
   id,
@@ -69,7 +79,13 @@ function PasswordField({
   );
 }
 
-export default function EditorControls({ cloud }: { cloud: RemoteAtlas }) {
+export default function EditorControls({
+  cloud,
+  ref,
+}: {
+  cloud: RemoteAtlas;
+  ref?: Ref<EditorControlsHandle>;
+}) {
   const dialog = useRef<HTMLDialogElement>(null);
   const [view, setView] = useState<View>("login");
   const [email, setEmail] = useState("");
@@ -82,7 +98,7 @@ export default function EditorControls({ cloud }: { cloud: RemoteAtlas }) {
   const [formVersion, setFormVersion] = useState(0);
   const [reviewed, setReviewed] = useState<StatusImport[]>([]);
   const [chosen, setChosen] = useState<Set<string>>(new Set());
-  const saving = Object.keys(cloud.pending).length > 0;
+  const saving = Object.keys(cloud.pending).length > 0 || cloud.signingOut;
   const blocked = busy || Boolean(success);
   const open = (next: View) => {
     setView(next);
@@ -119,6 +135,7 @@ export default function EditorControls({ cloud }: { cloud: RemoteAtlas }) {
     setSuccess("");
     cloud.dismissPasswordRecovery();
   };
+  useImperativeHandle(ref, () => ({ openSignIn: () => open("login") }));
   useEffect(() => {
     if (cloud.passwordRecovery) open("password");
   }, [cloud.passwordRecovery]);
@@ -162,13 +179,15 @@ export default function EditorControls({ cloud }: { cloud: RemoteAtlas }) {
         <span role="status">
           {cloud.loading
             ? "Loading latest…"
-            : saving
-              ? "Saving…"
-              : cloud.saved
-                ? "Saved"
-                : cloud.canEdit
-                  ? "Editing"
-                  : ""}
+            : cloud.signingOut
+              ? "Signing out…"
+              : saving
+                ? "Saving…"
+                : cloud.saved
+                  ? "Saved"
+                  : cloud.canEdit
+                    ? "Editing"
+                    : ""}
         </span>
         <div>
           {cloud.canEdit && cloud.migration.length > 0 && (

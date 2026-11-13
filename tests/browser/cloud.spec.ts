@@ -73,6 +73,9 @@ function store() {
     expiredSession: false,
     refreshError: false,
     callbackError: false,
+    logoutError: false,
+    logoutGate: null as Promise<void> | null,
+    logoutCalls: 0,
   };
 }
 type Store = ReturnType<typeof store>;
@@ -201,8 +204,13 @@ async function backend(
       }
       return reply(user(caller ?? ownerId));
     }
-    if (url.pathname === "/auth/v1/logout")
+    if (url.pathname === "/auth/v1/logout") {
+      state.logoutCalls++;
+      if (state.logoutGate) await state.logoutGate;
+      if (state.logoutError)
+        return reply({ message: "Sign-out service unavailable" }, 503);
       return route.fulfill({ status: 204 });
+    }
     if (url.pathname === "/auth/v1/otp") {
       state.otp = request.postDataJSON();
       state.redirect = url.searchParams.get("redirect_to") ?? "";
@@ -855,4 +863,281 @@ test("password controls fit a narrow screen, support reveal, and clear secrets o
     .click();
   await expect(password).toHaveValue("");
   await expect(password).toHaveAttribute("type", "password");
+});
+
+test("the top-left Editor switch opens sign-in and cancellation keeps Viewer and the selected city", async ({
+  context,
+  page,
+}) => {
+  const state = store();
+  await backend(context, state);
+  await page.goto("/?city=moscow-russia");
+  const modes = page.getByRole("group", { name: "Access mode" });
+  const viewer = modes.getByRole("button", { name: "Viewer", exact: true });
+  const editor = modes.getByRole("button", { name: "Editor", exact: true });
+  await expect(viewer).toHaveAttribute("aria-pressed", "true");
+  await expect(editor).toHaveAttribute("aria-pressed", "false");
+  await editor.click();
+  await expect(
+    page.getByRole("dialog", { name: "Editor sign in" }),
+  ).toBeVisible();
+  await expect(page.getByLabel("Email address", { exact: true })).toBeFocused();
+  await expect(editor).toHaveAttribute("aria-pressed", "false");
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog")).not.toBeVisible();
+  await expect(editor).toBeFocused();
+  await expect(viewer).toHaveAttribute("aria-pressed", "true");
+  await expect(page).toHaveURL(/\?city=moscow-russia$/);
+  expect(state.passwordAttempts).toHaveLength(0);
+});
+
+test("owner sign-in activates Editor and Viewer signs out without leaving the selected city", async ({
+  context,
+  page,
+}) => {
+  const state = store();
+  await backend(context, state);
+  await page.goto("/?city=moscow-russia");
+  const modes = page.getByRole("group", { name: "Access mode" });
+  await modes.getByRole("button", { name: "Editor", exact: true }).click();
+  await page
+    .getByLabel("Email address", { exact: true })
+    .fill("editor@example.test");
+  await page
+    .getByLabel("Password", { exact: true })
+    .fill("fixture-password-123");
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await expect(page.getByRole("dialog")).not.toBeVisible();
+  await expect(
+    modes.getByRole("button", { name: "Editor", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByLabel("Map status", { exact: true })).toBeEnabled();
+  await modes.getByRole("button", { name: "Viewer", exact: true }).click();
+  await expect(
+    modes.getByRole("button", { name: "Viewer", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByLabel("Map status", { exact: true })).toBeDisabled();
+  await expect(
+    page.getByRole("button", { name: "Editor sign in", exact: true }),
+  ).toBeVisible();
+  await expect(page).toHaveURL(/\?city=moscow-russia$/);
+  await page.reload();
+  await expect(
+    modes.getByRole("button", { name: "Editor", exact: true }),
+  ).toHaveAttribute("aria-pressed", "false");
+  await modes.getByRole("button", { name: "Editor", exact: true }).click();
+  await expect(page.getByLabel("Password", { exact: true })).toBeVisible();
+});
+
+test("a signed-in non-editor stays in Viewer after using the mode switch", async ({
+  context,
+  page,
+}) => {
+  const state = store();
+  state.passwordUser = strangerId;
+  await backend(context, state);
+  await page.goto("/?city=moscow-russia");
+  const modes = page.getByRole("group", { name: "Access mode" });
+  await modes.getByRole("button", { name: "Editor", exact: true }).click();
+  await page
+    .getByLabel("Email address", { exact: true })
+    .fill("viewer@example.test");
+  await page
+    .getByLabel("Password", { exact: true })
+    .fill("fixture-password-123");
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await expect(page.getByRole("dialog")).not.toBeVisible();
+  await expect(page.getByText(/doesn’t have editor access/)).toBeVisible();
+  await expect(
+    modes.getByRole("button", { name: "Viewer", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
+  await expect(
+    modes.getByRole("button", { name: "Editor", exact: true }),
+  ).toHaveAttribute("aria-pressed", "false");
+  await expect(page.getByLabel("Map status", { exact: true })).toBeDisabled();
+  await modes.getByRole("button", { name: "Viewer", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Editor sign in", exact: true }),
+  ).toBeVisible();
+});
+
+test("choosing Viewer during a permission check cannot later enable Editor", async ({
+  context,
+  page,
+}) => {
+  await backend(context, store(), ownerId);
+  let release!: () => void;
+  const held = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  await page.route(
+    `${fixtureOrigin}/rest/v1/rpc/atlas_can_edit`,
+    async (route) => {
+      await held;
+      return route.fulfill({
+        contentType: "application/json",
+        body: "true",
+        headers: { "access-control-allow-origin": "*" },
+      });
+    },
+  );
+  await page.goto("/?city=moscow-russia");
+  await expect(
+    page.getByRole("button", { name: "Sign out", exact: true }),
+  ).toBeVisible();
+  const modes = page.getByRole("group", { name: "Access mode" });
+  await modes.getByRole("button", { name: "Viewer", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Editor sign in", exact: true }),
+  ).toBeVisible();
+  const permissionResponse = page.waitForResponse(
+    (response) =>
+      response.url().endsWith("/rpc/atlas_can_edit") &&
+      response.request().method() === "POST",
+  );
+  release();
+  await (await permissionResponse).finished();
+  await expect(
+    modes.getByRole("button", { name: "Editor", exact: true }),
+  ).toHaveAttribute("aria-pressed", "false");
+  await expect(page.getByLabel("Map status", { exact: true })).toBeDisabled();
+  expect(
+    await page.evaluate((key) => localStorage.getItem(key), sessionKey),
+  ).toBeNull();
+});
+
+test("mode switching waits for saves and blocks editing while sign-out is pending", async ({
+  context,
+  page,
+}) => {
+  const state = store();
+  let releaseLogout!: () => void;
+  state.logoutGate = new Promise<void>((resolve) => {
+    releaseLogout = resolve;
+  });
+  await backend(context, state, ownerId);
+  await page.goto("/?city=moscow-russia");
+  const modes = page.getByRole("group", { name: "Access mode" });
+  const viewer = modes.getByRole("button", { name: "Viewer", exact: true });
+  const editor = modes.getByRole("button", { name: "Editor", exact: true });
+  await expect(editor).toHaveAttribute("aria-pressed", "true");
+  let releaseSave!: () => void;
+  const heldSave = new Promise<void>((resolve) => {
+    releaseSave = resolve;
+  });
+  await page.route(`${fixtureOrigin}/rest/v1/cities?*`, async (route) => {
+    if (route.request().method() !== "PATCH") return route.fallback();
+    await heldSave;
+    return route.fallback();
+  });
+  await page.getByLabel("Map status", { exact: true }).selectOption("Update");
+  await expect(viewer).toBeDisabled();
+  await expect(editor).toBeDisabled();
+  expect(state.logoutCalls).toBe(0);
+  releaseSave();
+  await expect(page.locator(".editor-tools")).toContainText("Saved");
+  await expect(viewer).toBeEnabled();
+  await viewer.click();
+  await expect.poll(() => state.logoutCalls).toBe(1);
+  await expect(viewer).toBeDisabled();
+  await expect(editor).toBeDisabled();
+  await expect(page.getByLabel("Map status", { exact: true })).toBeDisabled();
+  releaseLogout();
+  await expect(viewer).toBeEnabled();
+  await expect(viewer).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByLabel("Map status", { exact: true })).toHaveValue(
+    "Update",
+  );
+  expect(state.rows.get("moscow-russia")!.map_status).toBe("Update");
+});
+
+test("a failed switch to Viewer reports the error and can be retried", async ({
+  context,
+  page,
+}) => {
+  const state = store();
+  await backend(context, state, ownerId);
+  await page.goto("/?city=moscow-russia");
+  const modes = page.getByRole("group", { name: "Access mode" });
+  await expect(
+    modes.getByRole("button", { name: "Editor", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
+  await page.evaluate((key) => {
+    const original = Storage.prototype.removeItem;
+    Storage.prototype.removeItem = function (name) {
+      if (name === key)
+        throw new DOMException("Storage removal blocked", "SecurityError");
+      return original.call(this, name);
+    };
+    (
+      window as unknown as { restoreAuthStorage: () => void }
+    ).restoreAuthStorage = () => {
+      Storage.prototype.removeItem = original;
+    };
+  }, sessionKey);
+  await modes.getByRole("button", { name: "Viewer", exact: true }).click();
+  await expect(page.getByRole("alert")).toContainText(
+    "Couldn’t switch to Viewer",
+  );
+  await expect(
+    modes.getByRole("button", { name: "Editor", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByLabel("Map status", { exact: true })).toBeEnabled();
+  await page.evaluate(() =>
+    (
+      window as unknown as { restoreAuthStorage: () => void }
+    ).restoreAuthStorage(),
+  );
+  await modes.getByRole("button", { name: "Viewer", exact: true }).click();
+  await expect(
+    modes.getByRole("button", { name: "Viewer", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByRole("alert")).toHaveCount(0);
+  await expect(page.getByLabel("Map status", { exact: true })).toBeDisabled();
+});
+
+test("Viewer remains read-only when remote sign-out is unavailable", async ({
+  context,
+  page,
+}) => {
+  const state = store();
+  state.logoutError = true;
+  await backend(context, state, ownerId);
+  await page.goto("/?city=moscow-russia");
+  const modes = page.getByRole("group", { name: "Access mode" });
+  await expect(
+    modes.getByRole("button", { name: "Editor", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
+  await modes.getByRole("button", { name: "Viewer", exact: true }).click();
+  await expect(modes).toHaveAttribute("aria-busy", "false");
+  await expect(
+    modes.getByRole("button", { name: "Viewer", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
+  await expect(
+    page.getByRole("button", { name: "Editor sign in", exact: true }),
+  ).toBeVisible();
+  await expect(page.getByLabel("Map status", { exact: true })).toBeDisabled();
+  await expect(page.getByRole("alert")).toHaveCount(0);
+  expect(
+    await page.evaluate((key) => localStorage.getItem(key), sessionKey),
+  ).toBeNull();
+});
+
+test("the Viewer and Editor switch fits at 320px and remains usable without WebGL", async ({
+  context,
+  page,
+}) => {
+  await backend(context, store());
+  await page.setViewportSize({ width: 320, height: 568 });
+  await page.goto("/");
+  const modes = page.getByRole("group", { name: "Access mode" });
+  await expect(modes).toBeInViewport();
+  const bounds = (await modes.boundingBox())!;
+  expect(bounds.x).toBeGreaterThanOrEqual(0);
+  expect(bounds.x + bounds.width).toBeLessThanOrEqual(320);
+  await modes.getByRole("button", { name: "Editor", exact: true }).click();
+  await expect(
+    page.getByRole("dialog", { name: "Editor sign in" }),
+  ).toBeVisible();
+  await expect(page.getByLabel("Email address", { exact: true })).toBeFocused();
 });
