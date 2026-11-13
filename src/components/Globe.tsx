@@ -272,7 +272,7 @@ export default function Globe({
         source: "atlas-cities",
         filter: ["has", "point_count"],
         paint: {
-          "circle-radius": 23,
+          "circle-radius": 14,
           "circle-color": MAP_COLORS.clusterHalo,
           "circle-opacity": 0.12,
         },
@@ -283,9 +283,9 @@ export default function Globe({
         source: "atlas-cities",
         filter: ["has", "point_count"],
         paint: {
-          "circle-radius": 16,
+          "circle-radius": 10,
           "circle-color": MAP_COLORS.clusterFill,
-          "circle-stroke-width": 1.5,
+          "circle-stroke-width": 1,
           "circle-stroke-color": MAP_COLORS.clusterStroke,
         },
       });
@@ -297,7 +297,7 @@ export default function Globe({
         layout: {
           "text-field": ["get", "point_count_abbreviated"],
           "text-font": ["Open Sans Semibold"],
-          "text-size": 12,
+          "text-size": 10,
         },
         paint: { "text-color": MAP_COLORS.clusterText },
       });
