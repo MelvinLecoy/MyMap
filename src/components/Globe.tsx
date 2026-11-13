@@ -327,7 +327,7 @@ export default function Globe({
             3,
             6,
             5,
-            8.5,
+            6.5,
           ],
           "circle-color": ["get", "color"],
           "circle-stroke-color": [
