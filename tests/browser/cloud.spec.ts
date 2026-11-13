@@ -281,6 +281,42 @@ test("visitors see saved data and cannot use browser overrides to change the pub
   await expect(page.getByText("Loading latest…")).toHaveCount(0);
 });
 
+test("country details retain editor saves and viewer permissions in their nested cities", async ({
+  context,
+  page,
+}) => {
+  const state = store();
+  await backend(context, state, ownerId);
+  await page.goto("/?panel=countries&country=AL");
+  const countryTab = page.getByRole("tab", { name: "Countries", exact: true });
+  await expect(
+    page.getByRole("heading", { name: "Albania", exact: true }),
+  ).toBeVisible();
+  await page.locator(".city-row").click();
+  const picker = page.getByLabel("Map status", { exact: true });
+  await expect(picker).toBeEnabled();
+  await expect(countryTab).toHaveAttribute("aria-selected", "true");
+  await picker.selectOption("Update");
+  const tirana = atlas.cities.find((city) => city.name === "Tirana")!;
+  await expect.poll(() => state.rows.get(tirana.id)!.map_status).toBe("Update");
+  await expect(picker).toBeEnabled();
+  await page
+    .getByRole("button", { name: "Albania (1 city)", exact: true })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "Albania", exact: true }),
+  ).toBeVisible();
+  await expect(page.locator(".country-city-list .status")).toHaveText("Update");
+  await page.getByRole("button", { name: "Viewer", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Viewer", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
+  await page.locator(".city-row").click();
+  await expect(picker).toBeDisabled();
+  await expect(picker).toHaveValue("Update");
+  await expect(countryTab).toHaveAttribute("aria-selected", "true");
+});
+
 test("a city added to the database can be opened directly without rebuilding the website", async ({
   context,
   page,

@@ -28,12 +28,16 @@ import {
 import { LABEL_FONTS, LABEL_SIZES } from "../lib/map-typography";
 import { MAP_COLORS } from "../lib/palette";
 import { providerLabelFilters } from "../lib/map-labels";
+import { countryBounds, positionBounds } from "../lib/country-camera";
+import { countryKey } from "../lib/countries";
+import type { FeatureCollection } from "geojson";
 import type { City, CountryVisit } from "../lib/types";
 import "maplibre-gl/dist/maplibre-gl.css";
 interface Props {
   cities: City[];
   countries: CountryVisit[];
   selected: City | null;
+  selectedCountry?: string | null;
   onSelect: (id: string) => void;
   geonames: boolean;
   viewControl?: ReactNode;
@@ -42,6 +46,7 @@ export default function Globe({
   cities,
   countries,
   selected,
+  selectedCountry = null,
   onSelect,
   geonames,
   viewControl,
@@ -512,6 +517,54 @@ export default function Globe({
       MAP_COLORS.pinOutline,
     ]);
   }, [selected, ready]);
+  const previousCountry = useRef<string | null>(null);
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!selectedCountry || selected) {
+      previousCountry.current = null;
+      return;
+    }
+    if (!map || !ready || previousCountry.current === selectedCountry) return;
+    let cancelled = false;
+    const focusCountry = async () => {
+      let bounds = null;
+      try {
+        const source = map.getSource("atlas-countries") as
+          | GeoJSONSource
+          | undefined;
+        const geometry = await source?.getData();
+        if (geometry?.type === "FeatureCollection")
+          bounds = countryBounds(
+            geometry as FeatureCollection,
+            selectedCountry,
+          );
+      } catch {
+        // Known city coordinates still provide a useful view if boundaries are unavailable.
+      }
+      bounds ??= positionBounds(
+        cities
+          .filter(
+            (city) => countryKey(city) === selectedCountry && city.coordinates,
+          )
+          .map((city) => city.coordinates!),
+      );
+      if (cancelled || !bounds) return;
+      previousCountry.current = selectedCountry;
+      map.fitBounds(bounds, {
+        padding: { top: 80, bottom: 80, left: 48, right: 48 },
+        maxZoom: 6,
+        bearing: 0,
+        pitch: 0,
+        duration: motionDuration(1400),
+        essential: false,
+      });
+      setHint(false);
+    };
+    void focusCountry();
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedCountry, selected, ready, cities]);
   const previousCity = useRef<string | null>(null);
   useEffect(() => {
     const map = mapRef.current;

@@ -1,0 +1,5 @@
+﻿CountryCode,Country,Is195,VisitStatus,FirstVisitOrder,TimesVisited,TotalDaysSpent,VisitHistoryComplete,Notes
+FR,France,1,visited,1,2,8,1,EXAMPLE ONLY - complete two-visit history
+JP,Japan,1,visited,2,2,17,1,EXAMPLE ONLY - exact first visit and month-only return with known duration
+TW,Taiwan,0,visited,3,1,3,1,EXAMPLE ONLY - appears in 197-country view
+XK,Kosovo,0,visited,4,1,1,1,EXAMPLE ONLY - same-day visit

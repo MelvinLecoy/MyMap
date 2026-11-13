@@ -12,3 +12,16 @@ Clicking a country opens its cities. Country records are currently read-only
 starter data; the existing Supabase city editor and real travel totals continue
 to use the existing atlas data. Set `sample` to `false` after replacing the starter
 records to remove the sample notice.
+
+Selecting a country opens its own detail page and frames its boundary on the
+globe. Its city rows sit beneath the visit statistics and visit history; city
+details retain the Countries tab and return to the parent country. Country
+URLs use `?panel=countries&country=AL`; older `?country=AL` links still work.
+
+Country seed records may also supply `firstVisitOrder`, `timesVisited`,
+`totalDaysSpent`, `notes`, and a `visits` array with `number`, `arrival`,
+`departure`, `daysSpent`, and optional `notes`. Missing values display as
+“Not recorded”; a partial trip list is not used to guess all-time totals.
+Arrival and departure accept the same year/month/day precision as city visit
+dates. The personal CSV templates in `templates/` remain separate input files;
+this display change does not import them into the website.

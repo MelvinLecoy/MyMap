@@ -507,16 +507,34 @@ test("the Countries tab has labelled counts, independent filters, and reloadable
   ).toHaveAttribute("aria-selected", "true");
 });
 
-test("opening a country scopes the city list and survives city details and reload", async ({
+test("countries open their own details and keep their tab through city details and reload", async ({
   page,
 }) => {
   await page.goto("/?panel=countries");
   await page.getByLabel("Search countries", { exact: true }).fill("Algeria");
   await page.locator(".country-row").click();
   await expect(page).toHaveURL(/country=DZ/);
+  const countryTab = page.getByRole("tab", { name: "Countries", exact: true });
+  await expect(countryTab).toHaveAttribute("aria-selected", "true");
+  await expect(
+    page.getByRole("heading", { name: "Algeria", exact: true }),
+  ).toBeVisible();
+  await expect(page.getByLabel("Country visit statistics")).toContainText(
+    "Visit order",
+  );
+  await expect(page.getByLabel("Country visit statistics")).toContainText(
+    "Times visited",
+  );
+  await expect(page.getByLabel("Country visit statistics")).toContainText(
+    "Days spent",
+  );
+  await expect(
+    page.getByRole("heading", { name: "Visit history", exact: true }),
+  ).toBeVisible();
   await expect(page.locator(".city-row")).toHaveCount(3);
-  await expect(page.locator(".country-scope")).toContainText("Algeria");
-  await expect(page.locator(".collection-count")).toHaveText("3 cities");
+  await expect(page.locator(".country-cities-heading")).toHaveText(
+    "Cities3 cities",
+  );
   await page
     .locator(".city-row")
     .filter({ has: page.getByText("Algiers", { exact: true }) })
@@ -524,14 +542,145 @@ test("opening a country scopes the city list and survives city details and reloa
   await expect(
     page.getByRole("heading", { name: "Algiers", exact: true }),
   ).toBeVisible();
+  await expect(countryTab).toHaveAttribute("aria-selected", "true");
+  await page.reload();
+  await expect(countryTab).toHaveAttribute("aria-selected", "true");
+  await expect(
+    page.getByRole("heading", { name: "Algiers", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "View My Map", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Back to globe", exact: true })
+    .click();
+  await expect(countryTab).toHaveAttribute("aria-selected", "true");
   await page
     .getByRole("button", { name: "Algeria (3 cities)", exact: true })
     .click();
   await expect(page.locator(".city-row")).toHaveCount(3);
+  await expect(
+    page.getByRole("heading", { name: "Algeria", exact: true }),
+  ).toBeVisible();
   await page.reload();
   await expect(page.locator(".city-row")).toHaveCount(3);
-  await page.getByRole("button", { name: "Clear country filter" }).click();
-  await expect(page.locator(".city-row")).toHaveCount(321);
+  await expect(countryTab).toHaveAttribute("aria-selected", "true");
+  await page
+    .getByRole("button", { name: "All countries (131)", exact: true })
+    .click();
+  await expect(
+    page.getByLabel("Search countries", { exact: true }),
+  ).toHaveValue("");
+  await expect(page.locator(".country-row")).toHaveCount(131);
+  await expect(page).not.toHaveURL(/country=/);
+  await page.goBack();
+  await expect(
+    page.getByRole("heading", { name: "Algeria", exact: true }),
+  ).toBeVisible();
+  await page.goForward();
+  await expect(
+    page.getByLabel("Search countries", { exact: true }),
+  ).toBeVisible();
+});
+
+test("country selection frames its boundaries and legacy country links open country details", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/?country=AL");
+  await expect(
+    page.getByRole("tab", { name: "Countries", exact: true }),
+  ).toHaveAttribute("aria-selected", "true");
+  await expect(
+    page.getByRole("heading", { name: "Albania", exact: true }),
+  ).toBeVisible();
+  await expect(page.locator('[data-testid="map-canvas"]')).toHaveAttribute(
+    "data-ready",
+    "true",
+    { timeout: 30000 },
+  );
+  await expect(page.locator(".coordinates")).toHaveText(
+    /41\.\d° N\s*\/\s*20\.\d° E/,
+  );
+  await page
+    .getByRole("button", { name: "All countries (131)", exact: true })
+    .click();
+  await page.getByLabel("Search countries", { exact: true }).fill("Australia");
+  await page.locator(".country-row").click();
+  await expect(
+    page.getByRole("heading", { name: "Australia", exact: true }),
+  ).toBeVisible();
+  await expect(page.locator(".coordinates")).toHaveText(
+    /\d+\.\d° S\s*\/\s*\d+\.\d° E/,
+  );
+  await page
+    .getByRole("button", { name: "All countries (131)", exact: true })
+    .click();
+  await page.goBack();
+  await expect(
+    page.getByRole("heading", { name: "Australia", exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "All countries (131)", exact: true })
+    .click();
+  await page.getByRole("button", { name: "Clear search", exact: true }).click();
+  await page.getByLabel("Search countries", { exact: true }).fill("Albania");
+  await page.locator(".country-row").click();
+  await expect(page.locator(".coordinates")).toHaveText(
+    /41\.\d° N\s*\/\s*20\.\d° E/,
+  );
+  await page
+    .getByRole("button", { name: "All countries (131)", exact: true })
+    .click();
+  await page.getByLabel("Search countries", { exact: true }).fill("France");
+  await page.locator(".country-row").click();
+  await expect(page.locator(".coordinates")).toHaveText(
+    /4\d\.\d° N\s*\/\s*\d\.\d° E/,
+  );
+});
+
+test("country pages preserve city filters and fit narrow panels without overflow", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.getByLabel("Search cities and countries").fill("Adelaide");
+  await page.getByLabel("Filter by map status").selectOption("Unfinished");
+  await page.getByRole("tab", { name: "Countries", exact: true }).click();
+  await page
+    .getByLabel("Search countries", { exact: true })
+    .fill("St. Vincent");
+  await page.locator(".country-row").click();
+  await expect(page.locator(".city-row")).toHaveCount(1);
+  for (const width of [1440, 740, 320]) {
+    await page.setViewportSize({ width, height: 900 });
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    const bounds = await page
+      .locator(".country-detail")
+      .evaluate((el) => ({ width: el.clientWidth, scroll: el.scrollWidth }));
+    expect(bounds.scroll).toBeLessThanOrEqual(bounds.width);
+    await expect(
+      page.getByRole("heading", {
+        name: "St. Vincent and the Grenadines",
+        exact: true,
+      }),
+    ).toBeVisible();
+  }
+  await page.getByRole("tab", { name: "Cities", exact: true }).click();
+  await expect(page.getByLabel("Search cities and countries")).toHaveValue(
+    "Adelaide",
+  );
+  await expect(page.getByLabel("Filter by map status")).toHaveValue(
+    "Unfinished",
+  );
+  await page.getByRole("tab", { name: "Countries", exact: true }).click();
+  await page.getByLabel("Search countries", { exact: true }).fill("Albania");
+  await page.locator(".country-row").click();
+  await page.keyboard.press("Control+k");
+  await expect(
+    page.getByLabel("Search countries", { exact: true }),
+  ).toBeFocused();
   await expect(page).not.toHaveURL(/country=/);
 });
 

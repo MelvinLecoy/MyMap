@@ -3,21 +3,19 @@ import {
   ArrowLeft,
   ArrowRight,
   ArrowUpRight,
-  CircleCheck,
-  CircleDashed,
   ChevronDown,
   ChevronRight,
   LoaderCircle,
   Map,
   Search,
-  X,
-  CalendarDays,
   StickyNote,
   FlaskConical,
 } from "lucide-react";
 import Globe from "./components/Globe";
 import MapViewer from "./components/MapViewer";
 import CityName from "./components/CityName";
+import CountryDetail from "./components/CountryDetail";
+import { CityRow, Flag, VisitMarker } from "./components/CollectionItems";
 import CollectionFooter from "./components/CollectionFooter";
 import CollectionHeader, {
   CollectionTabs,
@@ -48,11 +46,9 @@ import {
 } from "./lib/status-storage";
 import {
   MAP_STATUSES,
-  VISIT_LABELS,
   formatVisitDate,
   type AtlasData,
   type MapStatus,
-  type VisitStatus,
 } from "./lib/types";
 const data = atlas as AtlasData;
 const statusStorageKey = data.demo
@@ -69,56 +65,11 @@ function readRoute(): {
     city: p.get("city"),
     view: p.get("view") === "map",
     panel:
-      !p.has("city") && p.get("panel") === "countries" ? "countries" : "cities",
+      p.get("panel") === "countries" || p.has("country")
+        ? "countries"
+        : "cities",
     country: p.get("country"),
   };
-}
-function Flag({ code }: { code: string | null }) {
-  return (
-    <span className="country-flag" aria-hidden="true">
-      {code && code !== "XK"
-        ? [...code.toUpperCase()]
-            .map((c) => String.fromCodePoint(127397 + c.charCodeAt(0)))
-            .join("")
-        : "◌"}
-    </span>
-  );
-}
-function Status({ status }: { status: MapStatus }) {
-  return (
-    <span
-      className={`status status-${status.toLowerCase().replaceAll(" ", "-")}`}
-    >
-      {status}
-    </span>
-  );
-}
-function VisitMarker({
-  visit,
-  inline = false,
-}: {
-  visit: VisitStatus;
-  inline?: boolean;
-}) {
-  const state = visit === "visited" || visit === "planned" ? visit : "not-yet";
-  const Icon =
-    state === "visited"
-      ? CircleCheck
-      : state === "planned"
-        ? CalendarDays
-        : CircleDashed;
-  return (
-    <span
-      className={
-        inline
-          ? `visit-value visit-value-${state}`
-          : `visit-marker visit-marker-${state}`
-      }
-    >
-      <Icon size={inline ? 18 : 20} strokeWidth={1.6} aria-hidden="true" />
-      <span>{VISIT_LABELS[visit]}</span>
-    </span>
-  );
 }
 export default function App() {
   const cloud = useRemoteAtlas(data, data.demo ? null : supabase);
@@ -176,14 +127,23 @@ export default function App() {
       const url = new URL(window.location.href);
       if (id) {
         url.searchParams.set("city", id);
-        url.searchParams.delete("panel");
+        const country = url.searchParams.get("country");
+        if (
+          country &&
+          cities.some((city) => city.id === id && countryKey(city) === country)
+        ) {
+          url.searchParams.set("panel", "countries");
+        } else {
+          url.searchParams.delete("panel");
+          url.searchParams.delete("country");
+        }
       } else url.searchParams.delete("city");
       if (view) url.searchParams.set("view", "map");
       else url.searchParams.delete("view");
       window.history[replace ? "replaceState" : "pushState"]({}, "", url);
       setRoute(readRoute());
     },
-    [],
+    [cities],
   );
   useEffect(() => {
     const listener = () => setRoute(readRoute());
@@ -196,17 +156,6 @@ export default function App() {
     else if (route.view && !selected?.map)
       navigate(selected?.id ?? null, false, true);
   }, [route.city, route.view, selected, navigate, cloud.enabled, cloud.ready]);
-  useEffect(() => {
-    const key = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-        e.preventDefault();
-        if (selected) navigate(null);
-        setTimeout(() => searchRef.current?.focus(), 0);
-      }
-    };
-    window.addEventListener("keydown", key);
-    return () => window.removeEventListener("keydown", key);
-  }, [selected, navigate]);
   const continents = useMemo(
     () => [...new Set(cities.map((c) => c.continent).filter(Boolean))].sort(),
     [cities],
@@ -218,6 +167,15 @@ export default function App() {
   );
   const scopedCountry = countryRecords.find(
     (country) => country.code === route.country,
+  );
+  const countryCities = useMemo(
+    () =>
+      scopedCountry
+        ? cities
+            .filter((city) => countryKey(city) === scopedCountry.code)
+            .sort((a, b) => a.name.localeCompare(b.name))
+        : [],
+    [cities, scopedCountry],
   );
   const countryContinents = useMemo(
     () =>
@@ -250,10 +208,18 @@ export default function App() {
       .sort((a, b) => a.name.localeCompare(b.name));
   }, [search, status, continent, cities, scopedCountry]);
   const mapCities = useMemo(() => {
+    if (countryView && scopedCountry) return countryCities;
     if (!countryView) return filtered;
     const codes = new Set(filteredCountries.map((country) => country.code));
     return cities.filter((city) => codes.has(countryKey(city)));
-  }, [countryView, filtered, filteredCountries, cities]);
+  }, [
+    countryView,
+    scopedCountry,
+    countryCities,
+    filtered,
+    filteredCountries,
+    cities,
+  ]);
   const changePanel = useCallback((panel: CollectionView) => {
     const current = readRoute();
     if (current.panel === panel && !current.city && !current.country) return;
@@ -266,20 +232,31 @@ export default function App() {
   }, []);
   const openCountry = (code: string) => {
     const url = new URL(window.location.href);
-    for (const key of ["city", "view", "panel"]) url.searchParams.delete(key);
+    for (const key of ["city", "view"]) url.searchParams.delete(key);
+    url.searchParams.set("panel", "countries");
     url.searchParams.set("country", code);
-    setSearch("");
-    setStatus("all");
-    setContinent("all");
     window.history.pushState({}, "", url);
     setRoute(readRoute());
   };
-  const clearCountry = () => {
+  const clearCountry = useCallback(() => {
     const url = new URL(window.location.href);
-    url.searchParams.delete("country");
+    for (const key of ["country", "city", "view"]) url.searchParams.delete(key);
+    url.searchParams.set("panel", "countries");
     window.history.pushState({}, "", url);
     setRoute(readRoute());
-  };
+  }, []);
+  useEffect(() => {
+    const key = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        if (route.country) clearCountry();
+        else if (selected) navigate(null);
+        setTimeout(() => searchRef.current?.focus(), 0);
+      }
+    };
+    window.addEventListener("keydown", key);
+    return () => window.removeEventListener("keydown", key);
+  }, [route.country, selected, navigate, clearCountry]);
   const resetFilters = () => {
     if (countryView) {
       setCountrySearch("");
@@ -311,6 +288,7 @@ export default function App() {
             cities={mapCities}
             countries={countryData}
             selected={selected}
+            selectedCountry={scopedCountry?.code ?? null}
             onSelect={(id) => navigate(id)}
             geonames={data.geonames}
             viewControl={
@@ -340,9 +318,11 @@ export default function App() {
           aria-label={
             selected
               ? `${selected.name} city details`
-              : countryView
-                ? "Country collection"
-                : "City collection"
+              : countryView && scopedCountry
+                ? `${scopedCountry.name} country details`
+                : countryView
+                  ? "Country collection"
+                  : "City collection"
           }
         >
           <CollectionTabs value={route.panel} onChange={changePanel} />
@@ -352,7 +332,16 @@ export default function App() {
             role="tabpanel"
             aria-labelledby={`${route.panel}-tab`}
           >
-            {!selected ? (
+            {!selected && countryView && scopedCountry ? (
+              <CountryDetail
+                key={scopedCountry.code}
+                country={scopedCountry}
+                cities={countryCities}
+                countryCount={countryRecords.length}
+                onBack={clearCountry}
+                onSelectCity={(id) => navigate(id)}
+              />
+            ) : !selected ? (
               <>
                 <CollectionHeader
                   view={route.panel}
@@ -368,19 +357,6 @@ export default function App() {
                   }
                   searchRef={searchRef}
                 />
-                {!countryView && scopedCountry && (
-                  <div className="country-scope">
-                    <Flag code={scopedCountry.code} />
-                    <span>{scopedCountry.name}</span>
-                    <button
-                      type="button"
-                      aria-label="Clear country filter"
-                      onClick={clearCountry}
-                    >
-                      <X size={13} aria-hidden="true" />
-                    </button>
-                  </div>
-                )}
                 <div
                   className="city-list"
                   aria-label={countryView ? "Countries" : "Cities"}
@@ -421,39 +397,11 @@ export default function App() {
                         </button>
                       ))
                     : filtered.map((city) => (
-                        <button
+                        <CityRow
                           key={city.id}
-                          className="city-row"
-                          onClick={() => navigate(city.id)}
-                        >
-                          <VisitMarker visit={city.visit} />
-                          <span className="city-row-body">
-                            <span className="city-row-name">{city.name}</span>
-                            <span className="city-row-country">
-                              <Flag code={city.countryCode} />
-                              <span>{city.country}</span>
-                            </span>
-                            {city.visit === "visited" && city.lastVisited && (
-                              <span className="city-row-year">
-                                <span className="visually-hidden">
-                                  Last visited{" "}
-                                </span>
-                                {city.lastVisited.slice(0, 4)}
-                              </span>
-                            )}
-                            {!city.coordinates && (
-                              <span className="location-missing">
-                                Location missing
-                              </span>
-                            )}
-                          </span>
-                          <Status status={city.status} />
-                          <ChevronRight
-                            className="row-chevron"
-                            size={14}
-                            aria-hidden="true"
-                          />
-                        </button>
+                          city={city}
+                          onSelect={(id) => navigate(id)}
+                        />
                       ))}
                   {!(countryView
                     ? filteredCountries.length

@@ -1,0 +1,198 @@
+﻿CountryCode,Country,Is195,VisitStatus,FirstVisitOrder,DisplayOrder195,DisplayOrder197
+CN,China,1,visited,1,1,1
+US,United States,1,visited,2,2,2
+CA,Canada,1,visited,3,3,3
+GB,United Kingdom,1,visited,4,4,4
+CH,Switzerland,1,visited,5,5,5
+NL,Netherlands,1,visited,6,6,6
+DK,Denmark,1,visited,7,7,7
+NO,Norway,1,visited,8,8,8
+SE,Sweden,1,visited,9,9,9
+PT,Portugal,1,visited,10,10,10
+ES,Spain,1,visited,11,11,11
+IT,Italy,1,visited,12,12,12
+VA,Vatican City,1,visited,13,13,13
+CZ,Czechia,1,visited,14,14,14
+DE,Germany,1,visited,15,15,15
+PL,Poland,1,visited,16,16,16
+HU,Hungary,1,visited,17,17,17
+SK,Slovakia,1,visited,18,18,18
+AT,Austria,1,visited,19,19,19
+FR,France,1,visited,20,20,20
+BE,Belgium,1,visited,21,21,21
+MC,Monaco,1,visited,22,22,22
+GR,Greece,1,visited,23,23,23
+HR,Croatia,1,visited,24,24,24
+SM,San Marino,1,visited,25,25,25
+LI,Liechtenstein,1,visited,26,26,26
+MX,Mexico,1,visited,27,27,27
+BZ,Belize,1,visited,28,28,28
+PA,Panama,1,visited,29,29,29
+CO,Colombia,1,visited,30,30,30
+SV,El Salvador,1,visited,31,31,31
+NI,Nicaragua,1,visited,32,32,32
+CR,Costa Rica,1,visited,33,33,33
+BR,Brazil,1,visited,34,34,34
+UY,Uruguay,1,visited,35,35,35
+AR,Argentina,1,visited,36,36,36
+CL,Chile,1,visited,37,37,37
+PE,Peru,1,visited,38,38,38
+AD,Andorra,1,visited,39,39,39
+LU,Luxembourg,1,visited,40,40,40
+IE,Ireland,1,visited,41,41,41
+BG,Bulgaria,1,visited,42,42,42
+RS,Serbia,1,visited,43,43,43
+RO,Romania,1,visited,44,44,44
+MD,Moldova,1,visited,45,45,45
+CY,Cyprus,1,visited,46,46,46
+EG,Egypt,1,visited,47,47,47
+SA,Saudi Arabia,1,visited,48,48,48
+JO,Jordan,1,visited,49,49,49
+TR,Turkey,1,visited,50,50,50
+AM,Armenia,1,visited,51,51,51
+GE,Georgia,1,visited,52,52,52
+AZ,Azerbaijan,1,visited,53,53,53
+AE,United Arab Emirates,1,visited,54,54,54
+BH,Bahrain,1,visited,55,55,55
+OM,Oman,1,visited,56,56,56
+QA,Qatar,1,visited,57,57,57
+KW,Kuwait,1,visited,58,58,58
+TH,Thailand,1,visited,59,59,59
+KR,South Korea,1,visited,60,60,60
+MY,Malaysia,1,visited,61,61,61
+SG,Singapore,1,visited,62,62,62
+VN,Vietnam,1,visited,63,63,63
+AU,Australia,1,visited,64,64,64
+NZ,New Zealand,1,visited,65,65,65
+FJ,Fiji,1,visited,66,66,66
+IS,Iceland,1,visited,67,67,67
+BO,Bolivia,1,visited,68,68,68
+EC,Ecuador,1,visited,69,69,69
+GT,Guatemala,1,visited,70,70,70
+BA,Bosnia and Herzegovina,1,visited,71,71,71
+MT,Malta,1,visited,72,72,72
+MK,North Macedonia,1,visited,73,73,73
+XK,Kosovo,0,visited,74,,74
+TJ,Tajikistan,1,visited,75,74,75
+UZ,Uzbekistan,1,visited,76,75,76
+KG,Kyrgyzstan,1,visited,77,76,77
+KZ,Kazakhstan,1,visited,78,77,78
+FI,Finland,1,visited,79,78,79
+EE,Estonia,1,visited,80,79,80
+LV,Latvia,1,visited,81,80,81
+LT,Lithuania,1,visited,82,81,82
+AL,Albania,1,visited,83,82,83
+ME,Montenegro,1,visited,84,83,84
+SI,Slovenia,1,visited,85,84,85
+JM,Jamaica,1,visited,86,85,86
+DO,Dominican Republic,1,visited,87,86,87
+JP,Japan,1,visited,88,87,88
+LA,Laos,1,visited,89,88,89
+KH,Cambodia,1,visited,90,89,90
+MM,Myanmar,1,visited,91,90,91
+BN,Brunei,1,visited,92,91,92
+MN,Mongolia,1,visited,93,92,93
+PH,Philippines,1,visited,94,93,94
+ID,Indonesia,1,visited,95,94,95
+NP,Nepal,1,visited,96,95,96
+LK,Sri Lanka,1,visited,97,96,97
+HN,Honduras,1,visited,98,97,98
+AF,Afghanistan,1,unknown,,,
+DZ,Algeria,1,unknown,,,
+AO,Angola,1,unknown,,,
+AG,Antigua and Barbuda,1,unknown,,,
+BS,Bahamas,1,unknown,,,
+BD,Bangladesh,1,unknown,,,
+BB,Barbados,1,unknown,,,
+BY,Belarus,1,unknown,,,
+BJ,Benin,1,unknown,,,
+BT,Bhutan,1,unknown,,,
+BW,Botswana,1,unknown,,,
+BF,Burkina Faso,1,unknown,,,
+BI,Burundi,1,unknown,,,
+CV,Cabo Verde,1,unknown,,,
+CM,Cameroon,1,unknown,,,
+CF,Central African Republic,1,unknown,,,
+TD,Chad,1,unknown,,,
+KM,Comoros,1,unknown,,,
+CI,Côte d’Ivoire,1,unknown,,,
+CU,Cuba,1,unknown,,,
+CD,Democratic Republic of the Congo,1,unknown,,,
+DJ,Djibouti,1,unknown,,,
+DM,Dominica,1,unknown,,,
+GQ,Equatorial Guinea,1,unknown,,,
+ER,Eritrea,1,unknown,,,
+SZ,Eswatini,1,unknown,,,
+ET,Ethiopia,1,unknown,,,
+GA,Gabon,1,unknown,,,
+GH,Ghana,1,unknown,,,
+GD,Grenada,1,unknown,,,
+GN,Guinea,1,unknown,,,
+GW,Guinea-Bissau,1,unknown,,,
+GY,Guyana,1,unknown,,,
+HT,Haiti,1,unknown,,,
+IN,India,1,unknown,,,
+IR,Iran,1,unknown,,,
+IQ,Iraq,1,unknown,,,
+IL,Israel,1,unknown,,,
+KE,Kenya,1,unknown,,,
+KI,Kiribati,1,unknown,,,
+LB,Lebanon,1,unknown,,,
+LS,Lesotho,1,unknown,,,
+LR,Liberia,1,unknown,,,
+LY,Libya,1,unknown,,,
+MG,Madagascar,1,unknown,,,
+MW,Malawi,1,unknown,,,
+MV,Maldives,1,unknown,,,
+ML,Mali,1,unknown,,,
+MH,Marshall Islands,1,unknown,,,
+MR,Mauritania,1,unknown,,,
+MU,Mauritius,1,unknown,,,
+FM,Micronesia,1,unknown,,,
+MA,Morocco,1,unknown,,,
+MZ,Mozambique,1,unknown,,,
+NA,Namibia,1,unknown,,,
+NR,Nauru,1,unknown,,,
+NE,Niger,1,unknown,,,
+NG,Nigeria,1,unknown,,,
+KP,North Korea,1,unknown,,,
+PK,Pakistan,1,unknown,,,
+PW,Palau,1,unknown,,,
+PS,Palestine,1,unknown,,,
+PG,Papua New Guinea,1,unknown,,,
+PY,Paraguay,1,unknown,,,
+CG,Republic of the Congo,1,unknown,,,
+GM,Republic of The Gambia,1,unknown,,,
+RU,Russia,1,unknown,,,
+RW,Rwanda,1,unknown,,,
+KN,Saint Kitts and Nevis,1,unknown,,,
+LC,Saint Lucia,1,unknown,,,
+VC,Saint Vincent and the Grenadines,1,unknown,,,
+WS,Samoa,1,unknown,,,
+ST,Sao Tome and Principe,1,unknown,,,
+SN,Senegal,1,unknown,,,
+SC,Seychelles,1,unknown,,,
+SL,Sierra Leone,1,unknown,,,
+SB,Solomon Islands,1,unknown,,,
+SO,Somalia,1,unknown,,,
+ZA,South Africa,1,unknown,,,
+SS,South Sudan,1,unknown,,,
+SD,Sudan,1,unknown,,,
+SR,Suriname,1,unknown,,,
+SY,Syria,1,unknown,,,
+TW,Taiwan,0,unknown,,,
+TZ,Tanzania,1,unknown,,,
+TL,Timor-Leste,1,unknown,,,
+TG,Togo,1,unknown,,,
+TO,Tonga,1,unknown,,,
+TT,Trinidad and Tobago,1,unknown,,,
+TN,Tunisia,1,unknown,,,
+TM,Turkmenistan,1,unknown,,,
+TV,Tuvalu,1,unknown,,,
+UG,Uganda,1,unknown,,,
+UA,Ukraine,1,unknown,,,
+VU,Vanuatu,1,unknown,,,
+VE,Venezuela,1,unknown,,,
+YE,Yemen,1,unknown,,,
+ZM,Zambia,1,unknown,,,
+ZW,Zimbabwe,1,unknown,,,

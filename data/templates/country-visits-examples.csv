@@ -1,0 +1,7 @@
+﻿CountryCode,Country,VisitNumber,ArrivalDate,DepartureDate,DaysSpent,Notes
+FR,France,1,2022-06-01,2022-06-05,5,EXAMPLE ONLY - first visit
+FR,France,2,2024-08-01,2024-08-03,3,EXAMPLE ONLY - return visit; France totals 2 visits and 8 days
+JP,Japan,1,2023-04-10,2023-04-19,,EXAMPLE ONLY - exact dates allow days to be calculated as 10
+JP,Japan,2,2025-10,2025-10,7,EXAMPLE ONLY - month known; duration supplied separately
+TW,Taiwan,1,2025-03-15,2025-03-17,3,EXAMPLE ONLY - stored once; shown in the 197-country panel view
+XK,Kosovo,1,2025-06-01,2025-06-01,1,EXAMPLE ONLY - same-day visit

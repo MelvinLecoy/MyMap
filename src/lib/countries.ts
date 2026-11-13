@@ -6,6 +6,18 @@ export interface CountrySeed {
   name: string;
   continent: string;
   visit: string;
+  firstVisitOrder?: number | null;
+  timesVisited?: number | null;
+  totalDaysSpent?: number | null;
+  notes?: string;
+  visits?: CountryTrip[];
+}
+export interface CountryTrip {
+  number: number;
+  arrival: string | null;
+  departure: string | null;
+  daysSpent: number | null;
+  notes?: string;
 }
 export interface CountryRecord extends Omit<CountrySeed, "visit"> {
   visit: VisitStatus;

@@ -6,6 +6,9 @@ import {
   searchText,
 } from "../src/lib/countries";
 import type { City } from "../src/lib/types";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import CountryDetail from "../src/components/CountryDetail";
 
 test("country rows count cities by stable country code, including empty countries", () => {
   const cities = [
@@ -45,4 +48,48 @@ test("country visit filters group both not-yet states and search ignores accents
   assert.equal(matchesVisit("visited", "visited"), true);
   assert.equal(matchesVisit("unknown", "all"), true);
   assert.equal(searchText("  Côte d’Ivoire  "), "cote d’ivoire");
+});
+
+test("country details preserve supplied totals and date precision without guessing from partial history", () => {
+  const [country] = buildCountryRecords(
+    [
+      {
+        code: "FR",
+        name: "France",
+        continent: "Europe",
+        visit: "visited",
+        firstVisitOrder: 20,
+        timesVisited: null,
+        totalDaysSpent: null,
+        visits: [
+          { number: 2, arrival: "2025-10", departure: "2025-10", daysSpent: 7 },
+          {
+            number: 1,
+            arrival: "2022-06-01",
+            departure: "2022-06-05",
+            daysSpent: 5,
+          },
+        ],
+      },
+    ],
+    [],
+  );
+  const html = renderToStaticMarkup(
+    createElement(CountryDetail, {
+      country,
+      cities: [],
+      countryCount: 1,
+      onBack: () => {},
+      onSelectCity: () => {},
+    }),
+  );
+  assert.match(html, /#20/);
+  assert.match(html, /1 June 2022/);
+  assert.match(html, /5 June 2022/);
+  assert.match(html, /October 2025/);
+  assert.match(html, /7 days/);
+  assert.ok(html.indexOf("Visit 1") < html.indexOf("Visit 2"));
+  assert.match(html, /Times visited<\/dt><dd><span[^>]*>Not recorded/);
+  assert.match(html, /Days spent<\/dt><dd><span[^>]*>Not recorded/);
+  assert.match(html, /No cities added/);
 });
