@@ -4,7 +4,7 @@ export const MAP_COLORS = {
   water: "#c5e4ec",
   land: "#edf0e6",
   visitedCountry: "#63b28a",
-  boundary: "#8ca397",
+  boundary: "#6b7772",
   adminBoundary: "#a8bdb0",
   grid: "#a6c1bc",
   label: "#344f54",
@@ -28,13 +28,13 @@ export const MAP_COLORS = {
 
 export const VISIT_YEAR_COLORS: Readonly<Record<string, string>> = {
   2026: "#26784f",
-  2025: "#d2b400",
+  2025: "#ffe600",
   2024: "#e67e00",
   2023: "#573122",
 };
 
 export const COUNTRY_STRIPE_COLORS: Readonly<Record<string, string>> = {
-  2025: "#ffe600",
+  2025: VISIT_YEAR_COLORS[2025],
   2024: VISIT_YEAR_COLORS[2024],
   2023: VISIT_YEAR_COLORS[2023],
 };
