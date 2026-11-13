@@ -1930,7 +1930,14 @@ h2 {
   line-height: 16px;
 }
 .country-detail-top {
-  padding-block: 6px 14px;
+  padding-block: 4px 10px;
+}
+.country-detail-top .back-to-cities {
+  min-height: 30px;
+  padding: 5px 9px;
+  gap: 6px;
+  border-radius: 6px;
+  font-size: 12px;
 }
 .country-detail {
   flex: 1;
@@ -1943,7 +1950,45 @@ h2 {
 }
 .country-place-card .detail-geography {
   margin: 0;
-  font-size: 12px;
+  min-width: 0;
+  color: #46675f;
+  font-family: "Manrope Variable", sans-serif;
+  font-size: 13px;
+  font-weight: 750;
+  letter-spacing: 0.1em;
+  line-height: 18px;
+  text-transform: uppercase;
+}
+.country-place-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.country-status-badge {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  border: 1px solid #d1dcd7;
+  border-radius: 999px;
+  background: #edf2f0;
+  color: #536961;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 16px;
+  white-space: nowrap;
+}
+.country-status-badge[data-visit="visited"] {
+  border-color: #a8cfb8;
+  background: #cfe8d9;
+  color: #245f42;
+}
+.country-status-badge[data-visit="planned"] {
+  border-color: #d7c6e7;
+  background: #eee7f5;
+  color: #684386;
 }
 .country-detail-heading {
   display: flex;
@@ -1980,26 +2025,14 @@ h2 {
   color: #287451;
   font-family: "Manrope Variable", sans-serif;
   font-size: 24px;
-  font-weight: 750;
+  font-weight: 800;
   line-height: 1;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
 .country-order-hash {
-  font-size: 14px;
-  font-weight: 500;
-  opacity: 0.65;
-}
-.country-detail-visit {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: 18px;
-  padding-top: 12px;
-  border-top: 1px solid var(--line);
-  font-size: 12px;
-  color: var(--muted);
+  font-size: 15px;
+  font-weight: 800;
 }
 .country-value-missing {
   color: var(--muted);

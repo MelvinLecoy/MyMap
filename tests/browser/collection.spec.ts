@@ -804,7 +804,7 @@ test("the real country data supports 195 and 197 ranks without inventing missing
 
 test("country title ranks stay beside wrapped names without splitting words", async ({
   page,
-}) => {
+}, testInfo) => {
   await page.addInitScript(() => {
     const original = HTMLCanvasElement.prototype.getContext;
     HTMLCanvasElement.prototype.getContext = function (
@@ -819,7 +819,7 @@ test("country title ranks stay beside wrapped names without splitting words", as
   let checkedWrappedRank = false;
   for (const width of [1600, 1440, 740, 320]) {
     await page.setViewportSize({ width, height: 1000 });
-    for (const code of ["AL", "LI", "DO", "GB", "BA", "CD"]) {
+    for (const code of ["AL", "LI", "DO", "GB", "BA", "CD", "MK", "CA"]) {
       await page.goto(`/?panel=countries&country=${code}`);
       await page.evaluate(() => document.fonts.ready);
       const layout = await page
@@ -875,12 +875,49 @@ test("country title ranks stay beside wrapped names without splitting words", as
         );
         if (layout.heading.height > layout.lineHeight * 1.5)
           checkedWrappedRank = true;
+        await expect(page.locator(".country-visit-rank")).toHaveCSS(
+          "font-weight",
+          "800",
+        );
+        await expect(page.locator(".country-order-hash")).toHaveCSS(
+          "font-weight",
+          "800",
+        );
       }
+      const meta = await page
+        .locator(".country-place-meta")
+        .evaluate((element) => {
+          const rect = (selector: string) => {
+            const r = element.querySelector(selector)!.getBoundingClientRect();
+            return { x: r.x, y: r.y, width: r.width, height: r.height };
+          };
+          return {
+            continent: rect(".detail-geography"),
+            status: rect(".country-status-badge"),
+          };
+        });
+      expect(meta.status.x).toBeGreaterThan(
+        meta.continent.x + meta.continent.width,
+      );
+      expect(meta.status.y + meta.status.height / 2).toBeCloseTo(
+        meta.continent.y + meta.continent.height / 2,
+        0,
+      );
+      await expect(page.locator(".country-status-badge")).toHaveText(
+        code === "CD" ? "Not recorded" : "Visited",
+      );
+      await expect(page.getByText("Visit status", { exact: true })).toHaveCount(
+        0,
+      );
+      const back = await page
+        .getByRole("button", { name: "All countries (195)", exact: true })
+        .boundingBox();
+      expect(back!.height).toBeLessThanOrEqual(32);
       await expect(page.locator(".country-statistics dt")).toHaveText([
-        ["AL", "LI", "GB", "BA"].includes(code)
+        ["AL", "LI", "GB", "BA", "MK"].includes(code)
           ? "Recorded visits"
           : "Times visited",
-        ["AL", "LI", "GB", "BA"].includes(code)
+        ["AL", "LI", "GB", "BA", "MK"].includes(code)
           ? "Recorded days"
           : "Days spent",
       ]);
@@ -891,6 +928,19 @@ test("country title ranks stay beside wrapped names without splitting words", as
       ).toBe(true);
       if (code === "AL")
         await expect(page.locator(".country-visit-rank")).toHaveText("#82");
+      if (code === "MK" && [320, 1440].includes(width)) {
+        const panel = await page.locator(".city-panel").boundingBox();
+        const card = await page.locator(".country-place-card").boundingBox();
+        await page.screenshot({
+          path: testInfo.outputPath(`country-heading-${width}.png`),
+          clip: {
+            x: panel!.x,
+            y: panel!.y,
+            width: panel!.width,
+            height: card!.y + card!.height - panel!.y + 12,
+          },
+        });
+      }
     }
   }
   expect(checkedWrappedRank).toBe(true);

@@ -1,8 +1,13 @@
-import { ArrowLeft, CalendarDays } from "lucide-react";
+import {
+  ArrowLeft,
+  CalendarDays,
+  CircleCheck,
+  CircleDashed,
+} from "lucide-react";
 import type { CountryRecord, CountrySet, CountryTrip } from "../lib/countries";
-import { formatVisitDate, type City } from "../lib/types";
+import { formatVisitDate, VISIT_LABELS, type City } from "../lib/types";
 import { useCountryHeading } from "../lib/use-country-heading";
-import { CityRow, Flag, VisitMarker } from "./CollectionItems";
+import { CityRow, Flag } from "./CollectionItems";
 
 function VisitDates({
   visit,
@@ -62,11 +67,19 @@ export default function CountryDetail({
   const visits = [...(country.visits ?? [])].sort(
     (a, b) => a.number - b.number,
   );
+  const visitLabel =
+    country.visit === "unknown" ? "Not recorded" : VISIT_LABELS[country.visit];
+  const VisitIcon =
+    country.visit === "visited"
+      ? CircleCheck
+      : country.visit === "planned"
+        ? CalendarDays
+        : CircleDashed;
   return (
     <>
       <div className="detail-top country-detail-top">
         <button type="button" className="back-to-cities" onClick={onBack}>
-          <ArrowLeft size={17} aria-hidden="true" />
+          <ArrowLeft size={15} aria-hidden="true" />
           All countries ({countryCount})
         </button>
       </div>
@@ -75,7 +88,17 @@ export default function CountryDetail({
           className="detail-place-card country-place-card"
           aria-label={`${country.name} information`}
         >
-          <p className="detail-geography">{country.continent || "Country"}</p>
+          <div className="country-place-meta">
+            <p className="detail-geography">{country.continent || "Country"}</p>
+            <span
+              className="country-status-badge"
+              data-visit={country.visit}
+              aria-label={`Visit status: ${visitLabel}`}
+            >
+              <VisitIcon size={13} strokeWidth={2} aria-hidden="true" />
+              {visitLabel}
+            </span>
+          </div>
           <div className="country-detail-heading" ref={headingRef}>
             <Flag code={country.code} />
             <h1>
@@ -101,14 +124,6 @@ export default function CountryDetail({
                 </span>
                 {visitOrder}
               </span>
-            )}
-          </div>
-          <div className="country-detail-visit">
-            <span>Visit status</span>
-            {country.visit === "unknown" ? (
-              <span className="country-value-missing">Not recorded</span>
-            ) : (
-              <VisitMarker visit={country.visit} inline />
             )}
           </div>
         </section>
