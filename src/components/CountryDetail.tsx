@@ -1,32 +1,25 @@
+import { useId } from "react";
 import {
   ArrowLeft,
   CalendarDays,
   CircleCheck,
   CircleDashed,
+  Crown,
 } from "lucide-react";
 import type { CountryRecord, CountrySet, CountryTrip } from "../lib/countries";
 import { formatVisitDate, VISIT_LABELS, type City } from "../lib/types";
 import { useCountryHeading } from "../lib/use-country-heading";
 import { CityRow, Flag } from "./CollectionItems";
 
-function VisitDates({
-  visit,
-  compact = false,
-}: {
-  visit: CountryTrip;
-  compact?: boolean;
-}) {
+function VisitDates({ visit }: { visit: CountryTrip }) {
   if (visit.arrival && visit.departure && visit.arrival !== visit.departure) {
     let arrival = formatVisitDate(visit.arrival);
     if (
-      compact &&
       visit.arrival.length === 10 &&
-      visit.departure.length === 10
+      visit.departure.length === 10 &&
+      visit.arrival.slice(0, 7) === visit.departure.slice(0, 7)
     ) {
-      if (visit.arrival.slice(0, 7) === visit.departure.slice(0, 7))
-        arrival = String(Number(visit.arrival.slice(8)));
-      else if (visit.arrival.slice(0, 4) === visit.departure.slice(0, 4))
-        arrival = arrival.replace(/ \d{4}$/, "");
+      arrival = String(Number(visit.arrival.slice(8)));
     }
     return (
       <>
@@ -63,6 +56,7 @@ export default function CountryDetail({
   visitOrder?: number | null;
   countrySet?: CountrySet;
 }) {
+  const rankFillId = `country-rank-${useId().replace(/:/g, "")}`;
   const headingRef = useCountryHeading(country.name, visitOrder);
   const visits = [...(country.visits ?? [])].sort(
     (a, b) => a.number - b.number,
@@ -119,10 +113,53 @@ export default function CountryDetail({
                 aria-label={`Visit order ${visitOrder}${countrySet ? ` in the ${countrySet}-country view` : ""}`}
                 title={`Visit order${countrySet ? ` (${countrySet} countries)` : ""}`}
               >
-                <span className="country-order-hash" aria-hidden="true">
-                  #
+                <svg
+                  className="country-rank-frame"
+                  viewBox="0 0 64 64"
+                  aria-hidden="true"
+                >
+                  <defs>
+                    <linearGradient id={rankFillId} x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%" stopColor="#fffef8" />
+                      <stop offset="100%" stopColor="#f5e6bf" />
+                    </linearGradient>
+                  </defs>
+                  <circle
+                    cx="32"
+                    cy="32"
+                    r="30.5"
+                    fill={`url(#${rankFillId})`}
+                  />
+                  <path
+                    d="M48 5A31 31 0 1 1 16 5"
+                    fill="none"
+                    stroke="#bea05c"
+                    strokeWidth="1.15"
+                    strokeLinecap="round"
+                  />
+                  <path
+                    d="M45 9A26.5 26.5 0 1 1 19 9"
+                    fill="none"
+                    stroke="#dfc78d"
+                    strokeWidth="0.85"
+                    strokeLinecap="round"
+                  />
+                </svg>
+                <Crown
+                  className="country-rank-crown"
+                  size={25}
+                  strokeWidth={1.8}
+                  aria-hidden="true"
+                />
+                <span
+                  className="country-rank-number"
+                  data-digits={String(visitOrder).length}
+                >
+                  <span className="country-order-hash" aria-hidden="true">
+                    #
+                  </span>
+                  <span className="country-rank-digits">{visitOrder}</span>
                 </span>
-                {visitOrder}
               </span>
             )}
           </div>
@@ -192,7 +229,6 @@ export default function CountryDetail({
                       {visit.periods.map((period) => (
                         <li key={period.number}>
                           <VisitDates
-                            compact
                             visit={{
                               number: period.number,
                               arrival: period.arrival,

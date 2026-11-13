@@ -2017,22 +2017,63 @@ h2 {
   white-space: nowrap;
 }
 .country-visit-rank {
-  display: inline-flex;
+  position: relative;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: 64px;
+  min-width: 64px;
+  height: 64px;
   flex-shrink: 0;
-  align-items: baseline;
   align-self: center;
-  gap: 1px;
-  color: #287451;
-  font-family: "Manrope Variable", sans-serif;
-  font-size: 24px;
-  font-weight: 800;
+  color: #684817;
+  font-family: "DM Sans Variable", sans-serif;
+  font-weight: 950;
   line-height: 1;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
+.country-rank-frame {
+  position: absolute;
+  inset: 0;
+  width: 64px;
+  height: 64px;
+  filter: drop-shadow(0 1px 1px #7c602515);
+}
+.country-rank-crown {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 25px;
+  height: 22px;
+  color: #99732d;
+  fill: #eed79b;
+}
+.country-rank-number {
+  position: relative;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 1px;
+  font-size: 27px;
+  font-weight: 950;
+  line-height: 1;
+  letter-spacing: -0.6px;
+  transform: translateY(2px);
+}
 .country-order-hash {
-  font-size: 15px;
-  font-weight: 800;
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+.country-rank-digits {
+  font-weight: 950;
+}
+.country-rank-number[data-digits="3"] {
+  font-size: 22px;
+}
+.country-rank-number[data-digits="3"] .country-order-hash {
+  font-size: 12px;
 }
 .country-value-missing {
   color: var(--muted);

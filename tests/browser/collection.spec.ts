@@ -877,11 +877,11 @@ test("country title ranks stay beside wrapped names without splitting words", as
           checkedWrappedRank = true;
         await expect(page.locator(".country-visit-rank")).toHaveCSS(
           "font-weight",
-          "800",
+          "950",
         );
         await expect(page.locator(".country-order-hash")).toHaveCSS(
           "font-weight",
-          "800",
+          "900",
         );
       }
       const meta = await page
@@ -951,6 +951,7 @@ test("country history shows stays and corrected dates without explanatory copy o
 }) => {
   for (const [code, visits, days] of [
     ["AT", 1, 3],
+    ["DK", 1, 3],
     ["AU", 2, 14],
     ["NZ", 1, 5],
     ["GB", 3, 12],
@@ -969,12 +970,20 @@ test("country history shows stays and corrected dates without explanatory copy o
     await expect(
       page.getByRole("heading", { name: "Notes", exact: true }),
     ).toHaveCount(0);
+    if (code === "AT")
+      await expect(
+        page.locator(".country-visit-list > li").first(),
+      ).toContainText("10 – 12 May 2024");
+    if (code === "DK")
+      await expect(
+        page.locator(".country-visit-list > li").first(),
+      ).toContainText("30 December 2023 – 1 January 2024");
     if (code === "AU") {
       await expect(page.getByLabel("Actual stays for visit 1")).toContainText(
         "24 – 27 July 2025",
       );
       await expect(page.getByLabel("Actual stays for visit 1")).toContainText(
-        "29 July – 3 August 2025",
+        "29 July 2025 – 3 August 2025",
       );
       await expect(
         page.locator(".country-visit-list > li").first(),
@@ -992,7 +1001,7 @@ test("country history shows stays and corrected dates without explanatory copy o
       ).toHaveCount(0);
       await expect(
         page.locator(".country-visit-list > li").last(),
-      ).toContainText("1 May 2026 – 2 May 2026");
+      ).toContainText("1 – 2 May 2026");
     }
   }
   await page.setViewportSize({ width: 320, height: 700 });
