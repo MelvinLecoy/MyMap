@@ -4,6 +4,7 @@ import maplibregl, {
   type Map as MapInstance,
   type ExpressionSpecification,
   type StyleSpecification,
+  type SymbolLayerSpecification,
 } from "maplibre-gl";
 import {
   Plus,
@@ -26,6 +27,7 @@ import {
 } from "../lib/map-style";
 import { LABEL_FONTS, LABEL_SIZES } from "../lib/map-typography";
 import { MAP_COLORS } from "../lib/palette";
+import { providerLabelFilters } from "../lib/map-labels";
 import type { City, CountryVisit } from "../lib/types";
 import "maplibre-gl/dist/maplibre-gl.css";
 interface Props {
@@ -46,6 +48,7 @@ export default function Globe({
 }: Props) {
   const container = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapInstance | null>(null);
+  const providerLabels = useRef<SymbolLayerSpecification[]>([]);
   const current = useRef({ cities, countries, selected, onSelect });
   current.current = { cities, countries, selected, onSelect };
   const [ready, setReady] = useState(false);
@@ -56,6 +59,7 @@ export default function Globe({
   const [hint, setHint] = useState(true);
   useEffect(() => {
     if (!container.current) return;
+    providerLabels.current = [];
     let map: MapInstance;
     try {
       map = new maplibregl.Map({
@@ -70,7 +74,7 @@ export default function Globe({
         maxZoom: MAP_CONFIG.maxZoom,
         attributionControl: false,
         renderWorldCopies: false,
-        crossSourceCollisions: false,
+        crossSourceCollisions: true,
         canvasContextAttributes: { antialias: true },
       });
     } catch {
@@ -94,6 +98,13 @@ export default function Globe({
     );
     const decorate = () => {
       if (map.getSource("atlas-countries")) return;
+      for (const layer of providerLabelFilters(
+        providerLabels.current,
+        current.current.cities,
+      )) {
+        if (map.getLayer(layer.id))
+          map.setFilter(layer.id, layer.filter ?? null);
+      }
       map.setProjection({ type: "globe" });
       if (!map.hasImage("atlas-city-dot")) {
         const size = 12;
@@ -449,7 +460,12 @@ export default function Globe({
       .then((style) => {
         if (!abort.signal.aborted) {
           setReady(false);
-          map.setStyle(simplifyProviderStyle(style));
+          const simplified = simplifyProviderStyle(style);
+          providerLabels.current = simplified.layers.filter(
+            (layer): layer is SymbolLayerSpecification =>
+              layer.type === "symbol",
+          );
+          map.setStyle(simplified);
           setProvider(true);
         }
       })
@@ -474,6 +490,15 @@ export default function Globe({
     const map = mapRef.current;
     const source = map?.getSource("atlas-cities") as GeoJSONSource | undefined;
     source?.setData(cityFeatures(cities));
+    if (map) {
+      for (const layer of providerLabelFilters(
+        providerLabels.current,
+        cities,
+      )) {
+        if (map.getLayer(layer.id))
+          map.setFilter(layer.id, layer.filter ?? null);
+      }
+    }
   }, [cities]);
   useEffect(() => {
     const map = mapRef.current;
