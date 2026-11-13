@@ -21,6 +21,12 @@ includes Kosovo and Taiwan. Honduras is #97 in the 195 view and #98 in the 197
 view; Kosovo is #74 in the latter. Stored order and trip data do not change
 when switching. Search and continent filters do not renumber visits.
 
+The Countries panel splits the Americas into North America and South America.
+South America contains Argentina, Bolivia, Brazil, Chile, Colombia, Ecuador,
+Guyana, Paraguay, Peru, Suriname, Uruguay, and Venezuela (12 countries). The
+remaining 23 countries, including Central America and the Caribbean, belong
+to North America. The Cities panel retains its existing America classification.
+
 Known country visits color the globe and update the footer (97 or 98 with the
 current history). City visits stay independent; visiting a country does not
 mark every city as visited. The existing Supabase city editor and saved map
