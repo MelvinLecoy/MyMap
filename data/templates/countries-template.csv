@@ -1,198 +1,198 @@
-﻿CountryCode,Country,Continent,Is195,VisitStatus,FirstVisitOrder,TimesVisited,TotalDaysSpent,VisitHistoryComplete,Notes
-CN,China,Asia,1,visited,1,,,0,
-US,United States,North America,1,visited,2,,,0,
-CA,Canada,North America,1,visited,3,,,0,
-GB,United Kingdom,Europe,1,visited,4,,,0,
-CH,Switzerland,Europe,1,visited,5,,,0,
-NL,Netherlands,Europe,1,visited,6,,,0,
-DK,Denmark,Europe,1,visited,7,,,0,
-NO,Norway,Europe,1,visited,8,,,0,
-SE,Sweden,Europe,1,visited,9,,,0,
-PT,Portugal,Europe,1,visited,10,,,0,
-ES,Spain,Europe,1,visited,11,,,0,
-IT,Italy,Europe,1,visited,12,,,0,
-VA,Vatican City,Europe,1,visited,13,,,0,
-CZ,Czechia,Europe,1,visited,14,,,0,
-DE,Germany,Europe,1,visited,15,,,0,
-PL,Poland,Europe,1,visited,16,,,0,
-HU,Hungary,Europe,1,visited,17,,,0,
-SK,Slovakia,Europe,1,visited,18,,,0,
-AT,Austria,Europe,1,visited,19,,,0,
-FR,France,Europe,1,visited,20,,,0,
-BE,Belgium,Europe,1,visited,21,,,0,
-MC,Monaco,Europe,1,visited,22,,,0,
-GR,Greece,Europe,1,visited,23,,,0,
-HR,Croatia,Europe,1,visited,24,,,0,
-SM,San Marino,Europe,1,visited,25,,,0,
-LI,Liechtenstein,Europe,1,visited,26,,,0,
-MX,Mexico,North America,1,visited,27,,,0,
-BZ,Belize,North America,1,visited,28,,,0,
-PA,Panama,North America,1,visited,29,,,0,
-CO,Colombia,South America,1,visited,30,,,0,
-SV,El Salvador,North America,1,visited,31,,,0,
-NI,Nicaragua,North America,1,visited,32,,,0,
-CR,Costa Rica,North America,1,visited,33,,,0,
-BR,Brazil,South America,1,visited,34,,,0,
-UY,Uruguay,South America,1,visited,35,,,0,
-AR,Argentina,South America,1,visited,36,,,0,
-CL,Chile,South America,1,visited,37,,,0,
-PE,Peru,South America,1,visited,38,,,0,
-AD,Andorra,Europe,1,visited,39,,,0,
-LU,Luxembourg,Europe,1,visited,40,,,0,
-IE,Ireland,Europe,1,visited,41,,,0,
-BG,Bulgaria,Europe,1,visited,42,,,0,
-RS,Serbia,Europe,1,visited,43,,,0,
-RO,Romania,Europe,1,visited,44,,,0,
-MD,Moldova,Europe,1,visited,45,,,0,
-CY,Cyprus,Europe,1,visited,46,,,0,
-EG,Egypt,Africa,1,visited,47,,,0,
-SA,Saudi Arabia,Asia,1,visited,48,,,0,
-JO,Jordan,Asia,1,visited,49,,,0,
-TR,Turkey,Europe,1,visited,50,,,0,
-AM,Armenia,Asia,1,visited,51,,,0,
-GE,Georgia,Asia,1,visited,52,,,0,
-AZ,Azerbaijan,Asia,1,visited,53,,,0,
-AE,United Arab Emirates,Asia,1,visited,54,,,0,
-BH,Bahrain,Asia,1,visited,55,,,0,
-OM,Oman,Asia,1,visited,56,,,0,
-QA,Qatar,Asia,1,visited,57,,,0,
-KW,Kuwait,Asia,1,visited,58,,,0,
-TH,Thailand,Asia,1,visited,59,,,0,
-KR,South Korea,Asia,1,visited,60,,,0,
-MY,Malaysia,Asia,1,visited,61,,,0,
-SG,Singapore,Asia,1,visited,62,,,0,
-VN,Vietnam,Asia,1,visited,63,,,0,
-AU,Australia,Oceania,1,visited,64,,,0,
-NZ,New Zealand,Oceania,1,visited,65,,,0,
-FJ,Fiji,Oceania,1,visited,66,,,0,
-IS,Iceland,Europe,1,visited,67,,,0,
-BO,Bolivia,South America,1,visited,68,,,0,
-EC,Ecuador,South America,1,visited,69,,,0,
-GT,Guatemala,North America,1,visited,70,,,0,
-BA,Bosnia & Herzegovina,Europe,1,visited,71,,,0,
-MT,Malta,Europe,1,visited,72,,,0,
-MK,North Macedonia,Europe,1,visited,73,,,0,
-XK,Kosovo,Europe,0,visited,74,,,0,
-TJ,Tajikistan,Asia,1,visited,75,,,0,
-UZ,Uzbekistan,Asia,1,visited,76,,,0,
-KG,Kyrgyzstan,Asia,1,visited,77,,,0,
-KZ,Kazakhstan,Asia,1,visited,78,,,0,
-FI,Finland,Europe,1,visited,79,,,0,
-EE,Estonia,Europe,1,visited,80,,,0,
-LV,Latvia,Europe,1,visited,81,,,0,
-LT,Lithuania,Europe,1,visited,82,,,0,
-AL,Albania,Europe,1,visited,83,,,0,
-ME,Montenegro,Europe,1,visited,84,,,0,
-SI,Slovenia,Europe,1,visited,85,,,0,
-JM,Jamaica,North America,1,visited,86,,,0,
-DO,Dominican Republic,North America,1,visited,87,,,0,
-JP,Japan,Asia,1,visited,88,,,0,
-LA,Laos,Asia,1,visited,89,,,0,
-KH,Cambodia,Asia,1,visited,90,,,0,
-MM,Myanmar,Asia,1,visited,91,,,0,
-BN,Brunei,Asia,1,visited,92,,,0,
-MN,Mongolia,Asia,1,visited,93,,,0,
-PH,Philippines,Asia,1,visited,94,,,0,
-ID,Indonesia,Asia,1,visited,95,,,0,
-NP,Nepal,Asia,1,visited,96,,,0,
-LK,Sri Lanka,Asia,1,visited,97,,,0,
-HN,Honduras,North America,1,visited,98,,,0,
-AF,Afghanistan,Asia,1,unknown,,,,0,
-DZ,Algeria,Africa,1,unknown,,,,0,
-AO,Angola,Africa,1,unknown,,,,0,
-AG,Antigua & Barbuda,North America,1,unknown,,,,0,
-BS,Bahamas,North America,1,unknown,,,,0,
-BD,Bangladesh,Asia,1,unknown,,,,0,
-BB,Barbados,North America,1,unknown,,,,0,
-BY,Belarus,Europe,1,unknown,,,,0,
-BJ,Benin,Africa,1,unknown,,,,0,
-BT,Bhutan,Asia,1,unknown,,,,0,
-BW,Botswana,Africa,1,unknown,,,,0,
-BF,Burkina Faso,Africa,1,unknown,,,,0,
-BI,Burundi,Africa,1,unknown,,,,0,
-CV,Cabo Verde,Africa,1,unknown,,,,0,
-CM,Cameroon,Africa,1,unknown,,,,0,
-CF,Central African Republic,Africa,1,unknown,,,,0,
-TD,Chad,Africa,1,unknown,,,,0,
-KM,Comoros,Africa,1,unknown,,,,0,
-CI,Côte d’Ivoire,Africa,1,unknown,,,,0,
-CU,Cuba,North America,1,unknown,,,,0,
-CD,DR Congo,Africa,1,unknown,,,,0,
-DJ,Djibouti,Africa,1,unknown,,,,0,
-DM,Dominica,North America,1,unknown,,,,0,
-GQ,Equatorial Guinea,Africa,1,unknown,,,,0,
-ER,Eritrea,Africa,1,unknown,,,,0,
-SZ,Eswatini,Africa,1,unknown,,,,0,
-ET,Ethiopia,Africa,1,unknown,,,,0,
-GA,Gabon,Africa,1,unknown,,,,0,
-GH,Ghana,Africa,1,unknown,,,,0,
-GD,Grenada,North America,1,unknown,,,,0,
-GN,Guinea,Africa,1,unknown,,,,0,
-GW,Guinea-Bissau,Africa,1,unknown,,,,0,
-GY,Guyana,South America,1,unknown,,,,0,
-HT,Haiti,North America,1,unknown,,,,0,
-IN,India,Asia,1,unknown,,,,0,
-IR,Iran,Asia,1,unknown,,,,0,
-IQ,Iraq,Asia,1,unknown,,,,0,
-IL,Israel,Asia,1,unknown,,,,0,
-KE,Kenya,Africa,1,unknown,,,,0,
-KI,Kiribati,Oceania,1,unknown,,,,0,
-LB,Lebanon,Asia,1,unknown,,,,0,
-LS,Lesotho,Africa,1,unknown,,,,0,
-LR,Liberia,Africa,1,unknown,,,,0,
-LY,Libya,Africa,1,unknown,,,,0,
-MG,Madagascar,Africa,1,unknown,,,,0,
-MW,Malawi,Africa,1,unknown,,,,0,
-MV,Maldives,Asia,1,unknown,,,,0,
-ML,Mali,Africa,1,unknown,,,,0,
-MH,Marshall Islands,Oceania,1,unknown,,,,0,
-MR,Mauritania,Africa,1,unknown,,,,0,
-MU,Mauritius,Africa,1,unknown,,,,0,
-FM,Micronesia,Oceania,1,unknown,,,,0,
-MA,Morocco,Africa,1,unknown,,,,0,
-MZ,Mozambique,Africa,1,unknown,,,,0,
-NA,Namibia,Africa,1,unknown,,,,0,
-NR,Nauru,Oceania,1,unknown,,,,0,
-NE,Niger,Africa,1,unknown,,,,0,
-NG,Nigeria,Africa,1,unknown,,,,0,
-KP,North Korea,Asia,1,unknown,,,,0,
-PK,Pakistan,Asia,1,unknown,,,,0,
-PW,Palau,Oceania,1,unknown,,,,0,
-PS,Palestine,Asia,1,unknown,,,,0,
-PG,Papua New Guinea,Oceania,1,unknown,,,,0,
-PY,Paraguay,South America,1,unknown,,,,0,
-CG,Republic of Congo,Africa,1,unknown,,,,0,
-GM,Gambia,Africa,1,unknown,,,,0,
-RU,Russia,Europe,1,unknown,,,,0,
-RW,Rwanda,Africa,1,unknown,,,,0,
-KN,Saint Kitts & Nevis,North America,1,unknown,,,,0,
-LC,Saint Lucia,North America,1,unknown,,,,0,
-VC,Saint Vincent & the Grenadines,North America,1,unknown,,,,0,
-WS,Samoa,Oceania,1,unknown,,,,0,
-ST,Sao Tome & Principe,Africa,1,unknown,,,,0,
-SN,Senegal,Africa,1,unknown,,,,0,
-SC,Seychelles,Africa,1,unknown,,,,0,
-SL,Sierra Leone,Africa,1,unknown,,,,0,
-SB,Solomon Islands,Oceania,1,unknown,,,,0,
-SO,Somalia,Africa,1,unknown,,,,0,
-ZA,South Africa,Africa,1,unknown,,,,0,
-SS,South Sudan,Africa,1,unknown,,,,0,
-SD,Sudan,Africa,1,unknown,,,,0,
-SR,Suriname,South America,1,unknown,,,,0,
-SY,Syria,Asia,1,unknown,,,,0,
-TW,Taiwan,Asia,0,unknown,,,,0,
-TZ,Tanzania,Africa,1,unknown,,,,0,
-TL,Timor-Leste,Asia,1,unknown,,,,0,
-TG,Togo,Africa,1,unknown,,,,0,
-TO,Tonga,Oceania,1,unknown,,,,0,
-TT,Trinidad & Tobago,North America,1,unknown,,,,0,
-TN,Tunisia,Africa,1,unknown,,,,0,
-TM,Turkmenistan,Asia,1,unknown,,,,0,
-TV,Tuvalu,Oceania,1,unknown,,,,0,
-UG,Uganda,Africa,1,unknown,,,,0,
-UA,Ukraine,Europe,1,unknown,,,,0,
-VU,Vanuatu,Oceania,1,unknown,,,,0,
-VE,Venezuela,South America,1,unknown,,,,0,
-YE,Yemen,Asia,1,unknown,,,,0,
-ZM,Zambia,Africa,1,unknown,,,,0,
-ZW,Zimbabwe,Africa,1,unknown,,,,0,
+﻿CountryCode,Country,Continent,Is195,VisitStatus,FirstVisitOrder,TimesVisited,TotalDaysSpent,VisitHistoryComplete,Notes,RecordedVisits,RecordedDaysSpent
+CN,China,Asia,1,visited,1,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",2,9
+US,United States,North America,1,visited,2,,,0,,,
+CA,Canada,North America,1,visited,3,,,0,,,
+GB,United Kingdom,Europe,1,visited,4,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",3,12
+CH,Switzerland,Europe,1,visited,5,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",2,11
+NL,Netherlands,Europe,1,visited,6,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,3
+DK,Denmark,Europe,1,visited,7,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,3
+NO,Norway,Europe,1,visited,8,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,3
+SE,Sweden,Europe,1,visited,9,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,1
+PT,Portugal,Europe,1,visited,10,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",2,4
+ES,Spain,Europe,1,visited,11,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",2,3
+IT,Italy,Europe,1,visited,12,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",2,8
+VA,Vatican City,Europe,1,visited,13,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",2,2
+CZ,Czechia,Europe,1,visited,14,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",2,4
+DE,Germany,Europe,1,visited,15,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",2,4
+PL,Poland,Europe,1,visited,16,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,2
+HU,Hungary,Europe,1,visited,17,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,2
+SK,Slovakia,Europe,1,visited,18,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,1
+AT,Austria,Europe,1,visited,19,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,3
+FR,France,Europe,1,visited,20,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,5
+BE,Belgium,Europe,1,visited,21,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",2,2
+MC,Monaco,Europe,1,visited,22,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,1
+GR,Greece,Europe,1,visited,23,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,2
+HR,Croatia,Europe,1,visited,24,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,3
+SM,San Marino,Europe,1,visited,25,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,1
+LI,Liechtenstein,Europe,1,visited,26,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,1
+MX,Mexico,North America,1,visited,27,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,4
+BZ,Belize,North America,1,visited,28,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,3
+PA,Panama,North America,1,visited,29,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,2
+CO,Colombia,South America,1,visited,30,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,2
+SV,El Salvador,North America,1,visited,31,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,1
+NI,Nicaragua,North America,1,visited,32,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,1
+CR,Costa Rica,North America,1,visited,33,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,2
+BR,Brazil,South America,1,visited,34,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,2
+UY,Uruguay,South America,1,visited,35,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,1
+AR,Argentina,South America,1,visited,36,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,2
+CL,Chile,South America,1,visited,37,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,1
+PE,Peru,South America,1,visited,38,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",2,5
+AD,Andorra,Europe,1,visited,39,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,1
+LU,Luxembourg,Europe,1,visited,40,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,1
+IE,Ireland,Europe,1,visited,41,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,1
+BG,Bulgaria,Europe,1,visited,42,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,1
+RS,Serbia,Europe,1,visited,43,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,1
+RO,Romania,Europe,1,visited,44,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,1
+MD,Moldova,Europe,1,visited,45,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,1
+CY,Cyprus,Europe,1,visited,46,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,2
+EG,Egypt,Africa,1,visited,47,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,2
+SA,Saudi Arabia,Asia,1,visited,48,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",2,2
+JO,Jordan,Asia,1,visited,49,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,2
+TR,Turkey,Europe,1,visited,50,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",2,9
+AM,Armenia,Asia,1,visited,51,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,1
+GE,Georgia,Asia,1,visited,52,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,2
+AZ,Azerbaijan,Asia,1,visited,53,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",2,2
+AE,United Arab Emirates,Asia,1,visited,54,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",3,13
+BH,Bahrain,Asia,1,visited,55,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,1
+OM,Oman,Asia,1,visited,56,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,2
+QA,Qatar,Asia,1,visited,57,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,2
+KW,Kuwait,Asia,1,visited,58,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,1
+TH,Thailand,Asia,1,visited,59,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,2
+KR,South Korea,Asia,1,visited,60,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,6
+MY,Malaysia,Asia,1,visited,61,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete. 21 July 2025 uses the Malaysia flag although Morning says Seoul and KL appears only in Midnight; flag-based attribution retained.",3,4
+SG,Singapore,Asia,1,visited,62,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",2,5
+VN,Vietnam,Asia,1,visited,63,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,2
+AU,Australia,Oceania,1,visited,64,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",2,14
+NZ,New Zealand,Oceania,1,visited,65,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,5
+FJ,Fiji,Oceania,1,visited,66,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,1
+IS,Iceland,Europe,1,visited,67,,,0,,,
+BO,Bolivia,South America,1,visited,68,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,4
+EC,Ecuador,South America,1,visited,69,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,2
+GT,Guatemala,North America,1,visited,70,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,5
+BA,Bosnia & Herzegovina,Europe,1,visited,71,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,3
+MT,Malta,Europe,1,visited,72,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,1
+MK,North Macedonia,Europe,1,visited,73,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",2,7
+XK,Kosovo,Europe,0,visited,74,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,1
+TJ,Tajikistan,Asia,1,visited,75,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,1
+UZ,Uzbekistan,Asia,1,visited,76,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,4
+KG,Kyrgyzstan,Asia,1,visited,77,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,2
+KZ,Kazakhstan,Asia,1,visited,78,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,5
+FI,Finland,Europe,1,visited,79,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,1
+EE,Estonia,Europe,1,visited,80,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,1
+LV,Latvia,Europe,1,visited,81,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,1
+LT,Lithuania,Europe,1,visited,82,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,1
+AL,Albania,Europe,1,visited,83,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,1
+ME,Montenegro,Europe,1,visited,84,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,3
+SI,Slovenia,Europe,1,visited,85,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,2
+JM,Jamaica,North America,1,visited,86,,,0,,,
+DO,Dominican Republic,North America,1,visited,87,,,0,,,
+JP,Japan,Asia,1,visited,88,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,6
+LA,Laos,Asia,1,visited,89,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,1
+KH,Cambodia,Asia,1,visited,90,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,3
+MM,Myanmar,Asia,1,visited,91,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,1
+BN,Brunei,Asia,1,visited,92,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,1
+MN,Mongolia,Asia,1,visited,93,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,1
+PH,Philippines,Asia,1,visited,94,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,1
+ID,Indonesia,Asia,1,visited,95,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,4
+NP,Nepal,Asia,1,visited,96,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,2
+LK,Sri Lanka,Asia,1,visited,97,,,0,"Recorded history: Travel Yearbook, Organized, excluding SA3.0; return gaps under 14 days merge visits; gaps do not count as days spent. Lifetime history may be incomplete.",1,2
+HN,Honduras,North America,1,visited,98,,,0,,,
+AF,Afghanistan,Asia,1,unknown,,,,0,,,
+DZ,Algeria,Africa,1,unknown,,,,0,,,
+AO,Angola,Africa,1,unknown,,,,0,,,
+AG,Antigua & Barbuda,North America,1,unknown,,,,0,,,
+BS,Bahamas,North America,1,unknown,,,,0,,,
+BD,Bangladesh,Asia,1,unknown,,,,0,,,
+BB,Barbados,North America,1,unknown,,,,0,,,
+BY,Belarus,Europe,1,unknown,,,,0,,,
+BJ,Benin,Africa,1,unknown,,,,0,,,
+BT,Bhutan,Asia,1,unknown,,,,0,,,
+BW,Botswana,Africa,1,unknown,,,,0,,,
+BF,Burkina Faso,Africa,1,unknown,,,,0,,,
+BI,Burundi,Africa,1,unknown,,,,0,,,
+CV,Cabo Verde,Africa,1,unknown,,,,0,,,
+CM,Cameroon,Africa,1,unknown,,,,0,,,
+CF,Central African Republic,Africa,1,unknown,,,,0,,,
+TD,Chad,Africa,1,unknown,,,,0,,,
+KM,Comoros,Africa,1,unknown,,,,0,,,
+CI,Côte d’Ivoire,Africa,1,unknown,,,,0,,,
+CU,Cuba,North America,1,unknown,,,,0,,,
+CD,DR Congo,Africa,1,unknown,,,,0,,,
+DJ,Djibouti,Africa,1,unknown,,,,0,,,
+DM,Dominica,North America,1,unknown,,,,0,,,
+GQ,Equatorial Guinea,Africa,1,unknown,,,,0,,,
+ER,Eritrea,Africa,1,unknown,,,,0,,,
+SZ,Eswatini,Africa,1,unknown,,,,0,,,
+ET,Ethiopia,Africa,1,unknown,,,,0,,,
+GA,Gabon,Africa,1,unknown,,,,0,,,
+GH,Ghana,Africa,1,unknown,,,,0,,,
+GD,Grenada,North America,1,unknown,,,,0,,,
+GN,Guinea,Africa,1,unknown,,,,0,,,
+GW,Guinea-Bissau,Africa,1,unknown,,,,0,,,
+GY,Guyana,South America,1,unknown,,,,0,,,
+HT,Haiti,North America,1,unknown,,,,0,,,
+IN,India,Asia,1,unknown,,,,0,,,
+IR,Iran,Asia,1,unknown,,,,0,,,
+IQ,Iraq,Asia,1,unknown,,,,0,,,
+IL,Israel,Asia,1,unknown,,,,0,,,
+KE,Kenya,Africa,1,unknown,,,,0,,,
+KI,Kiribati,Oceania,1,unknown,,,,0,,,
+LB,Lebanon,Asia,1,unknown,,,,0,,,
+LS,Lesotho,Africa,1,unknown,,,,0,,,
+LR,Liberia,Africa,1,unknown,,,,0,,,
+LY,Libya,Africa,1,unknown,,,,0,,,
+MG,Madagascar,Africa,1,unknown,,,,0,,,
+MW,Malawi,Africa,1,unknown,,,,0,,,
+MV,Maldives,Asia,1,unknown,,,,0,,,
+ML,Mali,Africa,1,unknown,,,,0,,,
+MH,Marshall Islands,Oceania,1,unknown,,,,0,,,
+MR,Mauritania,Africa,1,unknown,,,,0,,,
+MU,Mauritius,Africa,1,unknown,,,,0,,,
+FM,Micronesia,Oceania,1,unknown,,,,0,,,
+MA,Morocco,Africa,1,unknown,,,,0,,,
+MZ,Mozambique,Africa,1,unknown,,,,0,,,
+NA,Namibia,Africa,1,unknown,,,,0,,,
+NR,Nauru,Oceania,1,unknown,,,,0,,,
+NE,Niger,Africa,1,unknown,,,,0,,,
+NG,Nigeria,Africa,1,unknown,,,,0,,,
+KP,North Korea,Asia,1,unknown,,,,0,,,
+PK,Pakistan,Asia,1,unknown,,,,0,,,
+PW,Palau,Oceania,1,unknown,,,,0,,,
+PS,Palestine,Asia,1,unknown,,,,0,,,
+PG,Papua New Guinea,Oceania,1,unknown,,,,0,,,
+PY,Paraguay,South America,1,unknown,,,,0,,,
+CG,Republic of Congo,Africa,1,unknown,,,,0,,,
+GM,Gambia,Africa,1,unknown,,,,0,,,
+RU,Russia,Europe,1,unknown,,,,0,,,
+RW,Rwanda,Africa,1,unknown,,,,0,,,
+KN,Saint Kitts & Nevis,North America,1,unknown,,,,0,,,
+LC,Saint Lucia,North America,1,unknown,,,,0,,,
+VC,Saint Vincent & the Grenadines,North America,1,unknown,,,,0,,,
+WS,Samoa,Oceania,1,unknown,,,,0,,,
+ST,Sao Tome & Principe,Africa,1,unknown,,,,0,,,
+SN,Senegal,Africa,1,unknown,,,,0,,,
+SC,Seychelles,Africa,1,unknown,,,,0,,,
+SL,Sierra Leone,Africa,1,unknown,,,,0,,,
+SB,Solomon Islands,Oceania,1,unknown,,,,0,,,
+SO,Somalia,Africa,1,unknown,,,,0,,,
+ZA,South Africa,Africa,1,unknown,,,,0,,,
+SS,South Sudan,Africa,1,unknown,,,,0,,,
+SD,Sudan,Africa,1,unknown,,,,0,,,
+SR,Suriname,South America,1,unknown,,,,0,,,
+SY,Syria,Asia,1,unknown,,,,0,,,
+TW,Taiwan,Asia,0,unknown,,,,0,,,
+TZ,Tanzania,Africa,1,unknown,,,,0,,,
+TL,Timor-Leste,Asia,1,unknown,,,,0,,,
+TG,Togo,Africa,1,unknown,,,,0,,,
+TO,Tonga,Oceania,1,unknown,,,,0,,,
+TT,Trinidad & Tobago,North America,1,unknown,,,,0,,,
+TN,Tunisia,Africa,1,unknown,,,,0,,,
+TM,Turkmenistan,Asia,1,unknown,,,,0,,,
+TV,Tuvalu,Oceania,1,unknown,,,,0,,,
+UG,Uganda,Africa,1,unknown,,,,0,,,
+UA,Ukraine,Europe,1,unknown,,,,0,,,
+VU,Vanuatu,Oceania,1,unknown,,,,0,,,
+VE,Venezuela,South America,1,unknown,,,,0,,,
+YE,Yemen,Asia,1,unknown,,,,0,,,
+ZM,Zambia,Africa,1,unknown,,,,0,,,
+ZW,Zimbabwe,Africa,1,unknown,,,,0,,,

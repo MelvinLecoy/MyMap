@@ -13,13 +13,19 @@ import starter from "../data/countries.sample.json";
 
 const overview = readFileSync("data/countries.csv", "utf8");
 const history = readFileSync("data/country-visit-history.csv", "utf8");
-const countries = importCountryHistory(overview, history, starter.countries);
+const periods = readFileSync("data/country-visit-periods.csv", "utf8");
+const countries = importCountryHistory(
+  overview,
+  history,
+  starter.countries,
+  periods,
+);
 const overviewHeader =
   "CountryCode,Country,Continent,Is195,VisitStatus,FirstVisitOrder,TimesVisited,TotalDaysSpent,VisitHistoryComplete,Notes\n";
 const historyHeader =
   "CountryCode,VisitNumber,ArrivalDate,DepartureDate,DaysSpent,Notes\n";
 
-test("the supplied country history imports all 98 first visits without inventing totals or dates", () => {
+test("the verified yearbook imports 114 dated visits and six undated known visits without inventing lifetime totals", () => {
   assert.equal(
     countries.filter((country) => inCountrySet(country, 195)).length,
     195,
@@ -34,12 +40,30 @@ test("the supplied country history imports all 98 first visits without inventing
     assert.equal(country.timesVisited, null);
     assert.equal(country.totalDaysSpent, null);
     assert.equal(country.visitHistoryComplete, false);
+  }
+  assert.equal(
+    visited.reduce((n, c) => n + (c.recordedVisits ?? 0), 0),
+    114,
+  );
+  assert.equal(
+    visited.reduce((n, c) => n + (c.recordedDaysSpent ?? 0), 0),
+    270,
+  );
+  assert.equal(visited.flatMap((c) => c.visits ?? []).length, 120);
+  assert.equal(
+    visited.flatMap((c) => c.visits?.flatMap((v) => v.periods ?? []) ?? [])
+      .length,
+    125,
+  );
+  for (const code of ["CA", "DO", "HN", "IS", "JM", "US"]) {
+    const country = visited.find((c) => c.code === code)!;
+    assert.equal(country.recordedVisits, null);
     assert.deepEqual(
-      country.visits?.map((visit) => [
-        visit.number,
-        visit.arrival,
-        visit.departure,
-        visit.daysSpent,
+      country.visits?.map((v) => [
+        v.number,
+        v.arrival,
+        v.departure,
+        v.daysSpent,
       ]),
       [[1, null, null, null]],
     );

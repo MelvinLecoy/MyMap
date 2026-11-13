@@ -4,10 +4,15 @@ import { parse } from "csv-parse/sync";
 import { toCityRow, type CityRow } from "../../src/lib/cloud-data";
 import type { AtlasData } from "../../src/lib/types";
 import { COLLECTION_STATUS_STORAGE_KEY } from "../../src/lib/status-storage";
+import { toCountrySnapshot } from "../../src/lib/country-cloud-data";
+import type { CountrySeed } from "../../src/lib/countries";
 
 const atlas = JSON.parse(
   readFileSync("src/generated/atlas.json", "utf8"),
 ) as AtlasData;
+const countrySeeds = JSON.parse(
+  readFileSync("src/generated/countries.json", "utf8"),
+).countries as CountrySeed[];
 const ownerId = "11111111-1111-4111-8111-111111111111";
 const strangerId = "22222222-2222-4222-8222-222222222222";
 const fixtureOrigin = "https://atlas-test.supabase.co";
@@ -58,6 +63,8 @@ function store() {
       ]),
     ),
     failRead: false,
+    countrySnapshot: toCountrySnapshot(countrySeeds),
+    failCountryRead: false,
     failWrite: false,
     imports: 0,
     otp: null as null | Record<string, unknown>,
@@ -79,6 +86,16 @@ function store() {
   };
 }
 type Store = ReturnType<typeof store>;
+function shortenAustralia(state: Store) {
+  const visit = state.countrySnapshot.visits.find(
+    (v) => v.country_code === "AU" && v.visit_number === 2,
+  )!;
+  const period = state.countrySnapshot.periods.find(
+    (p) => p.country_code === "AU" && p.visit_number === 2,
+  )!;
+  visit.departure_date = period.departure_date = "2026-08-23";
+  visit.days_spent = 3;
+}
 function changed(
   row: CityRow,
   status: CityRow["map_status"],
@@ -165,6 +182,10 @@ async function backend(
         },
       });
     if (method === "OPTIONS") return reply({});
+    if (url.pathname === "/rest/v1/rpc/atlas_country_snapshot")
+      return state.failCountryRead
+        ? reply({ message: "unavailable" }, 503)
+        : reply(state.countrySnapshot);
     if (url.pathname === "/auth/v1/token") {
       if (url.searchParams.get("grant_type") === "pkce" && state.callbackError)
         return reply(
@@ -1196,4 +1217,48 @@ test("the Viewer and Editor switch fits at 320px and remains usable without WebG
     page.getByRole("dialog", { name: "Editor sign in" }),
   ).toBeVisible();
   await expect(page.getByLabel("Email address", { exact: true })).toBeFocused();
+});
+
+test("country history reads the database snapshot rather than the build-time totals", async ({
+  context,
+  page,
+}) => {
+  const state = store();
+  shortenAustralia(state);
+  await backend(context, state);
+  await page.goto("/?panel=countries&country=AU");
+  await expect(page.locator(".country-statistics dd")).toHaveText(["2", "13"]);
+  await expect(page.locator(".country-visit-list > li").last()).toContainText(
+    "23 August 2026",
+  );
+  await expect(page.getByLabel("Actual stays for visit 1")).toBeVisible();
+  await expect(
+    page
+      .getByRole("status")
+      .filter({ hasText: "Couldn’t refresh country history" }),
+  ).toHaveCount(0);
+});
+
+test("country outages retain a usable snapshot, retry recovers, and failed refreshes retain confirmed data", async ({
+  context,
+  page,
+}) => {
+  const state = store();
+  state.failCountryRead = true;
+  await backend(context, state);
+  await page.goto("/?panel=countries&country=AU");
+  await expect(page.locator(".country-statistics dd")).toHaveText(["2", "14"]);
+  await expect(
+    page.getByText("Couldn’t refresh country history.", { exact: false }),
+  ).toBeVisible();
+  shortenAustralia(state);
+  state.failCountryRead = false;
+  await page.getByRole("button", { name: "Retry", exact: true }).click();
+  await expect(page.locator(".country-statistics dd")).toHaveText(["2", "13"]);
+  state.failCountryRead = true;
+  await page.evaluate(() => window.dispatchEvent(new Event("focus")));
+  await expect(
+    page.getByText("Couldn’t refresh country history.", { exact: false }),
+  ).toBeVisible();
+  await expect(page.locator(".country-statistics dd")).toHaveText(["2", "13"]);
 });

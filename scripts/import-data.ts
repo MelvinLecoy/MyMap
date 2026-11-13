@@ -31,6 +31,7 @@ try {
         readFileSync("data/countries.csv", "utf8"),
         readFileSync("data/country-visit-history.csv", "utf8"),
         countryStarter.countries,
+        readFileSync("data/country-visit-periods.csv", "utf8"),
       );
   writeFileSync(
     "src/generated/countries.json",

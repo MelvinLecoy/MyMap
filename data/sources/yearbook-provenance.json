@@ -1,0 +1,25 @@
+{
+  "source_file": "Travel-Yearbook-Corrected.xlsx",
+  "source_sha256": "7f2bf8ac72c84c5104b8399add6600389d1f413006eea6cab466370788a7667f",
+  "original_uploaded_sha256": "437ba5e79adc430805c30511671cc4ed550648f817eb248b16a1d9e7048e976b",
+  "approved_corrections": [
+    {
+      "Date": "2026-05-03",
+      "Sheet": "Organized",
+      "FlagCell": "F51",
+      "DateCell": "F52",
+      "OriginalCountryCodesObserved": "BA;GB",
+      "EffectiveCountryCodes": "BA",
+      "Rule": "User correction: 3 May 2026 counts only as Bosnia & Herzegovina, not England/United Kingdom.",
+      "UKDaysBefore": 13,
+      "UKDaysAfter": 12,
+      "OverallCountryDaysBefore": 271,
+      "OverallCountryDaysAfter": 270
+    }
+  ],
+  "countries_with_dated_evidence": 92,
+  "recorded_visits": 114,
+  "actual_contiguous_stay_periods": 125,
+  "recorded_country_days": 270,
+  "new_visit_rule": "Next period's first date minus previous period's last date >= 14 days"
+}

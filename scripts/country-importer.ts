@@ -1,6 +1,7 @@
 import type { CountrySeed, CountryTrip } from "../src/lib/countries.js";
 import type { VisitStatus } from "../src/lib/types.js";
 import { countryCode, readCSV, validDate } from "./importer.js";
+import { calculateRecordedHistory } from "../src/lib/country-history.js";
 
 function integer(
   value: string | undefined,
@@ -24,10 +25,12 @@ export function importCountryHistory(
   overview: string,
   history: string,
   starter: CountrySeed[] = [],
+  stayPeriods?: string,
 ): CountrySeed[] {
   const countries = new Map<string, CountrySeed>();
   const complete = new Map<string, boolean>();
   const orders = new Set<number>();
+  const expectedRecorded = new Map<string, [number | null, number | null]>();
   for (const { values: row, line } of readCSV(overview, [
     "CountryCode",
     "Country",
@@ -93,6 +96,10 @@ export function importCountryHistory(
       visits: [],
     });
     complete.set(code, row.visithistorycomplete === "1");
+    expectedRecorded.set(code, [
+      integer(row.recordedvisits, `${context}: RecordedVisits`),
+      integer(row.recordeddaysspent, `${context}: RecordedDaysSpent`),
+    ]);
   }
   const seen = new Set<string>();
   for (const { values: row, line } of readCSV(history, [
@@ -142,6 +149,7 @@ export function importCountryHistory(
     }
     let daysSpent = integer(row.daysspent, `${context}: DaysSpent`, 1);
     if (
+      !stayPeriods &&
       daysSpent === null &&
       arrival?.length === 10 &&
       departure?.length === 10
@@ -156,6 +164,55 @@ export function importCountryHistory(
       daysSpent,
       notes: row.notes || "",
     } satisfies CountryTrip);
+  }
+  if (stayPeriods) {
+    const seenPeriods = new Set<string>();
+    for (const { values: row, line } of readCSV(stayPeriods, [
+      "CountryCode",
+      "VisitNumber",
+      "PeriodNumber",
+      "ArrivalDate",
+      "DepartureDate",
+    ])) {
+      const country = countries.get(row.countrycode.toUpperCase());
+      const visitNumber = integer(
+        row.visitnumber,
+        `Stay period row ${line}: VisitNumber`,
+        1,
+      );
+      const visit = country?.visits?.find((v) => v.number === visitNumber);
+      const number = integer(
+        row.periodnumber,
+        `Stay period row ${line}: PeriodNumber`,
+        1,
+      );
+      if (!visit || number === null)
+        throw new Error(
+          `Stay period row ${line}: unknown visit or missing period number.`,
+        );
+      const key = `${country!.code}:${visitNumber}:${number}`;
+      if (seenPeriods.has(key))
+        throw new Error(`Stay period row ${line}: duplicate period ${key}.`);
+      seenPeriods.add(key);
+      (visit.periods ??= []).push({
+        number,
+        arrival: row.arrivaldate,
+        departure: row.departuredate,
+        sourceRefs: row.sourcerefs || "",
+        notes: row.notes || "",
+      });
+    }
+  }
+  calculateRecordedHistory([...countries.values()]);
+  for (const country of countries.values()) {
+    const expected = expectedRecorded.get(country.code)!;
+    if (
+      (expected[0] !== null && expected[0] !== country.recordedVisits) ||
+      (expected[1] !== null && expected[1] !== country.recordedDaysSpent)
+    )
+      throw new Error(
+        `${country.code}: recorded totals disagree with actual stay periods.`,
+      );
   }
   for (const country of countries.values()) {
     const visits = country.visits!.sort((a, b) => a.number - b.number);

@@ -9,6 +9,9 @@
   "scripts": {
     "dev": "tsx scripts/import-data.ts && vite --host 0.0.0.0",
     "data:import": "tsx scripts/import-data.ts",
+    "country:prepare": "tsx scripts/prepare-country-database.ts",
+    "country:verify-live": "NODE_USE_ENV_PROXY=1 tsx scripts/prepare-country-database.ts --dry-run",
+    "country:apply": "NODE_USE_ENV_PROXY=1 tsx scripts/prepare-country-database.ts --apply",
     "data:resolve-coordinates": "tsx scripts/resolve-coordinates.ts",
     "atlas:prepare": "tsx scripts/prepare-atlas.ts",
     "typecheck": "tsc --noEmit",

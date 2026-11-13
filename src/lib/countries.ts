@@ -21,6 +21,8 @@ export interface CountrySeed {
   firstVisitOrder?: number | null;
   timesVisited?: number | null;
   totalDaysSpent?: number | null;
+  recordedVisits?: number | null;
+  recordedDaysSpent?: number | null;
   notes?: string;
   visits?: CountryTrip[];
 }
@@ -29,6 +31,14 @@ export interface CountryTrip {
   arrival: string | null;
   departure: string | null;
   daysSpent: number | null;
+  notes?: string;
+  periods?: CountryStayPeriod[];
+}
+export interface CountryStayPeriod {
+  number: number;
+  arrival: string;
+  departure: string;
+  sourceRefs?: string;
   notes?: string;
 }
 export interface CountryRecord extends Omit<CountrySeed, "visit"> {

@@ -2138,3 +2138,16 @@ h2 {
     overflow: visible;
   }
 }
+.country-history-scope,
+.country-stay-periods {
+  color: var(--muted, #526963);
+  font-size: 0.82rem;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+.country-history-scope {
+  margin: 12px 18px;
+}
+.country-stay-periods ul {
+  padding-left: 20px;
+}

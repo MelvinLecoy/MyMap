@@ -102,8 +102,21 @@ export default function CountryDetail({
         >
           {(
             [
-              ["Times visited", country.timesVisited, "visits"],
-              ["Days spent", country.totalDaysSpent, "days"],
+              [
+                country.timesVisited == null && country.recordedVisits != null
+                  ? "Recorded visits"
+                  : "Times visited",
+                country.timesVisited ?? country.recordedVisits,
+                "visits",
+              ],
+              [
+                country.totalDaysSpent == null &&
+                country.recordedDaysSpent != null
+                  ? "Recorded days"
+                  : "Days spent",
+                country.totalDaysSpent ?? country.recordedDaysSpent,
+                "days",
+              ],
             ] as const
           ).map(([label, value, kind]) => (
             <div key={kind}>
@@ -118,6 +131,13 @@ export default function CountryDetail({
             </div>
           ))}
         </dl>
+        {country.recordedVisits != null && !country.visitHistoryComplete && (
+          <p className="country-history-scope">
+            These totals cover recorded trips; earlier visits may be missing.
+            Return stays less than 14 days apart count as one visit. Days spent
+            exclude gaps.
+          </p>
+        )}
 
         <section
           className="country-history"
@@ -142,6 +162,28 @@ export default function CountryDetail({
                   <p>
                     <VisitDates visit={visit} />
                   </p>
+                  {visit.periods && visit.periods.length > 1 && (
+                    <div
+                      className="country-stay-periods"
+                      aria-label={`Actual stays for visit ${visit.number}`}
+                    >
+                      <p>Actual stays</p>
+                      <ul>
+                        {visit.periods.map((period) => (
+                          <li key={period.number}>
+                            <VisitDates
+                              visit={{
+                                number: period.number,
+                                arrival: period.arrival,
+                                departure: period.departure,
+                                daysSpent: null,
+                              }}
+                            />
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                   {visit.notes && (
                     <p className="country-visit-note">{visit.notes}</p>
                   )}

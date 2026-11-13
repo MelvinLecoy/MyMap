@@ -877,8 +877,12 @@ test("country title ranks stay beside wrapped names without splitting words", as
           checkedWrappedRank = true;
       }
       await expect(page.locator(".country-statistics dt")).toHaveText([
-        "Times visited",
-        "Days spent",
+        ["AL", "LI", "GB", "BA"].includes(code)
+          ? "Recorded visits"
+          : "Times visited",
+        ["AL", "LI", "GB", "BA"].includes(code)
+          ? "Recorded days"
+          : "Days spent",
       ]);
       expect(
         await page.evaluate(
@@ -890,4 +894,45 @@ test("country title ranks stay beside wrapped names without splitting words", as
     }
   }
   expect(checkedWrappedRank).toBe(true);
+});
+
+test("recorded country history shows actual stays, corrected UK dates, and incomplete lifetime scope", async ({
+  page,
+}) => {
+  for (const [code, visits, days] of [
+    ["AU", 2, 14],
+    ["NZ", 1, 5],
+    ["GB", 3, 12],
+  ] as const) {
+    await page.goto(`/?panel=countries&country=${code}`);
+    await expect(page.locator(".country-statistics dd")).toHaveText([
+      String(visits),
+      String(days),
+    ]);
+    await expect(page.locator(".country-history-scope")).toContainText(
+      "earlier visits may be missing",
+    );
+    if (code === "AU") {
+      await expect(page.getByLabel("Actual stays for visit 1")).toContainText(
+        "24 July 2025 – 27 July 2025",
+      );
+      await expect(page.getByLabel("Actual stays for visit 1")).toContainText(
+        "29 July 2025 – 3 August 2025",
+      );
+      await expect(
+        page.locator(".country-visit-list > li").first(),
+      ).toContainText("10 days");
+    }
+    if (code === "GB")
+      await expect(
+        page.locator(".country-visit-list > li").last(),
+      ).toContainText("1 May 2026 – 2 May 2026");
+  }
+  await page.setViewportSize({ width: 320, height: 700 });
+  await page.goto("/?panel=countries&country=AU");
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
 });

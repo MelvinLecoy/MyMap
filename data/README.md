@@ -49,3 +49,8 @@ or territory metadata. Existing Svalbard details and city records are retained
 outside the 195/197 country counts. Fillable copies and examples are in
 [templates/COUNTRY-VISITS.md](templates/COUNTRY-VISITS.md); update the tracked
 input CSVs when more history is provided.
+
+Country history now also uses `country-visit-periods.csv` for actual uninterrupted
+stays within counted visits. The overview's RecordedVisits/RecordedDaysSpent
+columns are checked against these stays. See [the current three-table format](templates/COUNTRY-VISITS.md)
+and [database design](../docs/country-history.md).

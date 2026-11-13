@@ -1,5 +1,13 @@
 # Supabase-backed atlas
 
+Country history is stored separately in `countries`, `country_visits` and
+`country_visit_periods`, with a coherent public snapshot and the same editor
+permissions. See [country history design, import and rollout](country-history.md).
+The original provisioning command below configures cities; country migration
+and imports use the separate `country:prepare`, `country:verify-live` and
+`country:apply` commands. The country panel reads this data; its browser editing
+form is not part of this change.
+
 The website supports static CSV mode and a database-backed mode. With both
 `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` configured, the deployed
 app reads `public.cities`; public visitors cannot change statuses. Only users

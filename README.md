@@ -147,6 +147,13 @@ Google controls the embedded content and access. Set the original My Map to **An
 
 ## Persistent saving with Supabase
 
+Country history uses three linked CSVs and database tables so a counted visit
+can contain several actual stay periods. The country panel reads database
+history when configured, with a bundled fallback. Recorded visits/days are
+labelled separately from unknown lifetime totals. See
+[the CSV format](data/templates/COUNTRY-VISITS.md) and
+[database design and rollout](docs/country-history.md).
+
 Set both `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` to enable the database-backed collection. In that mode, visitors have read-only access; the configured editor signs in with email and password on the same page and saves statuses to PostgreSQL. Email links remain available for first-time password setup and recovery. Browser-only overrides are imported only after explicit owner review. Privileged credentials are never bundled. See [docs/supabase.md](docs/supabase.md) for cloud provisioning, permissions, migration, export, and verification.
 
 ## Build and deploy

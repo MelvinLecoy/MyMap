@@ -40,6 +40,7 @@ import AccessModeSwitch from "./components/AccessModeSwitch";
 import atlas from "./generated/atlas.json";
 import { useCoordinateLayout } from "./lib/use-coordinate-layout";
 import { useRemoteAtlas } from "./lib/use-remote-atlas";
+import { useRemoteCountries } from "./lib/use-remote-countries";
 import { supabase } from "./lib/supabase";
 import { deriveCountries } from "./lib/cloud-data";
 import {
@@ -84,6 +85,10 @@ function readRoute(): {
 }
 export default function App() {
   const cloud = useRemoteAtlas(data, data.demo ? null : supabase);
+  const countryCloud = useRemoteCountries(
+    countrySeed.countries,
+    data.demo ? null : supabase,
+  );
   const [route, setRoute] = useState(readRoute);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("all");
@@ -173,8 +178,8 @@ export default function App() {
   );
   const countryView = route.panel === "countries";
   const countryRecords = useMemo(
-    () => buildCountryRecords(countrySeed.countries, cities),
-    [cities],
+    () => buildCountryRecords(countryCloud.countries, cities),
+    [cities, countryCloud.countries],
   );
   const countriesInView = useMemo(
     () =>
@@ -382,6 +387,17 @@ export default function App() {
             role="tabpanel"
             aria-labelledby={`${route.panel}-tab`}
           >
+            {countryView && countryCloud.error && (
+              <p className="country-history-scope" role="status">
+                {countryCloud.error}{" "}
+                <button
+                  type="button"
+                  onClick={() => void countryCloud.refresh()}
+                >
+                  Retry
+                </button>
+              </p>
+            )}
             {!selected && countryView && scopedCountry ? (
               <CountryDetail
                 key={scopedCountry.code}
