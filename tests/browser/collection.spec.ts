@@ -921,19 +921,29 @@ test("country history shows stays and corrected dates without explanatory copy o
     ).toHaveCount(0);
     if (code === "AU") {
       await expect(page.getByLabel("Actual stays for visit 1")).toContainText(
-        "24 July 2025 – 27 July 2025",
+        "24 – 27 July 2025",
       );
       await expect(page.getByLabel("Actual stays for visit 1")).toContainText(
-        "29 July 2025 – 3 August 2025",
+        "29 July – 3 August 2025",
       );
       await expect(
         page.locator(".country-visit-list > li").first(),
       ).toContainText("10 days");
     }
-    if (code === "GB")
+    if (code === "GB") {
+      const first = page.locator(".country-visit-list > li").first();
+      await expect(first.locator("ul > li")).toHaveText([
+        "14 – 16 December 2023",
+        "21 – 26 December 2023",
+      ]);
+      await expect(first.locator(":scope > p")).toHaveCount(0);
+      await expect(
+        first.getByText("Actual stays", { exact: true }),
+      ).toHaveCount(0);
       await expect(
         page.locator(".country-visit-list > li").last(),
       ).toContainText("1 May 2026 – 2 May 2026");
+    }
   }
   await page.setViewportSize({ width: 320, height: 700 });
   await page.goto("/?panel=countries&country=AU");

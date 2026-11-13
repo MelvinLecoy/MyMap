@@ -4,11 +4,28 @@ import { formatVisitDate, type City } from "../lib/types";
 import { useCountryHeading } from "../lib/use-country-heading";
 import { CityRow, Flag, VisitMarker } from "./CollectionItems";
 
-function VisitDates({ visit }: { visit: CountryTrip }) {
+function VisitDates({
+  visit,
+  compact = false,
+}: {
+  visit: CountryTrip;
+  compact?: boolean;
+}) {
   if (visit.arrival && visit.departure && visit.arrival !== visit.departure) {
+    let arrival = formatVisitDate(visit.arrival);
+    if (
+      compact &&
+      visit.arrival.length === 10 &&
+      visit.departure.length === 10
+    ) {
+      if (visit.arrival.slice(0, 7) === visit.departure.slice(0, 7))
+        arrival = String(Number(visit.arrival.slice(8)));
+      else if (visit.arrival.slice(0, 4) === visit.departure.slice(0, 4))
+        arrival = arrival.replace(/ \d{4}$/, "");
+    }
     return (
       <>
-        {formatVisitDate(visit.arrival)} – {formatVisitDate(visit.departure)}
+        {arrival} – {formatVisitDate(visit.departure)}
       </>
     );
   }
@@ -152,30 +169,29 @@ export default function CountryDetail({
                         : `${visit.daysSpent} ${visit.daysSpent === 1 ? "day" : "days"}`}
                     </span>
                   </div>
-                  <p>
-                    <VisitDates visit={visit} />
-                  </p>
-                  {visit.periods && visit.periods.length > 1 && (
-                    <div
+                  {visit.periods && visit.periods.length > 1 ? (
+                    <ul
                       className="country-stay-periods"
                       aria-label={`Actual stays for visit ${visit.number}`}
                     >
-                      <p>Actual stays</p>
-                      <ul>
-                        {visit.periods.map((period) => (
-                          <li key={period.number}>
-                            <VisitDates
-                              visit={{
-                                number: period.number,
-                                arrival: period.arrival,
-                                departure: period.departure,
-                                daysSpent: null,
-                              }}
-                            />
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+                      {visit.periods.map((period) => (
+                        <li key={period.number}>
+                          <VisitDates
+                            compact
+                            visit={{
+                              number: period.number,
+                              arrival: period.arrival,
+                              departure: period.departure,
+                              daysSpent: null,
+                            }}
+                          />
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p>
+                      <VisitDates visit={visit} />
+                    </p>
                   )}
                 </li>
               ))}

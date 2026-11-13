@@ -2059,11 +2059,11 @@ h2 {
   border-radius: 8px;
   background: var(--surface);
 }
-.country-visit-list li {
+.country-visit-list > li {
   padding: 12px;
   font-size: 11px;
 }
-.country-visit-list li + li {
+.country-visit-list > li + li {
   border-top: 1px solid var(--line);
 }
 .country-visit-title {
@@ -2138,8 +2138,7 @@ h2 {
     overflow: visible;
   }
 }
-.country-history-scope,
-.country-stay-periods {
+.country-history-scope {
   color: var(--muted, #526963);
   font-size: 0.82rem;
   line-height: 1.55;
@@ -2148,6 +2147,13 @@ h2 {
 .country-history-scope {
   margin: 12px 18px;
 }
-.country-stay-periods ul {
-  padding-left: 20px;
+.country-stay-periods {
+  margin: 5px 0 0;
+  padding-left: 18px;
+  color: var(--muted);
+  font-size: inherit;
+  line-height: 1.6;
+}
+.country-stay-periods li + li {
+  margin-top: 4px;
 }
