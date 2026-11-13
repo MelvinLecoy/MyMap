@@ -1,6 +1,15 @@
 import type { City, CountryVisit, VisitStatus } from "./types";
 import { VISIT_LABELS } from "./types";
 
+const countryNames: Record<string, { name: string; formal: string }> = {
+  CD: { name: "DR Congo", formal: "Democratic Republic of the Congo" },
+  CG: { name: "Republic of Congo", formal: "Republic of the Congo" },
+  GM: { name: "Gambia", formal: "Republic of the Gambia" },
+};
+export function countryDisplayName(name: string, code?: string | null) {
+  return (countryNames[code ?? ""]?.name ?? name).replace(/\band\b/gi, "&");
+}
+
 export interface CountrySeed {
   code: string;
   name: string;
@@ -44,6 +53,16 @@ export function buildCountryRecords(
   return seeds
     .map((country) => ({
       ...country,
+      name: countryDisplayName(country.name, country.code),
+      aliases: [
+        ...new Set([
+          country.name,
+          ...(country.aliases ?? []),
+          ...(countryNames[country.code]
+            ? [countryNames[country.code].formal]
+            : []),
+        ]),
+      ],
       visit: visited.has(country.code)
         ? ("visited" as const)
         : Object.hasOwn(VISIT_LABELS, country.visit)
@@ -96,5 +115,10 @@ export function matchesVisit(visit: VisitStatus, filter: string) {
   );
 }
 export function searchText(value: string) {
-  return value.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase().trim();
+  return value
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "")
+    .toLowerCase()
+    .replace(/\band\b/g, "&")
+    .trim();
 }

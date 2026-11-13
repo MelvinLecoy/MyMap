@@ -10,6 +10,7 @@ import {
   type MapStatus,
   type VisitStatus,
 } from "../lib/types";
+import { countryDisplayName } from "../lib/countries";
 
 export function Flag({ code }: { code: string | null }) {
   return (
@@ -79,7 +80,7 @@ export function CityRow({
         <span className="city-row-name">{city.name}</span>
         <span className="city-row-country">
           <Flag code={city.countryCode} />
-          <span>{city.country}</span>
+          <span>{countryDisplayName(city.country, city.countryCode)}</span>
         </span>
         {city.visit === "visited" && city.lastVisited && (
           <span className="city-row-year">

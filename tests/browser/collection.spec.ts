@@ -130,7 +130,9 @@ test("updated names and reviewed locations retain correct coordinates and countr
     await expect(page.locator(".detail-coordinates")).toContainText(
       `${Math.abs(longitude).toFixed(4)}° ${longitude >= 0 ? "E" : "W"}`,
     );
-    await expect(page.locator(".detail-country")).toContainText(record.country);
+    await expect(page.locator(".detail-country")).toContainText(
+      record.country.replace(/\band\b/gi, "&"),
+    );
     await expect(page.locator(".visit-value")).toHaveText("Not Yet");
     await expect(page.locator(".notes-section")).toHaveCount(0);
     await back(page);
@@ -667,7 +669,7 @@ test("country pages preserve city filters and fit narrow panels without overflow
     expect(bounds.scroll).toBeLessThanOrEqual(bounds.width);
     await expect(
       page.getByRole("heading", {
-        name: "Saint Vincent and the Grenadines",
+        name: "Saint Vincent & the Grenadines",
         exact: true,
       }),
     ).toBeVisible();

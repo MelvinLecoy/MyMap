@@ -24,6 +24,7 @@ import CollectionHeader, {
 import countrySeed from "./generated/countries.json";
 import {
   buildCountryRecords,
+  countryDisplayName,
   countryVisitOrders,
   countryKey,
   inCountrySet,
@@ -512,7 +513,10 @@ export default function App() {
                         </h1>
                         <p className="detail-country">
                           <Flag code={selected.countryCode} />
-                          {selected.country}
+                          {countryDisplayName(
+                            selected.country,
+                            selected.countryCode,
+                          )}
                         </p>
                       </div>
                       {selected.coordinates && (
