@@ -65,6 +65,7 @@ export function VisitMarker({
 export function CountryVisitMarker({ country }: { country: CountryRecord }) {
   if (country.visit !== "visited") return <VisitMarker visit={country.visit} />;
   const count = country.timesVisited ?? country.recordedVisits;
+  const label = count == null ? "Visited" : count === 1 ? "Visit" : "Visits";
   const latest = (country.visits ?? [])
     .flatMap((visit) =>
       visit.periods?.length
@@ -95,13 +96,17 @@ export function CountryVisitMarker({ country }: { country: CountryRecord }) {
   return (
     <span
       className="country-visit-summary"
-      title={`${count ?? "Unknown"} visits${date ? ` · Last visit ${date}` : ""}`}
+      title={`${count ?? "Unknown"} ${count === 1 ? "visit" : "visits"}${date ? ` · Last visit ${date}` : ""}`}
     >
       <span className="visit-marker visit-marker-visited country-count-badge">
         <strong className="country-visit-count">{count ?? "—"}</strong>
-        <span className="country-visit-label">Visited</span>
+        <span className="country-visit-label">{label}</span>
       </span>
-      <span className="country-last-visit" aria-hidden={!date}>
+      <span
+        className="country-last-visit"
+        data-year={date ? latest?.slice(0, 4) : undefined}
+        aria-hidden={!date}
+      >
         {date}
       </span>
     </span>

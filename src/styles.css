@@ -610,15 +610,16 @@ h2 {
   width: 40px;
   height: 40px;
   min-height: 0;
-  padding: 6px 4px;
+  padding: 7px 5px;
   gap: 0;
   border-radius: 8px;
+  transform: translateY(1px);
 }
 .country-visit-count {
   font-family: "DM Sans Variable", sans-serif;
   font-size: 18px;
   font-weight: 950;
-  line-height: 18px;
+  line-height: 16px;
   letter-spacing: -0.4px;
   font-variant-numeric: tabular-nums;
 }
@@ -638,6 +639,18 @@ h2 {
   text-align: center;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
+}
+.country-last-visit[data-year="2026"] {
+  color: #26784f;
+}
+.country-last-visit[data-year="2025"] {
+  color: #927300;
+}
+.country-last-visit[data-year="2024"] {
+  color: #b25b24;
+}
+.country-last-visit[data-year="2023"] {
+  color: #805438;
 }
 .city-row-body {
   display: flex;
