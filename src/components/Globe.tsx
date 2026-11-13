@@ -325,9 +325,9 @@ export default function Globe({
             0,
             3.5,
             3,
-            6,
+            4.5,
             5,
-            6.5,
+            5,
           ],
           "circle-color": ["get", "color"],
           "circle-stroke-color": [
@@ -336,12 +336,7 @@ export default function Globe({
             MAP_COLORS.pinSelectedOutline,
             MAP_COLORS.pinOutline,
           ],
-          "circle-stroke-width": [
-            "case",
-            ["==", ["get", "id"], current.current.selected?.id ?? ""],
-            3,
-            2,
-          ],
+          "circle-stroke-width": 1,
         },
       });
       map.addLayer({
@@ -490,12 +485,6 @@ export default function Globe({
       ["==", ["get", "id"], id],
       MAP_COLORS.pinSelectedOutline,
       MAP_COLORS.pinOutline,
-    ]);
-    map.setPaintProperty("city-pins", "circle-stroke-width", [
-      "case",
-      ["==", ["get", "id"], id],
-      3,
-      2,
     ]);
   }, [selected, ready]);
   const previousCity = useRef<string | null>(null);
