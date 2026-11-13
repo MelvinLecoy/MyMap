@@ -38,7 +38,6 @@ export function useRemoteAtlas(
     id: string;
     message: string;
   } | null>(null);
-  const [saved, setSaved] = useState(false);
   const alive = useRef(true);
   const fetching = useRef(false);
   const fetchAgain = useRef(false);
@@ -131,7 +130,6 @@ export function useRemoteAtlas(
         if (event === "SIGNED_OUT") {
           setPasswordRecovery(false);
           setAuthError("");
-          setSaved(false);
         }
       },
     );
@@ -186,7 +184,6 @@ export function useRemoteAtlas(
       pendingRef.current.add(id);
       writeVersion.current++;
       setPending((p) => ({ ...p, [id]: status }));
-      setSaved(false);
       setSaveError(null);
       try {
         const { data, error } = await client
@@ -204,7 +201,6 @@ export function useRemoteAtlas(
               row.id === id ? (data as CityRow) : row,
             ),
           );
-          setSaved(true);
         }
       } catch {
         if (alive.current) {
@@ -270,7 +266,6 @@ export function useRemoteAtlas(
       writeVersion.current++;
       setPending(Object.fromEntries(changes.map((c) => [c.id, c.status])));
       setSaveError(null);
-      setSaved(false);
       try {
         const { data, error } = await client.rpc("atlas_import_statuses", {
           changes: changes.map(({ id, status, updated_at }) => ({
@@ -289,7 +284,6 @@ export function useRemoteAtlas(
         );
         if (alive.current) {
           replaceRows(rowsRef.current.map((row) => updated.get(row.id) ?? row));
-          setSaved(true);
         }
         try {
           const remaining = readStatusOverrides(COLLECTION_STATUS_STORAGE_KEY);
@@ -411,7 +405,6 @@ export function useRemoteAtlas(
       }
       setCanEdit(false);
       setUser(null);
-      setSaved(false);
     } finally {
       setSigningOut(false);
     }
@@ -430,7 +423,6 @@ export function useRemoteAtlas(
     passwordRecovery,
     pending,
     saveError,
-    saved,
     migration,
     refresh,
     saveStatus,

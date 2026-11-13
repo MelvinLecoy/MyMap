@@ -276,8 +276,8 @@ test("visitors see saved data and cannot use browser overrides to change the pub
   );
   await expect(page.getByLabel("Map status", { exact: true })).toBeDisabled();
   await expect(
-    page.getByRole("button", { name: "Editor sign in" }),
-  ).toBeVisible();
+    page.getByRole("button", { name: "Editor", exact: true }),
+  ).toHaveAttribute("aria-pressed", "false");
   await expect(page.getByText("Loading latest…")).toHaveCount(0);
 });
 
@@ -315,7 +315,10 @@ test("only the editor can save and a separate device reads the confirmed status"
   const picker = page.getByLabel("Map status", { exact: true });
   await expect(picker).toBeEnabled();
   await picker.selectOption("Update");
-  await expect(page.locator(".editor-tools")).toContainText("Saved");
+  await expect
+    .poll(() => state.rows.get("moscow-russia")!.map_status)
+    .toBe("Update");
+  await expect(picker).toBeEnabled();
   await page.reload();
   await expect(picker).toHaveValue("Update");
   await expect(page.locator(".visit-value")).toHaveText("Not Yet");
@@ -334,11 +337,11 @@ test("only the editor can save and a separate device reads the confirmed status"
   } finally {
     await otherContext.close();
   }
-  await page.getByRole("button", { name: "Sign out", exact: true }).click();
+  await page.getByRole("button", { name: "Viewer", exact: true }).click();
   await expect(picker).toBeDisabled();
   await expect(
-    page.getByRole("button", { name: "Editor sign in" }),
-  ).toBeVisible();
+    page.getByRole("button", { name: "Editor", exact: true }),
+  ).toHaveAttribute("aria-pressed", "false");
 });
 
 test("failed writes roll back and concurrent edits are not overwritten", async ({
@@ -354,6 +357,7 @@ test("failed writes roll back and concurrent edits are not overwritten", async (
   await picker.selectOption("Update");
   await expect(page.getByRole("alert")).toContainText("wasn’t saved");
   await expect(picker).toHaveValue("Complete");
+  await expect(page.locator(".map-status-saving")).toHaveCount(0);
   expect(state.rows.get("moscow-russia")!.map_status).toBe("Complete");
   state.failWrite = false;
   state.rows.set(
@@ -418,7 +422,10 @@ test("a refresh that started before a save cannot replace the confirmed status",
   await page.evaluate(() => window.dispatchEvent(new Event("focus")));
   await requested;
   await picker.selectOption("Update");
-  await expect(page.locator(".editor-tools")).toContainText("Saved");
+  await expect
+    .poll(() => state.rows.get("moscow-russia")!.map_status)
+    .toBe("Update");
+  await expect(picker).toBeEnabled();
   const response = page.waitForResponse(
     (r) =>
       r.url().startsWith(`${fixtureOrigin}/rest/v1/cities?`) &&
@@ -496,7 +503,7 @@ test("the email-link fallback requests an existing account without creating a us
   const state = store();
   await backend(context, state);
   await page.goto("/");
-  await page.getByRole("button", { name: "Editor sign in" }).click();
+  await page.getByRole("button", { name: "Editor", exact: true }).click();
   await page.getByRole("button", { name: "Use an email link instead" }).click();
   await page.getByLabel("Email address").fill("editor@example.test");
   await page.getByRole("button", { name: "Email sign-in link" }).click();
@@ -540,9 +547,7 @@ test("password sign-in stays on the selected city, shows real loading, and survi
   });
   await backend(context, state);
   await page.goto("/?city=moscow-russia");
-  await page
-    .getByRole("button", { name: "Editor sign in", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Editor", exact: true }).click();
   await page
     .getByLabel("Email address", { exact: true })
     .fill("editor@example.test");
@@ -575,8 +580,8 @@ test("password sign-in stays on the selected city, shows real loading, and survi
   expect(state.otp).toBeNull();
   await page.reload();
   await expect(
-    page.getByRole("button", { name: "Sign out", exact: true }),
-  ).toBeVisible();
+    page.getByRole("button", { name: "Editor", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByLabel("Map status", { exact: true })).toBeEnabled();
 });
 
@@ -588,9 +593,7 @@ test("incorrect and rate-limited passwords remain read-only and a corrected retr
   state.passwordError = "invalid_credentials";
   await backend(context, state);
   await page.goto("/?city=moscow-russia");
-  await page
-    .getByRole("button", { name: "Editor sign in", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Editor", exact: true }).click();
   await page
     .getByLabel("Email address", { exact: true })
     .fill("editor@example.test");
@@ -633,9 +636,7 @@ test("network failures during password sign-in show an error and never grant edi
     (route) => route.abort(),
   );
   await page.goto("/?city=moscow-russia");
-  await page
-    .getByRole("button", { name: "Editor sign in", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Editor", exact: true }).click();
   await page
     .getByLabel("Email address", { exact: true })
     .fill("editor@example.test");
@@ -706,9 +707,7 @@ test("password recovery requests a PKCE reset link and returns to password sign-
   const state = store();
   await backend(context, state);
   await page.goto("/");
-  await page
-    .getByRole("button", { name: "Editor sign in", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Editor", exact: true }).click();
   await page
     .getByRole("button", { name: "Forgot password?", exact: true })
     .click();
@@ -775,8 +774,8 @@ test("an expired recovery link shows a useful error without granting access", as
   ).toBeVisible();
   await expect(page.getByLabel("Map status", { exact: true })).toBeDisabled();
   await expect(
-    page.getByRole("button", { name: "Editor sign in", exact: true }),
-  ).toBeVisible();
+    page.getByRole("button", { name: "Editor", exact: true }),
+  ).toHaveAttribute("aria-pressed", "false");
   expect(state.passwordUpdates).toHaveLength(0);
 });
 
@@ -792,12 +791,12 @@ test("sign-out propagates to another tab and removes editing access in both", as
   await other.goto(`${baseURL}/?city=moscow-russia`);
   await expect(page.getByLabel("Map status", { exact: true })).toBeEnabled();
   await expect(other.getByLabel("Map status", { exact: true })).toBeEnabled();
-  await page.getByRole("button", { name: "Sign out", exact: true }).click();
+  await page.getByRole("button", { name: "Viewer", exact: true }).click();
   await expect(page.getByLabel("Map status", { exact: true })).toBeDisabled();
   await expect(other.getByLabel("Map status", { exact: true })).toBeDisabled();
   await expect(
-    other.getByRole("button", { name: "Editor sign in", exact: true }),
-  ).toBeVisible();
+    other.getByRole("button", { name: "Editor", exact: true }),
+  ).toHaveAttribute("aria-pressed", "false");
 });
 
 test("an invalid expired session remains read-only and can sign in again on the same page", async ({
@@ -810,12 +809,10 @@ test("an invalid expired session remains read-only and can sign in again on the 
   await backend(context, state, ownerId);
   await page.goto("/?city=moscow-russia");
   await expect(
-    page.getByRole("button", { name: "Editor sign in", exact: true }),
-  ).toBeVisible();
+    page.getByRole("button", { name: "Editor", exact: true }),
+  ).toHaveAttribute("aria-pressed", "false");
   await expect(page.getByLabel("Map status", { exact: true })).toBeDisabled();
-  await page
-    .getByRole("button", { name: "Editor sign in", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Editor", exact: true }).click();
   await page
     .getByLabel("Email address", { exact: true })
     .fill("editor@example.test");
@@ -835,9 +832,7 @@ test("password controls fit a narrow screen, support reveal, and clear secrets o
   await backend(context, state);
   await page.setViewportSize({ width: 320, height: 568 });
   await page.goto("/");
-  await page
-    .getByRole("button", { name: "Editor sign in", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Editor", exact: true }).click();
   await expect(page.getByLabel("Email address", { exact: true })).toBeFocused();
   const password = page.getByLabel("Password", { exact: true });
   await password.fill("fixture-password-123");
@@ -858,9 +853,7 @@ test("password controls fit a narrow screen, support reveal, and clear secrets o
   expect(size.scroll).toBeLessThanOrEqual(size.width);
   await page.keyboard.press("Escape");
   await expect(page.getByRole("dialog")).not.toBeVisible();
-  await page
-    .getByRole("button", { name: "Editor sign in", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Editor", exact: true }).click();
   await expect(password).toHaveValue("");
   await expect(password).toHaveAttribute("type", "password");
 });
@@ -918,8 +911,8 @@ test("owner sign-in activates Editor and Viewer signs out without leaving the se
   ).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByLabel("Map status", { exact: true })).toBeDisabled();
   await expect(
-    page.getByRole("button", { name: "Editor sign in", exact: true }),
-  ).toBeVisible();
+    page.getByRole("button", { name: "Editor", exact: true }),
+  ).toHaveAttribute("aria-pressed", "false");
   await expect(page).toHaveURL(/\?city=moscow-russia$/);
   await page.reload();
   await expect(
@@ -957,8 +950,8 @@ test("a signed-in non-editor stays in Viewer after using the mode switch", async
   await expect(page.getByLabel("Map status", { exact: true })).toBeDisabled();
   await modes.getByRole("button", { name: "Viewer", exact: true }).click();
   await expect(
-    page.getByRole("button", { name: "Editor sign in", exact: true }),
-  ).toBeVisible();
+    page.getByRole("button", { name: "Editor", exact: true }),
+  ).toHaveAttribute("aria-pressed", "false");
 });
 
 test("choosing Viewer during a permission check cannot later enable Editor", async ({
@@ -970,9 +963,14 @@ test("choosing Viewer during a permission check cannot later enable Editor", asy
   const held = new Promise<void>((resolve) => {
     release = resolve;
   });
+  let requested!: () => void;
+  const permissionRequested = new Promise<void>((resolve) => {
+    requested = resolve;
+  });
   await page.route(
     `${fixtureOrigin}/rest/v1/rpc/atlas_can_edit`,
     async (route) => {
+      requested();
       await held;
       return route.fulfill({
         contentType: "application/json",
@@ -982,14 +980,12 @@ test("choosing Viewer during a permission check cannot later enable Editor", asy
     },
   );
   await page.goto("/?city=moscow-russia");
-  await expect(
-    page.getByRole("button", { name: "Sign out", exact: true }),
-  ).toBeVisible();
+  await permissionRequested;
   const modes = page.getByRole("group", { name: "Access mode" });
   await modes.getByRole("button", { name: "Viewer", exact: true }).click();
   await expect(
-    page.getByRole("button", { name: "Editor sign in", exact: true }),
-  ).toBeVisible();
+    page.getByRole("button", { name: "Editor", exact: true }),
+  ).toHaveAttribute("aria-pressed", "false");
   const permissionResponse = page.waitForResponse(
     (response) =>
       response.url().endsWith("/rpc/atlas_can_edit") &&
@@ -1009,7 +1005,7 @@ test("choosing Viewer during a permission check cannot later enable Editor", asy
 test("mode switching waits for saves and blocks editing while sign-out is pending", async ({
   context,
   page,
-}) => {
+}, testInfo) => {
   const state = store();
   let releaseLogout!: () => void;
   state.logoutGate = new Promise<void>((resolve) => {
@@ -1031,11 +1027,35 @@ test("mode switching waits for saves and blocks editing while sign-out is pendin
     return route.fallback();
   });
   await page.getByLabel("Map status", { exact: true }).selectOption("Update");
+  const feedback = page.locator(".map-status-saving");
+  await expect(feedback).toBeVisible();
+  await expect(feedback).toHaveText("Saving map status…");
+  await expect(feedback.locator("svg")).toHaveCSS(
+    "animation-name",
+    "editor-spin",
+  );
+  await expect(page.getByLabel("Map status", { exact: true })).toBeDisabled();
+  await expect(page.getByLabel("Map status", { exact: true })).toHaveAttribute(
+    "aria-busy",
+    "true",
+  );
+  await expect(page.getByText("Saved", { exact: true })).toHaveCount(0);
+  await page
+    .locator(".city-panel")
+    .screenshot({ path: testInfo.outputPath("saving-status.png") });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await expect(feedback.locator("svg")).toHaveCSS("animation-name", "none");
+  await expect(feedback).toBeVisible();
   await expect(viewer).toBeDisabled();
   await expect(editor).toBeDisabled();
   expect(state.logoutCalls).toBe(0);
   releaseSave();
-  await expect(page.locator(".editor-tools")).toContainText("Saved");
+  await expect(feedback).toHaveCount(0);
+  await expect(page.getByLabel("Map status", { exact: true })).toHaveAttribute(
+    "aria-busy",
+    "false",
+  );
+  await expect(page.getByText("Saved", { exact: true })).toHaveCount(0);
   await expect(viewer).toBeEnabled();
   await viewer.click();
   await expect.poll(() => state.logoutCalls).toBe(1);
@@ -1114,8 +1134,8 @@ test("Viewer remains read-only when remote sign-out is unavailable", async ({
     modes.getByRole("button", { name: "Viewer", exact: true }),
   ).toHaveAttribute("aria-pressed", "true");
   await expect(
-    page.getByRole("button", { name: "Editor sign in", exact: true }),
-  ).toBeVisible();
+    page.getByRole("button", { name: "Editor", exact: true }),
+  ).toHaveAttribute("aria-pressed", "false");
   await expect(page.getByLabel("Map status", { exact: true })).toBeDisabled();
   await expect(page.getByRole("alert")).toHaveCount(0);
   expect(

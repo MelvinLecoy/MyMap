@@ -64,7 +64,7 @@ selected city. Supabase retains the session across reloads. Signing out affects
 this browser and its other tabs, without signing out your other devices.
 
 To set your first password, sign in using **Use an email link instead**, then
-choose **Password** in the account controls. Choose at least 12 characters and
+choose **Password** in the city panel footer. Choose at least 12 characters and
 confirm it. Existing signed-in users can use the same control to change their
 password. Passwords go directly to Supabase Auth and are never added to city
 records, browser overrides, source files, or environment settings. No account
@@ -80,6 +80,11 @@ account grants no atlas edit rights, including after changing its own password.
 
 Saving updates the selected city by ID and its previously read `updated_at`.
 A conflict or failed save restores the confirmed value and reports the failure.
+An inline spinner beside **Map status** remains visible while its save is in
+progress and disappears when the request finishes. There is no permanent Saved
+indicator. The same compact footer in the collection and city details shows
+visit totals, with **Export** and **Password** on the right for the editor.
+Sign-in and sign-out are handled by the top-left mode switch.
 The collection refreshes on focus and every 30 seconds while visible. A database
 outage leaves the latest available collection browsable with editing paused.
 The initial static snapshot remains available if the database cannot be reached.

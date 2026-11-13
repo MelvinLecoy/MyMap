@@ -12,10 +12,9 @@ import {
   EyeOff,
   KeyRound,
   LoaderCircle,
-  LogIn,
-  LogOut,
   X,
 } from "lucide-react";
+import CollectionFooter from "./CollectionFooter";
 import { exportCitiesCsv } from "../lib/cloud-data";
 import {
   MIN_PASSWORD_LENGTH,
@@ -81,9 +80,13 @@ function PasswordField({
 
 export default function EditorControls({
   cloud,
+  countries,
+  visited,
   ref,
 }: {
   cloud: RemoteAtlas;
+  countries: number;
+  visited: number;
   ref?: Ref<EditorControlsHandle>;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
@@ -175,76 +178,54 @@ export default function EditorControls({
           <button onClick={() => void cloud.refresh()}>Retry</button>
         </div>
       )}
-      <div className="editor-tools">
-        <span role="status">
-          {cloud.loading
-            ? "Loading latest…"
-            : cloud.signingOut
-              ? "Signing out…"
-              : saving
-                ? "Saving…"
-                : cloud.saved
-                  ? "Saved"
-                  : cloud.canEdit
-                    ? "Editing"
-                    : ""}
-        </span>
-        <div>
-          {cloud.canEdit && cloud.migration.length > 0 && (
-            <button
-              onClick={() => open("import")}
-              disabled={saving || Boolean(cloud.loadError)}
-            >
-              Import saved ({cloud.migration.length})
-            </button>
-          )}
-          {cloud.canEdit && (
-            <button
-              onClick={download}
-              disabled={!cloud.ready || saving}
-              aria-label="Export collection CSV"
-              title="Export collection CSV"
-            >
-              <Download size={14} />
-            </button>
-          )}
-          {cloud.user ? (
-            <>
-              <button
-                onClick={() => open("password")}
-                disabled={saving}
-                aria-label="Set or change password"
-              >
-                <KeyRound size={13} />
-                Password
-              </button>
-              <button
-                onClick={() => {
-                  void cloud.signOut().catch(() => {
-                    open("login");
-                    setMessage("Couldn’t sign out. Try again.");
-                    setIsError(true);
-                  });
-                }}
-                disabled={saving}
-              >
-                <LogOut size={13} />
-                Sign out
-              </button>
-            </>
-          ) : (
-            <button onClick={() => open("login")}>
-              <LogIn size={13} />
-              Editor sign in
-            </button>
-          )}
+      {cloud.canEdit && cloud.migration.length > 0 && (
+        <div className="cloud-message">
+          <span>This browser has local status changes.</span>
+          <button
+            onClick={() => open("import")}
+            disabled={saving || Boolean(cloud.loadError)}
+          >
+            Import saved ({cloud.migration.length})
+          </button>
         </div>
-      </div>
+      )}
       {cloud.authError && (
         <p className="cloud-message" role="status">
           {cloud.authError}
         </p>
       )}
+      <CollectionFooter
+        countries={countries}
+        visited={visited}
+        actions={
+          cloud.canEdit && (
+            <div
+              className="editor-tools"
+              role="group"
+              aria-label="Collection tools"
+            >
+              <button
+                onClick={download}
+                disabled={!cloud.ready || saving}
+                aria-label="Export collection CSV"
+                title="Export collection CSV"
+              >
+                <Download size={14} aria-hidden="true" />
+                Export
+              </button>
+              <button
+                onClick={() => open("password")}
+                disabled={saving}
+                aria-label="Set or change password"
+                title="Set or change password"
+              >
+                <KeyRound size={14} aria-hidden="true" />
+                Password
+              </button>
+            </div>
+          )
+        }
+      />
       <dialog
         ref={dialog}
         className="editor-dialog"

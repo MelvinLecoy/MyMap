@@ -422,6 +422,7 @@ h2 {
   animation: spin 1s linear infinite;
 }
 .city-panel {
+  container-type: inline-size;
   --collection-inset: 20px;
   border-left: 1px solid var(--line);
   display: flex;
@@ -711,7 +712,12 @@ h2 {
   color: var(--muted);
 }
 .collection-bottom {
-  padding: 14px var(--collection-inset);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 50px;
+  padding: 6px 14px;
   border-top: 1px solid var(--line);
   background: var(--surface-alt);
   flex-shrink: 0;
@@ -744,6 +750,33 @@ h2 {
 .journey-stats > div + div {
   border-left: 1px solid var(--border);
   padding-left: 18px;
+}
+.journey-stats--compact {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  font-size: 10px;
+  line-height: 20px;
+}
+.journey-stats--compact .stats-label {
+  font-size: 10px;
+  line-height: 13px;
+}
+.journey-stats--compact .journey-totals {
+  gap: 6px;
+}
+.journey-totals .journey-total {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+.journey-totals .journey-total + .journey-total::before {
+  content: "·";
+  color: var(--muted);
+  margin-right: 2px;
+}
+.journey-stats--compact strong {
+  font-size: 17px;
 }
 .empty-state {
   text-align: center;
@@ -923,6 +956,18 @@ h2 {
   text-align: right;
   overflow-wrap: anywhere;
 }
+.map-status-label,
+.map-status-saving {
+  display: inline-flex;
+  align-items: center;
+}
+.map-status-label {
+  gap: 7px;
+  white-space: nowrap;
+}
+.map-status-saving {
+  color: var(--accent);
+}
 .status-picker {
   position: relative;
   min-width: 124px;
@@ -959,31 +1004,61 @@ h2 {
 .editor-tools {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 6px;
-  padding: 8px var(--collection-inset);
-  border-top: 1px solid var(--line);
-  color: var(--muted);
-  font-size: 10px;
+  gap: 5px;
+  color: var(--accent);
+  font-size: 11px;
   flex-shrink: 0;
 }
-.editor-tools > div,
 .editor-tools button {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 6px;
-}
-.editor-tools > div {
-  flex-wrap: wrap;
-  justify-content: flex-end;
-}
-.editor-tools button {
-  padding: 4px;
-  border-radius: 4px;
+  justify-content: center;
+  gap: 5px;
+  min-height: 32px;
+  padding: 5px 7px;
+  border: 1px solid #c9dcd0;
+  border-radius: 6px;
+  background: #f7fbf7;
+  line-height: 20px;
   white-space: nowrap;
 }
 .editor-tools button:hover {
-  background: var(--surface-alt);
+  background: var(--surface);
+  border-color: #8bb3a3;
+}
+@container (max-width: 330px) {
+  .map-status-label {
+    gap: 5px;
+    font-size: 13px;
+  }
+  .map-status-saving svg {
+    width: 12px;
+    height: 12px;
+  }
+  .collection-bottom {
+    gap: 6px;
+    padding-inline: 10px;
+  }
+  .journey-stats--compact {
+    font-size: 9px;
+  }
+  .journey-stats--compact strong {
+    font-size: 14px;
+  }
+  .journey-stats--compact .journey-totals {
+    gap: 4px;
+  }
+  .journey-totals .journey-total {
+    gap: 3px;
+  }
+  .editor-tools {
+    gap: 4px;
+    font-size: 10px;
+  }
+  .editor-tools button {
+    gap: 4px;
+    padding-inline: 5px;
+  }
 }
 .cloud-message {
   display: flex;
@@ -993,6 +1068,7 @@ h2 {
   color: var(--muted);
   font-size: 11px;
   line-height: 1.5;
+  flex-shrink: 0;
 }
 .cloud-message button {
   color: var(--accent);
@@ -1496,7 +1572,7 @@ h2 {
   .city-row {
     column-gap: 8px;
   }
-  .journey-stats {
+  .journey-stats:not(.journey-stats--compact) {
     gap: 12px;
   }
   .journey-stats > div + div {

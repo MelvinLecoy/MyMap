@@ -7,6 +7,7 @@ import {
   CircleDashed,
   ChevronDown,
   ChevronRight,
+  LoaderCircle,
   Map,
   Search,
   SlidersHorizontal,
@@ -17,6 +18,7 @@ import {
 import Globe from "./components/Globe";
 import MapViewer from "./components/MapViewer";
 import CityName from "./components/CityName";
+import CollectionFooter from "./components/CollectionFooter";
 import EditorControls, {
   type EditorControlsHandle,
 } from "./components/EditorControls";
@@ -367,19 +369,6 @@ export default function App() {
                   </div>
                 )}
               </div>
-              <footer className="collection-bottom" aria-label="Visited places">
-                <div className="journey-stats">
-                  <span className="stats-label">Visited</span>
-                  <div>
-                    <strong>{countries}</strong>
-                    <span>{countries === 1 ? "country" : "countries"}</span>
-                  </div>
-                  <div>
-                    <strong>{visited}</strong>
-                    <span>{visited === 1 ? "city" : "cities"}</span>
-                  </div>
-                </div>
-              </footer>
             </>
           ) : (
             <>
@@ -459,12 +448,27 @@ export default function App() {
                 )}
                 <div className="detail-facts">
                   <div className="detail-fact-row">
-                    <label htmlFor="city-map-status">Map status</label>
+                    <span className="map-status-label">
+                      <label htmlFor="city-map-status">Map status</label>
+                      {cloud.pending[selected.id] && (
+                        <span className="map-status-saving" role="status">
+                          <LoaderCircle
+                            size={14}
+                            className="editor-spinner"
+                            aria-hidden="true"
+                          />
+                          <span className="visually-hidden">
+                            Saving map status…
+                          </span>
+                        </span>
+                      )}
+                    </span>
                     <span
                       className={`status-picker status-${selected.status.toLowerCase().replaceAll(" ", "-")}`}
                     >
                       <select
                         id="city-map-status"
+                        aria-busy={Boolean(cloud.pending[selected.id])}
                         value={selected.status}
                         disabled={
                           cloud.enabled &&
@@ -532,8 +536,15 @@ export default function App() {
               </div>
             </>
           )}
-          {cloud.enabled && (
-            <EditorControls ref={editorControls} cloud={cloud} />
+          {cloud.enabled ? (
+            <EditorControls
+              ref={editorControls}
+              cloud={cloud}
+              countries={countries}
+              visited={visited}
+            />
+          ) : (
+            <CollectionFooter countries={countries} visited={visited} />
           )}
         </aside>
       </main>
