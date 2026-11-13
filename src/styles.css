@@ -598,6 +598,47 @@ h2 {
   color: #165b37;
   box-shadow: inset 0 0 0 1px #7bbf98;
 }
+.country-visit-summary {
+  display: grid;
+  grid-template-rows: 40px 10px;
+  row-gap: 6px;
+  justify-items: center;
+  width: 48px;
+  height: 56px;
+}
+.country-row .country-count-badge {
+  width: 40px;
+  height: 40px;
+  min-height: 0;
+  padding: 6px 4px;
+  gap: 0;
+  border-radius: 8px;
+}
+.country-visit-count {
+  font-family: "DM Sans Variable", sans-serif;
+  font-size: 18px;
+  font-weight: 950;
+  line-height: 18px;
+  letter-spacing: -0.4px;
+  font-variant-numeric: tabular-nums;
+}
+.country-visit-label {
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 10px;
+}
+.country-last-visit {
+  display: block;
+  width: 48px;
+  height: 10px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 10px;
+  text-align: center;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
 .city-row-body {
   display: flex;
   flex-direction: column;

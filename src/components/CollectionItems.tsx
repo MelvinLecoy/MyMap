@@ -10,7 +10,7 @@ import {
   type MapStatus,
   type VisitStatus,
 } from "../lib/types";
-import { countryDisplayName } from "../lib/countries";
+import { countryDisplayName, type CountryRecord } from "../lib/countries";
 
 export function Flag({ code }: { code: string | null }) {
   return (
@@ -58,6 +58,52 @@ export function VisitMarker({
     >
       <Icon size={inline ? 18 : 20} strokeWidth={1.6} aria-hidden="true" />
       <span>{VISIT_LABELS[visit]}</span>
+    </span>
+  );
+}
+
+export function CountryVisitMarker({ country }: { country: CountryRecord }) {
+  if (country.visit !== "visited") return <VisitMarker visit={country.visit} />;
+  const count = country.timesVisited ?? country.recordedVisits;
+  const latest = (country.visits ?? [])
+    .flatMap((visit) =>
+      visit.periods?.length
+        ? visit.periods.map((period) => period.departure)
+        : [visit.departure ?? visit.arrival],
+    )
+    .filter((date): date is string => Boolean(date))
+    .sort()
+    .at(-1);
+  const month =
+    latest && /^\d{4}-\d{2}/.test(latest)
+      ? [
+          "Jan",
+          "Feb",
+          "Mar",
+          "Apr",
+          "May",
+          "Jun",
+          "Jul",
+          "Aug",
+          "Sep",
+          "Oct",
+          "Nov",
+          "Dec",
+        ][Number(latest.slice(5, 7)) - 1]
+      : null;
+  const date = month && latest ? `${month} ${latest.slice(2, 4)}` : "";
+  return (
+    <span
+      className="country-visit-summary"
+      title={`${count ?? "Unknown"} visits${date ? ` · Last visit ${date}` : ""}`}
+    >
+      <span className="visit-marker visit-marker-visited country-count-badge">
+        <strong className="country-visit-count">{count ?? "—"}</strong>
+        <span className="country-visit-label">Visited</span>
+      </span>
+      <span className="country-last-visit" aria-hidden={!date}>
+        {date}
+      </span>
     </span>
   );
 }

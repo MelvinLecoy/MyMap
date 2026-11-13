@@ -15,7 +15,12 @@ import Globe from "./components/Globe";
 import MapViewer from "./components/MapViewer";
 import CityName from "./components/CityName";
 import CountryDetail from "./components/CountryDetail";
-import { CityRow, Flag, VisitMarker } from "./components/CollectionItems";
+import {
+  CityRow,
+  CountryVisitMarker,
+  Flag,
+  VisitMarker,
+} from "./components/CollectionItems";
 import CollectionFooter from "./components/CollectionFooter";
 import CollectionHeader, {
   CollectionTabs,
@@ -445,7 +450,7 @@ export default function App() {
                           className="country-row"
                           onClick={() => openCountry(country.code)}
                         >
-                          <VisitMarker visit={country.visit} />
+                          <CountryVisitMarker country={country} />
                           <span className="city-row-body">
                             <span className="city-row-name">
                               {country.name}
