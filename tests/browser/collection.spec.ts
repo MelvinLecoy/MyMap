@@ -983,7 +983,7 @@ test("country history shows stays and corrected dates without explanatory copy o
         "24 – 27 July 2025",
       );
       await expect(page.getByLabel("Actual stays for visit 1")).toContainText(
-        "29 July 2025 – 3 August 2025",
+        "29 July – 3 August 2025",
       );
       await expect(
         page.locator(".country-visit-list > li").first(),
