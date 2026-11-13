@@ -1,6 +1,6 @@
 import { bilingualPlaceName, providerTypography } from "./map-typography";
 import { MAP_COLORS } from "./palette";
-import type { StyleSpecification } from "maplibre-gl";
+import type { ExpressionSpecification, StyleSpecification } from "maplibre-gl";
 import type { City, CountryVisit } from "./types";
 import type { FeatureCollection, Point } from "geojson";
 export const MAP_CONFIG = {
@@ -154,5 +154,25 @@ export function fillColors(countries: CountryVisit[]): string | unknown[] {
       c.color || (c.visited ? MAP_COLORS.visitedCountry : MAP_COLORS.land),
     ]),
     MAP_COLORS.land,
+  ];
+}
+
+export function countryFillOpacity(
+  countries: CountryVisit[],
+): ExpressionSpecification {
+  return [
+    "case",
+    [
+      "in",
+      ["get", "code"],
+      [
+        "literal",
+        countries
+          .filter((country) => country.visited)
+          .map((country) => country.code),
+      ],
+    ],
+    1,
+    0.95,
   ];
 }

@@ -10,7 +10,12 @@ import {
   type MapStatus,
   type VisitStatus,
 } from "../lib/types";
-import { countryDisplayName, type CountryRecord } from "../lib/countries";
+import {
+  countryDisplayName,
+  latestCountryVisit,
+  type CountryRecord,
+} from "../lib/countries";
+import { VISIT_YEAR_COLORS } from "../lib/palette";
 
 export function Flag({ code }: { code: string | null }) {
   return (
@@ -66,15 +71,7 @@ export function CountryVisitMarker({ country }: { country: CountryRecord }) {
   if (country.visit !== "visited") return <VisitMarker visit={country.visit} />;
   const count = country.timesVisited ?? country.recordedVisits;
   const label = count == null ? "Visited" : count === 1 ? "Visit" : "Visits";
-  const latest = (country.visits ?? [])
-    .flatMap((visit) =>
-      visit.periods?.length
-        ? visit.periods.map((period) => period.departure)
-        : [visit.departure ?? visit.arrival],
-    )
-    .filter((date): date is string => Boolean(date))
-    .sort()
-    .at(-1);
+  const latest = latestCountryVisit(country);
   const month =
     latest && /^\d{4}-\d{2}/.test(latest)
       ? [
@@ -105,6 +102,9 @@ export function CountryVisitMarker({ country }: { country: CountryRecord }) {
       <span
         className="country-last-visit"
         data-year={date ? latest?.slice(0, 4) : undefined}
+        style={{
+          color: latest ? VISIT_YEAR_COLORS[latest.slice(0, 4)] : undefined,
+        }}
         aria-hidden={!date}
       >
         {date}

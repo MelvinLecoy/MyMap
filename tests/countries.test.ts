@@ -85,8 +85,7 @@ test("country details preserve supplied totals and date precision without guessi
   );
   assert.match(html, /aria-label="Visit order 20"/);
   assert.doesNotMatch(html, /<dt>Visit order/);
-  assert.match(html, /1 June 2022/);
-  assert.match(html, /5 June 2022/);
+  assert.match(html, /1 – 5 June 2022/);
   assert.match(html, /October 2025/);
   assert.match(html, /7 days/);
   assert.ok(html.indexOf("Visit 1") < html.indexOf("Visit 2"));

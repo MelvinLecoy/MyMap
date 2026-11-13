@@ -46,6 +46,20 @@ export interface CountryRecord extends Omit<CountrySeed, "visit"> {
   cityCount: number;
 }
 
+export function latestCountryVisit(country: Pick<CountrySeed, "visits">) {
+  return (
+    (country.visits ?? [])
+      .flatMap((visit) =>
+        visit.periods?.length
+          ? visit.periods.map((period) => period.departure)
+          : [visit.departure ?? visit.arrival],
+      )
+      .filter((date): date is string => Boolean(date))
+      .sort()
+      .at(-1) ?? null
+  );
+}
+
 export function countryKey(city: Pick<City, "countryCode" | "country">) {
   return city.countryCode || city.country;
 }
@@ -111,6 +125,7 @@ export function mergeCountryVisits(
       code: country.code,
       color: previous?.color ?? null,
       visited: Boolean(previous?.visited || country.visit === "visited"),
+      lastVisited: latestCountryVisit(country),
     });
   }
   return [...result.values()];

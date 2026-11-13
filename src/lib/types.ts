@@ -26,6 +26,7 @@ export interface CountryVisit {
   code: string;
   visited: boolean;
   color: string | null;
+  lastVisited?: string | null;
 }
 export interface AtlasData {
   demo: boolean;

@@ -19,6 +19,7 @@ import {
 import {
   asset,
   cityFeatures,
+  countryFillOpacity,
   fillColors,
   initialZoom,
   localStyle,
@@ -26,7 +27,11 @@ import {
   simplifyProviderStyle,
 } from "../lib/map-style";
 import { LABEL_FONTS, LABEL_SIZES } from "../lib/map-typography";
-import { MAP_COLORS } from "../lib/palette";
+import { COUNTRY_STRIPE_COLORS, MAP_COLORS } from "../lib/palette";
+import {
+  countryStripeImage,
+  countryStripeLayers,
+} from "../lib/country-stripes";
 import { providerLabelFilters } from "../lib/map-labels";
 import { countryBounds, positionBounds } from "../lib/country-camera";
 import { countryKey } from "../lib/countries";
@@ -171,11 +176,20 @@ export default function Globe({
             "fill-color": fillColors(
               current.current.countries,
             ) as ExpressionSpecification,
-            "fill-opacity": 0.95,
+            "fill-opacity": countryFillOpacity(current.current.countries),
           },
         },
         firstLabel,
       );
+      for (const [year, color] of Object.entries(COUNTRY_STRIPE_COLORS)) {
+        const name = "atlas-visit-stripes-" + year;
+        if (!map.hasImage(name)) {
+          map.addImage(name, countryStripeImage(color), { pixelRatio: 2 });
+        }
+      }
+      for (const layer of countryStripeLayers(current.current.countries)) {
+        map.addLayer(layer, firstLabel);
+      }
       map.addLayer(
         {
           id: "atlas-grid",
@@ -507,6 +521,23 @@ export default function Globe({
   }, [cities]);
   useEffect(() => {
     const map = mapRef.current;
+    if (!ready || !map?.getLayer("atlas-land")) return;
+    map.setPaintProperty(
+      "atlas-land",
+      "fill-color",
+      fillColors(countries) as ExpressionSpecification,
+    );
+    map.setPaintProperty(
+      "atlas-land",
+      "fill-opacity",
+      countryFillOpacity(countries),
+    );
+    for (const layer of countryStripeLayers(countries)) {
+      if (map.getLayer(layer.id)) map.setFilter(layer.id, layer.filter ?? null);
+    }
+  }, [countries, ready]);
+  useEffect(() => {
+    const map = mapRef.current;
     if (!ready || !map?.getLayer("city-pins")) return;
     const id = selected?.id ?? "";
     map.setFilter("city-selection-halo", ["==", ["get", "id"], id]);
@@ -693,6 +724,37 @@ export default function Globe({
               <i className="legend-pin" />
               Visited city
             </span>
+            <div
+              className="map-year-legend"
+              aria-label="Country last visit year"
+            >
+              <span className="legend-year-caption">Last visit</span>
+              {[
+                "2026",
+                ...Object.keys(COUNTRY_STRIPE_COLORS).sort().reverse(),
+              ].map((year) => {
+                const color = COUNTRY_STRIPE_COLORS[year];
+                return (
+                  <span
+                    key={year}
+                    title={year === "2023" ? "2023 or earlier" : undefined}
+                  >
+                    <i
+                      className="legend-country"
+                      style={{
+                        backgroundColor: MAP_COLORS.visitedCountry,
+                        backgroundImage: color
+                          ? "repeating-linear-gradient(135deg, " +
+                            color +
+                            " 0 1px, transparent 1px 3px)"
+                          : undefined,
+                      }}
+                    />
+                    {year === "2023" ? "≤2023" : year}
+                  </span>
+                );
+              })}
+            </div>
           </div>
           {!regional && hint && (
             <div className="globe-hint">

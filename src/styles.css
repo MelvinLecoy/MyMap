@@ -25,7 +25,7 @@
   --action: #73baa5;
   --action-hover: #64ad97;
   --on-accent: #173d3c;
-  --visited-country: #8bc9b6;
+  --visited-country: #63b28a;
   --visit-text: #316b59;
   --visited-pin: #e4a53d;
 }
@@ -290,9 +290,11 @@ h2 {
   bottom: 65px;
   left: 50%;
   transform: translateX(-50%);
-  display: flex;
+  display: grid;
+  grid-template-columns: auto auto;
   align-items: center;
-  gap: 21px;
+  column-gap: 21px;
+  row-gap: 8px;
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 7px;
@@ -305,6 +307,20 @@ h2 {
   align-items: center;
   gap: 7px;
   color: var(--text);
+}
+.map-year-legend {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.map-legend .map-year-legend span {
+  font-size: 9px;
+  gap: 4px;
+}
+.map-year-legend .legend-year-caption {
+  color: var(--muted);
 }
 .legend-country {
   display: inline-block;
@@ -611,7 +627,7 @@ h2 {
   height: 40px;
   min-height: 0;
   padding: 7px 5px;
-  gap: 0;
+  gap: 1px;
   border-radius: 8px;
   transform: translateY(1px);
 }
@@ -619,7 +635,7 @@ h2 {
   font-family: "DM Sans Variable", sans-serif;
   font-size: 18px;
   font-weight: 950;
-  line-height: 16px;
+  line-height: 15px;
   letter-spacing: -0.4px;
   font-variant-numeric: tabular-nums;
 }
@@ -639,18 +655,6 @@ h2 {
   text-align: center;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
-}
-.country-last-visit[data-year="2026"] {
-  color: #26784f;
-}
-.country-last-visit[data-year="2025"] {
-  color: #b99b00;
-}
-.country-last-visit[data-year="2024"] {
-  color: #e67e00;
-}
-.country-last-visit[data-year="2023"] {
-  color: #573122;
 }
 .city-row-body {
   display: flex;
@@ -1610,7 +1614,9 @@ h2 {
     padding-left: 12px;
   }
   .map-legend {
-    flex-direction: column;
+    left: auto;
+    transform: none;
+    max-width: calc(100% - 84px);
     align-items: flex-start;
     gap: 9px;
     right: 14px;
@@ -1726,13 +1732,15 @@ h2 {
     font-size: 16px;
   }
   .map-legend {
-    flex-direction: row;
     gap: 15px;
     right: 14px;
     bottom: 48px;
     padding: 10px 12px;
   }
   .map-legend span {
+    font-size: 8px;
+  }
+  .map-legend .map-year-legend span {
     font-size: 8px;
   }
   .map-controls {
