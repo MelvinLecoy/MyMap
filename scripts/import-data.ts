@@ -1,5 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { importCities } from "./importer.js";
+import { importCountryHistory } from "./country-importer.js";
+import countryStarter from "../data/countries.sample.json";
 const demo =
   process.argv.includes("--demo") ||
   (process.argv.includes("--demo-fallback") && !existsSync("data/cities.csv"));
@@ -23,6 +25,17 @@ try {
     },
   );
   mkdirSync("src/generated", { recursive: true });
+  const countryHistory = demo
+    ? countryStarter.countries
+    : importCountryHistory(
+        readFileSync("data/countries.csv", "utf8"),
+        readFileSync("data/country-visit-history.csv", "utf8"),
+        countryStarter.countries,
+      );
+  writeFileSync(
+    "src/generated/countries.json",
+    JSON.stringify({ sample: demo, countries: countryHistory }, null, 2) + "\n",
+  );
   writeFileSync(
     "src/generated/atlas.json",
     JSON.stringify(data, null, 2) + "\n",

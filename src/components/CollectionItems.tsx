@@ -14,7 +14,7 @@ import {
 export function Flag({ code }: { code: string | null }) {
   return (
     <span className="country-flag" aria-hidden="true">
-      {code && code !== "XK"
+      {code
         ? [...code.toUpperCase()]
             .map((c) => String.fromCodePoint(127397 + c.charCodeAt(0)))
             .join("")

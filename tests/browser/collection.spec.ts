@@ -54,7 +54,7 @@ test.beforeEach(async ({ context, page, baseURL }) => {
   );
 });
 
-test("the default globe loads all 321 real entries without demo visits or saved demo statuses", async ({
+test("the default globe loads all 321 real entries without demo city visits or saved demo statuses", async ({
   page,
 }) => {
   await page.goto("/");
@@ -65,7 +65,7 @@ test("the default globe loads all 321 real entries without demo visits or saved 
     page.locator(".visit-marker-visited, .visit-marker-planned"),
   ).toHaveCount(0);
   await expect(page.locator(".collection-bottom")).toHaveText(
-    /Visited\s*0\s*countries\s*0\s*cities/,
+    /Visited\s*97\s*countries\s*0\s*cities/,
   );
   await expect(page.locator(".city-row .status-complete")).toHaveCount(253);
   await expect(page.locator(".city-row .status-unfinished")).toHaveCount(7);
@@ -413,7 +413,7 @@ test("real status edits persist and sync separately from demo edits without chan
   await page.getByLabel("Filter by map status").selectOption("Unfinished");
   await expect(page.locator(".city-row")).toHaveCount(8);
   await expect(page.locator(".collection-bottom")).toHaveText(
-    /Visited\s*0\s*countries\s*0\s*cities/,
+    /Visited\s*97\s*countries\s*0\s*cities/,
   );
   await page.getByLabel("Filter by map status").selectOption("all");
   await openCity(page, "Moscow");
@@ -468,11 +468,11 @@ test("the Countries tab has labelled counts, independent filters, and reloadable
   await expect(page.locator(".collection-count")).toHaveText("1 city");
   await tabs.getByRole("tab", { name: "Countries", exact: true }).click();
   await expect(page).toHaveURL(/panel=countries/);
-  await expect(page.locator(".country-row")).toHaveCount(131);
-  await expect(page.locator(".collection-count")).toHaveText("131 countries");
+  await expect(page.locator(".country-row")).toHaveCount(195);
+  await expect(page.locator(".collection-count")).toHaveText("195 countries");
   await expect(
     page.getByText("Sample country data", { exact: true }),
-  ).toBeVisible();
+  ).toHaveCount(0);
   await page.getByLabel("Search countries", { exact: true }).fill("Australia");
   await expect(page.locator(".country-row")).toHaveCount(1);
   await expect(page.locator(".country-row")).toContainText("6 cities");
@@ -489,6 +489,11 @@ test("the Countries tab has labelled counts, independent filters, and reloadable
   await page
     .getByLabel("Filter by visit status", { exact: true })
     .selectOption("visited");
+  await expect(page.locator(".country-row")).toHaveCount(97);
+  await expect(page.locator(".collection-count")).toHaveText("97 countries");
+  await page
+    .getByLabel("Filter by visit status", { exact: true })
+    .selectOption("planned");
   await expect(
     page.getByRole("heading", { name: "No countries found" }),
   ).toBeVisible();
@@ -496,7 +501,7 @@ test("the Countries tab has labelled counts, independent filters, and reloadable
   await page
     .getByRole("button", { name: "Clear filters", exact: true })
     .click();
-  await expect(page.locator(".country-row")).toHaveCount(131);
+  await expect(page.locator(".country-row")).toHaveCount(195);
   await page.reload();
   await expect(
     tabs.getByRole("tab", { name: "Countries", exact: true }),
@@ -564,12 +569,12 @@ test("countries open their own details and keep their tab through city details a
   await expect(page.locator(".city-row")).toHaveCount(3);
   await expect(countryTab).toHaveAttribute("aria-selected", "true");
   await page
-    .getByRole("button", { name: "All countries (131)", exact: true })
+    .getByRole("button", { name: "All countries (195)", exact: true })
     .click();
   await expect(
     page.getByLabel("Search countries", { exact: true }),
   ).toHaveValue("");
-  await expect(page.locator(".country-row")).toHaveCount(131);
+  await expect(page.locator(".country-row")).toHaveCount(195);
   await expect(page).not.toHaveURL(/country=/);
   await page.goBack();
   await expect(
@@ -601,7 +606,7 @@ test("country selection frames its boundaries and legacy country links open coun
     /41\.\d° N\s*\/\s*20\.\d° E/,
   );
   await page
-    .getByRole("button", { name: "All countries (131)", exact: true })
+    .getByRole("button", { name: "All countries (195)", exact: true })
     .click();
   await page.getByLabel("Search countries", { exact: true }).fill("Australia");
   await page.locator(".country-row").click();
@@ -612,14 +617,14 @@ test("country selection frames its boundaries and legacy country links open coun
     /\d+\.\d° S\s*\/\s*\d+\.\d° E/,
   );
   await page
-    .getByRole("button", { name: "All countries (131)", exact: true })
+    .getByRole("button", { name: "All countries (195)", exact: true })
     .click();
   await page.goBack();
   await expect(
     page.getByRole("heading", { name: "Australia", exact: true }),
   ).toBeVisible();
   await page
-    .getByRole("button", { name: "All countries (131)", exact: true })
+    .getByRole("button", { name: "All countries (195)", exact: true })
     .click();
   await page.getByRole("button", { name: "Clear search", exact: true }).click();
   await page.getByLabel("Search countries", { exact: true }).fill("Albania");
@@ -628,7 +633,7 @@ test("country selection frames its boundaries and legacy country links open coun
     /41\.\d° N\s*\/\s*20\.\d° E/,
   );
   await page
-    .getByRole("button", { name: "All countries (131)", exact: true })
+    .getByRole("button", { name: "All countries (195)", exact: true })
     .click();
   await page.getByLabel("Search countries", { exact: true }).fill("France");
   await page.locator(".country-row").click();
@@ -662,7 +667,7 @@ test("country pages preserve city filters and fit narrow panels without overflow
     expect(bounds.scroll).toBeLessThanOrEqual(bounds.width);
     await expect(
       page.getByRole("heading", {
-        name: "St. Vincent and the Grenadines",
+        name: "Saint Vincent and the Grenadines",
         exact: true,
       }),
     ).toBeVisible();
@@ -719,4 +724,85 @@ test("collection tabs work with a keyboard and the compact header fits narrow pa
       );
     }
   }
+});
+
+test("the real country data supports 195 and 197 ranks without inventing missing trip details", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    const original = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (
+      this: HTMLCanvasElement,
+      type: string,
+      ...args: unknown[]
+    ) {
+      if (type.includes("webgl")) return null;
+      return original.apply(this, [type, ...args] as never);
+    } as typeof original;
+  });
+  await page.goto("/?panel=countries");
+  const listSize = page.getByLabel("Country list size", { exact: true });
+  await expect(listSize).toHaveValue("195");
+  await expect(page.locator(".country-row")).toHaveCount(195);
+  await expect(page.locator(".collection-bottom")).toHaveText(
+    /Visited\s*97\s*countries\s*0\s*cities/,
+  );
+  await page.getByLabel("Search countries", { exact: true }).fill("Honduras");
+  await page.locator(".country-row").click();
+  await expect(
+    page.getByRole("heading", { name: "Honduras", exact: true }),
+  ).toBeVisible();
+  await expect(page.getByLabel("Country visit statistics")).toContainText(
+    "#97",
+  );
+  await expect(
+    page.locator(".country-statistics .country-value-missing"),
+  ).toHaveCount(2);
+  await expect(page.locator(".country-visit-list")).toContainText(
+    "Dates not recorded",
+  );
+  await page
+    .getByRole("button", { name: "All countries (195)", exact: true })
+    .click();
+  await listSize.selectOption("197");
+  await expect(page).toHaveURL(/countrySet=197/);
+  await page.locator(".country-row").click();
+  await expect(page.getByLabel("Country visit statistics")).toContainText(
+    "#98",
+  );
+  await page.reload();
+  await expect(page.getByLabel("Country visit statistics")).toContainText(
+    "#98",
+  );
+  await page
+    .getByRole("button", { name: "All countries (197)", exact: true })
+    .click();
+  await expect(listSize).toHaveValue("197");
+  await expect(page.locator(".country-row")).toHaveCount(197);
+  await expect(page.locator(".collection-bottom")).toHaveText(
+    /Visited\s*98\s*countries\s*0\s*cities/,
+  );
+  await page.getByLabel("Search countries", { exact: true }).fill("Kosovo");
+  await page.locator(".country-row").click();
+  await expect(page.getByLabel("Country visit statistics")).toContainText(
+    "#74",
+  );
+  await page
+    .getByRole("button", { name: "All countries (197)", exact: true })
+    .click();
+  await page.getByLabel("Search countries", { exact: true }).fill("Taiwan");
+  await page.locator(".country-row").click();
+  await expect(
+    page.locator(".country-statistics .country-value-missing"),
+  ).toHaveCount(3);
+  await expect(page.locator(".country-visit-list")).toHaveCount(0);
+  await page
+    .getByRole("button", { name: "All countries (197)", exact: true })
+    .click();
+  await page.getByRole("button", { name: "Clear search", exact: true }).click();
+  await listSize.selectOption("195");
+  await expect(page.locator(".country-row")).toHaveCount(195);
+  await page.goBack();
+  await expect(listSize).toHaveValue("197");
+  await expect(page.locator(".country-row")).toHaveCount(197);
 });

@@ -1,5 +1,5 @@
 import { ArrowLeft, CalendarDays, StickyNote } from "lucide-react";
-import type { CountryRecord, CountryTrip } from "../lib/countries";
+import type { CountryRecord, CountrySet, CountryTrip } from "../lib/countries";
 import { formatVisitDate, type City } from "../lib/types";
 import { CityRow, Flag, VisitMarker } from "./CollectionItems";
 
@@ -29,12 +29,16 @@ export default function CountryDetail({
   countryCount,
   onBack,
   onSelectCity,
+  visitOrder = country.firstVisitOrder,
+  countrySet,
 }: {
   country: CountryRecord;
   cities: City[];
   countryCount: number;
   onBack: () => void;
   onSelectCity: (id: string) => void;
+  visitOrder?: number | null;
+  countrySet?: CountrySet;
 }) {
   const visits = [...(country.visits ?? [])].sort(
     (a, b) => a.number - b.number,
@@ -73,7 +77,11 @@ export default function CountryDetail({
         >
           {(
             [
-              ["Visit order", country.firstVisitOrder, "order"],
+              [
+                countrySet ? `Visit order (${countrySet})` : "Visit order",
+                visitOrder,
+                "order",
+              ],
               ["Times visited", country.timesVisited, "visits"],
               ["Days spent", country.totalDaysSpent, "days"],
             ] as const

@@ -21,12 +21,16 @@ import CollectionHeader, {
   CollectionTabs,
   type CollectionView,
 } from "./components/CollectionHeader";
-import countrySeed from "../data/countries.sample.json";
+import countrySeed from "./generated/countries.json";
 import {
   buildCountryRecords,
+  countryVisitOrders,
   countryKey,
+  inCountrySet,
+  mergeCountryVisits,
   matchesVisit,
   searchText,
+  type CountrySet,
 } from "./lib/countries";
 import EditorControls, {
   type EditorControlsHandle,
@@ -59,6 +63,7 @@ function readRoute(): {
   view: boolean;
   panel: CollectionView;
   country: string | null;
+  countrySet: CountrySet;
 } {
   const p = new URLSearchParams(window.location.search);
   return {
@@ -69,6 +74,11 @@ function readRoute(): {
         ? "countries"
         : "cities",
     country: p.get("country"),
+    countrySet:
+      p.get("countrySet") === "197" ||
+      ["XK", "TW"].includes(p.get("country") ?? "")
+        ? 197
+        : 195,
   };
 }
 export default function App() {
@@ -165,6 +175,19 @@ export default function App() {
     () => buildCountryRecords(countrySeed.countries, cities),
     [cities],
   );
+  const countriesInView = useMemo(
+    () =>
+      countrySeed.sample
+        ? countryRecords
+        : countryRecords.filter((country) =>
+            inCountrySet(country, route.countrySet),
+          ),
+    [countryRecords, route.countrySet],
+  );
+  const countryOrders = useMemo(
+    () => countryVisitOrders(countryRecords, route.countrySet),
+    [countryRecords, route.countrySet],
+  );
   const scopedCountry = countryRecords.find(
     (country) => country.code === route.country,
   );
@@ -181,20 +204,22 @@ export default function App() {
     () =>
       [
         ...new Set(
-          countryRecords.map((country) => country.continent).filter(Boolean),
+          countriesInView.map((country) => country.continent).filter(Boolean),
         ),
       ].sort(),
-    [countryRecords],
+    [countriesInView],
   );
   const filteredCountries = useMemo(() => {
     const query = searchText(countrySearch);
-    return countryRecords.filter(
+    return countriesInView.filter(
       (country) =>
-        searchText(`${country.name} ${country.code}`).includes(query) &&
+        searchText(
+          `${country.name} ${country.code} ${country.aliases?.join(" ") ?? ""}`,
+        ).includes(query) &&
         matchesVisit(country.visit, countryVisit) &&
         (countryContinent === "all" || country.continent === countryContinent),
     );
-  }, [countryRecords, countrySearch, countryVisit, countryContinent]);
+  }, [countriesInView, countrySearch, countryVisit, countryContinent]);
   const filtered = useMemo(() => {
     const query = searchText(search);
     return cities
@@ -224,6 +249,7 @@ export default function App() {
     const current = readRoute();
     if (current.panel === panel && !current.city && !current.country) return;
     const url = new URL(window.location.href);
+    if (current.countrySet === 197) url.searchParams.set("countrySet", "197");
     for (const key of ["city", "view", "country"]) url.searchParams.delete(key);
     if (panel === "countries") url.searchParams.set("panel", panel);
     else url.searchParams.delete("panel");
@@ -240,11 +266,24 @@ export default function App() {
   };
   const clearCountry = useCallback(() => {
     const url = new URL(window.location.href);
+    if (readRoute().countrySet === 197)
+      url.searchParams.set("countrySet", "197");
     for (const key of ["country", "city", "view"]) url.searchParams.delete(key);
     url.searchParams.set("panel", "countries");
     window.history.pushState({}, "", url);
     setRoute(readRoute());
   }, []);
+  const changeCountrySet = (set: CountrySet) => {
+    const url = new URL(window.location.href);
+    if (set === 197) url.searchParams.set("countrySet", "197");
+    else url.searchParams.delete("countrySet");
+    if (scopedCountry && !inCountrySet(scopedCountry, set)) {
+      for (const key of ["country", "city", "view"])
+        url.searchParams.delete(key);
+    }
+    window.history.pushState({}, "", url);
+    setRoute(readRoute());
+  };
   useEffect(() => {
     const key = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
@@ -271,11 +310,21 @@ export default function App() {
   };
   const countryData = useMemo(
     () =>
-      cloud.enabled ? deriveCountries(cities, data.countries) : data.countries,
-    [cloud.enabled, cities],
+      mergeCountryVisits(
+        cloud.enabled
+          ? deriveCountries(cities, data.countries)
+          : data.countries,
+        countryRecords,
+      ),
+    [cloud.enabled, cities, countryRecords],
   );
   const visited = cities.filter((c) => c.visit === "visited").length;
-  const countries = countryData.filter((c) => c.visited).length;
+  const countries = countryData.filter(
+    (c) =>
+      c.visited &&
+      (countrySeed.sample ||
+        countriesInView.some((country) => country.code === c.code)),
+  ).length;
   const closeViewer = useCallback(() => {
     navigate(selected?.id ?? null);
     setTimeout(() => viewerButton.current?.focus(), 0);
@@ -337,7 +386,9 @@ export default function App() {
                 key={scopedCountry.code}
                 country={scopedCountry}
                 cities={countryCities}
-                countryCount={countryRecords.length}
+                countryCount={countriesInView.length}
+                visitOrder={countryOrders.get(scopedCountry.code) ?? null}
+                countrySet={countrySeed.sample ? undefined : route.countrySet}
                 onBack={clearCountry}
                 onSelectCity={(id) => navigate(id)}
               />
@@ -356,6 +407,8 @@ export default function App() {
                     countryView ? filteredCountries.length : filtered.length
                   }
                   searchRef={searchRef}
+                  countrySet={countrySeed.sample ? undefined : route.countrySet}
+                  onCountrySet={changeCountrySet}
                 />
                 <div
                   className="city-list"

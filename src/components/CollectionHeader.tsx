@@ -8,6 +8,7 @@ import {
   X,
 } from "lucide-react";
 import { MAP_STATUSES } from "../lib/types";
+import type { CountrySet } from "../lib/countries";
 
 export type CollectionView = "cities" | "countries";
 
@@ -122,6 +123,8 @@ export default function CollectionHeader({
   continents,
   count,
   searchRef,
+  countrySet,
+  onCountrySet,
 }: {
   view: CollectionView;
   search: string;
@@ -133,6 +136,8 @@ export default function CollectionHeader({
   continents: string[];
   count: number;
   searchRef: RefObject<HTMLInputElement | null>;
+  countrySet?: CountrySet;
+  onCountrySet?: (set: CountrySet) => void;
 }) {
   const countries = view === "countries";
   const noun = countries
@@ -142,6 +147,19 @@ export default function CollectionHeader({
     : count === 1
       ? "city"
       : "cities";
+  const resultCount = (
+    <span
+      className="collection-count"
+      role="status"
+      aria-live="polite"
+      aria-label={`${count} ${noun}`}
+    >
+      <strong className={countries ? "country-total" : "city-total"}>
+        {count}
+      </strong>{" "}
+      <span>{noun}</span>
+    </span>
+  );
   return (
     <div className="collection-controls">
       <h1 className="visually-hidden">{countries ? "Countries" : "Cities"}</h1>
@@ -198,17 +216,27 @@ export default function CollectionHeader({
             ...continents.map((value) => ({ value, label: value })),
           ]}
         />
-        <span
-          className="collection-count"
-          role="status"
-          aria-live="polite"
-          aria-label={`${count} ${noun}`}
-        >
-          <strong className={countries ? "country-total" : "city-total"}>
-            {count}
-          </strong>{" "}
-          <span>{noun}</span>
-        </span>
+        {countries && countrySet && onCountrySet ? (
+          <div className="country-count-control">
+            {resultCount}
+            <ChevronDown size={12} aria-hidden="true" />
+            <select
+              aria-label="Country list size"
+              title={`Showing the ${countrySet}-country list`}
+              value={countrySet}
+              onChange={(event) =>
+                onCountrySet(event.target.value === "197" ? 197 : 195)
+              }
+            >
+              <option value="195">195 countries</option>
+              <option value="197">
+                197 countries · includes Kosovo and Taiwan
+              </option>
+            </select>
+          </div>
+        ) : (
+          resultCount
+        )}
       </div>
     </div>
   );

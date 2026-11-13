@@ -2,7 +2,9 @@
 
 Use `countries-template.csv` for the country overview and
 `country-visits-template.csv` for individual trips. You can supply summary
-information now and add trip dates later.
+information now and add trip dates later. The live build imports the tracked
+`data/countries.csv` and `data/country-visit-history.csv` files, which contain
+the supplied history; these templates are fillable copies for subsequent updates.
 
 Your supplied order is preserved as 98 consecutive first visits: Kosovo is 74,
 Honduras is 98, and Taiwan has no order yet. The old `73.5` notation has been
@@ -19,6 +21,7 @@ even when it has several visits.
 | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `CountryCode`          | Stable country identifier. Keep it unchanged.                                                                                                              |
 | `Country`              | Display name, supplied for readability.                                                                                                                    |
+| `Continent`            | Prefilled geography used by the country filters. Keep it unless correcting the classification.                                                             |
 | `Is195`                | Membership flag: `1` for the base 195, `0` for Kosovo and Taiwan. This column never contains a visit rank.                                                 |
 | `VisitStatus`          | `visited`, `planned`, `not-visited`, or `unknown`. Your 98 supplied countries are `visited`; the remaining countries are `unknown` until you confirm them. |
 | `FirstVisitOrder`      | Whole-number order among all visited countries, including Kosovo and Taiwan when applicable. Unknown or unvisited countries stay blank.                    |
@@ -111,8 +114,8 @@ add them to each other:
 establish that all their durations are known. A supplied all-time total must
 not be less than its known trip subtotal. When complete details and supplied
 totals disagree, flag the mismatch for review rather than silently replacing
-either value. These are requirements for the future importer and panel;
-the current CSV files do not implement an import themselves.
+either value. The build importer validates these rules and rejects inconsistent
+complete totals. The panel leaves unspecified all-time totals unfilled.
 
 ## Filling in more data
 
@@ -142,5 +145,7 @@ enforce unique country orders when present and unique visit numbers within a
 country. Store the reported totals separately from any totals calculated by
 queries; calculated ranks do not need stored columns.
 
-The current website still uses its existing starter country data. This change
-restructures the input CSVs and data plan only.
+The website now imports the known country history from the two tracked CSVs.
+Country histories are currently updated through those files and rebuilt for
+deployment. The two database tables above remain a proposed mapping for future
+country editing; the existing Supabase city table is unchanged.

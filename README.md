@@ -178,7 +178,7 @@ npx playwright install chromium
 CHROMIUM_PATH='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' npm run test:browser
 ```
 
-The browser suite selects the included real collection after a normal build. It checks all 321 entries, source statuses, zero initial visit totals, country/continent filters, reviewed coordinates and aliases, Nice and Vienna's distinct map links, intentional missing positions, layouts down to 320px, saved-status isolation and tab synchronization, and the WebGL fallback. For the existing camera, cluster, notes/date, history, and blocked-storage regression suite, run `npm run build:demo` followed by `npm run test:browser`; finish with `npm run build` to restore the real collection.
+The browser suite selects the included real collection after a normal build. It checks all 321 entries, source statuses, the supplied country history and independent city visits, country/continent filters, reviewed coordinates and aliases, Nice and Vienna's distinct map links, intentional missing positions, layouts down to 320px, saved-status isolation and tab synchronization, and the WebGL fallback. For the existing camera, cluster, notes/date, history, and blocked-storage regression suite, run `npm run build:demo` followed by `npm run test:browser`; finish with `npm run build` to restore the real collection.
 
 Unit tests compare the prepared collection with the latest uploaded source and cover coordinate provenance, URL validation, CSV edge cases, stable/duplicate IDs, visits/dates, typography, and independent country/pin colors. External-provider and live Google embed availability remain separate network-dependent checks.
 
