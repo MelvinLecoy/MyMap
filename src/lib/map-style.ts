@@ -4,8 +4,8 @@ import type { StyleSpecification } from "maplibre-gl";
 import type { City, CountryVisit } from "./types";
 import type { FeatureCollection, Point } from "geojson";
 export const MAP_CONFIG = {
-  clusterRadius: 48,
-  clusterMaxZoom: 5,
+  clusterRadius: 24,
+  clusterMaxZoom: 4,
   labelMinZoom: 4,
   maxZoom: 10,
   center: [25, 43] as [number, number],
