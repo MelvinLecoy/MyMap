@@ -896,10 +896,11 @@ test("country title ranks stay beside wrapped names without splitting words", as
   expect(checkedWrappedRank).toBe(true);
 });
 
-test("recorded country history shows actual stays, corrected UK dates, and incomplete lifetime scope", async ({
+test("country history shows stays and corrected dates without explanatory copy or notes", async ({
   page,
 }) => {
   for (const [code, visits, days] of [
+    ["AT", 1, 3],
     ["AU", 2, 14],
     ["NZ", 1, 5],
     ["GB", 3, 12],
@@ -909,9 +910,15 @@ test("recorded country history shows actual stays, corrected UK dates, and incom
       String(visits),
       String(days),
     ]);
-    await expect(page.locator(".country-history-scope")).toContainText(
-      "earlier visits may be missing",
-    );
+    await expect(
+      page.getByText("These totals cover recorded trips", { exact: false }),
+    ).toHaveCount(0);
+    await expect(
+      page.getByText("Recorded yearbook visit", { exact: false }),
+    ).toHaveCount(0);
+    await expect(
+      page.getByRole("heading", { name: "Notes", exact: true }),
+    ).toHaveCount(0);
     if (code === "AU") {
       await expect(page.getByLabel("Actual stays for visit 1")).toContainText(
         "24 July 2025 – 27 July 2025",

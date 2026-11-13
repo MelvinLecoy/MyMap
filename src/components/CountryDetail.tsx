@@ -1,4 +1,4 @@
-import { ArrowLeft, CalendarDays, StickyNote } from "lucide-react";
+import { ArrowLeft, CalendarDays } from "lucide-react";
 import type { CountryRecord, CountrySet, CountryTrip } from "../lib/countries";
 import { formatVisitDate, type City } from "../lib/types";
 import { useCountryHeading } from "../lib/use-country-heading";
@@ -131,13 +131,6 @@ export default function CountryDetail({
             </div>
           ))}
         </dl>
-        {country.recordedVisits != null && !country.visitHistoryComplete && (
-          <p className="country-history-scope">
-            These totals cover recorded trips; earlier visits may be missing.
-            Return stays less than 14 days apart count as one visit. Days spent
-            exclude gaps.
-          </p>
-        )}
 
         <section
           className="country-history"
@@ -184,9 +177,6 @@ export default function CountryDetail({
                       </ul>
                     </div>
                   )}
-                  {visit.notes && (
-                    <p className="country-visit-note">{visit.notes}</p>
-                  )}
                 </li>
               ))}
             </ol>
@@ -196,16 +186,6 @@ export default function CountryDetail({
             </p>
           )}
         </section>
-
-        {country.notes && (
-          <section className="notes-section">
-            <h2>
-              <StickyNote size={14} aria-hidden="true" />
-              Notes
-            </h2>
-            <p>{country.notes}</p>
-          </section>
-        )}
 
         <section
           className="country-cities"
