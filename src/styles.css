@@ -644,13 +644,13 @@ h2 {
   color: #26784f;
 }
 .country-last-visit[data-year="2025"] {
-  color: #927300;
+  color: #b99b00;
 }
 .country-last-visit[data-year="2024"] {
-  color: #b25b24;
+  color: #dc4d08;
 }
 .country-last-visit[data-year="2023"] {
-  color: #805438;
+  color: #573122;
 }
 .city-row-body {
   display: flex;
