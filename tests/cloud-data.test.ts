@@ -13,8 +13,8 @@ import { importCities } from "../scripts/importer.js";
 test("the database collection and CSV exports preserve IDs, links, statuses and missing positions", () => {
   const rows = collectionRows();
   const cities = rows.map(fromCityRow);
-  assert.equal(cities.length, 340);
-  assert.equal(cities.filter((c) => c.coordinates).length, 338);
+  assert.equal(cities.length, 343);
+  assert.equal(cities.filter((c) => c.coordinates).length, 341);
   assert.deepEqual(cities.map(toCityRow), rows);
   const edited = cities.find((c) => c.id === "moscow-russia")!;
   edited.status = "Update";
@@ -23,7 +23,7 @@ test("the database collection and CSV exports preserve IDs, links, statuses and 
   edited.notes = 'A note, with "quotes"\nand a new line.';
   const result = importCities(exportCitiesCsv(cities)).data;
   assert.deepEqual(result.cities, cities);
-  assert.equal(deriveCountries(cities, []).filter((c) => c.visited).length, 96);
+  assert.equal(deriveCountries(cities, []).filter((c) => c.visited).length, 97);
   assert.equal(cities.find((c) => c.name === "Iguazu")?.coordinates, null);
 });
 

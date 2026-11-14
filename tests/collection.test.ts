@@ -24,7 +24,7 @@ test("the published collection preserves all rows and links from the updated CSV
     metadata.sourceSha256,
   );
   assert.equal(raw.length, 321);
-  assert.equal(normalized.length, raw.length + 19);
+  assert.equal(normalized.length, raw.length + 22);
   const approved = new Set(
     data.cities.filter((c) => c.visits?.length).map((c) => c.id),
   );
@@ -52,7 +52,7 @@ test("the published collection preserves all rows and links from the updated CSV
     );
   }
   assert.equal(data.demo, false);
-  assert.equal(new Set(data.cities.map((city) => city.id)).size, 340);
+  assert.equal(new Set(data.cities.map((city) => city.id)).size, 343);
   const mapIds = data.cities
     .filter((c) => c.map)
     .map((city) => {
@@ -73,13 +73,16 @@ test("the published collection preserves all rows and links from the updated CSV
       "como-italy",
       "detroit-usa",
       "gold-coast-australia",
+      "huizhou-china",
       "interlaken-switzerland",
       "jerash-jordan",
       "johor-bahru-malaysia",
       "kunming-china",
+      "las-vegas-usa",
       "lugano-switzerland",
       "niagara-falls-usa",
       "portsmouth-uk",
+      "reykjavik-iceland",
       "rome-italy",
       "san-antonio-usa",
       "southampton-uk",
@@ -138,9 +141,9 @@ test("reviewed coordinates cover 319 distinct places and leave only the two requ
 test("the real collection contains only approved city visits and no sample notes or colors", () => {
   assert.equal(
     data.cities.filter((city) => city.visit === "visited").length,
-    171,
+    174,
   );
-  assert.equal(data.cities.filter((city) => city.lastVisited).length, 171);
+  assert.equal(data.cities.filter((city) => city.lastVisited).length, 174);
   assert.ok(data.cities.every((city) => !city.notes && !city.pinColor));
   assert.ok(data.countries.every((country) => !country.color));
   assert.equal(
@@ -153,6 +156,6 @@ test("the real collection contains only approved city visits and no sample notes
   );
   assert.equal(
     data.cities.filter((city) => city.status === "Not Started").length,
-    80,
+    83,
   );
 });

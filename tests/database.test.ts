@@ -31,7 +31,7 @@ test("real PostgreSQL enforces public reads, owner-only writes, validation, and 
           "select count(*)::int as count from cities;",
         )
       ).rows[0].count,
-      340,
+      343,
     );
     await assert.rejects(
       db.exec(
@@ -131,7 +131,7 @@ test("real PostgreSQL enforces public reads, owner-only writes, validation, and 
           "select count(*)::int as count from cities where latitude is not null;",
         )
       ).rows[0].count,
-      338,
+      341,
     );
     // Applying the schema again must not remove the editor or saved progress.
     await db.exec(migration);

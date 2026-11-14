@@ -2,8 +2,8 @@
 
 The authoritative approved data is tracked in Git: `data/cities.csv`,
 `city-visit-history.csv`, `city-visit-periods.csv`, `countries.csv`, `country-visit-history.csv` and
-`country-visit-periods.csv`. The city source ledgers reproduce 171 visited cities,
-219 counted visits, 232 stays and 393.5 city-days. Prior corrections and approved
+`country-visit-periods.csv`. The city source ledgers reproduce 174 visited cities,
+222 counted visits, 235 stays and 400.5 city-days. Prior corrections and approved
 batches are preserved. Country history remains incomplete and unchanged at 273.5
 recorded country-days.
 

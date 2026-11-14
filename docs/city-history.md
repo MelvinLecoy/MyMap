@@ -1,8 +1,8 @@
 # City visit history
 
-The approved city history contains **171 cities, 219 counted visits, 232 actual stays
-and 393.5 summed city-days**. Reykjavík remains excluded. The collection
-contains 340 cities, including the later supplied Southampton history.
+The approved city history contains **174 cities, 222 counted visits, 235 actual stays
+and 400.5 summed city-days**. The collection contains 343 cities, including the later supplied Southampton
+and Reykjavik histories.
 
 A new city visit starts when the next arrival is **at least six calendar days after
 the previous departure**. A shorter gap joins the same visit. Measure each gap
@@ -139,3 +139,9 @@ city history CSVs. `202611140003_seoul_visit_correction.sql` accepts only the
 published old or approved new row, updates both the counted visit and its stay,
 and leaves unrelated history, metadata and country tables unchanged. The current
 city import/synchronization commands apply it before seeding the new batch.
+
+The later chat batch adds Huizhou (14–17 July 2023, 4 days), Las Vegas, Nevada
+(4 May 2025, 1 day; typed as “Lad Vegas”), and Reykjavik (14–15 October 2025,
+2 days). These three new records have GeoNames coordinates and are preserved
+in the batch ledger. The new Reykjavik instruction supersedes exclusion of
+the earlier screenshot entry.

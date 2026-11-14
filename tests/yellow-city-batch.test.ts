@@ -71,12 +71,12 @@ test("all 81 supplied cities retain exact stays, country identities and new-city
     [["2025-07-17", "2025-07-21", 4.5]],
   );
   assert.equal(seoul.lastVisited, "2025-07-21");
-  assert.equal(cities.length, 340);
-  assert.equal(cities.filter((c) => c.visit === "visited").length, 171);
-  assert.equal(toCityVisitRows(cities).length, 219);
-  assert.equal(toCityPeriodRows(cities).length, 232);
+  assert.equal(cities.length, 343);
+  assert.equal(cities.filter((c) => c.visit === "visited").length, 174);
+  assert.equal(toCityVisitRows(cities).length, 222);
+  assert.equal(toCityPeriodRows(cities).length, 235);
   assert.equal(
     toCityVisitRows(cities).reduce((n, v) => n + v.days_spent, 0),
-    393.5,
+    400.5,
   );
 });

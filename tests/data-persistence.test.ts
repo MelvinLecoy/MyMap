@@ -24,11 +24,11 @@ test("current CSVs agree across city/country tables and detect changed fields, m
     ),
   );
   assert.deepEqual(report.counts, {
-    cities: 340,
-    visitedCities: 171,
-    cityVisits: 219,
-    cityStays: 232,
-    cityDays: 393.5,
+    cities: 343,
+    visitedCities: 174,
+    cityVisits: 222,
+    cityStays: 235,
+    cityDays: 400.5,
     countries: 198,
     countryVisits: 120,
     countryPeriods: 127,
@@ -109,25 +109,15 @@ test("approved main-branch changes synchronize atomically, survive a new read, r
       }))
       .filter(
         (c) =>
-          ![
+          !new Set([
             "austin-usa",
             "san-antonio-usa",
-            "niagara-falls-usa",
-            "detroit-usa",
-            "basel-switzerland",
-            "bath-uk",
-            "como-italy",
-            "gold-coast-australia",
-            "interlaken-switzerland",
-            "jerash-jordan",
-            "johor-bahru-malaysia",
-            "cologne-germany",
-            "kunming-china",
-            "lugano-switzerland",
-            "portsmouth-uk",
-            "southampton-uk",
-            "sunshine-coast-australia",
-          ].includes(c.id),
+            ...JSON.parse(
+              readFileSync("data/sources/city-visit-batches.json", "utf8"),
+            ).batches.flatMap((b: { newCities: { cityid: string }[] }) =>
+              b.newCities.map((c) => c.cityid),
+            ),
+          ]).has(c.id),
       );
     const additions = new Set([
       ...JSON.parse(
