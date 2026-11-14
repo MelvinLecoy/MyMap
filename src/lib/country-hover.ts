@@ -12,6 +12,24 @@ const hovered: ExpressionSpecification = [
 const transition = { duration: 0, delay: 0 };
 const uniformPaintOptions = { validate: false };
 
+export function restoreCountryPaint(
+  map: MapInstance,
+  countries: CountryVisit[],
+) {
+  if (!map.getLayer("atlas-land")) return;
+  map.setPaintProperty("atlas-land", "fill-color", fillColors(countries));
+  map.setPaintProperty(
+    "atlas-land",
+    "fill-opacity",
+    countryFillOpacity(countries),
+  );
+  map.setPaintProperty("atlas-borders", "line-opacity", 0.9);
+  for (const layer of countryStripeLayers(countries)) {
+    map.setFilter(layer.id, layer.filter ?? null);
+    map.setPaintProperty(layer.id, "fill-opacity", 1);
+  }
+}
+
 /** A shared-source overlay: geographic hit areas and city layers stay fixed. */
 function createHighlight(
   map: MapInstance,
@@ -208,6 +226,13 @@ function createHighlight(
       if (active) state(active, false);
       active = target = null;
       disposed = true;
+      for (const id of [
+        ...fillIds,
+        `atlas-${kind}-shadow`,
+        `atlas-${kind}-shadow-edge`,
+        `atlas-${kind}-outline`,
+      ])
+        if (map.getLayer(id)) map.removeLayer(id);
     },
   };
 }

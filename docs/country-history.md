@@ -140,18 +140,24 @@ The small A button in that column toggles alphabetical order independently of
 the visited filter. Visits and Days spent toggle highest-first sorting with
 alphabetical ties; toggling an active sort off restores visit-number order.
 Unranked countries follow in alphabetical order. Sorting changes only the list
-order and does not replace the globe's city data. Globe hover, continent and last-visited
-year filters combine independently from city filters. The country search bar is
-replaced by the hovered country's name and a clear button. The result stays visible
-when moving into the panel. Hover does not change the camera, open a profile,
-filter globe pins or replace an already-open profile. Year colors are shared;
+order and does not replace the globe's city data. A uses 10px text and a 16px button
+on desktop and phone layouts. Globe hover, continent and last-visited
+year filters combine independently from city filters. A small H button on the
+scoreboard's left edge opts into desktop country hover. It starts off; switching
+it off clears the hover filter. The separate hovered-country strip is removed.
+Phones and touch-only layouts create no hover layers and register no hover handlers;
+country tapping and profile navigation remain available. Hover does not change the
+camera, open a profile, filter globe pins or replace an already-open profile. Year colors are shared;
 2023 and earlier form one brown option. Country map progress is not shown.
 
 The scoreboard embeds a compact denominator menu beside Countries visited, offering
-195 and 197 (🇽🇰 & 🇹🇼). The selected set affects only scoreboard totals; the list,
-profile visit order, globe pins and footer always use the full 197-country set.
-Country profiles retain the globe's raised outline independently of temporary
-hover highlights. The scoreboard sums known lifetime values when supplied
+195 and 197 (🇽🇰 & 🇹🇼). Scoreboard totals use that set. When Countries visited is
+active, rows also follow the selected set: 97 visited countries in 195 mode and
+98 in 197 mode. Base mode includes every country and territory record (currently
+198, including Svalbard), independently of the totals selector. Profile visit
+order remains stable, and footer totals remain global. Desktop country profiles
+retain the globe's raised outline independently of temporary hover highlights.
+The scoreboard sums known lifetime values when supplied
 and otherwise recorded history; a visited country with unknown totals retains
 its unknown values instead of receiving invented visits or days. Rows show the
 last date above a 34px visit square, with 3px above and 4px below the square, and

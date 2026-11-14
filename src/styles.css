@@ -2187,7 +2187,35 @@ h2 {
   padding-inline: 4px;
 }
 .country-overview-totals > div:first-child dd {
-  padding-right: 6px;
+  padding-right: 12px;
+}
+.country-overview {
+  position: relative;
+}
+.country-hover-toggle {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: -17px;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 18px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  color: var(--muted);
+  background: var(--surface);
+  font-size: 10px;
+  line-height: 14px;
+  font-weight: 750;
+}
+.country-hover-toggle:hover,
+.country-hover-toggle[aria-pressed="true"] {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--surface-alt);
 }
 .country-alphabetical-toggle {
   position: absolute;
@@ -2196,15 +2224,15 @@ h2 {
   right: 2px;
   display: grid;
   place-items: center;
-  width: 13px;
-  height: 13px;
+  width: 16px;
+  height: 16px;
   padding: 0;
   border: 1px solid transparent;
   border-radius: 3px;
   color: var(--muted);
   background: transparent;
-  font-size: 8px;
-  line-height: 11px;
+  font-size: 10px;
+  line-height: 14px;
   font-weight: 750;
 }
 .country-alphabetical-toggle:hover,
@@ -2213,46 +2241,14 @@ h2 {
   background: var(--surface);
   border-color: var(--line);
 }
-.country-alphabetical-toggle:focus-visible {
+.country-alphabetical-toggle:focus-visible,
+.country-hover-toggle:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 1px;
 }
 .collection-controls .country-filter-row {
   gap: 4px;
   margin-top: 0;
-}
-.country-globe-preview {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 7px;
-  padding: 4px 6px;
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  background: var(--surface-alt);
-  color: var(--muted);
-  font-size: 11px;
-  line-height: 16px;
-}
-.country-globe-preview strong {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: var(--text);
-  font-weight: 650;
-}
-.country-globe-preview button {
-  display: grid;
-  place-items: center;
-  width: 20px;
-  height: 20px;
-  border-radius: 4px;
-  color: var(--muted);
-}
-.country-globe-preview button:hover {
-  background: var(--surface);
 }
 @container (max-width: 330px) {
   .country-overview-totals dt {

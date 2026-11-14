@@ -73,6 +73,8 @@ import {
   type MapStatus,
 } from "./lib/types";
 const data = atlas as AtlasData;
+const COUNTRY_HOVER_QUERY =
+  "(min-width: 761px) and (hover: hover) and (pointer: fine)";
 const statusStorageKey = data.demo
   ? MAP_STATUS_STORAGE_KEY
   : COLLECTION_STATUS_STORAGE_KEY;
@@ -109,6 +111,10 @@ export default function App() {
   const [visitedOnly, setVisitedOnly] = useState(false);
   const [citySort, setCitySort] = useState<CityScoreSort>("alphabetical");
   const [countryPreview, setCountryPreview] = useState<string | null>(null);
+  const [countryHoverEnabled, setCountryHoverEnabled] = useState(false);
+  const [countryHoverAvailable, setCountryHoverAvailable] = useState(
+    () => window.matchMedia(COUNTRY_HOVER_QUERY).matches,
+  );
   const [countryVisit, setCountryVisit] = useState("all");
   const [countryContinent, setCountryContinent] = useState("all");
   const [countryLastVisitYear, setCountryLastVisitYear] = useState("all");
@@ -118,6 +124,18 @@ export default function App() {
     readStatusOverrides(statusStorageKey),
   );
   const [saveErrorCity, setSaveErrorCity] = useState<string | null>(null);
+  useEffect(() => {
+    const media = window.matchMedia(COUNTRY_HOVER_QUERY);
+    const update = () => {
+      setCountryHoverAvailable(media.matches);
+      if (!media.matches) {
+        setCountryHoverEnabled(false);
+        setCountryPreview(null);
+      }
+    };
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
   const cities = useMemo(
     () =>
       cloud.enabled
@@ -222,13 +240,7 @@ export default function App() {
     () => buildCountryRecords(countryCloud.countries, cities),
     [cities, countryCloud.countries],
   );
-  const countriesInView = useMemo(
-    () =>
-      countrySeed.sample
-        ? countryRecords
-        : countryRecords.filter((country) => inCountrySet(country, 197)),
-    [countryRecords],
-  );
+  const countriesInView = countryRecords;
   const countryOrders = useMemo(
     () => countryVisitOrders(countryRecords, 197),
     [countryRecords],
@@ -277,11 +289,16 @@ export default function App() {
       ].sort((a, b) => Number(b) - Number(a)),
     [countryLastVisits],
   );
+  const visitedCountrySet =
+    countryVisit === "visited" ? route.countrySet : null;
   const countryScope = useMemo(() => {
     const matches = countriesInView.filter((country) => {
       const year = countryLastVisits.get(country.code)?.slice(0, 4);
       return (
         matchesVisit(country.visit, countryVisit) &&
+        (visitedCountrySet == null ||
+          countrySeed.sample ||
+          inCountrySet(country, visitedCountrySet)) &&
         (countryContinent === "all" ||
           country.continent === countryContinent) &&
         (countryLastVisitYear === "all" ||
@@ -295,14 +312,16 @@ export default function App() {
   }, [
     countriesInView,
     countryVisit,
+    visitedCountrySet,
     countryContinent,
     countryLastVisitYear,
     countryLastVisits,
   ]);
   const filteredCountries = useMemo(() => {
-    const matches = countryPreview
-      ? countryScope.filter((country) => country.code === countryPreview)
-      : [...countryScope];
+    const matches =
+      countryHoverAvailable && countryHoverEnabled && countryPreview
+        ? countryScope.filter((country) => country.code === countryPreview)
+        : [...countryScope];
     if (countrySort === "alphabetical") return matches;
     if (countrySort === "visit-order")
       return matches.sort(
@@ -316,7 +335,13 @@ export default function App() {
           (countryVisitSummary(a)[countrySort] ?? 0) ||
         a.name.localeCompare(b.name),
     );
-  }, [countryScope, countryPreview, countrySort]);
+  }, [
+    countryScope,
+    countryPreview,
+    countrySort,
+    countryHoverAvailable,
+    countryHoverEnabled,
+  ]);
   const countryScoreboard = useMemo(
     () =>
       countrySeed.sample
@@ -326,15 +351,25 @@ export default function App() {
           ),
     [filteredCountries, route.countrySet],
   );
-  const previewCountry = countryRecords.find(
-    (country) => country.code === countryPreview,
-  );
   const previewCountryFromGlobe = useCallback(
     (code: string | null) => {
-      if (code && countryView && !route.country && !route.city)
+      if (
+        code &&
+        countryHoverAvailable &&
+        countryHoverEnabled &&
+        countryView &&
+        !route.country &&
+        !route.city
+      )
         setCountryPreview(code);
     },
-    [countryView, route.country, route.city],
+    [
+      countryView,
+      route.country,
+      route.city,
+      countryHoverAvailable,
+      countryHoverEnabled,
+    ],
   );
   const cityScope = useMemo(() => {
     const query = searchText(search);
@@ -485,6 +520,8 @@ export default function App() {
             onSelect={(id) => navigate(id)}
             onSelectCountry={openCountry}
             onHoverCountry={previewCountryFromGlobe}
+            hoverAvailable={countryHoverAvailable}
+            hoverEnabled={countryHoverEnabled && countryHoverAvailable}
             countryCodes={countriesInView.map((country) => country.code)}
             geonames={data.geonames}
             viewControl={
@@ -558,6 +595,12 @@ export default function App() {
                       countrySeed.sample ? undefined : route.countrySet
                     }
                     onCountrySet={changeCountrySet}
+                    hoverAvailable={countryHoverAvailable}
+                    hoverEnabled={countryHoverEnabled}
+                    onHoverToggle={() => {
+                      setCountryHoverEnabled((current) => !current);
+                      setCountryPreview(null);
+                    }}
                     visitedOnly={countryVisit === "visited"}
                     sort={countrySort}
                     onVisitedOnly={() => {
@@ -608,8 +651,6 @@ export default function App() {
                     countryView ? filteredCountries.length : filtered.length
                   }
                   searchRef={searchRef}
-                  countryPreview={previewCountry}
-                  onClearCountryPreview={() => setCountryPreview(null)}
                 />
                 <div
                   className="city-list"
@@ -672,7 +713,9 @@ export default function App() {
                       </h2>
                       <p>
                         {countryView
-                          ? "Try another year or continent, or hover over a country on the globe."
+                          ? countryHoverEnabled && countryPreview
+                            ? "Try another filter or turn H off."
+                            : "Try another year or continent."
                           : "Try another place or a different map status."}
                       </p>
                       <button onClick={resetFilters}>

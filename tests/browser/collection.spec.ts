@@ -399,7 +399,7 @@ test("country collection mirrors the compact scoreboard, filters and visit rows 
   await expect(scores.locator("dl")).toHaveCSS("height", "49px");
   await expect(page.locator(".city-map-progress")).toHaveCount(0);
   const names = page.locator(".country-row .city-row-name");
-  await expect(names).toHaveCount(197);
+  await expect(names).toHaveCount(198);
   await expect(alphabetical).toHaveAttribute("aria-pressed", "false");
   for (const [index, name] of firstVisits.entries())
     await expect(names.nth(index)).toHaveText(name);
@@ -420,13 +420,19 @@ test("country collection mirrors the compact scoreboard, filters and visit rows 
   expect(badge.height).toBe(34);
   await expect(albania.locator(".country-city-count strong")).toHaveText("1");
   await visited.click();
+  await expect(names).toHaveCount(97);
+  await expect(names.filter({ hasText: /^Kosovo$/ })).toHaveCount(0);
+  await chooseFilter(page, "Country scoreboard scope", "197 (🇽🇰 & 🇹🇼)");
   await expect(names).toHaveCount(98);
+  await expect(names.filter({ hasText: /^Kosovo$/ })).toHaveCount(1);
+  await chooseFilter(page, "Country scoreboard scope", "195");
+  await expect(names).toHaveCount(97);
   for (const [index, name] of firstVisits.entries())
     await expect(names.nth(index)).toHaveText(name);
   await alphabetical.click();
   await expect(alphabetical).toHaveAttribute("aria-pressed", "true");
   await expect(visited).toHaveAttribute("aria-pressed", "true");
-  await expect(names).toHaveCount(98);
+  await expect(names).toHaveCount(97);
   await expect(names.first()).toHaveText("Albania");
   await alphabetical.focus();
   await page.keyboard.press("Space");
@@ -434,12 +440,14 @@ test("country collection mirrors the compact scoreboard, filters and visit rows 
   await expect(names.first()).toHaveText("China");
   await alphabetical.click();
   await visited.click();
-  await expect(names).toHaveCount(197);
+  await expect(names).toHaveCount(198);
+  await expect(names.filter({ hasText: /^Kosovo$/ })).toHaveCount(1);
+  await expect(names.filter({ hasText: /^Svalbard$/ })).toHaveCount(1);
   await expect(alphabetical).toHaveAttribute("aria-pressed", "false");
   await alphabetical.click();
   await expect(names.first()).toHaveText("Afghanistan");
   await visited.click();
-  await expect(names).toHaveCount(98);
+  await expect(names).toHaveCount(97);
   await expect(alphabetical).toHaveAttribute("aria-pressed", "false");
   await expect(names.first()).toHaveText("China");
   await visits.click();
@@ -452,7 +460,7 @@ test("country collection mirrors the compact scoreboard, filters and visit rows 
   await days.click();
   await expect(names.first()).toHaveText("China");
   await visited.click();
-  await expect(names).toHaveCount(197);
+  await expect(names).toHaveCount(198);
   await chooseFilter(page, "Filter by last visited year", "2025");
   await expect(names.filter({ hasText: /^Austria$/ })).toHaveCount(1);
   await expect(names.filter({ hasText: /^Australia$/ })).toHaveCount(0);
@@ -466,7 +474,7 @@ test("country collection mirrors the compact scoreboard, filters and visit rows 
   await page
     .getByRole("button", { name: "Clear filters", exact: true })
     .click();
-  await expect(names).toHaveCount(197);
+  await expect(names).toHaveCount(198);
   await page
     .getByRole("combobox", { name: "Country scoreboard scope", exact: true })
     .click();
@@ -474,7 +482,7 @@ test("country collection mirrors the compact scoreboard, filters and visit rows 
   await page
     .getByRole("option", { name: "197 (🇽🇰 & 🇹🇼)", exact: true })
     .click();
-  await expect(names).toHaveCount(197);
+  await expect(names).toHaveCount(198);
   await expect(page).toHaveURL(/countrySet=197/);
   await expect(scores.locator(".scoreboard-stat-value")).toHaveText([
     "98",
@@ -482,9 +490,9 @@ test("country collection mirrors the compact scoreboard, filters and visit rows 
     "314.5",
   ]);
   await page.reload();
-  await expect(names).toHaveCount(197);
+  await expect(names).toHaveCount(198);
   await chooseFilter(page, "Country scoreboard scope", "195");
-  await expect(names).toHaveCount(197);
+  await expect(names).toHaveCount(198);
   const usa = page
     .locator(".country-row")
     .filter({ has: page.getByText("United States", { exact: true }) });
@@ -523,6 +531,82 @@ test("country collection mirrors the compact scoreboard, filters and visit rows 
         (x) => x.label.left >= x.cell.left && x.label.right <= x.cell.right,
       ),
     ).toBe(true);
+  }
+});
+
+test("phone country controls keep A and scoped visited filtering while omitting H", async ({
+  browser,
+}) => {
+  const context = await browser.newContext({
+    viewport: { width: 320, height: 900 },
+    hasTouch: true,
+    isMobile: true,
+  });
+  try {
+    const page = await context.newPage();
+    await withoutGlobe(page);
+    await page.goto("http://127.0.0.1:4173/?panel=countries");
+    const scores = page.locator(".country-overview");
+    const visited = scores.getByRole("button", { name: /^Countries visited / });
+    const alphabetical = scores.getByRole("button", {
+      name: "Sort countries alphabetically",
+      exact: true,
+    });
+    const names = page.locator(".country-row .city-row-name");
+    await expect(
+      page.getByRole("button", { name: "Enable country hover", exact: true }),
+    ).toHaveCount(0);
+    await expect(alphabetical).toHaveCSS("font-size", "10px");
+    await expect(scores.locator("dl")).toHaveCSS("height", "49px");
+    await expect(names).toHaveCount(198);
+    await visited.tap();
+    await expect(names).toHaveCount(97);
+    await expect(names.filter({ hasText: /^Kosovo$/ })).toHaveCount(0);
+    await alphabetical.tap();
+    await expect(names.first()).toHaveText("Albania");
+    await expect(visited).toHaveAttribute("aria-pressed", "true");
+    await scores
+      .getByRole("combobox", { name: "Country scoreboard scope", exact: true })
+      .tap();
+    await page
+      .getByRole("option", { name: "197 (🇽🇰 & 🇹🇼)", exact: true })
+      .tap();
+    await expect(names).toHaveCount(98);
+    await expect(names.filter({ hasText: /^Kosovo$/ })).toHaveCount(1);
+    await scores
+      .getByRole("combobox", { name: "Country scoreboard scope", exact: true })
+      .tap();
+    await page.getByRole("option", { name: "195", exact: true }).tap();
+    await expect(names).toHaveCount(97);
+    await visited.tap();
+    await expect(names).toHaveCount(198);
+    await expect(names.filter({ hasText: /^Svalbard$/ })).toHaveCount(1);
+    await expect(names.filter({ hasText: /^Kosovo$/ })).toHaveCount(1);
+    const a = (await alphabetical.boundingBox())!;
+    const scope = (await scores
+      .getByRole("combobox", { name: "Country scoreboard scope", exact: true })
+      .boundingBox())!;
+    expect(a.x >= scope.x + scope.width || a.y + a.height <= scope.y).toBe(
+      true,
+    );
+    await openCountry(page, "Taiwan");
+    await expect(
+      page.getByRole("heading", { name: "Taiwan", exact: true }),
+    ).toBeVisible();
+    await page
+      .getByRole("button", { name: "All countries (198)", exact: true })
+      .tap();
+    await page.setViewportSize({ width: 390, height: 900 });
+    await expect(
+      page.getByRole("button", { name: "Enable country hover", exact: true }),
+    ).toHaveCount(0);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+  } finally {
+    await context.close();
   }
 });
 
@@ -1131,8 +1215,8 @@ test("the Countries tab has labelled counts, independent filters, and reloadable
   await expect(page.locator(".collection-count")).toHaveText("1 city");
   await tabs.getByRole("tab", { name: "Countries", exact: true }).click();
   await expect(page).toHaveURL(/panel=countries/);
-  await expect(page.locator(".country-row")).toHaveCount(197);
-  await expect(page.locator(".collection-count")).toHaveText("197 countries");
+  await expect(page.locator(".country-row")).toHaveCount(198);
+  await expect(page.locator(".collection-count")).toHaveText("198 countries");
   await expect(
     page.getByText("Sample country data", { exact: true }),
   ).toHaveCount(0);
@@ -1158,8 +1242,8 @@ test("the Countries tab has labelled counts, independent filters, and reloadable
     .locator(".country-overview")
     .getByRole("button", { name: /^Countries visited / })
     .click();
-  await expect(page.locator(".country-row")).toHaveCount(98);
-  await expect(page.locator(".collection-count")).toHaveText("98 countries");
+  await expect(page.locator(".country-row")).toHaveCount(97);
+  await expect(page.locator(".collection-count")).toHaveText("97 countries");
   await chooseFilter(page, "Filter by last visited year", "2024");
   await chooseFilter(page, "Filter by continent", "Oceania");
   await expect(
@@ -1169,7 +1253,7 @@ test("the Countries tab has labelled counts, independent filters, and reloadable
   await page
     .getByRole("button", { name: "Clear filters", exact: true })
     .click();
-  await expect(page.locator(".country-row")).toHaveCount(197);
+  await expect(page.locator(".country-row")).toHaveCount(198);
   await page.reload();
   await expect(
     tabs.getByRole("tab", { name: "Countries", exact: true }),
@@ -1237,12 +1321,12 @@ test("countries open their own details and keep their tab through city details a
   await expect(page.locator(".city-row")).toHaveCount(3);
   await expect(countryTab).toHaveAttribute("aria-selected", "true");
   await page
-    .getByRole("button", { name: "All countries (197)", exact: true })
+    .getByRole("button", { name: "All countries (198)", exact: true })
     .click();
   await expect(
     page.getByLabel("Search countries", { exact: true }),
   ).toHaveCount(0);
-  await expect(page.locator(".country-row")).toHaveCount(197);
+  await expect(page.locator(".country-row")).toHaveCount(198);
   await expect(page).not.toHaveURL(/country=/);
   await page.goBack();
   await expect(
@@ -1286,11 +1370,20 @@ test("whole-country hover stays stable over lifted land, opens its panel and cle
   await expect(globe).toHaveAttribute("data-ready", "true", { timeout: 30000 });
   await expect(page.locator(".coordinates")).toContainText("26.5° N");
   await page
-    .getByRole("button", { name: "All countries (197)", exact: true })
+    .getByRole("button", { name: "All countries (198)", exact: true })
     .click();
   const box = (await globe.boundingBox())!;
   const point = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
   const before = await globe.screenshot();
+  const hoverToggle = page.getByRole("button", {
+    name: "Enable country hover",
+    exact: true,
+  });
+  await expect(hoverToggle).toHaveAttribute("aria-pressed", "false");
+  await page.mouse.move(point.x, point.y);
+  await expect(globe).toHaveAttribute("data-hover-country", "");
+  await expect(page.locator(".country-row")).toHaveCount(198);
+  await hoverToggle.click();
   await page.evaluate(() => {
     const stats = (
       window as unknown as Window & {
@@ -1305,16 +1398,18 @@ test("whole-country hover stays stable over lifted land, opens its panel and cle
   await expect(page.locator(".country-row .city-row-name")).toHaveText([
     "Libya",
   ]);
-  await expect(page.locator(".country-globe-preview")).toContainText("Libya");
-  await page.locator(".country-globe-preview").hover();
+  await expect(page.locator(".country-globe-preview")).toHaveCount(0);
+  await hoverToggle.hover();
   await expect(globe).toHaveAttribute("data-hover-country", "");
   await expect(page.locator(".country-row .city-row-name")).toHaveText([
     "Libya",
   ]);
-  await page
-    .getByRole("button", { name: "Show all countries", exact: true })
-    .click();
-  await expect(page.locator(".country-row")).toHaveCount(197);
+  await hoverToggle.click();
+  await expect(page.locator(".country-row")).toHaveCount(198);
+  await page.mouse.move(point.x, point.y);
+  await expect(globe).toHaveAttribute("data-hover-country", "");
+  await expect(page.locator(".country-row")).toHaveCount(198);
+  await hoverToggle.click();
   await page.mouse.move(point.x, point.y);
   await expect(globe).toHaveAttribute("data-hover-country", "LY");
   await expect(page.locator(".maplibregl-canvas")).toHaveCSS(
@@ -1377,7 +1472,7 @@ test("whole-country hover stays stable over lifted land, opens its panel and cle
     page.getByRole("heading", { name: "Libya", exact: true }),
   ).toBeVisible();
   await page
-    .getByRole("button", { name: "All countries (197)", exact: true })
+    .getByRole("button", { name: "All countries (198)", exact: true })
     .click();
   await page.mouse.move(point.x, point.y);
   await page.mouse.down();
@@ -1403,7 +1498,10 @@ test("striped-country hover clears over the sea and city pins retain click prior
     /43\.0° N.*25\.0° E/,
   );
   await page
-    .getByRole("button", { name: "All countries (197)", exact: true })
+    .getByRole("button", { name: "All countries (198)", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Enable country hover", exact: true })
     .click();
   let box = (await globe.boundingBox())!;
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
@@ -1450,8 +1548,12 @@ test("touch taps open country panels with reduced motion and do not leave a hove
     });
     await expect(page.locator(".coordinates")).toContainText("26.5° N");
     await page
-      .getByRole("button", { name: "All countries (197)", exact: true })
+      .getByRole("button", { name: "All countries (198)", exact: true })
       .click();
+    await expect(
+      page.getByRole("button", { name: "Enable country hover", exact: true }),
+    ).toHaveCount(0);
+    await expect(globe).toHaveAttribute("data-hover-available", "false");
     const box = (await globe.boundingBox())!;
     await page.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2);
     await expect(
@@ -1483,7 +1585,7 @@ test("country selection frames its boundaries and legacy country links open coun
     /41\.\d° N\s*\/\s*20\.\d° E/,
   );
   await page
-    .getByRole("button", { name: "All countries (197)", exact: true })
+    .getByRole("button", { name: "All countries (198)", exact: true })
     .click();
   await openCountry(page, "Australia");
   await expect(
@@ -1493,21 +1595,21 @@ test("country selection frames its boundaries and legacy country links open coun
     /\d+\.\d° S\s*\/\s*\d+\.\d° E/,
   );
   await page
-    .getByRole("button", { name: "All countries (197)", exact: true })
+    .getByRole("button", { name: "All countries (198)", exact: true })
     .click();
   await page.goBack();
   await expect(
     page.getByRole("heading", { name: "Australia", exact: true }),
   ).toBeVisible();
   await page
-    .getByRole("button", { name: "All countries (197)", exact: true })
+    .getByRole("button", { name: "All countries (198)", exact: true })
     .click();
   await openCountry(page, "Albania");
   await expect(page.locator(".coordinates")).toHaveText(
     /41\.\d° N\s*\/\s*20\.\d° E/,
   );
   await page
-    .getByRole("button", { name: "All countries (197)", exact: true })
+    .getByRole("button", { name: "All countries (198)", exact: true })
     .click();
   await openCountry(page, "France");
   await expect(page.locator(".coordinates")).toHaveText(
@@ -1618,7 +1720,7 @@ test("country scoreboard scope leaves rows and profile ranks unchanged without i
   await page.goto("/?panel=countries");
   const listSize = page.getByLabel("Country scoreboard scope", { exact: true });
   await expect(listSize).toContainText("195");
-  await expect(page.locator(".country-row")).toHaveCount(197);
+  await expect(page.locator(".country-row")).toHaveCount(198);
   await expect(page.locator(".collection-bottom")).toHaveText(
     /Visited\s*98\s*countries\s*174\s*cities/,
   );
@@ -1632,7 +1734,7 @@ test("country scoreboard scope leaves rows and profile ranks unchanged without i
     "26 September 2026",
   );
   await page
-    .getByRole("button", { name: "All countries (197)", exact: true })
+    .getByRole("button", { name: "All countries (198)", exact: true })
     .click();
   await chooseFilter(page, "Country scoreboard scope", "197 (🇽🇰 & 🇹🇼)");
   await expect(page).toHaveURL(/countrySet=197/);
@@ -1641,17 +1743,17 @@ test("country scoreboard scope leaves rows and profile ranks unchanged without i
   await page.reload();
   await expect(page.locator(".country-visit-rank")).toHaveText("#98");
   await page
-    .getByRole("button", { name: "All countries (197)", exact: true })
+    .getByRole("button", { name: "All countries (198)", exact: true })
     .click();
   await expect(listSize).toContainText("197");
-  await expect(page.locator(".country-row")).toHaveCount(197);
+  await expect(page.locator(".country-row")).toHaveCount(198);
   await expect(page.locator(".collection-bottom")).toHaveText(
     /Visited\s*98\s*countries\s*174\s*cities/,
   );
   await openCountry(page, "Kosovo");
   await expect(page.locator(".country-visit-rank")).toHaveText("#74");
   await page
-    .getByRole("button", { name: "All countries (197)", exact: true })
+    .getByRole("button", { name: "All countries (198)", exact: true })
     .click();
   await openCountry(page, "Taiwan");
   await expect(
@@ -1660,13 +1762,13 @@ test("country scoreboard scope leaves rows and profile ranks unchanged without i
   await expect(page.locator(".country-visit-rank")).toHaveCount(0);
   await expect(page.locator(".country-visit-list")).toHaveCount(0);
   await page
-    .getByRole("button", { name: "All countries (197)", exact: true })
+    .getByRole("button", { name: "All countries (198)", exact: true })
     .click();
   await chooseFilter(page, "Country scoreboard scope", "195");
-  await expect(page.locator(".country-row")).toHaveCount(197);
+  await expect(page.locator(".country-row")).toHaveCount(198);
   await page.goBack();
   await expect(listSize).toContainText("197");
-  await expect(page.locator(".country-row")).toHaveCount(197);
+  await expect(page.locator(".country-row")).toHaveCount(198);
 });
 
 test("country title ranks stay beside wrapped names without splitting words", async ({
@@ -1777,7 +1879,7 @@ test("country title ranks stay beside wrapped names without splitting words", as
         0,
       );
       const back = await page
-        .getByRole("button", { name: "All countries (197)", exact: true })
+        .getByRole("button", { name: "All countries (198)", exact: true })
         .boundingBox();
       expect(back!.height).toBeLessThanOrEqual(32);
       await expect(page.locator(".country-statistics dt")).toHaveText([

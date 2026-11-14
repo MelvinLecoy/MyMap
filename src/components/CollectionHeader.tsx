@@ -1,9 +1,7 @@
 import { useRef, type RefObject } from "react";
 import { Building2, CalendarDays, Globe2, Search, X } from "lucide-react";
-import type { CountryRecord } from "../lib/countries";
 import { VISIT_YEAR_COLORS } from "../lib/palette";
 import FilterDropdown from "./FilterDropdown";
-import { Flag } from "./CollectionItems";
 
 export type CollectionView = "cities" | "countries";
 
@@ -77,8 +75,6 @@ export default function CollectionHeader({
   lastVisitYears,
   count,
   searchRef,
-  countryPreview,
-  onClearCountryPreview,
 }: {
   view: CollectionView;
   search: string;
@@ -91,8 +87,6 @@ export default function CollectionHeader({
   lastVisitYears: string[];
   count: number;
   searchRef: RefObject<HTMLInputElement | null>;
-  countryPreview?: Pick<CountryRecord, "code" | "name">;
-  onClearCountryPreview?: () => void;
 }) {
   const countries = view === "countries";
   const noun = countries
@@ -142,24 +136,6 @@ export default function CollectionHeader({
             <kbd>⌘ K</kbd>
           )}
         </label>
-      )}
-      {countries && countryPreview && (
-        <div
-          className="country-globe-preview"
-          role="status"
-          aria-label="Country shown from globe"
-        >
-          <Globe2 size={12} aria-hidden="true" />
-          <Flag code={countryPreview.code} />
-          <strong>{countryPreview.name}</strong>
-          <button
-            type="button"
-            aria-label="Show all countries"
-            onClick={onClearCountryPreview}
-          >
-            <X size={12} aria-hidden="true" />
-          </button>
-        </div>
       )}
       <div
         className={`filter-row city-filter-row${countries ? " country-filter-row" : ""}`}

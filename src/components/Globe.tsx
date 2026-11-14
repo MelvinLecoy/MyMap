@@ -5,6 +5,7 @@ import maplibregl, {
   type ExpressionSpecification,
   type StyleSpecification,
   type SymbolLayerSpecification,
+  type MapMouseEvent,
 } from "maplibre-gl";
 import {
   Plus,
@@ -35,7 +36,7 @@ import {
 import { providerLabelFilters } from "../lib/map-labels";
 import { countryBounds, positionBounds } from "../lib/country-camera";
 import { countryKey } from "../lib/countries";
-import { createCountryHover } from "../lib/country-hover";
+import { createCountryHover, restoreCountryPaint } from "../lib/country-hover";
 import type { FeatureCollection } from "geojson";
 import type { City, CountryVisit } from "../lib/types";
 import "maplibre-gl/dist/maplibre-gl.css";
@@ -47,6 +48,8 @@ interface Props {
   onSelect: (id: string) => void;
   onSelectCountry: (code: string) => void;
   onHoverCountry: (code: string | null) => void;
+  hoverAvailable: boolean;
+  hoverEnabled: boolean;
   countryCodes: string[];
   geonames: boolean;
   viewControl?: ReactNode;
@@ -59,6 +62,8 @@ export default function Globe({
   onSelect,
   onSelectCountry,
   onHoverCountry,
+  hoverAvailable,
+  hoverEnabled,
   countryCodes,
   geonames,
   viewControl,
@@ -69,6 +74,7 @@ export default function Globe({
   const countryHover = useRef<ReturnType<typeof createCountryHover> | null>(
     null,
   );
+  const configureHoverRef = useRef<(() => void) | null>(null);
   const current = useRef({
     cities,
     countries,
@@ -77,6 +83,8 @@ export default function Globe({
     onSelect,
     onSelectCountry,
     onHoverCountry,
+    hoverAvailable,
+    hoverEnabled,
     countryCodes: new Set(countryCodes),
   });
   current.current = {
@@ -87,6 +95,8 @@ export default function Globe({
     onSelect,
     onSelectCountry,
     onHoverCountry,
+    hoverAvailable,
+    hoverEnabled,
     countryCodes: new Set(countryCodes),
   };
   const [ready, setReady] = useState(false);
@@ -135,7 +145,6 @@ export default function Globe({
       "bottom-right",
     );
     const canvas = map.getCanvas();
-    const hoverMedia = window.matchMedia("(hover: hover)");
     const hoverPoint = { x: 0, y: 0 };
     let hoverFrame = 0;
     let hoveredCountry: string | null = null;
@@ -285,15 +294,8 @@ export default function Globe({
         firstLabel,
       );
       countryHover.current?.destroy();
-      countryHover.current = createCountryHover(
-        map,
-        current.current.countries,
-        firstLabel,
-        motionDuration,
-      );
-      countryHover.current.setSelectedCountry(
-        current.current.selected ? null : current.current.selectedCountry,
-      );
+      countryHover.current = null;
+      configureHover();
       hoveredCountry = null;
       if (container.current) container.current.dataset.hoverCountry = "";
       for (const [id, minzoom, filter] of [
@@ -467,11 +469,6 @@ export default function Globe({
       hoverCountry(null);
       setCursor("");
     };
-    map.on("movestart", clearHover);
-    map.getCanvas().addEventListener("mouseleave", clearHover);
-    map
-      .getCanvas()
-      .addEventListener("touchstart", clearHover, { passive: true });
     map.on("dragstart", () => setHint(false));
     const pickCityFeature = (point: { x: number; y: number }) => {
       if (!map.getSource("atlas-cities") || !map.getLayer("city-pins"))
@@ -553,8 +550,8 @@ export default function Globe({
         /* A simultaneous filter change can replace a cluster. */
       }
     });
-    map.on("mousemove", (e) => {
-      if (map.isMoving() || !hoverMedia.matches) {
+    const handleHover = (e: MapMouseEvent) => {
+      if (map.isMoving() || !current.current.hoverAvailable) {
         clearHover();
         return;
       }
@@ -564,16 +561,53 @@ export default function Globe({
       // High-rate pointers only need one hit test for the next visible frame.
       hoverFrame = requestAnimationFrame(() => {
         hoverFrame = 0;
-        if (map.isMoving() || !hoverMedia.matches) {
+        if (map.isMoving() || !current.current.hoverAvailable) {
           clearHover();
           return;
         }
         const city = pickCityFeature(hoverPoint);
-        const code = city ? null : pickCountry(hoverPoint);
+        const code =
+          city || !current.current.hoverEnabled
+            ? null
+            : pickCountry(hoverPoint);
         hoverCountry(code);
         setCursor(city || code ? "pointer" : "");
       });
-    });
+    };
+    function configureHover() {
+      map.off("mousemove", handleHover);
+      map.off("movestart", clearHover);
+      canvas.removeEventListener("mouseleave", clearHover);
+      canvas.removeEventListener("touchstart", clearHover);
+      if (!current.current.hoverAvailable) {
+        clearHover();
+        countryHover.current?.destroy();
+        countryHover.current = null;
+        restoreCountryPaint(map, current.current.countries);
+        return;
+      }
+      if (!map.getLayer("atlas-land")) return;
+      if (!countryHover.current) {
+        const firstLabel = map
+          .getStyle()
+          .layers.find((layer) => layer.type === "symbol")?.id;
+        countryHover.current = createCountryHover(
+          map,
+          current.current.countries,
+          firstLabel,
+          motionDuration,
+        );
+      }
+      countryHover.current.setSelectedCountry(
+        current.current.selected ? null : current.current.selectedCountry,
+      );
+      if (!current.current.hoverEnabled) clearHover();
+      map.on("movestart", clearHover);
+      canvas.addEventListener("mouseleave", clearHover);
+      canvas.addEventListener("touchstart", clearHover, { passive: true });
+      map.on("mousemove", handleHover);
+    }
+    configureHoverRef.current = configureHover;
     const resize = new ResizeObserver(() => map.resize());
     resize.observe(container.current);
     // Start with the bundled atlas immediately. A compatible provider adds closer-scale labels.
@@ -614,10 +648,12 @@ export default function Globe({
       clearTimeout(timeout);
       resize.disconnect();
       cancelHoverPick();
+      configureHoverRef.current = null;
       countryHover.current?.destroy();
       countryHover.current = null;
       map.getCanvas().removeEventListener("mouseleave", clearHover);
       map.getCanvas().removeEventListener("touchstart", clearHover);
+      map.off("mousemove", handleHover);
       map.remove();
       mapRef.current = null;
     };
@@ -639,8 +675,12 @@ export default function Globe({
   useEffect(() => {
     const map = mapRef.current;
     if (!ready || !map?.getLayer("atlas-land")) return;
-    countryHover.current?.updateCountries(countries);
+    if (countryHover.current) countryHover.current.updateCountries(countries);
+    else restoreCountryPaint(map, countries);
   }, [countries, ready]);
+  useEffect(() => {
+    configureHoverRef.current?.();
+  }, [hoverAvailable, hoverEnabled, ready]);
   useEffect(() => {
     if (ready)
       countryHover.current?.setSelectedCountry(
@@ -758,6 +798,7 @@ export default function Globe({
         data-testid="map-canvas"
         data-ready={ready}
         data-hover-country=""
+        data-hover-available={hoverAvailable}
         data-selected-country={selected ? "" : (selectedCountry ?? "")}
       />
       <div className="map-topline">
