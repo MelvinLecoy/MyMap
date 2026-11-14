@@ -12,7 +12,7 @@ export function cityCollection(): City[] {
 }
 const sqlJson = (value: unknown) =>
   `'${JSON.stringify(value).replaceAll("'", "''")}'::jsonb`;
-const newIds = ["rome-italy", "vatican-city-vatican-city"];
+const newIds = ["rome-italy", "vatican-city-vatican-city", "austin-usa", "san-antonio-usa"];
 
 /** Scoped initial/idempotent import. Existing differing histories require a new review. */
 export function citySeedSql(cities: City[]): string {

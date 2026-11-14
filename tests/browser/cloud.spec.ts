@@ -332,12 +332,12 @@ test("saving a city's map status updates progress and filters while retaining it
     })
     .click();
   await expect(page.locator(".city-map-progress-heading")).toContainText(
-    "254 / 323 complete",
+    "254 / 325 complete",
   );
   await expect(page.locator(".city-overview-totals dd")).toHaveText([
-    "57",
-    "111",
-    "249.5",
+    "69",
+    "124",
+    "265.5",
   ]);
   await page
     .getByRole("group", { name: "Map progress filters" })
@@ -648,9 +648,9 @@ test("the editor can export every city with saved statuses and nullable coordina
     columns: true,
     bom: true,
   }) as Array<Record<string, string>>;
-  expect(rows).toHaveLength(323);
+  expect(rows).toHaveLength(325);
   expect(rows.find((c) => c.CityId === "moscow-russia")!.Status).toBe("Update");
-  expect(rows.filter((c) => c.Latitude && c.Longitude)).toHaveLength(321);
+  expect(rows.filter((c) => c.Latitude && c.Longitude)).toHaveLength(323);
   expect(rows.find((c) => c.CityId === "london-uk")!.RecordedDaysSpent).toBe(
     "6.5",
   );
@@ -663,9 +663,9 @@ test("the editor can export every city with saved statuses and nullable coordina
     columns: true,
     bom: true,
   }) as Array<Record<string, string>>;
-  expect(visits).toHaveLength(111);
-  expect(new Set(visits.map((v) => v.CityId)).size).toBe(57);
-  expect(visits.reduce((n, v) => n + Number(v.DaysSpent), 0)).toBe(249.5);
+  expect(visits).toHaveLength(124);
+  expect(new Set(visits.map((v) => v.CityId)).size).toBe(69);
+  expect(visits.reduce((n, v) => n + Number(v.DaysSpent), 0)).toBe(265.5);
   expect(
     visits.find(
       (v) =>

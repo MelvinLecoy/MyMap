@@ -93,8 +93,148 @@
   "halfDays": "Keep the screenshot date bounds; a fractional duration does not identify which date was a half-day.",
   "visitCounting": "Each approved screenshot entry is a city stay; the country 14-day grouping rule is not applied.",
   "expected": {
-    "cities": 57,
-    "stays": 111,
-    "days": 249.5
-  }
+    "cities": 69,
+    "stays": 124,
+    "days": 265.5
+  },
+  "additionalVisits": [
+    {
+      "city": "Seattle",
+      "country_code": "US",
+      "visits": [
+        {
+          "start": "2022-07-17",
+          "end": "2022-07-18",
+          "days": 2
+        }
+      ]
+    },
+    {
+      "city": "Dallas",
+      "country_code": "US",
+      "visits": [
+        {
+          "start": "2024-12-17",
+          "end": "2024-12-17",
+          "days": 1
+        },
+        {
+          "start": "2025-04-02",
+          "end": "2025-04-02",
+          "days": 1
+        }
+      ]
+    },
+    {
+      "city": "Denver",
+      "country_code": "US",
+      "visits": [
+        {
+          "start": "2024-12-14",
+          "end": "2024-12-15",
+          "days": 2
+        }
+      ]
+    },
+    {
+      "city": "Austin",
+      "country_code": "US",
+      "visits": [
+        {
+          "start": "2024-12-16",
+          "end": "2024-12-16",
+          "days": 1
+        }
+      ]
+    },
+    {
+      "city": "San Antonio",
+      "country_code": "US",
+      "visits": [
+        {
+          "start": "2024-12-16",
+          "end": "2024-12-16",
+          "days": 1
+        }
+      ]
+    },
+    {
+      "city": "San Diego",
+      "country_code": "US",
+      "visits": [
+        {
+          "start": "2026-04-04",
+          "end": "2026-04-05",
+          "days": 2
+        }
+      ]
+    },
+    {
+      "city": "Tijuana",
+      "country_code": "MX",
+      "visits": [
+        {
+          "start": "2026-04-04",
+          "end": "2026-04-04",
+          "days": 1
+        }
+      ]
+    },
+    {
+      "city": "Baltimore",
+      "country_code": "US",
+      "visits": [
+        {
+          "start": "2026-07-11",
+          "end": "2026-07-11",
+          "days": 1
+        }
+      ]
+    },
+    {
+      "city": "Ottawa",
+      "country_code": "CA",
+      "visits": [
+        {
+          "start": "2026-07-11",
+          "end": "2026-07-11",
+          "days": 1
+        }
+      ]
+    },
+    {
+      "city": "Montego Bay",
+      "country_code": "JM",
+      "visits": [
+        {
+          "start": "2026-07-12",
+          "end": "2026-07-12",
+          "days": 1
+        }
+      ]
+    },
+    {
+      "city": "Santo Domingo",
+      "country_code": "DO",
+      "visits": [
+        {
+          "start": "2026-07-15",
+          "end": "2026-07-15",
+          "days": 1
+        }
+      ]
+    },
+    {
+      "city": "San Pedro Sula",
+      "country_code": "HN",
+      "visits": [
+        {
+          "start": "2026-09-26",
+          "end": "2026-09-26",
+          "days": 1
+        }
+      ]
+    }
+  ],
+  "additionalVisitsSource": "Owner-supplied city dates and durations, 2026-11-13; no original screenshot records were altered."
 }

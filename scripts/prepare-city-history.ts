@@ -23,6 +23,7 @@ const decisions = JSON.parse(
   }[];
   expected: { cities: number; stays: number; days: number };
   excludedCities: string[];
+  additionalVisits: { city: string; country_code: string; visits: SourceCard["visits"] }[];
 };
 const csv = (rows: unknown[][]) =>
   rows
@@ -70,6 +71,26 @@ for (const row of [
     latitude: "41.90292",
     longitude: "12.45339",
   },
+  {
+    cityid: "austin-usa",
+    cities: "Austin",
+    country: "USA",
+    countrycode: "US",
+    continent: "America",
+    region: "North America",
+    latitude: "30.2672",
+    longitude: "-97.7431",
+  },
+  {
+    cityid: "san-antonio-usa",
+    cities: "San Antonio",
+    country: "USA",
+    countrycode: "US",
+    continent: "America",
+    region: "North America",
+    latitude: "29.4241",
+    longitude: "-98.4936",
+  },
 ])
   if (!metadata.some((c) => c.cityid === row.cityid))
     metadata.push({
@@ -92,9 +113,12 @@ const history: unknown[][] = [];
 let totalDays = 0,
   cityCount = 0;
 const applied = new Set<number>();
-for (const card of cards.filter(
-  (c) => !decisions.excludedCities.includes(c.city),
-)) {
+// Original screenshot transcription is immutable. Append later owner-supplied
+// histories here, so regeneration keeps the new cities and stays intact.
+for (const card of [
+  ...cards.filter((c) => !decisions.excludedCities.includes(c.city)),
+  ...decisions.additionalVisits.map((v) => ({ ...v, excluded: false })),
+]) {
   const matches = metadata.filter(
     (c) =>
       c.countrycode === card.country_code &&
