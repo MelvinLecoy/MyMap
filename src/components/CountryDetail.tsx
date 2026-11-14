@@ -6,7 +6,11 @@ import {
   CircleDashed,
   Crown,
 } from "lucide-react";
-import type { CountryRecord, CountryTrip } from "../lib/countries";
+import {
+  countryVisitOrderLabel,
+  type CountryRecord,
+  type CountryTrip,
+} from "../lib/countries";
 import { formatVisitDate, VISIT_LABELS, type City } from "../lib/types";
 import { useCountryHeading } from "../lib/use-country-heading";
 import { CityRow, Flag } from "./CollectionItems";
@@ -71,6 +75,10 @@ export default function CountryDetail({
   visitOrder?: number | null;
 }) {
   const rankFillId = `country-rank-${useId().replace(/:/g, "")}`;
+  const orderLabel =
+    visitOrder == null
+      ? null
+      : countryVisitOrderLabel(country.code, visitOrder);
   const headingRef = useCountryHeading(country.name, visitOrder);
   const visits = [...(country.visits ?? [])].sort(
     (a, b) => a.number - b.number,
@@ -124,8 +132,12 @@ export default function CountryDetail({
               <span
                 className="country-visit-rank"
                 role="note"
-                aria-label={`Visit order ${visitOrder}`}
-                title="Visit order"
+                aria-label={`Visit order ${orderLabel}`}
+                title={
+                  country.code === "XK"
+                    ? "Visit order · * Included in the 197-country set"
+                    : "Visit order"
+                }
               >
                 <svg
                   className="country-rank-frame"
@@ -173,6 +185,9 @@ export default function CountryDetail({
                     #
                   </span>
                   <span className="country-rank-digits">{visitOrder}</span>
+                  {country.code === "XK" && (
+                    <sup className="country-order-asterisk">*</sup>
+                  )}
                 </span>
               </span>
             )}

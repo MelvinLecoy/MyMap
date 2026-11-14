@@ -91,8 +91,8 @@ export default function FilterDropdown({
         setOpen(false);
         return;
       }
-      const width = Math.min(Math.max(anchor.width, 170), viewportWidth - 16);
-      const desiredHeight = Math.min(280, options.length * 28 + 10);
+      const width = menu.current?.getBoundingClientRect().width ?? anchor.width;
+      const desiredHeight = Math.min(280, options.length * 24 + 10);
       const below = viewportHeight - anchor.bottom - 13;
       const above = anchor.top - 13;
       const opensBelow =
@@ -100,7 +100,6 @@ export default function FilterDropdown({
       const maxHeight = Math.max(0, Math.min(280, opensBelow ? below : above));
       const height = Math.min(desiredHeight, maxHeight);
       setPosition({
-        width,
         maxHeight,
         left: Math.max(8, Math.min(anchor.left, viewportWidth - width - 8)),
         top: opensBelow

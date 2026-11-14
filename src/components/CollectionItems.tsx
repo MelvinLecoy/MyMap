@@ -3,7 +3,6 @@ import {
   ChevronRight,
   CircleCheck,
   CircleDashed,
-  Crown,
 } from "lucide-react";
 import {
   VISIT_LABELS,
@@ -16,6 +15,7 @@ import {
   countryDisplayName,
   latestCountryVisit,
   countryVisitSummary,
+  countryVisitOrderLabel,
   type CountryRecord,
 } from "../lib/countries";
 import { VISIT_YEAR_COLORS } from "../lib/palette";
@@ -73,7 +73,32 @@ export function VisitMarker({
 }
 
 export function CountryVisitMarker({ country }: { country: CountryRecord }) {
-  if (country.visit !== "visited") return <VisitMarker visit={country.visit} />;
+  return (
+    <span className="country-visit-marker">
+      {(country.code === "XK" || country.code === "TW") && (
+        <span
+          className="country-set-badge"
+          role="img"
+          aria-label="Included in the 197-country set"
+          title="197-country set: Kosovo and Taiwan"
+        >
+          <svg viewBox="0 0 24 28" aria-hidden="true">
+            <path d="m12 1 3 2h3l1 3 3 2-1 3 2 3-2 3 1 3-3 2-1 3h-3l-3 2-3-2H6l-1-3-3-2 1-3-2-3 2-3-1-3 3-2 1-3h3Z" />
+          </svg>
+          <span>UN</span>
+          <strong>197</strong>
+        </span>
+      )}
+      {country.visit === "visited" ? (
+        <CountryVisitedSummary country={country} />
+      ) : (
+        <VisitMarker visit={country.visit} />
+      )}
+    </span>
+  );
+}
+
+function CountryVisitedSummary({ country }: { country: CountryRecord }) {
   const summary = countryVisitSummary(country);
   const count = summary.visits;
   const label = count == null ? "Visited" : count === 1 ? "Visit" : "Visits";
@@ -107,23 +132,57 @@ export function CountryVisitMarker({ country }: { country: CountryRecord }) {
   );
 }
 
-export function CountryVisitOrderBadge({ order }: { order: number | null }) {
+export function CountryVisitOrderBadge({
+  code,
+  order,
+}: {
+  code: string;
+  order: number | null;
+}) {
+  const label = order == null ? null : countryVisitOrderLabel(code, order);
   return (
     <span className="country-row-order">
       {order != null && (
         <span
           className="country-order-badge"
           role="note"
-          aria-label={`Visit order ${order}`}
-          title={`Country visit order: #${order}`}
+          aria-label={`Visit order ${label}`}
+          title={
+            code === "XK"
+              ? `Country visit order: #${label} · Included in the 197-country set`
+              : `Country visit order: #${label}`
+          }
         >
-          <Crown size={10} strokeWidth={1.6} aria-hidden="true" />
+          <svg
+            className="country-order-shield"
+            viewBox="0 0 40 44"
+            aria-hidden="true"
+          >
+            <path d="M6 3Q20 7 34 3Q35 8 38 11C34 20 38 28 34 34C30 39 24 40 20 43C16 40 10 39 6 34C2 28 6 20 2 11Q5 8 6 3Z" />
+            <path
+              className="country-order-shield-inset"
+              d="M8 6Q20 9 32 6L35 12C32 21 35 28 32 32C29 36 23 38 20 40C17 38 11 36 8 32C5 28 8 21 5 12Z"
+            />
+          </svg>
           <span className="country-order-number">
             <span className="country-row-order-hash">#</span>
             {order}
+            {code === "XK" && <sup className="country-order-asterisk">*</sup>}
           </span>
         </span>
       )}
+    </span>
+  );
+}
+
+export function CountryCityCount({ count }: { count: number }) {
+  return (
+    <span className="country-city-count" data-empty={count === 0}>
+      <svg viewBox="0 0 48 44" aria-hidden="true">
+        <path d="M22.3 3Q24 0 25.7 3L45 38Q46.5 41 43 41H5Q1.5 41 3 38Z" />
+      </svg>
+      <strong>{count}</strong>{" "}
+      <span>{count === 1 ? "city" : "cities"}</span>
     </span>
   );
 }

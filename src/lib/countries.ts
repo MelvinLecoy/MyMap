@@ -120,6 +120,24 @@ export function countryVisitOrders(countries: CountrySeed[], set: CountrySet) {
       .map((country, index) => [country.code, index + 1]),
   );
 }
+
+export function countryDisplayVisitOrders(
+  countries: CountrySeed[],
+  set: CountrySet,
+) {
+  const orders = countryVisitOrders(countries, set);
+  // Base-mode rows also include Kosovo, without consuming a place in the 195 count.
+  if (set === 195) {
+    const kosovoOrder = countryVisitOrders(countries, 197).get("XK");
+    if (kosovoOrder != null) orders.set("XK", kosovoOrder);
+  }
+  return orders;
+}
+
+export function countryVisitOrderLabel(code: string, order: number) {
+  return `${order}${code === "XK" ? "*" : ""}`;
+}
+
 export function mergeCountryVisits(
   initial: CountryVisit[],
   records: CountryRecord[],

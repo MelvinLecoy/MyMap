@@ -2155,7 +2155,7 @@ h2 {
   border-color: var(--line);
 }
 .country-row {
-  grid-template-columns: 48px minmax(0, 1fr) 32px 60px 14px;
+  grid-template-columns: 48px minmax(0, 1fr) 32px 52px 14px;
   column-gap: 8px;
 }
 .country-row .city-row-name {
@@ -2165,33 +2165,76 @@ h2 {
 .country-row .country-flag {
   flex-shrink: 0;
 }
+.country-visit-marker {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 48px;
+}
+.country-set-badge {
+  position: absolute;
+  top: calc(50% - 1px);
+  left: -13px;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 24px;
+  color: #456d85;
+  font-size: 5.5px;
+  line-height: 7px;
+  font-weight: 700;
+}
+.country-set-badge svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  fill: #edf5f9;
+  stroke: #9cb8c7;
+  stroke-width: 0.9;
+}
+.country-set-badge > :not(svg) {
+  position: relative;
+}
+.country-set-badge strong {
+  font-size: 7px;
+  line-height: 8px;
+  font-weight: 800;
+}
 .country-row-order {
   display: grid;
   place-items: center;
   width: 32px;
 }
 .country-order-badge {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1px;
+  position: relative;
+  display: grid;
+  place-items: center;
   width: 32px;
-  height: 32px;
-  border: 1px solid #d4c293;
-  border-radius: 9px;
-  background: linear-gradient(155deg, #fffef8, #f4e8c8);
-  box-shadow:
-    inset 0 1px 0 #ffffff,
-    0 1px 2px #795b1810;
+  height: 36px;
   color: #71521b;
 }
-.country-order-badge > svg {
-  color: #a17b32;
-  fill: #e8d5a2;
-  flex-shrink: 0;
+.country-order-shield {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  fill: #f8edcf;
+  stroke: #b99b50;
+  stroke-width: 1.1;
+  filter: drop-shadow(0 1px 1px #795b1810);
+}
+.country-order-shield .country-order-shield-inset {
+  fill: none;
+  stroke: #e3cf94;
+  stroke-width: 0.8;
 }
 .country-order-number {
+  position: relative;
+  transform: translateY(-1px);
   display: inline-flex;
   align-items: baseline;
   gap: 1px;
@@ -2205,29 +2248,49 @@ h2 {
   font-size: 8px;
   font-weight: 650;
 }
+.country-order-asterisk {
+  align-self: flex-start;
+  font-size: 0.65em;
+  line-height: 1;
+  font-weight: 700;
+}
 .country-city-count {
-  display: inline-flex;
-  align-items: baseline;
-  justify-content: center;
-  gap: 4px;
-  padding: 4px 7px;
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  background: var(--surface);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  justify-self: center;
+  width: 44px;
+  height: 40px;
+  padding-bottom: 5px;
   color: var(--muted);
-  font-size: 9px;
-  line-height: 12px;
+  font-size: 8px;
+  line-height: 10px;
   white-space: nowrap;
+}
+.country-city-count > svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  fill: #edf4ef;
+  stroke: #bbd0c3;
+  stroke-width: 1;
+}
+.country-city-count > :not(svg) {
+  position: relative;
 }
 .country-city-count strong {
   color: var(--text);
   font-size: 12px;
   font-weight: 800;
+  line-height: 12px;
   font-variant-numeric: tabular-nums;
 }
-.country-city-count[data-empty="true"] {
-  background: transparent;
-  border-color: transparent;
+.country-city-count[data-empty="true"] > svg {
+  fill: #f4f6f2;
+  stroke: #dde6df;
 }
 .country-city-count[data-empty="true"] strong {
   color: var(--muted);
@@ -2246,17 +2309,17 @@ h2 {
   position: absolute;
   z-index: 2;
   top: 50%;
-  left: -17px;
+  left: -18px;
   transform: translateY(-50%);
   display: grid;
   place-items: center;
   width: 16px;
   height: 18px;
   padding: 0;
-  border: 1px solid var(--line);
+  border: 1px solid transparent;
   border-radius: 3px;
   color: var(--muted);
-  background: var(--surface);
+  background: transparent;
   font-size: 10px;
   line-height: 14px;
   font-weight: 750;
@@ -2264,8 +2327,8 @@ h2 {
 .country-hover-toggle:hover,
 .country-hover-toggle[aria-pressed="true"] {
   color: var(--accent);
-  border-color: var(--accent);
-  background: var(--surface-alt);
+  border-color: var(--line);
+  background: var(--surface);
 }
 .country-alphabetical-toggle {
   position: absolute;
@@ -2752,6 +2815,8 @@ h2 {
   overflow-y: auto;
   overscroll-behavior: contain;
   min-width: 0;
+  width: max-content;
+  max-width: calc(100vw - 16px);
   padding: 4px;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -2764,10 +2829,11 @@ h2 {
   touch-action: pan-y;
 }
 .collection-filter-option {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 12px;
   align-items: center;
-  gap: 8px;
-  height: 28px;
+  gap: 10px;
+  height: 24px;
   padding: 0 7px;
   border-radius: 4px;
   color: var(--text);
@@ -2777,8 +2843,8 @@ h2 {
   cursor: pointer;
 }
 .collection-filter-option-label {
-  flex: 1;
   min-width: 0;
+  white-space: nowrap;
 }
 .collection-filter-option[aria-selected="true"] {
   color: var(--accent);

@@ -5,6 +5,8 @@ import { importCountryHistory } from "../scripts/country-importer";
 import {
   buildCountryRecords,
   countryVisitOrders,
+  countryDisplayVisitOrders,
+  countryVisitOrderLabel,
   inCountrySet,
   mergeCountryVisits,
 } from "../src/lib/countries";
@@ -97,6 +99,33 @@ test("country set selection changes ranks consistently and retains the stored ch
   assert.equal(
     countries.find((country) => country.code === "HN")?.firstVisitOrder,
     98,
+  );
+});
+
+test("display ranks retain Kosovo's starred place without consuming a 195-country number", () => {
+  const before = countries.map((country) => [
+    country.code,
+    country.firstVisitOrder,
+  ]);
+  const base = countryDisplayVisitOrders(countries, 195);
+  const full = countryDisplayVisitOrders(countries, 197);
+  assert.equal(countryVisitOrderLabel("XK", base.get("XK")!), "74*");
+  assert.equal(countryVisitOrderLabel("XK", full.get("XK")!), "74*");
+  for (const [code, rank] of [
+    ["TJ", 74],
+    ["UZ", 75],
+    ["KG", 76],
+    ["KZ", 77],
+    ["FI", 78],
+    ["HN", 97],
+  ] as const) {
+    assert.equal(base.get(code), rank);
+    assert.equal(full.get(code), rank + 1);
+  }
+  assert.equal(base.get("TW"), undefined);
+  assert.deepEqual(
+    countries.map((country) => [country.code, country.firstVisitOrder]),
+    before,
   );
 });
 

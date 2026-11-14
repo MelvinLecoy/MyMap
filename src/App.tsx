@@ -26,6 +26,7 @@ import {
   CityRow,
   CountryVisitMarker,
   CountryVisitOrderBadge,
+  CountryCityCount,
   Flag,
   VisitMarker,
 } from "./components/CollectionItems";
@@ -38,7 +39,7 @@ import countrySeed from "./generated/countries.json";
 import {
   buildCountryRecords,
   countryDisplayName,
-  countryVisitOrders,
+  countryDisplayVisitOrders,
   countryKey,
   latestCountryVisit,
   countryVisitSummary,
@@ -243,8 +244,8 @@ export default function App() {
   );
   const countriesInView = countryRecords;
   const countryOrders = useMemo(
-    () => countryVisitOrders(countryRecords, 197),
-    [countryRecords],
+    () => countryDisplayVisitOrders(countryRecords, route.countrySet),
+    [countryRecords, route.countrySet],
   );
   const scopedCountry = countryRecords.find(
     (country) => country.code === route.country,
@@ -682,17 +683,10 @@ export default function App() {
                             </span>
                           </span>
                           <CountryVisitOrderBadge
+                            code={country.code}
                             order={countryOrders.get(country.code) ?? null}
                           />
-                          <span
-                            className="country-city-count"
-                            data-empty={country.cityCount === 0}
-                          >
-                            <strong>{country.cityCount}</strong>{" "}
-                            <span>
-                              {country.cityCount === 1 ? "city" : "cities"}
-                            </span>
-                          </span>
+                          <CountryCityCount count={country.cityCount} />
                           <ChevronRight
                             className="row-chevron"
                             size={14}

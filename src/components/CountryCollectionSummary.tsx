@@ -117,7 +117,7 @@ export default function CountryCollectionSummary({
                     }
                     options={[
                       { value: "195", label: "195" },
-                      { value: "197", label: "197 (🇽🇰 & 🇹🇼)" },
+                      { value: "197", label: "197 (🇽🇰🇹🇼)" },
                     ]}
                   />
                 </div>
