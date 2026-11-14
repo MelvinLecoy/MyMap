@@ -667,15 +667,15 @@ h2 {
 }
 .city-visit-summary {
   display: grid;
-  grid-template-rows: 10px 36px 10px;
-  gap: 5px;
+  grid-template-rows: 10px 34px 10px;
+  gap: 4px;
   justify-items: center;
   width: 48px;
-  height: 66px;
+  height: 62px;
 }
 .city-row .city-count-badge {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   min-height: 0;
   padding: 3px;
   gap: 1px;
@@ -683,14 +683,14 @@ h2 {
   box-shadow: inset 0 0 0 1px #a2cdb3;
 }
 .city-count-badge strong {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 900;
-  line-height: 17px;
+  line-height: 16px;
   font-variant-numeric: tabular-nums;
 }
 .city-count-badge > span {
-  font-size: 9px;
-  line-height: 10px;
+  font-size: 8.5px;
+  line-height: 9px;
 }
 .city-last-visit {
   font-size: 10px;

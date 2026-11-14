@@ -255,26 +255,19 @@ test("compact year and continent menus filter latest visits, retain year colors 
   const date = (await row.locator(".city-last-visit").boundingBox())!;
   const badge = (await row.locator(".city-count-badge").boundingBox())!;
   const duration = (await row.locator(".city-row-duration").boundingBox())!;
-  expect(badge.y - date.y - date.height).toBe(5);
-  expect(duration.y - badge.y - badge.height).toBe(5);
+  expect(badge.y - date.y - date.height).toBe(4);
+  expect(duration.y - badge.y - badge.height).toBe(4);
   expect((await row.boundingBox())!.height).toBe(72);
   expect(badge.width).toBe(badge.height);
+  expect(badge.width).toBe(34);
   await expect(row.locator(".city-row-metrics .city-row-duration")).toHaveCount(
     0,
   );
   await year.click();
-  const years = [
-    ...new Set(
-      data.cities.flatMap((city) =>
-        city.lastVisited ? [city.lastVisited.slice(0, 4)] : [],
-      ),
-    ),
-  ]
-    .sort()
-    .reverse();
+  const years = ["2026", "2025", "2024", "2023 or before"];
   await expect(page.getByRole("option")).toHaveText(["All years", ...years]);
   for (const value of years) {
-    const color = VISIT_YEAR_COLORS[Number(value) <= 2023 ? "2023" : value];
+    const color = VISIT_YEAR_COLORS[value.slice(0, 4)];
     const rgb = color
       .slice(1)
       .match(/../g)!
@@ -285,7 +278,16 @@ test("compact year and continent menus filter latest visits, retain year colors 
         .locator(".collection-filter-option-label"),
     ).toHaveCSS("color", `rgb(${rgb.join(", ")})`);
   }
-  await page.getByRole("option", { name: "2025", exact: true }).click();
+  await page
+    .getByRole("option", { name: "2023 or before", exact: true })
+    .click();
+  await expect(page.locator(".city-row")).toHaveCount(
+    data.cities.filter(
+      (city) =>
+        city.lastVisited && Number(city.lastVisited.slice(0, 4)) <= 2023,
+    ).length,
+  );
+  await chooseFilter(page, "Filter by last visited year", "2025");
   const in2025 = data.cities.filter((city) =>
     city.lastVisited?.startsWith("2025"),
   );

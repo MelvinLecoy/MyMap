@@ -231,7 +231,8 @@ export default function CollectionHeader({
                 { value: "all", label: "All years", shortLabel: "Year" },
                 ...lastVisitYears.map((value) => ({
                   value,
-                  label: value,
+                  label: value === "2023" ? "2023 or before" : value,
+                  shortLabel: value === "2023" ? "≤2023" : undefined,
                   color:
                     VISIT_YEAR_COLORS[Number(value) <= 2023 ? "2023" : value],
                 })),

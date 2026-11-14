@@ -206,7 +206,9 @@ export default function App() {
         ...new Set(
           [...cityLastVisits.values()]
             .filter((date) => date != null)
-            .map((date) => date.slice(0, 4)),
+            .map((date) =>
+              Number(date.slice(0, 4)) <= 2023 ? "2023" : date.slice(0, 4),
+            ),
         ),
       ].sort((a, b) => Number(b) - Number(a)),
     [cityLastVisits],
@@ -264,14 +266,19 @@ export default function App() {
   const cityScope = useMemo(() => {
     const query = searchText(search);
     return cities
-      .filter(
-        (city) =>
+      .filter((city) => {
+        const year = cityLastVisits.get(city.id)?.slice(0, 4);
+        return (
           searchText(`${city.name} ${city.country}`).includes(query) &&
           (continent === "all" || city.continent === continent) &&
           (lastVisitYear === "all" ||
-            cityLastVisits.get(city.id)?.slice(0, 4) === lastVisitYear) &&
-          (!scopedCountry || countryKey(city) === scopedCountry.code),
-      )
+            (year != null &&
+              (lastVisitYear === "2023"
+                ? Number(year) <= 2023
+                : year === lastVisitYear))) &&
+          (!scopedCountry || countryKey(city) === scopedCountry.code)
+        );
+      })
       .sort((a, b) => a.name.localeCompare(b.name));
   }, [search, continent, lastVisitYear, cityLastVisits, cities, scopedCountry]);
   const cityProgressScope = useMemo(
