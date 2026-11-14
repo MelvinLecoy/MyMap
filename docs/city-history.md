@@ -1,6 +1,6 @@
 # City visit history
 
-The approved city history contains **57 cities, 111 stays and 248 days**. Each
+The approved city history contains **57 cities, 111 stays and 249.5 days**. Each
 screenshot entry remains a separate city stay. Southampton and Reykjavík are
 excluded. Rome and Vatican City were absent from the original collection and
 are added without invented map links; the collection now has 323 cities.
@@ -20,9 +20,11 @@ The owner did not specify which date was partial, so no time or daily allocation
 is invented. Auckland's separate 28 July stay remains one day.
 
 The three corrected starts are Prague 5 May 2024 (two days), Panama City
-24 March 2025 (one day), and Boston 20 August 2021 (one day). All other screenshot
-entries are preserved, including the midnight-related exceptions approved by
-the owner. The baseline transcription and approval ledger are tracked in
+24 March 2025 (one day), and Boston 20 August 2021 (one day). Later owner
+corrections adjust Los Angeles 30 January–2 February 2022 (3.5 days), Orlando
+1–6 March 2022 (5.5 days), Boston 26–28 June 2022 (2.5 days), and San Francisco
+1–2 November 2025 (2 days). All other screenshot entries are preserved,
+including the midnight-related exceptions approved by the owner. The baseline transcription and approval ledger are tracked in
 `data/sources/city-screenshot-transcription.json` and `city-visit-decisions.json`.
 `npm run city:prepare-data` reproduces both city CSVs from those sources. This
 is a source preparation command, not a synchronization from the live database.
@@ -53,6 +55,9 @@ does not alter timestamps. Country tables and their complete snapshot are
 compared inside the transaction and must remain identical.
 
 This change does not propagate city dates or durations into country history.
+The subsequent four-city owner corrections have a separate guarded migration,
+`202611130004_city_visit_owner_corrections.sql`, which must be applied to the live
+Supabase database in addition to deploying the updated CSV bundle.
 The owner's subsequent country-specific corrections are applied separately by
 `history:apply-updates`; see [duration updates](duration-updates.md).
 
