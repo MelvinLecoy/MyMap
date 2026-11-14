@@ -58,6 +58,10 @@ This change does not propagate city dates or durations into country history.
 The subsequent four-city owner corrections have a separate guarded migration,
 `202611130004_city_visit_owner_corrections.sql`, which must be applied to the live
 Supabase database in addition to deploying the updated CSV bundle.
+Use `npm run city:verify-corrections` for a transactionally rolled-back live
+check, then `npm run city:apply-corrections` to commit it using the configured
+Supabase management credential. `npm run city:prepare-data` regenerates the
+corrected local CSVs first; it does not edit the live database.
 The owner's subsequent country-specific corrections are applied separately by
 `history:apply-updates`; see [duration updates](duration-updates.md).
 
