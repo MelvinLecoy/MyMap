@@ -1175,6 +1175,127 @@ test("countries open their own details and keep their tab through city details a
   ).toBeVisible();
 });
 
+test("whole-country hover stays stable over lifted land, opens its panel and clears during globe dragging", async ({
+  page,
+}) => {
+  await page.route("https://tiles.openfreemap.org/**", (route) =>
+    route.abort(),
+  );
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("/?country=LY");
+  const globe = page.getByTestId("map-canvas");
+  await expect(globe).toHaveAttribute("data-ready", "true", { timeout: 30000 });
+  await expect(page.locator(".coordinates")).toContainText("26.5° N");
+  await page
+    .getByRole("button", { name: "All countries (195)", exact: true })
+    .click();
+  const box = (await globe.boundingBox())!;
+  const point = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+  const before = await globe.screenshot();
+  await page.mouse.move(point.x, point.y);
+  await expect(globe).toHaveAttribute("data-hover-country", "LY");
+  await expect(page.locator(".maplibregl-canvas")).toHaveCSS(
+    "cursor",
+    "pointer",
+  );
+  await expect
+    .poll(async () => Buffer.compare(await globe.screenshot(), before))
+    .not.toBe(0);
+  await page.mouse.move(point.x + 18, point.y + 12);
+  await expect(globe).toHaveAttribute("data-hover-country", "LY");
+  await page.mouse.click(point.x + 18, point.y + 12);
+  await expect(page).toHaveURL(/panel=countries.*country=LY/);
+  await expect(
+    page.getByRole("heading", { name: "Libya", exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "All countries (195)", exact: true })
+    .click();
+  await page.mouse.move(point.x, point.y);
+  await page.mouse.down();
+  await page.mouse.move(point.x + 85, point.y + 20, { steps: 8 });
+  await page.mouse.up();
+  await expect(page).not.toHaveURL(/country=LY/);
+  await expect(globe).toHaveAttribute("data-hover-country", "");
+  await page.getByLabel("Search countries", { exact: true }).hover();
+  await expect(globe).toHaveAttribute("data-hover-country", "");
+  expect(errors).toEqual([]);
+});
+
+test("striped-country hover clears over the sea and city pins retain click priority", async ({
+  page,
+}) => {
+  await page.route("https://tiles.openfreemap.org/**", (route) =>
+    route.abort(),
+  );
+  await page.goto("/?country=IE");
+  const globe = page.getByTestId("map-canvas");
+  await expect(globe).toHaveAttribute("data-ready", "true", { timeout: 30000 });
+  await expect(page.locator(".coordinates")).not.toHaveText(
+    /43\.0° N.*25\.0° E/,
+  );
+  await page
+    .getByRole("button", { name: "All countries (195)", exact: true })
+    .click();
+  let box = (await globe.boundingBox())!;
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await expect(globe).toHaveAttribute("data-hover-country", "IE");
+  await page.mouse.move(box.x + 20, box.y + box.height * 0.45);
+  await expect(globe).toHaveAttribute("data-hover-country", "");
+  await page.goto("/?city=reykjavik-iceland");
+  await expect(globe).toHaveAttribute("data-ready", "true", { timeout: 30000 });
+  await expect(page.locator(".coordinates")).toContainText("64.1° N");
+  await page
+    .getByRole("button", { name: "All cities (343)", exact: true })
+    .click();
+  box = (await globe.boundingBox())!;
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await expect(globe).toHaveAttribute("data-hover-country", "");
+  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+  await expect(page).toHaveURL(/city=reykjavik-iceland/);
+  await expect(
+    page.getByRole("heading", { name: "Reykjavik", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("tab", { name: "Cities", exact: true }),
+  ).toHaveAttribute("aria-selected", "true");
+});
+
+test("touch taps open country panels with reduced motion and do not leave a hover state", async ({
+  browser,
+}) => {
+  const context = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    hasTouch: true,
+    isMobile: true,
+    reducedMotion: "reduce",
+  });
+  try {
+    const page = await context.newPage();
+    await page.route("https://tiles.openfreemap.org/**", (route) =>
+      route.abort(),
+    );
+    await page.goto("http://127.0.0.1:4173/?country=LY");
+    const globe = page.getByTestId("map-canvas");
+    await expect(globe).toHaveAttribute("data-ready", "true", {
+      timeout: 30000,
+    });
+    await expect(page.locator(".coordinates")).toContainText("26.5° N");
+    await page
+      .getByRole("button", { name: "All countries (195)", exact: true })
+      .click();
+    const box = (await globe.boundingBox())!;
+    await page.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2);
+    await expect(
+      page.getByRole("heading", { name: "Libya", exact: true }),
+    ).toBeVisible();
+    await expect(globe).toHaveAttribute("data-hover-country", "");
+  } finally {
+    await context.close();
+  }
+});
+
 test("country selection frames its boundaries and legacy country links open country details", async ({
   page,
 }) => {

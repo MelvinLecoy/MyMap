@@ -1,0 +1,211 @@
+import type { ExpressionSpecification, Map as MapInstance } from "maplibre-gl";
+import { countryFillOpacity, fillColors } from "./map-style";
+import { countryStripeLayers } from "./country-stripes";
+import { MAP_COLORS } from "./palette";
+import type { CountryVisit } from "./types";
+
+const hovered: ExpressionSpecification = [
+  "boolean",
+  ["feature-state", "countryHover"],
+  false,
+];
+const onlyHovered = (
+  value: number | ExpressionSpecification,
+): ExpressionSpecification => ["case", hovered, value, 0];
+const transition = { duration: 0, delay: 0 };
+
+/** A shared-source overlay: geographic hit areas and city layers stay fixed. */
+export function createCountryHover(
+  map: MapInstance,
+  countries: CountryVisit[],
+  beforeId: string | undefined,
+  duration: (milliseconds: number) => number,
+) {
+  let active: string | null = null;
+  let target: string | null = null;
+  let progress = 0;
+  let frame = 0;
+  let disposed = false;
+  const stripeIds = countryStripeLayers(countries).map(
+    (layer) => `atlas-hover-${layer.id}`,
+  );
+  map.addLayer(
+    {
+      id: "atlas-hover-shadow",
+      type: "fill",
+      source: "atlas-countries",
+      paint: {
+        "fill-color": "#173d3c",
+        "fill-opacity": onlyHovered(0),
+        "fill-translate": [0, 1],
+        "fill-translate-anchor": "viewport",
+        "fill-opacity-transition": transition,
+      },
+    },
+    beforeId,
+  );
+  map.addLayer(
+    {
+      id: "atlas-hover-shadow-edge",
+      type: "line",
+      source: "atlas-countries",
+      paint: {
+        "line-color": "#173d3c",
+        "line-width": 3,
+        "line-blur": 1.2,
+        "line-opacity": onlyHovered(0),
+        "line-translate": [0, 1],
+        "line-translate-anchor": "viewport",
+        "line-opacity-transition": transition,
+      },
+    },
+    beforeId,
+  );
+  map.addLayer(
+    {
+      id: "atlas-hover-land",
+      type: "fill",
+      source: "atlas-countries",
+      paint: {
+        "fill-color": fillColors(countries) as ExpressionSpecification,
+        "fill-opacity": onlyHovered(countryFillOpacity(countries)),
+        "fill-translate": [0, 0],
+        "fill-translate-anchor": "viewport",
+        "fill-translate-transition": transition,
+        "fill-opacity-transition": transition,
+      },
+    },
+    beforeId,
+  );
+  for (const layer of countryStripeLayers(countries)) {
+    map.addLayer(
+      {
+        ...layer,
+        id: `atlas-hover-${layer.id}`,
+        paint: {
+          ...layer.paint,
+          "fill-opacity": onlyHovered(1),
+          "fill-opacity-transition": transition,
+          "fill-translate": [0, 0],
+          "fill-translate-anchor": "viewport",
+          "fill-translate-transition": transition,
+        },
+      },
+      beforeId,
+    );
+  }
+  map.addLayer(
+    {
+      id: "atlas-hover-outline",
+      type: "line",
+      source: "atlas-countries",
+      paint: {
+        "line-color": MAP_COLORS.cityLabel,
+        "line-width": 1.25,
+        "line-opacity": onlyHovered(0),
+        "line-translate": [0, 0],
+        "line-translate-anchor": "viewport",
+        "line-translate-transition": transition,
+        "line-opacity-transition": transition,
+      },
+    },
+    beforeId,
+  );
+
+  function paint() {
+    if (disposed || !map.getLayer("atlas-hover-land")) return;
+    const offset: [number, number] = [0, duration(160) ? -2 * progress : 0];
+    for (const id of ["atlas-hover-land", ...stripeIds])
+      map.setPaintProperty(id, "fill-translate", offset);
+    map.setPaintProperty("atlas-hover-outline", "line-translate", offset);
+    map.setPaintProperty(
+      "atlas-hover-outline",
+      "line-opacity",
+      onlyHovered(0.85 * progress),
+    );
+    map.setPaintProperty(
+      "atlas-hover-shadow",
+      "fill-opacity",
+      onlyHovered(0.12 * progress),
+    );
+    map.setPaintProperty(
+      "atlas-hover-shadow-edge",
+      "line-opacity",
+      onlyHovered(0.18 * progress),
+    );
+  }
+  function state(code: string, value: boolean) {
+    if (map.getSource("atlas-countries"))
+      map.setFeatureState(
+        { source: "atlas-countries", id: code },
+        { countryHover: value },
+      );
+  }
+  function updateCountries(next: CountryVisit[]) {
+    if (disposed || !map.getLayer("atlas-hover-land")) return;
+    map.setPaintProperty("atlas-land", "fill-color", fillColors(next));
+    map.setPaintProperty("atlas-land", "fill-opacity", [
+      "case",
+      hovered,
+      0,
+      countryFillOpacity(next),
+    ]);
+    map.setPaintProperty("atlas-borders", "line-opacity", [
+      "case",
+      hovered,
+      0,
+      0.9,
+    ]);
+    map.setPaintProperty("atlas-hover-land", "fill-color", fillColors(next));
+    map.setPaintProperty(
+      "atlas-hover-land",
+      "fill-opacity",
+      onlyHovered(countryFillOpacity(next)),
+    );
+    for (const layer of countryStripeLayers(next)) {
+      map.setFilter(layer.id, layer.filter ?? null);
+      map.setPaintProperty(layer.id, "fill-opacity", ["case", hovered, 0, 1]);
+      map.setFilter(`atlas-hover-${layer.id}`, layer.filter ?? null);
+    }
+  }
+  function setCountry(code: string | null) {
+    if (disposed || code === target) return;
+    cancelAnimationFrame(frame);
+    target = code;
+    if (code && code !== active) {
+      if (active) state(active, false);
+      active = code;
+      progress = 0;
+      state(code, true);
+    }
+    const from = progress,
+      to = code ? 1 : 0;
+    const start = performance.now(),
+      milliseconds = duration(code ? 160 : 120);
+    const tick = (now: number) => {
+      if (disposed) return;
+      const fraction = milliseconds
+        ? Math.min(1, (now - start) / milliseconds)
+        : 1;
+      progress = from + (to - from) * (1 - (1 - fraction) ** 3);
+      paint();
+      if (fraction < 1) frame = requestAnimationFrame(tick);
+      else if (!target && active) {
+        state(active, false);
+        active = null;
+      }
+    };
+    tick(start);
+  }
+  updateCountries(countries);
+  return {
+    setCountry,
+    updateCountries,
+    destroy() {
+      cancelAnimationFrame(frame);
+      if (active) state(active, false);
+      active = target = null;
+      disposed = true;
+    },
+  };
+}

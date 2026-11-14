@@ -35,6 +35,7 @@ import {
 import { providerLabelFilters } from "../lib/map-labels";
 import { countryBounds, positionBounds } from "../lib/country-camera";
 import { countryKey } from "../lib/countries";
+import { createCountryHover } from "../lib/country-hover";
 import type { FeatureCollection } from "geojson";
 import type { City, CountryVisit } from "../lib/types";
 import "maplibre-gl/dist/maplibre-gl.css";
@@ -44,6 +45,8 @@ interface Props {
   selected: City | null;
   selectedCountry?: string | null;
   onSelect: (id: string) => void;
+  onSelectCountry: (code: string) => void;
+  countryCodes: string[];
   geonames: boolean;
   viewControl?: ReactNode;
 }
@@ -53,14 +56,33 @@ export default function Globe({
   selected,
   selectedCountry = null,
   onSelect,
+  onSelectCountry,
+  countryCodes,
   geonames,
   viewControl,
 }: Props) {
   const container = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapInstance | null>(null);
   const providerLabels = useRef<SymbolLayerSpecification[]>([]);
-  const current = useRef({ cities, countries, selected, onSelect });
-  current.current = { cities, countries, selected, onSelect };
+  const countryHover = useRef<ReturnType<typeof createCountryHover> | null>(
+    null,
+  );
+  const current = useRef({
+    cities,
+    countries,
+    selected,
+    onSelect,
+    onSelectCountry,
+    countryCodes: new Set(countryCodes),
+  });
+  current.current = {
+    cities,
+    countries,
+    selected,
+    onSelect,
+    onSelectCountry,
+    countryCodes: new Set(countryCodes),
+  };
   const [ready, setReady] = useState(false);
   const [unavailable, setUnavailable] = useState(false);
   const [regional, setRegional] = useState(false);
@@ -153,6 +175,7 @@ export default function Globe({
         type: "geojson",
         data: asset("atlas/countries.geojson"),
         tolerance: 0.1,
+        promoteId: "code",
       });
       map.addSource("atlas-admin1", {
         type: "geojson",
@@ -250,6 +273,14 @@ export default function Globe({
         },
         firstLabel,
       );
+      countryHover.current?.destroy();
+      countryHover.current = createCountryHover(
+        map,
+        current.current.countries,
+        firstLabel,
+        motionDuration,
+      );
+      if (container.current) container.current.dataset.hoverCountry = "";
       for (const [id, minzoom, filter] of [
         ["large", 0, ["<=", ["get", "rank"], 3]],
         [
@@ -401,6 +432,20 @@ export default function Globe({
       setRegional(map.getZoom() >= 3);
     };
     map.on("moveend", move);
+    const hoverCountry = (code: string | null) => {
+      countryHover.current?.setCountry(code);
+      if (container.current)
+        container.current.dataset.hoverCountry = code ?? "";
+    };
+    const clearHover = () => {
+      hoverCountry(null);
+      map.getCanvas().style.cursor = "";
+    };
+    map.on("movestart", clearHover);
+    map.getCanvas().addEventListener("mouseleave", clearHover);
+    map
+      .getCanvas()
+      .addEventListener("touchstart", clearHover, { passive: true });
     map.on("dragstart", () => setHint(false));
     const pickCityFeature = (point: { x: number; y: number }) => {
       if (!map.getSource("atlas-cities") || !map.getLayer("city-pins"))
@@ -439,9 +484,23 @@ export default function Globe({
         )
         .sort((a, b) => a.distance - b.distance)[0]?.feature;
     };
+    const pickCountry = (point: { x: number; y: number }) => {
+      if (!map.getLayer("atlas-land")) return null;
+      const feature = map
+        .queryRenderedFeatures([point.x, point.y], { layers: ["atlas-land"] })
+        .find((feature) =>
+          current.current.countryCodes.has(feature.properties.code),
+        );
+      return (feature?.properties.code as string | undefined) ?? null;
+    };
     map.on("click", async (e) => {
       const f = pickCityFeature(e.point);
-      if (!f || f.geometry.type !== "Point") return;
+      hoverCountry(null);
+      if (!f || f.geometry.type !== "Point") {
+        const code = pickCountry(e.point);
+        if (code) current.current.onSelectCountry(code);
+        return;
+      }
       if (!f.properties.cluster) {
         if (f.properties.id) current.current.onSelect(f.properties.id);
         return;
@@ -460,7 +519,14 @@ export default function Globe({
       }
     });
     map.on("mousemove", (e) => {
-      map.getCanvas().style.cursor = pickCityFeature(e.point) ? "pointer" : "";
+      if (map.isMoving() || !window.matchMedia("(hover: hover)").matches) {
+        clearHover();
+        return;
+      }
+      const city = pickCityFeature(e.point);
+      const code = city ? null : pickCountry(e.point);
+      hoverCountry(code);
+      map.getCanvas().style.cursor = city || code ? "pointer" : "";
     });
     const resize = new ResizeObserver(() => map.resize());
     resize.observe(container.current);
@@ -501,6 +567,10 @@ export default function Globe({
       abort.abort();
       clearTimeout(timeout);
       resize.disconnect();
+      countryHover.current?.destroy();
+      countryHover.current = null;
+      map.getCanvas().removeEventListener("mouseleave", clearHover);
+      map.getCanvas().removeEventListener("touchstart", clearHover);
       map.remove();
       mapRef.current = null;
     };
@@ -522,19 +592,7 @@ export default function Globe({
   useEffect(() => {
     const map = mapRef.current;
     if (!ready || !map?.getLayer("atlas-land")) return;
-    map.setPaintProperty(
-      "atlas-land",
-      "fill-color",
-      fillColors(countries) as ExpressionSpecification,
-    );
-    map.setPaintProperty(
-      "atlas-land",
-      "fill-opacity",
-      countryFillOpacity(countries),
-    );
-    for (const layer of countryStripeLayers(countries)) {
-      if (map.getLayer(layer.id)) map.setFilter(layer.id, layer.filter ?? null);
-    }
+    countryHover.current?.updateCountries(countries);
   }, [countries, ready]);
   useEffect(() => {
     const map = mapRef.current;
@@ -646,6 +704,7 @@ export default function Globe({
         ref={container}
         data-testid="map-canvas"
         data-ready={ready}
+        data-hover-country=""
       />
       <div className="map-topline">
         {viewControl ?? (

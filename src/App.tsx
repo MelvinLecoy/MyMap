@@ -462,6 +462,8 @@ export default function App() {
             selected={selected}
             selectedCountry={scopedCountry?.code ?? null}
             onSelect={(id) => navigate(id)}
+            onSelectCountry={openCountry}
+            countryCodes={countryRecords.map((country) => country.code)}
             geonames={data.geonames}
             viewControl={
               cloud.enabled ? (
