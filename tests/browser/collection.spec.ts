@@ -255,7 +255,7 @@ test("compact year and continent menus filter latest visits, retain year colors 
   const date = (await row.locator(".city-last-visit").boundingBox())!;
   const badge = (await row.locator(".city-count-badge").boundingBox())!;
   const duration = (await row.locator(".city-row-duration").boundingBox())!;
-  expect(badge.y - date.y - date.height).toBe(4);
+  expect(badge.y - date.y - date.height).toBe(3);
   expect(duration.y - badge.y - badge.height).toBe(4);
   expect((await row.boundingBox())!.height).toBe(72);
   expect(badge.width).toBe(badge.height);

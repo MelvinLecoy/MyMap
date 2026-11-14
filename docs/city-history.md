@@ -120,7 +120,7 @@ the viewport on narrow screens. Clear filters resets year and continent too.
 
 City rows show the last visit as year/month above the visit badge and actual
 days below it. Country dates retain their existing format. The visited city
-square is 34px with 4px gaps above and below, keeping the normal 72px row height.
+square is 34px with a 3px gap above and 4px below, keeping the normal 72px row height.
 
 ## Expanded verified city batch
 

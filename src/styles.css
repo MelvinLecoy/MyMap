@@ -666,10 +666,9 @@ h2 {
   min-width: 0;
 }
 .city-visit-summary {
-  display: grid;
-  grid-template-rows: 10px 34px 10px;
-  gap: 4px;
-  justify-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   width: 48px;
   height: 62px;
 }
@@ -677,6 +676,8 @@ h2 {
   width: 34px;
   height: 34px;
   min-height: 0;
+  flex-shrink: 0;
+  margin-top: 3px;
   padding: 3px;
   gap: 1px;
   border-radius: 8px;
@@ -693,6 +694,8 @@ h2 {
   line-height: 9px;
 }
 .city-last-visit {
+  height: 10px;
+  flex-shrink: 0;
   font-size: 9px;
   line-height: 10px;
   font-weight: 650;
@@ -709,6 +712,9 @@ h2 {
   line-height: 10px;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+}
+.city-visit-summary .city-row-duration {
+  margin-top: 4px;
 }
 .city-row-duration strong {
   color: var(--text);
