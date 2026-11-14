@@ -25,10 +25,14 @@ and checks cached visit totals against the sum of actual durations.
 
 The website appends a duration only when it differs from the inclusive date
 span, such as `(1 day)` or `(3.5 days)`. Ordinary dates have no annotation.
-Every visit and country summary uses actual durations. The shared 2025 color
-is now `#b19800` for date labels and globe stripes, balanced between the earlier
-neon yellow and muted gold. Other year colors and country fills stay
-unchanged.
+Every visit and country summary uses actual durations. The 2025 date labels and
+year filters use `#dfbf00` (RGB 223, 191, 0), paired with pure yellow `#ffff00`
+for the globe. The shared year palette stores that brighter globe override
+alongside the date color. Date labels, year filters and globe stripes for 2023
+or earlier all use `#733900` (RGB 115, 57, 0). Other year colors and country fills
+stay unchanged. Visited-city pins and their legend use black. Individual city-pin
+radii are one pixel smaller; cluster and cluster-halo radii are two pixels smaller.
+Clustering rules and click targets are retained.
 
 The Cities panel adds visit/day statistics and a map-progress overview. Progress
 buttons update the existing status filter and globe; totals follow the visible

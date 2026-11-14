@@ -142,31 +142,24 @@ test("country half-days work for any country, reject quarters, and retain compat
   );
 });
 
-test("2025 uses the same readable golden yellow for date text and stripe pixels", () => {
-  assert.equal(COUNTRY_STRIPE_COLORS[2025], VISIT_YEAR_COLORS[2025]);
+test("the shared year palette correlates date labels and globe stripe colors", () => {
+  assert.equal(VISIT_YEAR_COLORS[2025], "#dfbf00");
+  assert.equal(COUNTRY_STRIPE_COLORS[2025], "#ffff00");
+  assert.equal(COUNTRY_STRIPE_COLORS[2023], VISIT_YEAR_COLORS[2023]);
+  assert.equal(COUNTRY_STRIPE_COLORS[2024], VISIT_YEAR_COLORS[2024]);
   const rgb = (hex: string) =>
     [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
-  const lum = (hex: string) =>
-    rgb(hex)
-      .map((v) => v / 255)
-      .map((v) => (v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4))
-      .reduce((n, v, i) => n + v * [0.2126, 0.7152, 0.0722][i], 0);
-  assert.ok(
-    (lum("#fbfcf7") + 0.05) / (lum(VISIT_YEAR_COLORS[2025]) + 0.05) >= 2.7,
-  );
-  assert.ok(lum(VISIT_YEAR_COLORS[2025]) > lum("#887200"));
-  assert.ok(lum(VISIT_YEAR_COLORS[2025]) < lum("#ffe600"));
   const pattern = countryStripeImage(COUNTRY_STRIPE_COLORS[2025]);
   const pixel =
     Array.from(pattern.data).findIndex((v, i) => i % 4 === 3 && v > 0) - 3;
   assert.ok(pixel >= 0);
   assert.deepEqual(
     Array.from(pattern.data.slice(pixel, pixel + 3)),
-    rgb(VISIT_YEAR_COLORS[2025]),
+    rgb(COUNTRY_STRIPE_COLORS[2025]),
   );
   assert.deepEqual(
     [VISIT_YEAR_COLORS[2026], VISIT_YEAR_COLORS[2024], VISIT_YEAR_COLORS[2023]],
-    ["#26784f", "#e67e00", "#573122"],
+    ["#26784f", "#e67e00", "#733900"],
   );
 });
 

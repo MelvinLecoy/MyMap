@@ -27,7 +27,6 @@
   --on-accent: #173d3c;
   --visited-country: #63b28a;
   --visit-text: #316b59;
-  --visited-pin: #e4a53d;
 }
 * {
   box-sizing: border-box;
@@ -332,10 +331,9 @@ h2 {
 }
 .legend-pin {
   display: inline-block;
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: var(--visited-pin);
 }
 .coordinates {
   position: absolute;

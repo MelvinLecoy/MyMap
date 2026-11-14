@@ -17,7 +17,7 @@ export const MAP_COLORS = {
   clusterText: "#253f4c",
   clusterHalo: "#86c7b3",
   selectionHalo: "#4d9b8a",
-  pinVisited: "#e4a53d",
+  pinVisited: "#000000",
   pinNotVisited: "#fdfffa",
   pinUnknown: "#254651",
   pinOutline: "#6c8c91",
@@ -26,15 +26,36 @@ export const MAP_COLORS = {
   horizon: "#b4dce0",
 } as const;
 
-export const VISIT_YEAR_COLORS: Readonly<Record<string, string>> = {
-  2026: "#26784f",
-  2025: "#b19800",
-  2024: "#e67e00",
-  2023: "#573122",
+// Date labels, year filters and globe stripes share one year-to-color mapping.
+// A stripe override lets the globe use a brighter shade of the same year color.
+export const VISIT_YEAR_PALETTE: Readonly<
+  Record<
+    string,
+    {
+      date: string;
+      globeStripe?: string | null;
+    }
+  >
+> = {
+  2026: { date: "#26784f", globeStripe: null },
+  2025: { date: "#dfbf00", globeStripe: "#ffff00" },
+  2024: { date: "#e67e00" },
+  2023: { date: "#733900" },
 };
 
-export const COUNTRY_STRIPE_COLORS: Readonly<Record<string, string>> = {
-  2025: VISIT_YEAR_COLORS[2025],
-  2024: VISIT_YEAR_COLORS[2024],
-  2023: VISIT_YEAR_COLORS[2023],
-};
+export const VISIT_YEAR_COLORS: Readonly<Record<string, string>> =
+  Object.fromEntries(
+    Object.entries(VISIT_YEAR_PALETTE).map(([year, color]) => [
+      year,
+      color.date,
+    ]),
+  );
+
+export const COUNTRY_STRIPE_COLORS: Readonly<Record<string, string>> =
+  Object.fromEntries(
+    Object.entries(VISIT_YEAR_PALETTE).flatMap(([year, color]) =>
+      color.globeStripe === null
+        ? []
+        : [[year, color.globeStripe ?? color.date]],
+    ),
+  );

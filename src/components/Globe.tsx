@@ -350,7 +350,7 @@ export default function Globe({
         source: "atlas-cities",
         filter: ["has", "point_count"],
         paint: {
-          "circle-radius": 18,
+          "circle-radius": 16,
           "circle-color": MAP_COLORS.clusterHalo,
           "circle-opacity": 0.12,
         },
@@ -361,7 +361,7 @@ export default function Globe({
         source: "atlas-cities",
         filter: ["has", "point_count"],
         paint: {
-          "circle-radius": 12.5,
+          "circle-radius": 10.5,
           "circle-color": MAP_COLORS.clusterFill,
           "circle-stroke-width": 2,
           "circle-stroke-color": MAP_COLORS.clusterStroke,
@@ -401,11 +401,11 @@ export default function Globe({
             ["linear"],
             ["zoom"],
             0,
-            3.5,
+            2.5,
             3,
-            4.5,
+            3.5,
             5,
-            5,
+            4,
           ],
           "circle-color": ["get", "color"],
           "circle-stroke-color": [
@@ -875,7 +875,10 @@ export default function Globe({
               Visited country
             </span>
             <span>
-              <i className="legend-pin" />
+              <i
+                className="legend-pin"
+                style={{ backgroundColor: MAP_COLORS.pinVisited }}
+              />
               Visited city
             </span>
             <div
