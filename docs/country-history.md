@@ -134,8 +134,13 @@ count remains one. The correction is included in the country ledger and
 `202611140005_costa_rica_duration.sql`; other histories remain unchanged.
 
 The country collection shares the compact city scoreboard and visit-row style.
-Countries visited toggles visited-only results; Visits and Days spent toggle
-highest-first sorting with alphabetical ties. Globe hover, continent and last-visited
+Countries visited toggles visited-only results in recorded visit-number order,
+starting with China, the US, Canada, the UK, Switzerland and the Netherlands.
+The small A button in that column toggles alphabetical order independently of
+the visited filter. Visits and Days spent toggle highest-first sorting with
+alphabetical ties; toggling an active sort off restores visit-number order.
+Unranked countries follow in alphabetical order. Sorting changes only the list
+order and does not replace the globe's city data. Globe hover, continent and last-visited
 year filters combine independently from city filters. The country search bar is
 replaced by the hovered country's name and a clear button. The result stays visible
 when moving into the panel. Hover does not change the camera, open a profile,

@@ -2186,6 +2186,37 @@ h2 {
 .country-overview-totals > div {
   padding-inline: 4px;
 }
+.country-overview-totals > div:first-child dd {
+  padding-right: 6px;
+}
+.country-alphabetical-toggle {
+  position: absolute;
+  z-index: 2;
+  top: -4px;
+  right: 2px;
+  display: grid;
+  place-items: center;
+  width: 13px;
+  height: 13px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  color: var(--muted);
+  background: transparent;
+  font-size: 8px;
+  line-height: 11px;
+  font-weight: 750;
+}
+.country-alphabetical-toggle:hover,
+.country-alphabetical-toggle[aria-pressed="true"] {
+  color: var(--accent);
+  background: var(--surface);
+  border-color: var(--line);
+}
+.country-alphabetical-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
 .collection-controls .country-filter-row {
   gap: 4px;
   margin-top: 0;

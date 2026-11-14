@@ -379,6 +379,18 @@ test("country collection mirrors the compact scoreboard, filters and visit rows 
   const visited = scores.getByRole("button", { name: /^Countries visited / });
   const visits = scores.getByRole("button", { name: /^Visits / });
   const days = scores.getByRole("button", { name: /^Days spent / });
+  const alphabetical = scores.getByRole("button", {
+    name: "Sort countries alphabetically",
+    exact: true,
+  });
+  const firstVisits = [
+    "China",
+    "United States",
+    "Canada",
+    "United Kingdom",
+    "Switzerland",
+    "Netherlands",
+  ];
   await expect(scores.locator(".scoreboard-stat-value")).toHaveText([
     "97",
     "125",
@@ -388,6 +400,9 @@ test("country collection mirrors the compact scoreboard, filters and visit rows 
   await expect(page.locator(".city-map-progress")).toHaveCount(0);
   const names = page.locator(".country-row .city-row-name");
   await expect(names).toHaveCount(197);
+  await expect(alphabetical).toHaveAttribute("aria-pressed", "false");
+  for (const [index, name] of firstVisits.entries())
+    await expect(names.nth(index)).toHaveText(name);
   const albania = page
     .locator(".country-row")
     .filter({ has: page.locator(".city-row-name", { hasText: /^Albania$/ }) });
@@ -406,6 +421,27 @@ test("country collection mirrors the compact scoreboard, filters and visit rows 
   await expect(albania.locator(".country-city-count strong")).toHaveText("1");
   await visited.click();
   await expect(names).toHaveCount(98);
+  for (const [index, name] of firstVisits.entries())
+    await expect(names.nth(index)).toHaveText(name);
+  await alphabetical.click();
+  await expect(alphabetical).toHaveAttribute("aria-pressed", "true");
+  await expect(visited).toHaveAttribute("aria-pressed", "true");
+  await expect(names).toHaveCount(98);
+  await expect(names.first()).toHaveText("Albania");
+  await alphabetical.focus();
+  await page.keyboard.press("Space");
+  await expect(alphabetical).toHaveAttribute("aria-pressed", "false");
+  await expect(names.first()).toHaveText("China");
+  await alphabetical.click();
+  await visited.click();
+  await expect(names).toHaveCount(197);
+  await expect(alphabetical).toHaveAttribute("aria-pressed", "false");
+  await alphabetical.click();
+  await expect(names.first()).toHaveText("Afghanistan");
+  await visited.click();
+  await expect(names).toHaveCount(98);
+  await expect(alphabetical).toHaveAttribute("aria-pressed", "false");
+  await expect(names.first()).toHaveText("China");
   await visits.click();
   await expect(names.nth(0)).toHaveText("Canada");
   await expect(names.nth(1)).toHaveText("China");
@@ -414,7 +450,7 @@ test("country collection mirrors the compact scoreboard, filters and visit rows 
   await expect(names.nth(0)).toHaveText("Canada");
   await expect(names.nth(1)).toHaveText("Australia");
   await days.click();
-  await expect(names.first()).toHaveText("Albania");
+  await expect(names.first()).toHaveText("China");
   await visited.click();
   await expect(names).toHaveCount(197);
   await chooseFilter(page, "Filter by last visited year", "2025");

@@ -19,7 +19,9 @@ import CityVisitHistory from "./components/CityVisitHistory";
 import CityCollectionSummary, {
   type CityScoreSort,
 } from "./components/CityCollectionSummary";
-import CountryCollectionSummary from "./components/CountryCollectionSummary";
+import CountryCollectionSummary, {
+  type CountryScoreSort,
+} from "./components/CountryCollectionSummary";
 import {
   CityRow,
   CountryVisitMarker,
@@ -110,7 +112,8 @@ export default function App() {
   const [countryVisit, setCountryVisit] = useState("all");
   const [countryContinent, setCountryContinent] = useState("all");
   const [countryLastVisitYear, setCountryLastVisitYear] = useState("all");
-  const [countrySort, setCountrySort] = useState<CityScoreSort>("alphabetical");
+  const [countrySort, setCountrySort] =
+    useState<CountryScoreSort>("visit-order");
   const [statusOverrides, setStatusOverrides] = useState(() =>
     readStatusOverrides(statusStorageKey),
   );
@@ -288,28 +291,32 @@ export default function App() {
               : year === countryLastVisitYear)))
       );
     });
-    if (countrySort === "alphabetical") return matches;
-    return matches.sort(
-      (a, b) =>
-        (countryVisitSummary(b)[countrySort] ?? 0) -
-          (countryVisitSummary(a)[countrySort] ?? 0) ||
-        a.name.localeCompare(b.name),
-    );
+    return matches;
   }, [
     countriesInView,
     countryVisit,
     countryContinent,
     countryLastVisitYear,
     countryLastVisits,
-    countrySort,
   ]);
-  const filteredCountries = useMemo(
-    () =>
-      countryPreview
-        ? countryScope.filter((country) => country.code === countryPreview)
-        : countryScope,
-    [countryScope, countryPreview],
-  );
+  const filteredCountries = useMemo(() => {
+    const matches = countryPreview
+      ? countryScope.filter((country) => country.code === countryPreview)
+      : [...countryScope];
+    if (countrySort === "alphabetical") return matches;
+    if (countrySort === "visit-order")
+      return matches.sort(
+        (a, b) =>
+          (a.firstVisitOrder ?? Infinity) - (b.firstVisitOrder ?? Infinity) ||
+          a.name.localeCompare(b.name),
+      );
+    return matches.sort(
+      (a, b) =>
+        (countryVisitSummary(b)[countrySort] ?? 0) -
+          (countryVisitSummary(a)[countrySort] ?? 0) ||
+        a.name.localeCompare(b.name),
+    );
+  }, [countryScope, countryPreview, countrySort]);
   const countryScoreboard = useMemo(
     () =>
       countrySeed.sample
@@ -434,7 +441,7 @@ export default function App() {
       setCountryVisit("all");
       setCountryContinent("all");
       setCountryLastVisitYear("all");
-      setCountrySort("alphabetical");
+      setCountrySort("visit-order");
     } else {
       setSearch("");
       setStatus("all");
@@ -553,14 +560,15 @@ export default function App() {
                     onCountrySet={changeCountrySet}
                     visitedOnly={countryVisit === "visited"}
                     sort={countrySort}
-                    onVisitedOnly={() =>
+                    onVisitedOnly={() => {
                       setCountryVisit((current) =>
                         current === "visited" ? "all" : "visited",
-                      )
-                    }
+                      );
+                      setCountrySort("visit-order");
+                    }}
                     onSort={(sort) =>
                       setCountrySort((current) =>
-                        current === sort ? "alphabetical" : sort,
+                        current === sort ? "visit-order" : sort,
                       )
                     }
                   />

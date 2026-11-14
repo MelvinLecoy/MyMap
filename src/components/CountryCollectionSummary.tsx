@@ -8,6 +8,8 @@ import CollectionScoreboard, {
   type CollectionScoreSort,
 } from "./CollectionScoreboard";
 
+export type CountryScoreSort = CollectionScoreSort | "visit-order";
+
 export default function CountryCollectionSummary({
   countries,
   visitedOnly,
@@ -19,9 +21,9 @@ export default function CountryCollectionSummary({
 }: {
   countries: CountryRecord[];
   visitedOnly: boolean;
-  sort: CollectionScoreSort;
+  sort: CountryScoreSort;
   onVisitedOnly: () => void;
-  onSort: (sort: CollectionScoreSort) => void;
+  onSort: (sort: CountryScoreSort) => void;
   countrySet?: CountrySet;
   onCountrySet?: (set: CountrySet) => void;
 }) {
@@ -59,9 +61,25 @@ export default function CountryCollectionSummary({
               .length,
             active: visitedOnly,
             title: visitedOnly
-              ? "Show all countries"
-              : "Show visited countries only",
+              ? "Show all countries in visit order"
+              : "Show visited countries in visit order",
             onClick: onVisitedOnly,
+            cornerControl: (
+              <button
+                type="button"
+                className="country-alphabetical-toggle"
+                aria-label="Sort countries alphabetically"
+                aria-pressed={sort === "alphabetical"}
+                title={
+                  sort === "alphabetical"
+                    ? "Return to visit number order"
+                    : "Sort alphabetically"
+                }
+                onClick={() => onSort("alphabetical")}
+              >
+                A
+              </button>
+            ),
             valueControl:
               countrySet && onCountrySet ? (
                 <div className="country-scoreboard-scope">
@@ -92,7 +110,7 @@ export default function CountryCollectionSummary({
             active: sort === "visits",
             title:
               sort === "visits"
-                ? "Return to alphabetical order"
+                ? "Return to visit number order"
                 : "Sort by most visits",
             onClick: () => onSort("visits"),
           },
@@ -103,7 +121,7 @@ export default function CountryCollectionSummary({
             active: sort === "days",
             title:
               sort === "days"
-                ? "Return to alphabetical order"
+                ? "Return to visit number order"
                 : "Sort by most days spent",
             onClick: () => onSort("days"),
           },

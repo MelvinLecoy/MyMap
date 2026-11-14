@@ -9,6 +9,7 @@ export interface ScoreboardStat {
   title: string;
   onClick: () => void;
   valueControl?: ReactNode;
+  cornerControl?: ReactNode;
 }
 
 export default function CollectionScoreboard({
@@ -41,6 +42,7 @@ export default function CollectionScoreboard({
               </span>
             </button>
             {stat.valueControl}
+            {stat.cornerControl}
           </dd>
         </div>
       ))}
