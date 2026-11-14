@@ -1300,6 +1300,21 @@ test("whole-country hover stays stable over lifted land, opens its panel and cle
         ).countryHoverWorkerStats.reloads,
     ),
   ).toBe(0);
+  // A queued hit test must not restore a hover after the pointer has left.
+  await page.evaluate(({ x, y }) => {
+    const canvas = document.querySelector(".maplibregl-canvas")!;
+    canvas.dispatchEvent(
+      new MouseEvent("mousemove", { bubbles: true, clientX: x, clientY: y }),
+    );
+    canvas.dispatchEvent(new MouseEvent("mouseleave"));
+  }, point);
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+      ),
+  );
+  await expect(globe).toHaveAttribute("data-hover-country", "");
   await page.mouse.move(point.x + 18, point.y + 12);
   await expect(globe).toHaveAttribute("data-hover-country", "LY");
   await page.mouse.click(point.x + 18, point.y + 12);
@@ -1310,8 +1325,17 @@ test("whole-country hover stays stable over lifted land, opens its panel and cle
   await page.getByRole("heading", { name: "Libya", exact: true }).hover();
   await expect(globe).toHaveAttribute("data-hover-country", "");
   await expect(globe).toHaveAttribute("data-selected-country", "LY");
-  await page.mouse.move(box.x + box.width * 0.96, point.y);
-  await expect(globe).toHaveAttribute("data-hover-country", "EG");
+  let hoverOffset = 0;
+  await expect
+    .poll(async () => {
+      // Country hit testing resumes when the profile's camera animation ends.
+      await page.mouse.move(
+        box.x + box.width * 0.96 + (hoverOffset++ % 2),
+        point.y,
+      );
+      return globe.getAttribute("data-hover-country");
+    })
+    .toBe("EG");
   await expect(globe).toHaveAttribute("data-selected-country", "LY");
   await expect(
     page.getByRole("heading", { name: "Libya", exact: true }),

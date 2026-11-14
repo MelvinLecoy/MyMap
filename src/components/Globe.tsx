@@ -134,6 +134,11 @@ export default function Globe({
       }),
       "bottom-right",
     );
+    const canvas = map.getCanvas();
+    const hoverMedia = window.matchMedia("(hover: hover)");
+    const hoverPoint = { x: 0, y: 0 };
+    let hoverFrame = 0;
+    let hoveredCountry: string | null = null;
     const decorate = () => {
       if (map.getSource("atlas-countries")) return;
       for (const layer of providerLabelFilters(
@@ -289,6 +294,7 @@ export default function Globe({
       countryHover.current.setSelectedCountry(
         current.current.selected ? null : current.current.selectedCountry,
       );
+      hoveredCountry = null;
       if (container.current) container.current.dataset.hoverCountry = "";
       for (const [id, minzoom, filter] of [
         ["large", 0, ["<=", ["get", "rank"], 3]],
@@ -441,19 +447,25 @@ export default function Globe({
       setRegional(map.getZoom() >= 3);
     };
     map.on("moveend", move);
-    let hoveredCountry: string | null = null;
+    const cancelHoverPick = () => {
+      cancelAnimationFrame(hoverFrame);
+      hoverFrame = 0;
+    };
     const hoverCountry = (code: string | null) => {
       countryHover.current?.setCountry(code);
-      if (code !== hoveredCountry) {
-        hoveredCountry = code;
-        current.current.onHoverCountry(code);
-      }
+      if (code === hoveredCountry) return;
+      hoveredCountry = code;
+      current.current.onHoverCountry(code);
       if (container.current)
         container.current.dataset.hoverCountry = code ?? "";
     };
+    const setCursor = (cursor: string) => {
+      if (canvas.style.cursor !== cursor) canvas.style.cursor = cursor;
+    };
     const clearHover = () => {
+      cancelHoverPick();
       hoverCountry(null);
-      map.getCanvas().style.cursor = "";
+      setCursor("");
     };
     map.on("movestart", clearHover);
     map.getCanvas().addEventListener("mouseleave", clearHover);
@@ -472,31 +484,35 @@ export default function Globe({
       // Project the existing clustered source features for a screen-space fallback.
       const center = map.getCenter();
       const radians = Math.PI / 180;
-      return map
-        .querySourceFeatures("atlas-cities")
-        .filter((f) => f.geometry.type === "Point")
-        .map((f) => {
-          const [lng, lat] = (f.geometry as { coordinates: number[] })
-            .coordinates;
-          const facing =
-            Math.sin(center.lat * radians) * Math.sin(lat * radians) +
-            Math.cos(center.lat * radians) *
-              Math.cos(lat * radians) *
-              Math.cos((lng - center.lng) * radians);
-          const projected = map.project([lng, lat]);
-          return {
-            feature: f,
-            distance:
-              facing > 0
-                ? Math.hypot(projected.x - point.x, projected.y - point.y)
-                : Infinity,
-          };
-        })
-        .filter(
-          ({ feature, distance }) =>
-            distance <= (feature.properties.cluster ? 21 : 14),
-        )
-        .sort((a, b) => a.distance - b.distance)[0]?.feature;
+      const sinCenter = Math.sin(center.lat * radians);
+      const cosCenter = Math.cos(center.lat * radians);
+      let closest:
+        | ReturnType<MapInstance["querySourceFeatures"]>[number]
+        | undefined;
+      let closestDistance = Infinity;
+      for (const feature of map.querySourceFeatures("atlas-cities")) {
+        if (feature.geometry.type !== "Point") continue;
+        const [lng, lat] = feature.geometry.coordinates;
+        const facing =
+          sinCenter * Math.sin(lat * radians) +
+          cosCenter *
+            Math.cos(lat * radians) *
+            Math.cos((lng - center.lng) * radians);
+        if (!(facing > 0)) continue;
+        const projected = map.project([lng, lat]);
+        const distance = Math.hypot(
+          projected.x - point.x,
+          projected.y - point.y,
+        );
+        if (
+          distance <= (feature.properties.cluster ? 21 : 14) &&
+          distance < closestDistance
+        ) {
+          closest = feature;
+          closestDistance = distance;
+        }
+      }
+      return closest;
     };
     const pickCountry = (point: { x: number; y: number }) => {
       if (!map.getLayer("atlas-land")) return null;
@@ -508,6 +524,7 @@ export default function Globe({
       return (feature?.properties.code as string | undefined) ?? null;
     };
     map.on("click", async (e) => {
+      cancelHoverPick();
       const f = pickCityFeature(e.point);
       if (!f || f.geometry.type !== "Point") {
         const code = pickCountry(e.point);
@@ -537,14 +554,25 @@ export default function Globe({
       }
     });
     map.on("mousemove", (e) => {
-      if (map.isMoving() || !window.matchMedia("(hover: hover)").matches) {
+      if (map.isMoving() || !hoverMedia.matches) {
         clearHover();
         return;
       }
-      const city = pickCityFeature(e.point);
-      const code = city ? null : pickCountry(e.point);
-      hoverCountry(code);
-      map.getCanvas().style.cursor = city || code ? "pointer" : "";
+      hoverPoint.x = e.point.x;
+      hoverPoint.y = e.point.y;
+      if (hoverFrame) return;
+      // High-rate pointers only need one hit test for the next visible frame.
+      hoverFrame = requestAnimationFrame(() => {
+        hoverFrame = 0;
+        if (map.isMoving() || !hoverMedia.matches) {
+          clearHover();
+          return;
+        }
+        const city = pickCityFeature(hoverPoint);
+        const code = city ? null : pickCountry(hoverPoint);
+        hoverCountry(code);
+        setCursor(city || code ? "pointer" : "");
+      });
     });
     const resize = new ResizeObserver(() => map.resize());
     resize.observe(container.current);
@@ -585,6 +613,7 @@ export default function Globe({
       abort.abort();
       clearTimeout(timeout);
       resize.disconnect();
+      cancelHoverPick();
       countryHover.current?.destroy();
       countryHover.current = null;
       map.getCanvas().removeEventListener("mouseleave", clearHover);

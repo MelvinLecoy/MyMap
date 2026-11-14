@@ -10,6 +10,7 @@ const hovered: ExpressionSpecification = [
   ["boolean", ["feature-state", "countrySelected"], false],
 ];
 const transition = { duration: 0, delay: 0 };
+const uniformPaintOptions = { validate: false };
 
 /** A shared-source overlay: geographic hit areas and city layers stay fixed. */
 function createHighlight(
@@ -36,6 +37,7 @@ function createHighlight(
   const stripeIds = countryStripeLayers(countries).map(
     (layer) => `atlas-${kind}-${layer.id}`,
   );
+  const fillIds = [`atlas-${kind}-land`, ...stripeIds];
   map.addLayer(
     {
       id: `atlas-${kind}-shadow`,
@@ -124,9 +126,14 @@ function createHighlight(
   function paint() {
     if (disposed || !map.getLayer(`atlas-${kind}-land`)) return;
     const offset: [number, number] = [0, duration(160) ? -2 * progress : 0];
-    for (const id of [`atlas-${kind}-land`, ...stripeIds])
-      map.setPaintProperty(id, "fill-translate", offset);
-    map.setPaintProperty(`atlas-${kind}-outline`, "line-translate", offset);
+    for (const id of fillIds)
+      map.setPaintProperty(id, "fill-translate", offset, uniformPaintOptions);
+    map.setPaintProperty(
+      `atlas-${kind}-outline`,
+      "line-translate",
+      offset,
+      uniformPaintOptions,
+    );
   }
   function state(code: string, value: boolean) {
     if (map.getSource("atlas-countries"))
