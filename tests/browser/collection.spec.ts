@@ -534,6 +534,95 @@ test("country collection mirrors the compact scoreboard, filters and visit rows 
   }
 });
 
+test("country row visit-order badges align beside city counts and leave room for wrapped names", async ({
+  page,
+}) => {
+  await withoutGlobe(page);
+  await page.goto("/?panel=countries");
+  const rows = page.locator(".country-row");
+  const countryRow = (name: string) =>
+    rows.filter({
+      has: page.locator(".city-row-name", { hasText: new RegExp(`^${name}$`) }),
+    });
+  await expect(rows).toHaveCount(198);
+  await expect(rows.locator(".country-order-badge")).toHaveCount(98);
+  for (const [index, name] of [
+    "China",
+    "United States",
+    "Canada",
+    "United Kingdom",
+    "Switzerland",
+    "Netherlands",
+  ].entries()) {
+    await expect(countryRow(name).getByRole("note")).toHaveAttribute(
+      "aria-label",
+      `Visit order ${index + 1}`,
+    );
+  }
+  for (const name of ["Afghanistan", "Taiwan", "Svalbard"])
+    await expect(countryRow(name).locator(".country-order-badge")).toHaveCount(
+      0,
+    );
+  await page.evaluate(() => document.fonts.ready);
+  for (const width of [320, 390, 650, 1440]) {
+    await page.setViewportSize({ width, height: 1000 });
+    const layout = await rows.evaluateAll((elements) =>
+      elements.map((row) => {
+        const box = (selector: string) =>
+          row.querySelector(selector)!.getBoundingClientRect();
+        const name = box(".city-row-name"),
+          order = box(".country-row-order"),
+          count = box(".country-city-count");
+        const bounds = row.getBoundingClientRect();
+        return {
+          name: row.querySelector(".city-row-name")!.textContent,
+          orderLeft: order.left,
+          countLeft: count.left,
+          fits:
+            name.right <= order.left - 7 &&
+            order.right <= count.left - 7 &&
+            box(".city-row-body").bottom <= bounds.bottom - 2 &&
+            row.scrollWidth <= row.clientWidth,
+        };
+      }),
+    );
+    expect(
+      layout.filter((row) => !row.fits),
+      `Country rows fit at ${width}px`,
+    ).toEqual([]);
+    expect(new Set(layout.map((row) => row.orderLeft)).size).toBe(1);
+    expect(new Set(layout.map((row) => row.countLeft)).size).toBe(1);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    if (width === 320)
+      expect(
+        (await countryRow("Bosnia & Herzegovina")
+          .locator(".city-row-name")
+          .boundingBox())!.height,
+      ).toBeGreaterThan(20);
+  }
+  await page
+    .getByRole("button", { name: "Sort countries alphabetically", exact: true })
+    .click();
+  await expect(rows.first().locator(".city-row-name")).toHaveText(
+    "Afghanistan",
+  );
+  await expect(countryRow("Honduras").getByRole("note")).toHaveAttribute(
+    "aria-label",
+    "Visit order 98",
+  );
+  await chooseFilter(page, "Country scoreboard scope", "197 (🇽🇰 & 🇹🇼)");
+  await expect(countryRow("Kosovo").getByRole("note")).toHaveAttribute(
+    "aria-label",
+    "Visit order 74",
+  );
+  await countryRow("Honduras").click();
+  await expect(page.locator(".country-visit-rank")).toHaveText("#98");
+});
+
 test("phone country controls keep A and scoped visited filtering while omitting H", async ({
   browser,
 }) => {

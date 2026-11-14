@@ -3,6 +3,7 @@ import {
   ChevronRight,
   CircleCheck,
   CircleDashed,
+  Crown,
 } from "lucide-react";
 import {
   VISIT_LABELS,
@@ -100,6 +101,27 @@ export function CountryVisitMarker({ country }: { country: CountryRecord }) {
       {summary.days != null && (
         <span className="country-row-duration">
           <strong>{summary.days}</strong> {summary.days === 1 ? "day" : "days"}
+        </span>
+      )}
+    </span>
+  );
+}
+
+export function CountryVisitOrderBadge({ order }: { order: number | null }) {
+  return (
+    <span className="country-row-order">
+      {order != null && (
+        <span
+          className="country-order-badge"
+          role="note"
+          aria-label={`Visit order ${order}`}
+          title={`Country visit order: #${order}`}
+        >
+          <Crown size={10} strokeWidth={1.6} aria-hidden="true" />
+          <span className="country-order-number">
+            <span className="country-row-order-hash">#</span>
+            {order}
+          </span>
         </span>
       )}
     </span>

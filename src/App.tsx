@@ -25,6 +25,7 @@ import CountryCollectionSummary, {
 import {
   CityRow,
   CountryVisitMarker,
+  CountryVisitOrderBadge,
   Flag,
   VisitMarker,
 } from "./components/CollectionItems";
@@ -680,6 +681,9 @@ export default function App() {
                               <span>{country.continent}</span>
                             </span>
                           </span>
+                          <CountryVisitOrderBadge
+                            order={countryOrders.get(country.code) ?? null}
+                          />
                           <span
                             className="country-city-count"
                             data-empty={country.cityCount === 0}

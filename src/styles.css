@@ -2154,9 +2154,61 @@ h2 {
   background: var(--surface);
   border-color: var(--line);
 }
+.country-row {
+  grid-template-columns: 48px minmax(0, 1fr) 32px 60px 14px;
+  column-gap: 8px;
+}
+.country-row .city-row-name {
+  white-space: normal;
+  word-break: normal;
+}
+.country-row .country-flag {
+  flex-shrink: 0;
+}
+.country-row-order {
+  display: grid;
+  place-items: center;
+  width: 32px;
+}
+.country-order-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #d4c293;
+  border-radius: 9px;
+  background: linear-gradient(155deg, #fffef8, #f4e8c8);
+  box-shadow:
+    inset 0 1px 0 #ffffff,
+    0 1px 2px #795b1810;
+  color: #71521b;
+}
+.country-order-badge > svg {
+  color: #a17b32;
+  fill: #e8d5a2;
+  flex-shrink: 0;
+}
+.country-order-number {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 1px;
+  font-size: 12px;
+  line-height: 12px;
+  font-weight: 850;
+  font-variant-numeric: tabular-nums;
+}
+.country-row-order-hash {
+  color: #9a7d45;
+  font-size: 8px;
+  font-weight: 650;
+}
 .country-city-count {
   display: inline-flex;
   align-items: baseline;
+  justify-content: center;
   gap: 4px;
   padding: 4px 7px;
   border: 1px solid var(--line);
