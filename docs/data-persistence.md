@@ -2,9 +2,9 @@
 
 The authoritative approved data is tracked in Git: `data/cities.csv`,
 `city-visit-history.csv`, `city-visit-periods.csv`, `countries.csv`, `country-visit-history.csv` and
-`country-visit-periods.csv`. The city source ledger reproduces 69 visited cities,
-112 counted visits, 124 stays and 265.5 city-days. The four recent corrections and 13 additional
-stays are preserved. Country history remains incomplete and unchanged at 273.5
+`country-visit-periods.csv`. The city source ledgers reproduce 90 visited cities,
+137 counted visits, 150 stays and 305.5 city-days. Prior corrections and approved
+batches are preserved. Country history remains incomplete and unchanged at 273.5
 recorded country-days.
 
 The website uses Supabase as its saved runtime data. A code deployment does not
@@ -52,3 +52,8 @@ For a fresh database, provision the base city schema/collection first, then run
 the existing country and city import commands. The current CSV seeds already
 contain the approved additions. The synchronization command operates on that
 initialized atlas and is also safe to repeat after a normal website restart.
+
+Every owner-approved data batch updates GitHub CSVs, Supabase and the deployed
+site together. Data-only updates use focused import/database checks, a build
+and a brief live check; broader browser regressions are reserved for related UI
+changes or failures. New batches are recorded in `data/sources/city-visit-batches.json`.

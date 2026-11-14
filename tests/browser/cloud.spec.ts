@@ -331,15 +331,15 @@ test("current approved history survives a cold load, reload and unavailable data
   await page.goto("/");
   await loaded;
   await expect(page.locator(".city-overview-totals dd")).toHaveText([
-    "69",
-    "112",
-    "265.5",
+    "90",
+    "137",
+    "305.5",
   ]);
   await page.reload();
   await expect(page.locator(".city-overview-totals dd")).toHaveText([
-    "69",
-    "112",
-    "265.5",
+    "90",
+    "137",
+    "305.5",
   ]);
   state.failRead = true;
   await page.reload();
@@ -347,9 +347,9 @@ test("current approved history survives a cold load, reload and unavailable data
     page.getByText(/Couldn’t refresh the saved collection/),
   ).toBeVisible();
   await expect(page.locator(".city-overview-totals dd")).toHaveText([
-    "69",
-    "112",
-    "265.5",
+    "90",
+    "137",
+    "305.5",
   ]);
   await page.goto("/?city=san-francisco-usa");
   await expect(page.locator(".city-statistics dd")).toHaveText(["2", "5"]);
@@ -391,12 +391,12 @@ test("saving a city's map status updates progress and filters while retaining it
     })
     .click();
   await expect(page.locator(".city-map-progress-heading")).toContainText(
-    "254 / 325 complete",
+    "254 / 327 complete",
   );
   await expect(page.locator(".city-overview-totals dd")).toHaveText([
-    "69",
-    "112",
-    "265.5",
+    "90",
+    "137",
+    "305.5",
   ]);
   await page
     .getByRole("group", { name: "Map progress filters" })
@@ -711,9 +711,9 @@ test("the editor can export every city with saved statuses and nullable coordina
     columns: true,
     bom: true,
   }) as Array<Record<string, string>>;
-  expect(rows).toHaveLength(325);
+  expect(rows).toHaveLength(327);
   expect(rows.find((c) => c.CityId === "moscow-russia")!.Status).toBe("Update");
-  expect(rows.filter((c) => c.Latitude && c.Longitude)).toHaveLength(323);
+  expect(rows.filter((c) => c.Latitude && c.Longitude)).toHaveLength(325);
   expect(rows.find((c) => c.CityId === "london-uk")!.RecordedDaysSpent).toBe(
     "6.5",
   );
@@ -726,7 +726,7 @@ test("the editor can export every city with saved statuses and nullable coordina
     columns: true,
     bom: true,
   }) as Array<Record<string, string>>;
-  expect(visits).toHaveLength(112);
+  expect(visits).toHaveLength(137);
   const periodDownload = page.waitForEvent("download");
   await page
     .getByRole("button", { name: "City stay periods CSV", exact: true })
@@ -736,8 +736,8 @@ test("the editor can export every city with saved statuses and nullable coordina
     columns: true,
     bom: true,
   }) as Array<Record<string, string>>;
-  expect(periods).toHaveLength(124);
-  expect(periods.reduce((n, p) => n + Number(p.DaysSpent), 0)).toBe(265.5);
+  expect(periods).toHaveLength(150);
+  expect(periods.reduce((n, p) => n + Number(p.DaysSpent), 0)).toBe(305.5);
   expect(
     periods
       .filter((p) => p.CityId === "shanghai-china")
@@ -752,8 +752,8 @@ test("the editor can export every city with saved statuses and nullable coordina
     ["1", "1", "2026-08-30", "2026-08-31", "1.5"],
     ["1", "2", "2026-09-01", "2026-09-01", "1"],
   ]);
-  expect(new Set(visits.map((v) => v.CityId)).size).toBe(69);
-  expect(visits.reduce((n, v) => n + Number(v.DaysSpent), 0)).toBe(265.5);
+  expect(new Set(visits.map((v) => v.CityId)).size).toBe(90);
+  expect(visits.reduce((n, v) => n + Number(v.DaysSpent), 0)).toBe(305.5);
   expect(
     visits.find(
       (v) =>

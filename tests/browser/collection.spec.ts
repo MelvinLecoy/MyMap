@@ -28,12 +28,12 @@ test("city overview, compact visit rows, map progress filters and city details u
   });
   await page.goto("/");
   await expect(page.locator(".city-overview-totals dd")).toHaveText([
-    "69",
-    "112",
-    "265.5",
+    "90",
+    "137",
+    "305.5",
   ]);
   await expect(page.locator(".city-map-progress-heading")).toContainText(
-    "253 / 325 complete",
+    "253 / 327 complete",
   );
   const filters = page.getByRole("group", { name: "Map progress filters" });
   await filters
@@ -64,9 +64,9 @@ test("city overview, compact visit rows, map progress filters and city details u
     await page.setViewportSize({ width, height: 1000 });
     await page.goto("/");
     await expect(page.locator(".city-overview-totals dd")).toHaveText([
-      "69",
-      "112",
-      "265.5",
+      "90",
+      "137",
+      "305.5",
     ]);
     expect(
       await page.evaluate(
@@ -240,18 +240,18 @@ test.beforeEach(async ({ context, page, baseURL }) => {
   );
 });
 
-test("the default globe loads all 325 entries with approved city visits and no saved demo statuses", async ({
+test("the default globe loads all 327 entries with approved city visits and no saved demo statuses", async ({
   page,
 }) => {
   await page.goto("/");
-  await expect(page.locator(".city-row")).toHaveCount(325);
-  await expect(page.locator(".city-total")).toHaveText("325");
+  await expect(page.locator(".city-row")).toHaveCount(327);
+  await expect(page.locator(".city-total")).toHaveText("327");
   await expect(page.locator(".visit-marker-not-yet")).toHaveCount(256);
   await expect(
     page.locator(".visit-marker-visited, .visit-marker-planned"),
-  ).toHaveCount(69);
+  ).toHaveCount(90);
   await expect(page.locator(".collection-bottom")).toHaveText(
-    /Visited\s*97\s*countries\s*69\s*cities/,
+    /Visited\s*97\s*countries\s*90\s*cities/,
   );
   await expect(page.locator(".city-row .status-complete")).toHaveCount(253);
   await expect(page.locator(".city-row .status-unfinished")).toHaveCount(7);
@@ -603,7 +603,7 @@ test("real status edits persist and sync separately from demo edits without chan
   await page.getByLabel("Filter by map status").selectOption("Unfinished");
   await expect(page.locator(".city-row")).toHaveCount(8);
   await expect(page.locator(".collection-bottom")).toHaveText(
-    /Visited\s*97\s*countries\s*69\s*cities/,
+    /Visited\s*97\s*countries\s*90\s*cities/,
   );
   await page.getByLabel("Filter by map status").selectOption("all");
   await openCity(page, "Moscow");
@@ -641,7 +641,7 @@ test("the full collection and corrected map links remain usable without WebGL", 
   await expect(
     page.getByText("The interactive globe needs WebGL.", { exact: false }),
   ).toBeVisible();
-  await expect(page.locator(".city-row")).toHaveCount(325);
+  await expect(page.locator(".city-row")).toHaveCount(327);
   await openCity(page, "Nice");
   await expect(
     page.getByRole("button", { name: "View My Map", exact: true }),
@@ -653,7 +653,7 @@ test("the Countries tab has labelled counts, independent filters, and reloadable
 }) => {
   await page.goto("/");
   const tabs = page.getByRole("tablist", { name: "Collection view" });
-  await expect(page.locator(".collection-count")).toHaveText("325 cities");
+  await expect(page.locator(".collection-count")).toHaveText("327 cities");
   await page.getByLabel("Search cities and countries").fill("Adelaide");
   await expect(page.locator(".collection-count")).toHaveText("1 city");
   await tabs.getByRole("tab", { name: "Countries", exact: true }).click();
@@ -935,7 +935,7 @@ test("the real country data supports 195 and 197 ranks without inventing missing
   await expect(listSize).toHaveValue("195");
   await expect(page.locator(".country-row")).toHaveCount(195);
   await expect(page.locator(".collection-bottom")).toHaveText(
-    /Visited\s*97\s*countries\s*69\s*cities/,
+    /Visited\s*97\s*countries\s*90\s*cities/,
   );
   await page.getByLabel("Search countries", { exact: true }).fill("Honduras");
   await page.locator(".country-row").click();
@@ -964,7 +964,7 @@ test("the real country data supports 195 and 197 ranks without inventing missing
   await expect(listSize).toHaveValue("197");
   await expect(page.locator(".country-row")).toHaveCount(197);
   await expect(page.locator(".collection-bottom")).toHaveText(
-    /Visited\s*98\s*countries\s*69\s*cities/,
+    /Visited\s*98\s*countries\s*90\s*cities/,
   );
   await page.getByLabel("Search countries", { exact: true }).fill("Kosovo");
   await page.locator(".country-row").click();

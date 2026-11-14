@@ -1,8 +1,8 @@
 # City visit history
 
-The approved city history contains **69 cities, 112 counted visits, 124 actual stays
-and 265.5 summed city-days**. Southampton and Reykjavík are excluded. Rome,
-Vatican City, Austin and San Antonio extend the collection to 325 cities.
+The approved city history contains **90 cities, 137 counted visits, 150 actual stays
+and 305.5 summed city-days**. Southampton and Reykjavík are excluded. Rome,
+Vatican City, Austin, San Antonio, Niagara Falls and Detroit extend the collection to 327 cities.
 
 A new city visit starts when the next arrival is **at least six calendar days after
 the previous departure**. A shorter gap joins the same visit. Measure each gap
@@ -93,3 +93,27 @@ The Cities panel shows visit totals and map progress for the current search and
 filters. Progress chips share the map-status filter used by the globe. City rows
 show visit count, latest month/year, days spent and map status without increasing
 the 72px row height. Map status saves retain all visit history.
+
+## Expanded verified city batch
+
+The owner-verified `expanded_cities_visit_data_verified.xlsx` is retained in
+`data/sources/`, alongside its transcription and source hash in
+`city-visit-batches.json`. Its two sheets describe the same 26 stays across 21
+cities; they are imported once. These add 40 city-days and 25 counted visits.
+Tashkent's stays on 21 and 24 May 2026 share one visit. Nadi (4–5 August 2025)
+and San José (6–7 April 2025) each retain their explicit 1.5-day duration.
+
+Duration-only entries use `departure = arrival + ceil(days) - 1`; two days cover
+the start date and the following day, while 0.5 days cover the start date only.
+Explicit departure dates take precedence. Commas separate actual stays, which
+are then grouped using the existing six-day rule. Siem Reap and Tromsø reuse
+the existing Krong Siem Reap and Tromso records. Niagara Falls (US) and Detroit
+receive new city records with GeoNames coordinates and no invented map links.
+
+`python scripts/prepare-expanded-city-batch.py` rebuilds this workbook's
+transcription (requires openpyxl). `npm run city:prepare-data` then regenerates
+all three CSVs from the original sources plus the approved batches. Histories
+for the same city merge chronologically; a later approved batch replaces an
+older entry with the same arrival date. Each batch update must reach GitHub
+CSVs, Supabase and the deployed website together. Use the focused data checks,
+build and brief live verification described in AGENTS.md.

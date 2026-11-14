@@ -1,0 +1,442 @@
+{
+  "batches": [
+    {
+      "id": "expanded-cities-verified",
+      "sourceFile": "expanded_cities_visit_data_verified.xlsx",
+      "sourceSha256": "921e42cf4d489696281e1c7ce5d6cace50c58aa9423af433aaf10d37113c5088",
+      "dateInterpretation": "Inclusive calendar dates; duration-only entries end start + ceil(days) - 1. Explicit departure dates and half-day durations are retained. Comma-separated stays are grouped by the city six-day rule.",
+      "expected": {
+        "cities": 21,
+        "stays": 26,
+        "visits": 25,
+        "days": 40
+      },
+      "newCities": [
+        {
+          "cityid": "niagara-falls-usa",
+          "cities": "Niagara Falls",
+          "country": "USA",
+          "countrycode": "US",
+          "continent": "America",
+          "region": "North America",
+          "subregion": "",
+          "status": "Not Started",
+          "link": "",
+          "visited": "No",
+          "latitude": "43.0945",
+          "longitude": "-79.05671"
+        },
+        {
+          "cityid": "detroit-usa",
+          "cities": "Detroit",
+          "country": "USA",
+          "countrycode": "US",
+          "continent": "America",
+          "region": "North America",
+          "subregion": "",
+          "status": "Not Started",
+          "link": "",
+          "visited": "No",
+          "latitude": "42.33143",
+          "longitude": "-83.04575"
+        }
+      ],
+      "coordinateSource": {
+        "dataset": "GeoNames cities500 via geonamescache 3.0.2",
+        "cities": [
+          {
+            "name": "Detroit",
+            "countrycode": "US",
+            "latitude": 42.33143,
+            "longitude": -83.04575,
+            "geonameid": 4990729,
+            "population": 645705
+          },
+          {
+            "name": "Niagara Falls",
+            "countrycode": "US",
+            "latitude": 43.0945,
+            "longitude": -79.05671,
+            "geonameid": 5128723,
+            "population": 48916
+          }
+        ]
+      },
+      "cities": [
+        {
+          "city": "Bishkek",
+          "sourceCity": "Bishkek",
+          "city_id": "bishkek-kyrgyzstan",
+          "country_code": "KG",
+          "visits": [
+            {
+              "start": "2026-05-25",
+              "end": "2026-05-26",
+              "days": 2
+            }
+          ],
+          "sourceRows": [
+            2
+          ]
+        },
+        {
+          "city": "Tbilisi",
+          "sourceCity": "Tbilisi",
+          "city_id": "tbilisi-georgia",
+          "country_code": "GE",
+          "visits": [
+            {
+              "start": "2025-05-24",
+              "end": "2025-05-25",
+              "days": 2
+            }
+          ],
+          "sourceRows": [
+            3
+          ]
+        },
+        {
+          "city": "Sarajevo",
+          "sourceCity": "Sarajevo",
+          "city_id": "sarajevo-bosnia",
+          "country_code": "BA",
+          "visits": [
+            {
+              "start": "2026-05-04",
+              "end": "2026-05-05",
+              "days": 2
+            }
+          ],
+          "sourceRows": [
+            4
+          ]
+        },
+        {
+          "city": "Krong Siem Reap",
+          "sourceCity": "Siem Reap",
+          "city_id": "krong-siem-reap-cambodia",
+          "country_code": "KH",
+          "visits": [
+            {
+              "start": "2026-08-09",
+              "end": "2026-08-10",
+              "days": 2
+            }
+          ],
+          "sourceRows": [
+            5
+          ]
+        },
+        {
+          "city": "Baku",
+          "sourceCity": "Baku",
+          "city_id": "baku-azerbaijan",
+          "country_code": "AZ",
+          "visits": [
+            {
+              "start": "2025-05-26",
+              "end": "2025-05-26",
+              "days": 1
+            },
+            {
+              "start": "2026-05-19",
+              "end": "2026-05-19",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            6,
+            7
+          ]
+        },
+        {
+          "city": "Tashkent",
+          "sourceCity": "Tashkent",
+          "city_id": "tashkent-uzbekistan",
+          "country_code": "UZ",
+          "visits": [
+            {
+              "start": "2026-05-21",
+              "end": "2026-05-21",
+              "days": 1
+            },
+            {
+              "start": "2026-05-24",
+              "end": "2026-05-24",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            8,
+            9
+          ]
+        },
+        {
+          "city": "La Paz",
+          "sourceCity": "La Paz",
+          "city_id": "la-paz-bolivia",
+          "country_code": "BO",
+          "visits": [
+            {
+              "start": "2025-12-22",
+              "end": "2025-12-23",
+              "days": 2
+            }
+          ],
+          "sourceRows": [
+            10
+          ]
+        },
+        {
+          "city": "Athens",
+          "sourceCity": "Athens",
+          "city_id": "athens-greece",
+          "country_code": "GR",
+          "visits": [
+            {
+              "start": "2024-08-10",
+              "end": "2024-08-11",
+              "days": 2
+            }
+          ],
+          "sourceRows": [
+            11
+          ]
+        },
+        {
+          "city": "Niagara Falls",
+          "sourceCity": "Niagara Falls",
+          "city_id": "niagara-falls-usa",
+          "country_code": "US",
+          "visits": [
+            {
+              "start": "2021-08-23",
+              "end": "2021-08-24",
+              "days": 2
+            }
+          ],
+          "sourceRows": [
+            12
+          ]
+        },
+        {
+          "city": "Quito",
+          "sourceCity": "Quito",
+          "city_id": "quito-ecuador",
+          "country_code": "EC",
+          "visits": [
+            {
+              "start": "2025-12-26",
+              "end": "2025-12-27",
+              "days": 2
+            }
+          ],
+          "sourceRows": [
+            13
+          ]
+        },
+        {
+          "city": "Brussels",
+          "sourceCity": "Brussels",
+          "city_id": "brussels-belgium",
+          "country_code": "BE",
+          "visits": [
+            {
+              "start": "2024-08-01",
+              "end": "2024-08-01",
+              "days": 1
+            },
+            {
+              "start": "2025-05-09",
+              "end": "2025-05-09",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            14,
+            15
+          ]
+        },
+        {
+          "city": "Tromso",
+          "sourceCity": "Tromsø",
+          "city_id": "tromso-norway",
+          "country_code": "NO",
+          "visits": [
+            {
+              "start": "2024-01-02",
+              "end": "2024-01-03",
+              "days": 2
+            }
+          ],
+          "sourceRows": [
+            16
+          ]
+        },
+        {
+          "city": "Muscat",
+          "sourceCity": "Muscat",
+          "city_id": "muscat-oman",
+          "country_code": "OM",
+          "visits": [
+            {
+              "start": "2025-06-02",
+              "end": "2025-06-03",
+              "days": 2
+            }
+          ],
+          "sourceRows": [
+            17
+          ]
+        },
+        {
+          "city": "Buenos Aires",
+          "sourceCity": "Buenos Aires",
+          "city_id": "buenos-aires-argentina",
+          "country_code": "AR",
+          "visits": [
+            {
+              "start": "2025-04-11",
+              "end": "2025-04-12",
+              "days": 2
+            }
+          ],
+          "sourceRows": [
+            18
+          ]
+        },
+        {
+          "city": "Rio de Janeiro",
+          "sourceCity": "Rio de Janeiro",
+          "city_id": "rio-de-janeiro-brazil",
+          "country_code": "BR",
+          "visits": [
+            {
+              "start": "2025-04-08",
+              "end": "2025-04-09",
+              "days": 2
+            }
+          ],
+          "sourceRows": [
+            19
+          ]
+        },
+        {
+          "city": "Milan",
+          "sourceCity": "Milan",
+          "city_id": "milan-italy",
+          "country_code": "IT",
+          "visits": [
+            {
+              "start": "2024-01-10",
+              "end": "2024-01-10",
+              "days": 1
+            },
+            {
+              "start": "2024-08-15",
+              "end": "2024-08-15",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            20,
+            21
+          ]
+        },
+        {
+          "city": "Nadi",
+          "sourceCity": "Nadi",
+          "city_id": "nadi-fiji",
+          "country_code": "FJ",
+          "visits": [
+            {
+              "start": "2025-08-04",
+              "end": "2025-08-05",
+              "days": 1.5
+            }
+          ],
+          "sourceRows": [
+            22
+          ]
+        },
+        {
+          "city": "San Jose",
+          "sourceCity": "San José",
+          "city_id": "san-jose-costa-rica",
+          "country_code": "CR",
+          "visits": [
+            {
+              "start": "2025-04-06",
+              "end": "2025-04-07",
+              "days": 1.5
+            }
+          ],
+          "sourceRows": [
+            23
+          ]
+        },
+        {
+          "city": "Cairo",
+          "sourceCity": "Cairo",
+          "city_id": "cairo-egypt",
+          "country_code": "EG",
+          "visits": [
+            {
+              "start": "2025-05-15",
+              "end": "2025-05-16",
+              "days": 2
+            }
+          ],
+          "sourceRows": [
+            24
+          ]
+        },
+        {
+          "city": "Riyadh",
+          "sourceCity": "Riyadh",
+          "city_id": "riyadh-saudi-arabia",
+          "country_code": "SA",
+          "visits": [
+            {
+              "start": "2025-05-17",
+              "end": "2025-05-17",
+              "days": 1
+            },
+            {
+              "start": "2025-06-07",
+              "end": "2025-06-07",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            25,
+            26
+          ]
+        },
+        {
+          "city": "Detroit",
+          "sourceCity": "Detroit",
+          "city_id": "detroit-usa",
+          "country_code": "US",
+          "visits": [
+            {
+              "start": "2026-04-17",
+              "end": "2026-04-17",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            27
+          ]
+        }
+      ]
+    }
+  ],
+  "expectedCollection": {
+    "cities": 90,
+    "visits": 137,
+    "stays": 150,
+    "days": 305.5,
+    "entries": 327
+  }
+}

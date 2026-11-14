@@ -87,6 +87,7 @@ test("all affected city counts follow the six-day rule without changing any stay
   const cities = cityCollection();
   const expected: Record<string, number> = {
     Antigua: 1,
+    Tashkent: 1,
     Bern: 3,
     Boston: 2,
     Budapest: 2,
@@ -112,8 +113,8 @@ test("all affected city counts follow the six-day rule without changing any stay
   const stays = toCityStayRows(cities),
     periods = toCityPeriodRows(cities),
     visits = toCityVisitRows(cities);
-  assert.equal(visits.length, 112);
-  assert.equal(periods.length, 124);
+  assert.equal(visits.length, 137);
+  assert.equal(periods.length, 150);
   const values = (rows: typeof stays) =>
     rows.map((r) => [
       r.city_id,
@@ -124,7 +125,7 @@ test("all affected city counts follow the six-day rule without changing any stay
   assert.deepEqual(values(periods), values(stays));
   assert.equal(
     visits.reduce((n, v) => n + v.days_spent, 0),
-    265.5,
+    305.5,
   );
   const legacy = readCitySnapshot({
     cities: cities.map(toCityRow),
@@ -145,7 +146,7 @@ test("all affected city counts follow the six-day rule without changing any stay
   assert.throws(() => readCitySnapshot(bad), /Invalid city/);
 });
 
-test("the live-format migration preserves all 124 stays, country history, metadata and revisions, with SQL-enforced grouping and private writes", async () => {
+test("the live-format migration preserves all 150 stays, country history, metadata and revisions, with SQL-enforced grouping and private writes", async () => {
   const db = new PGlite();
   const owner = "11111111-1111-4111-8111-111111111111";
   const migration = readFileSync(
@@ -187,7 +188,7 @@ test("the live-format migration preserves all 124 stays, country history, metada
       "update cities set map_status='Update',notes='Preserve owner edit',pin_color='#123456' where id='london-uk';",
     );
     const before = await load();
-    assert.equal(before.cities.visits.length, 124);
+    assert.equal(before.cities.visits.length, 150);
     assert.equal(before.cities.periods, undefined);
     await db.exec(migration.replace(/commit;\s*$/i, "rollback;"));
     assert.deepEqual(
@@ -197,8 +198,8 @@ test("the live-format migration preserves all 124 stays, country history, metada
     );
     await db.exec(migration);
     const after = await load();
-    assert.equal(after.cities.visits.length, 112);
-    assert.equal(after.cities.periods.length, 124);
+    assert.equal(after.cities.visits.length, 137);
+    assert.equal(after.cities.periods.length, 150);
     assert.deepEqual(after.cities.cities, before.cities.cities);
     assert.deepEqual(after.countries, before.countries);
     const stays = (rows: typeof before.cities.visits) =>
@@ -222,7 +223,7 @@ test("the live-format migration preserves all 124 stays, country history, metada
     );
     await db.exec("rollback;");
     await db.exec("set role anon;");
-    assert.equal((await load()).cities.periods.length, 124);
+    assert.equal((await load()).cities.periods.length, 150);
     await fails(
       "update city_visit_periods set days_spent=1 where city_id='shanghai-china'",
       /permission denied/,

@@ -5,6 +5,8 @@ import { CITY_VISIT_GAP_DAYS, groupCityStays } from "../src/lib/city-visits.js";
 
 interface SourceCard {
   city: string;
+  city_id?: string;
+  batch?: boolean;
   country_code: string;
   excluded: boolean;
   visits: { start: string; end: string; days: number }[];
@@ -12,6 +14,21 @@ interface SourceCard {
 const cards = JSON.parse(
   readFileSync("data/sources/city-screenshot-transcription.json", "utf8"),
 ) as SourceCard[];
+const batches = JSON.parse(
+  readFileSync("data/sources/city-visit-batches.json", "utf8"),
+) as {
+  batches: {
+    cities: Omit<SourceCard, "excluded">[];
+    newCities: Record<string, string>[];
+  }[];
+  expectedCollection: {
+    cities: number;
+    visits: number;
+    stays: number;
+    days: number;
+    entries: number;
+  };
+};
 const decisions = JSON.parse(
   readFileSync("data/sources/city-visit-decisions.json", "utf8"),
 ) as {
@@ -55,7 +72,7 @@ const originalHeaders = (
   parse(sourceCsv, { bom: true, to: 1 }) as string[][]
 )[0];
 const metadata = readCSV(sourceCsv).map((r) => r.values);
-// These two cities are present in the approved history but absent from the original collection.
+// Approved cities that were absent from the original collection.
 for (const row of [
   {
     cityid: "rome-italy",
@@ -97,6 +114,7 @@ for (const row of [
     latitude: "29.4241",
     longitude: "-98.4936",
   },
+  ...batches.batches.flatMap((batch) => batch.newCities),
 ])
   if (!metadata.some((c) => c.cityid === row.cityid))
     metadata.push({
@@ -120,27 +138,42 @@ const periods: unknown[][] = [];
 let totalDays = 0,
   cityCount = 0;
 const applied = new Set<number>();
+const byCity = new Map<
+  string,
+  {
+    city: Record<string, string>;
+    stays: Map<string, SourceCard["visits"][number]>;
+  }
+>();
 // Original screenshot transcription is immutable. Append later owner-supplied
 // histories here, so regeneration keeps the new cities and stays intact.
-for (const card of [
+const sourceCards: SourceCard[] = [
   ...cards.filter((c) => !decisions.excludedCities.includes(c.city)),
   ...decisions.additionalVisits.map((v) => ({ ...v, excluded: false })),
-]) {
+  ...batches.batches.flatMap((batch) =>
+    batch.cities.map((card) => ({ ...card, excluded: false, batch: true })),
+  ),
+];
+for (const card of sourceCards) {
   const matches = metadata.filter(
     (c) =>
       c.countrycode === card.country_code &&
-      (aliases[card.city]
-        ? c.cityid === aliases[card.city]
-        : normalize(c.cities) === normalize(card.city)),
+      (card.city_id
+        ? c.cityid === card.city_id
+        : aliases[card.city]
+          ? c.cityid === aliases[card.city]
+          : normalize(c.cities) === normalize(card.city)),
   );
   if (matches.length !== 1)
     throw new Error(`Ambiguous or missing city: ${card.city}`);
   const city = matches[0];
   const stays = card.visits
     .map((visit) => {
-      const index = decisions.corrections.findIndex(
-        (c) => c.city === card.city && c.originalStart === visit.start,
-      );
+      const index = card.batch
+        ? -1
+        : decisions.corrections.findIndex(
+            (c) => c.city === card.city && c.originalStart === visit.start,
+          );
       const correction = decisions.corrections[index];
       if (correction) applied.add(index);
       return {
@@ -150,6 +183,14 @@ for (const card of [
       };
     })
     .sort((a, b) => a.start.localeCompare(b.start));
+  const prepared = byCity.get(city.cityid) ?? { city, stays: new Map() };
+  for (const stay of stays) prepared.stays.set(stay.start, stay);
+  byCity.set(city.cityid, prepared);
+}
+for (const { city, stays: byArrival } of byCity.values()) {
+  const stays = [...byArrival.values()].sort((a, b) =>
+    a.start.localeCompare(b.start),
+  );
   const visits = groupCityStays(
     stays.map((s) => ({
       arrival: s.start,
@@ -188,11 +229,12 @@ for (const card of [
 }
 if (
   applied.size !== decisions.corrections.length ||
-  cityCount !== decisions.expected.cities ||
-  history.length !== decisions.expected.visits ||
-  periods.length !== decisions.expected.stays ||
+  cityCount !== batches.expectedCollection.cities ||
+  history.length !== batches.expectedCollection.visits ||
+  periods.length !== batches.expectedCollection.stays ||
+  metadata.length !== batches.expectedCollection.entries ||
   decisions.visitGapDays !== CITY_VISIT_GAP_DAYS ||
-  totalDays !== decisions.expected.days
+  totalDays !== batches.expectedCollection.days
 )
   throw new Error("Approved city history totals or corrections did not match.");
 const headers = [

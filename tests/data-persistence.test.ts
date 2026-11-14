@@ -24,11 +24,11 @@ test("current CSVs agree across city/country tables and detect changed fields, m
     ),
   );
   assert.deepEqual(report.counts, {
-    cities: 325,
-    visitedCities: 69,
-    cityVisits: 112,
-    cityStays: 124,
-    cityDays: 265.5,
+    cities: 327,
+    visitedCities: 90,
+    cityVisits: 137,
+    cityStays: 150,
+    cityDays: 305.5,
     countries: 198,
     countryVisits: 120,
     countryPeriods: 127,
@@ -107,8 +107,21 @@ test("approved main-branch changes synchronize atomically, survive a new read, r
             daysSpent: p.daysSpent,
           })),
       }))
-      .filter((c) => !["austin-usa", "san-antonio-usa"].includes(c.id));
+      .filter(
+        (c) =>
+          ![
+            "austin-usa",
+            "san-antonio-usa",
+            "niagara-falls-usa",
+            "detroit-usa",
+          ].includes(c.id),
+      );
     const additions = new Set([
+      ...JSON.parse(
+        readFileSync("data/sources/city-visit-batches.json", "utf8"),
+      ).batches.flatMap((b: { cities: { city: string }[] }) =>
+        b.cities.map((c) => c.city),
+      ),
       "Seattle",
       "Dallas",
       "Denver",

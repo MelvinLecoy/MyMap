@@ -106,16 +106,16 @@ test("all approved screenshot entries survive, with only the approved correction
     assert.equal(city.lastVisited, expected.at(-1)!.departure);
   }
   assert.equal(cards.filter((c) => !c.excluded).length, 57);
-  assert.equal(cities.filter((c) => c.visits?.length).length, 69);
-  assert.equal(history.length, 124);
-  assert.equal(groups.length, 112);
-  assert.equal(periods.length, 124);
+  assert.equal(cities.filter((c) => c.visits?.length).length, 90);
+  assert.equal(history.length, 150);
+  assert.equal(groups.length, 137);
+  assert.equal(periods.length, 150);
   assert.equal(
     history.reduce((n, v) => n + v.days_spent, 0),
-    265.5,
+    305.5,
   );
-  assert.equal(cities.length, 325);
-  assert.equal(cities.filter((c) => c.visit === "visited").length, 69);
+  assert.equal(cities.length, 327);
+  assert.equal(cities.filter((c) => c.visit === "visited").length, 90);
   assert.deepEqual(cityVisitSummary(find("auckland-new-zealand").visits!), {
     visits: 2,
     days: 4.5,
@@ -210,7 +210,7 @@ test("new city stays migrate idempotently without modifying existing map statuse
     await db.exec(`insert into public.city_visits (city_id,visit_number,arrival_date,departure_date,days_spent)
       select city_id,visit_number,arrival_date,departure_date,days_spent
       from jsonb_populate_recordset(null::public.city_visits,'${encoded}'::jsonb);`);
-    assert.equal(oldVisits.length, 111);
+    assert.equal(oldVisits.length, 137);
     const migration = readFileSync(
       "supabase/migrations/202611130005_city_visit_additions.sql",
       "utf8",
@@ -225,12 +225,12 @@ test("new city stays migrate idempotently without modifying existing map statuse
         ).rows[0].result,
       );
     const result = await snapshot();
-    assert.equal(result.cities.length, 325);
-    assert.equal(result.visits.length, 112);
-    assert.equal(result.periods.length, 124);
+    assert.equal(result.cities.length, 327);
+    assert.equal(result.visits.length, 137);
+    assert.equal(result.periods.length, 150);
     assert.equal(
       result.visits.reduce((n, v) => n + v.days_spent, 0),
-      265.5,
+      305.5,
     );
     await db.exec(migration);
     assert.deepEqual(
@@ -401,6 +401,8 @@ test("PostgreSQL imports city history atomically, preserves countries and edits,
         (c) =>
           ![
             "rome-italy",
+            "niagara-falls-usa",
+            "detroit-usa",
             "vatican-city-vatican-city",
             "austin-usa",
             "san-antonio-usa",
@@ -437,12 +439,12 @@ test("PostgreSQL imports city history atomically, preserves countries and edits,
     );
     await db.exec(sql);
     const imported = await fetch();
-    assert.equal(imported.cities.length, 325);
-    assert.equal(imported.visits.length, 112);
-    assert.equal(imported.periods.length, 124);
+    assert.equal(imported.cities.length, 327);
+    assert.equal(imported.visits.length, 137);
+    assert.equal(imported.periods.length, 150);
     assert.equal(
       imported.visits.reduce((n, v) => n + v.days_spent, 0),
-      265.5,
+      305.5,
     );
     assert.deepEqual(await countries(), countryBefore);
     for (const before of originalRows) {
@@ -464,7 +466,7 @@ test("PostgreSQL imports city history atomically, preserves countries and edits,
       "Idempotent import must preserve revisions, not just values",
     );
     await db.exec("set role anon;");
-    assert.equal((await fetch()).visits.length, 112);
+    assert.equal((await fetch()).visits.length, 137);
     await fails(
       "update city_visits set days_spent=3 where city_id='london-uk'",
       /permission denied/,

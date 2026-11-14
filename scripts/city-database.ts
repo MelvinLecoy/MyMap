@@ -22,6 +22,13 @@ const newIds = [
   "vatican-city-vatican-city",
   "austin-usa",
   "san-antonio-usa",
+  ...(
+    JSON.parse(
+      readFileSync("data/sources/city-visit-batches.json", "utf8"),
+    ) as {
+      batches: { newCities: { cityid: string }[] }[];
+    }
+  ).batches.flatMap((batch) => batch.newCities.map((city) => city.cityid)),
 ];
 
 /** Scoped initial/idempotent import. Existing differing histories require a new review. */
