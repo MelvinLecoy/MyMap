@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { MAP_STATUS_STORAGE_KEY } from "../../src/lib/status-storage";
+import { mapFilterButton, setMapFilter } from "./collection-filters";
 // Test the complete bundled atlas independently of external services.
 test.beforeEach(async ({ page }) => {
   await page.route("https://tiles.openfreemap.org/**", (r) => r.abort());
@@ -46,10 +47,10 @@ test("globe, list, search and every status are functional", async ({
     ["Unfinished", 1],
     ["Not Started", 1],
   ] as const) {
-    await page.getByLabel("Filter by map status").selectOption(status);
+    await setMapFilter(page, status);
     await expect(page.locator(".city-row")).toHaveCount(count);
   }
-  await page.getByLabel("Filter by map status").selectOption("all");
+  await setMapFilter(page, "all");
   await page.getByRole("textbox").fill("somewhere-nonexistent");
   await expect(
     page.getByRole("heading", { name: "No cities found" }),
@@ -237,7 +238,7 @@ test("status edits survive reloads, synchronize tabs, and update list filters in
   await expect(
     page.locator(".city-row").filter({ hasText: "Kyiv" }).locator(".status"),
   ).toHaveText("Complete");
-  await page.getByLabel("Filter by map status").selectOption("Update");
+  await setMapFilter(page, "Update");
   await expect(page.locator(".city-row")).toHaveCount(2);
   await expect(page.locator(".collection-bottom")).toHaveText(
     /Visited\s*2\s*countries\s*1\s*city/,
@@ -303,7 +304,7 @@ test("viewer is lazy, canonical, accessible, and preserves filters and camera", 
   );
   await page.goto("/");
   await expect(page.locator("iframe")).toHaveCount(0);
-  await page.getByLabel("Filter by map status").selectOption("Complete");
+  await setMapFilter(page, "Complete");
   await page.getByRole("textbox").fill("Kyiv");
   await page.locator(".city-row").click();
   await expect(page.locator(".map-view-badge")).toContainText("Regional view");
@@ -328,7 +329,10 @@ test("viewer is lazy, canonical, accessible, and preserves filters and camera", 
   await expect(page.getByRole("button", { name: "View My Map" })).toBeFocused();
   await page.getByRole("button", { name: "All cities (5)" }).click();
   await expect(page.getByRole("textbox")).toHaveValue("Kyiv");
-  await expect(page.getByLabel("Filter by map status")).toHaveValue("Complete");
+  await expect(mapFilterButton(page, "Complete")).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
   await expect(page.locator(".city-row")).toHaveCount(1);
   await page.goto("/?city=moscow-russia&view=map");
   await expect(page.locator("iframe")).toHaveCount(1);

@@ -567,6 +567,9 @@ h2 {
   text-align: left;
   position: relative;
 }
+.city-row {
+  padding-block: 3px;
+}
 :is(.city-row, .country-row):after {
   content: "";
   position: absolute;
@@ -664,17 +667,17 @@ h2 {
 }
 .city-visit-summary {
   display: grid;
-  grid-template-rows: 40px 10px;
-  gap: 6px;
+  grid-template-rows: 10px 36px 10px;
+  gap: 5px;
   justify-items: center;
   width: 48px;
-  height: 56px;
+  height: 66px;
 }
 .city-row .city-count-badge {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   min-height: 0;
-  padding: 5px;
+  padding: 3px;
   gap: 1px;
   border-radius: 8px;
   box-shadow: inset 0 0 0 1px #a2cdb3;
@@ -697,23 +700,23 @@ h2 {
 }
 .city-row-metrics {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 5px;
+  align-items: center;
+  justify-content: flex-end;
 }
 .city-row-duration {
   color: var(--muted);
-  font-size: 10px;
-  line-height: 14px;
+  font-size: 9px;
+  line-height: 10px;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 .city-row-duration strong {
   color: var(--text);
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 750;
 }
 .city-overview {
-  margin: 0 var(--collection-inset) 14px;
+  margin: 0 var(--collection-inset) 8px;
   flex-shrink: 0;
 }
 .city-overview-totals {
@@ -768,7 +771,9 @@ h2 {
   inset: -5px 3px;
   border-radius: 5px;
   content: "";
-  transition: background 0.15s, box-shadow 0.15s;
+  transition:
+    background 0.15s,
+    box-shadow 0.15s;
 }
 .city-overview-totals button:hover::after {
   background: #28776c0a;
@@ -788,7 +793,7 @@ h2 {
   outline-offset: -1px;
 }
 .city-map-progress {
-  margin-top: 10px;
+  margin-top: 9px;
 }
 .city-map-progress-heading {
   display: flex;
@@ -2026,7 +2031,7 @@ h2 {
 
 /* Compact Cities / Countries collection navigation. */
 .collection-navigation {
-  padding: 12px 16px 10px;
+  padding: 12px 16px 11px;
   flex-shrink: 0;
 }
 .collection-tabs {
@@ -2079,6 +2084,18 @@ h2 {
   gap: 8px;
   margin-top: 8px;
   min-height: 18px;
+}
+.collection-controls .city-filter-row {
+  gap: 6px;
+}
+.city-filter-row > .collection-filter:first-child {
+  flex: 0 1 83px;
+}
+.city-filter-row > .collection-filter:nth-child(2) {
+  flex: 1 1 101px;
+}
+.city-filter-row > .collection-count {
+  padding-left: 7px;
 }
 .collection-controls .status-filter,
 .collection-controls .continent-filter {
@@ -2560,4 +2577,98 @@ h2 {
 }
 .country-stay-periods li + li {
   margin-top: 4px;
+}
+
+/* Compact, portalled collection filters. */
+.collection-filter {
+  display: inline-flex;
+  min-width: 0;
+}
+.collection-filter-trigger {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  min-width: 0;
+  height: 24px;
+  padding: 0 6px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 14px;
+}
+.collection-filter-value {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.collection-filter-chevron {
+  margin-left: auto;
+  color: var(--muted);
+  transition: transform 0.15s;
+}
+.collection-filter-trigger:hover {
+  border-color: var(--border);
+  background: var(--surface-alt);
+}
+.collection-filter[data-active="true"] .collection-filter-trigger,
+.collection-filter-trigger[aria-expanded="true"] {
+  border-color: #aac8bc;
+  background: #edf5ef;
+  color: var(--accent);
+}
+.collection-filter-trigger[aria-expanded="true"] .collection-filter-chevron {
+  transform: rotate(180deg);
+}
+.collection-filter-trigger:focus-visible {
+  outline-offset: 2px;
+}
+.collection-filter-menu {
+  position: fixed;
+  z-index: 100;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  min-width: 0;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow:
+    0 6px 22px #253f4c1a,
+    0 1px 4px #253f4c0d;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+  touch-action: pan-y;
+}
+.collection-filter-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 28px;
+  padding: 0 7px;
+  border-radius: 4px;
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 450;
+  line-height: 16px;
+  cursor: pointer;
+}
+.collection-filter-option-label {
+  flex: 1;
+  min-width: 0;
+}
+.collection-filter-option[aria-selected="true"] {
+  color: var(--accent);
+  font-weight: 650;
+}
+.collection-filter-option[data-active="true"] {
+  background: var(--surface-alt);
+}
+.collection-filter-option > svg {
+  flex-shrink: 0;
+  color: var(--accent);
 }

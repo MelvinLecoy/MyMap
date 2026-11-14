@@ -70,5 +70,5 @@ export function formatVisitDate(date: string): string {
 export function formatShortVisitDate(date: string): string {
   const [year, month] = date.split("-");
   if (!month) return year;
-  return `${["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][Number(month) - 1]} ${year.slice(2)}`;
+  return `${year.slice(2)} ${["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][Number(month) - 1]}`;
 }

@@ -124,6 +124,18 @@ function CityVisitMarker({ city }: { city: City }) {
   const year = date?.slice(0, 4);
   return (
     <span className="city-visit-summary">
+      <span
+        className="city-last-visit"
+        style={{
+          color: year
+            ? VISIT_YEAR_COLORS[Number(year) <= 2023 ? "2023" : year]
+            : undefined,
+        }}
+        aria-hidden={!date}
+      >
+        <span className="visually-hidden">Last visited </span>
+        {date ? formatShortVisitDate(date) : ""}
+      </span>
       <span className="visit-marker visit-marker-visited city-count-badge">
         {count ? (
           <strong>{count}</strong>
@@ -132,17 +144,11 @@ function CityVisitMarker({ city }: { city: City }) {
         )}
         <span>{count ? (count === 1 ? "Visit" : "Visits") : "Visited"}</span>
       </span>
-      <span
-        className="city-last-visit"
-        style={{
-          color: year
-            ? VISIT_YEAR_COLORS[Number(year) <= 2023 ? "2023" : year]
-            : undefined,
-        }}
-      >
-        <span className="visually-hidden">Last visited </span>
-        {date ? formatShortVisitDate(date) : ""}
-      </span>
+      {summary.visits > 0 && (
+        <span className="city-row-duration">
+          <strong>{summary.days}</strong> {summary.days === 1 ? "day" : "days"}
+        </span>
+      )}
     </span>
   );
 }
@@ -154,7 +160,6 @@ export function CityRow({
   city: City;
   onSelect: (id: string) => void;
 }) {
-  const summary = cityVisitSummary(city.visits ?? []);
   return (
     <button
       type="button"
@@ -174,12 +179,6 @@ export function CityRow({
       </span>
       <span className="city-row-metrics">
         <Status status={city.status} />
-        {summary.visits > 0 && (
-          <span className="city-row-duration">
-            <strong>{summary.days}</strong>{" "}
-            {summary.days === 1 ? "day" : "days"}
-          </span>
-        )}
       </span>
       <ChevronRight className="row-chevron" size={14} aria-hidden="true" />
     </button>

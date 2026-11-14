@@ -104,6 +104,7 @@ export default function App() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("all");
   const [continent, setContinent] = useState("all");
+  const [lastVisitYear, setLastVisitYear] = useState("all");
   const [visitedOnly, setVisitedOnly] = useState(false);
   const [citySort, setCitySort] = useState<CityScoreSort>("alphabetical");
   const [countrySearch, setCountrySearch] = useState("");
@@ -189,6 +190,27 @@ export default function App() {
     () => [...new Set(cities.map((c) => c.continent).filter(Boolean))].sort(),
     [cities],
   );
+  const cityLastVisits = useMemo(
+    () =>
+      new globalThis.Map(
+        cities.map((city) => [
+          city.id,
+          cityVisitSummary(city.visits ?? []).lastVisited ?? city.lastVisited,
+        ]),
+      ),
+    [cities],
+  );
+  const lastVisitYears = useMemo(
+    () =>
+      [
+        ...new Set(
+          [...cityLastVisits.values()]
+            .filter((date) => date != null)
+            .map((date) => date.slice(0, 4)),
+        ),
+      ].sort((a, b) => Number(b) - Number(a)),
+    [cityLastVisits],
+  );
   const countryView = route.panel === "countries";
   const countryRecords = useMemo(
     () => buildCountryRecords(countryCloud.countries, cities),
@@ -246,10 +268,12 @@ export default function App() {
         (city) =>
           searchText(`${city.name} ${city.country}`).includes(query) &&
           (continent === "all" || city.continent === continent) &&
+          (lastVisitYear === "all" ||
+            cityLastVisits.get(city.id)?.slice(0, 4) === lastVisitYear) &&
           (!scopedCountry || countryKey(city) === scopedCountry.code),
       )
       .sort((a, b) => a.name.localeCompare(b.name));
-  }, [search, continent, cities, scopedCountry]);
+  }, [search, continent, lastVisitYear, cityLastVisits, cities, scopedCountry]);
   const cityProgressScope = useMemo(
     () => cityScope.filter((city) => !visitedOnly || city.visit === "visited"),
     [cityScope, visitedOnly],
@@ -341,6 +365,7 @@ export default function App() {
       setSearch("");
       setStatus("all");
       setContinent("all");
+      setLastVisitYear("all");
       setVisitedOnly(false);
       setCitySort("alphabetical");
       if (route.country) clearCountry();
@@ -468,6 +493,9 @@ export default function App() {
                   continent={countryView ? countryContinent : continent}
                   onContinent={countryView ? setCountryContinent : setContinent}
                   continents={countryView ? countryContinents : continents}
+                  lastVisitYear={lastVisitYear}
+                  onLastVisitYear={setLastVisitYear}
+                  lastVisitYears={lastVisitYears}
                   count={
                     countryView ? filteredCountries.length : filtered.length
                   }

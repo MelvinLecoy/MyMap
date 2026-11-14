@@ -1,14 +1,16 @@
 import { useRef, type RefObject } from "react";
 import {
   Building2,
+  CalendarDays,
   Globe2,
   Search,
   SlidersHorizontal,
   ChevronDown,
   X,
 } from "lucide-react";
-import { MAP_STATUSES, MAP_STATUS_LABELS } from "../lib/types";
 import type { CountrySet } from "../lib/countries";
+import { VISIT_YEAR_COLORS } from "../lib/palette";
+import FilterDropdown from "./FilterDropdown";
 
 export type CollectionView = "cities" | "countries";
 
@@ -121,6 +123,9 @@ export default function CollectionHeader({
   continent,
   onContinent,
   continents,
+  lastVisitYear,
+  onLastVisitYear,
+  lastVisitYears,
   count,
   searchRef,
   countrySet,
@@ -134,6 +139,9 @@ export default function CollectionHeader({
   continent: string;
   onContinent: (value: string) => void;
   continents: string[];
+  lastVisitYear: string;
+  onLastVisitYear: (value: string) => void;
+  lastVisitYears: string[];
   count: number;
   searchRef: RefObject<HTMLInputElement | null>;
   countrySet?: CountrySet;
@@ -186,39 +194,65 @@ export default function CollectionHeader({
           <kbd>⌘ K</kbd>
         )}
       </label>
-      <div className="filter-row">
-        <FilterSelect
-          label={countries ? "Filter by visit status" : "Filter by map status"}
-          value={status}
-          onChange={onStatus}
-          icon
-          shortAll={countries ? "All visits" : "All statuses"}
-          options={
-            countries
-              ? [
-                  { value: "all", label: "All visit statuses" },
-                  { value: "not-yet", label: "Not Yet" },
-                  { value: "planned", label: "Planned" },
-                  { value: "visited", label: "Visited" },
-                ]
-              : [
-                  { value: "all", label: "All map statuses" },
-                  ...MAP_STATUSES.map((value) => ({
-                    value,
-                    label: MAP_STATUS_LABELS[value],
-                  })),
-                ]
-          }
-        />
-        <FilterSelect
-          label="Filter by continent"
-          value={continent}
-          onChange={onContinent}
-          options={[
-            { value: "all", label: "All continents" },
-            ...continents.map((value) => ({ value, label: value })),
-          ]}
-        />
+      <div className={`filter-row${countries ? "" : " city-filter-row"}`}>
+        {countries ? (
+          <>
+            <FilterSelect
+              label="Filter by visit status"
+              value={status}
+              onChange={onStatus}
+              icon
+              shortAll="All visits"
+              options={[
+                { value: "all", label: "All visit statuses" },
+                { value: "not-yet", label: "Not Yet" },
+                { value: "planned", label: "Planned" },
+                { value: "visited", label: "Visited" },
+              ]}
+            />
+            <FilterSelect
+              label="Filter by continent"
+              value={continent}
+              onChange={onContinent}
+              options={[
+                { value: "all", label: "All continents" },
+                ...continents.map((value) => ({ value, label: value })),
+              ]}
+            />
+          </>
+        ) : (
+          <>
+            <FilterDropdown
+              label="Filter by last visited year"
+              value={lastVisitYear}
+              onChange={onLastVisitYear}
+              icon={CalendarDays}
+              options={[
+                { value: "all", label: "All years", shortLabel: "Year" },
+                ...lastVisitYears.map((value) => ({
+                  value,
+                  label: value,
+                  color:
+                    VISIT_YEAR_COLORS[Number(value) <= 2023 ? "2023" : value],
+                })),
+              ]}
+            />
+            <FilterDropdown
+              label="Filter by continent"
+              value={continent}
+              onChange={onContinent}
+              icon={Globe2}
+              options={[
+                {
+                  value: "all",
+                  label: "All continents",
+                  shortLabel: "Continent",
+                },
+                ...continents.map((value) => ({ value, label: value })),
+              ]}
+            />
+          </>
+        )}
         {countries && countrySet && onCountrySet ? (
           <div className="country-count-control">
             {resultCount}

@@ -1,6 +1,12 @@
 import { test, expect, type Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import type { AtlasData } from "../../src/lib/types";
+import { VISIT_YEAR_COLORS } from "../../src/lib/palette";
+import {
+  chooseFilter,
+  mapFilterButton,
+  setMapFilter,
+} from "./collection-filters";
 import {
   MAP_STATUS_STORAGE_KEY,
   COLLECTION_STATUS_STORAGE_KEY,
@@ -37,8 +43,9 @@ test("city overview, compact visit rows, map progress filters and city details u
   );
   const filters = page.getByRole("group", { name: "Map progress filters" });
   await filters.getByRole("button", { name: "Update 7", exact: true }).click();
-  await expect(page.getByLabel("Filter by map status")).toHaveValue(
-    "Unfinished",
+  await expect(mapFilterButton(page, "Unfinished")).toHaveAttribute(
+    "aria-pressed",
+    "true",
   );
   await expect(page.locator(".city-row")).toHaveCount(7);
   await page.getByLabel("Search cities and countries").fill("Shanghai");
@@ -50,7 +57,7 @@ test("city overview, compact visit rows, map progress filters and city details u
   const row = page.locator(".city-row");
   await expect(row.locator(".city-count-badge")).toContainText("1");
   await expect(row.locator(".city-row-duration")).toHaveText("2.5 days");
-  await expect(row.locator(".city-last-visit")).toContainText("Sep 26");
+  await expect(row.locator(".city-last-visit")).toContainText("26 Sep");
   await expect(row.locator(".status")).toHaveText("Update");
   expect((await row.boundingBox())!.height).toBeLessThanOrEqual(73);
   await row.click();
@@ -164,8 +171,9 @@ test("scoreboard toggles compose with filters and sort visits and half-days with
   await visits.click();
   await expect(visits).toHaveAttribute("aria-pressed", "false");
   await filters.getByRole("button", { name: /^Update / }).click();
-  await expect(page.getByLabel("Filter by map status")).toHaveValue(
-    "Unfinished",
+  await expect(mapFilterButton(page, "Unfinished")).toHaveAttribute(
+    "aria-pressed",
+    "true",
   );
   const visitedUpdates = data.cities.filter(
     (city) => city.visit === "visited" && city.status === "Unfinished",
@@ -181,7 +189,10 @@ test("scoreboard toggles compose with filters and sort visits and half-days with
   await expect(visited).toHaveAttribute("aria-pressed", "false");
   await expect(names).toHaveText(alphabetical);
   await filters.getByRole("button", { name: /^Usable / }).click();
-  await expect(page.getByLabel("Filter by map status")).toHaveValue("Update");
+  await expect(mapFilterButton(page, "Update")).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
   await expect(names).toHaveCount(0);
   await page
     .getByRole("button", { name: "Clear filters", exact: true })
@@ -199,6 +210,146 @@ test("scoreboard toggles compose with filters and sort visits and half-days with
     await expect(names.first()).toHaveText("New York City");
     await visits.click();
     await expect(names.first()).toHaveText(alphabetical[0]);
+  }
+});
+
+test("compact year and continent menus filter latest visits, retain year colors and support keyboard controls", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    const get = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (
+      this: HTMLCanvasElement,
+      type: string,
+      ...args: unknown[]
+    ) {
+      return type.includes("webgl")
+        ? null
+        : get.apply(this, [type, ...args] as never);
+    } as typeof get;
+  });
+  await page.goto("/");
+  const year = page.getByRole("combobox", {
+    name: "Filter by last visited year",
+    exact: true,
+  });
+  const continent = page.getByRole("combobox", {
+    name: "Filter by continent",
+    exact: true,
+  });
+  await expect(page.locator(".city-filter-row [role=combobox]")).toHaveCount(2);
+  await expect(page.locator(".city-map-progress")).toHaveCSS(
+    "margin-top",
+    "9px",
+  );
+  await expect(page.locator(".collection-navigation")).toHaveCSS(
+    "padding",
+    "12px 16px 11px",
+  );
+  await expect(page.locator(".city-overview")).toHaveCSS(
+    "margin-bottom",
+    "8px",
+  );
+  const row = page.locator(".city-row").first();
+  await expect(row.locator(".city-last-visit")).toContainText("26 Aug");
+  const date = (await row.locator(".city-last-visit").boundingBox())!;
+  const badge = (await row.locator(".city-count-badge").boundingBox())!;
+  const duration = (await row.locator(".city-row-duration").boundingBox())!;
+  expect(badge.y - date.y - date.height).toBe(5);
+  expect(duration.y - badge.y - badge.height).toBe(5);
+  expect((await row.boundingBox())!.height).toBe(72);
+  expect(badge.width).toBe(badge.height);
+  await expect(row.locator(".city-row-metrics .city-row-duration")).toHaveCount(
+    0,
+  );
+  await year.click();
+  const years = [
+    ...new Set(
+      data.cities.flatMap((city) =>
+        city.lastVisited ? [city.lastVisited.slice(0, 4)] : [],
+      ),
+    ),
+  ]
+    .sort()
+    .reverse();
+  await expect(page.getByRole("option")).toHaveText(["All years", ...years]);
+  for (const value of years) {
+    const color = VISIT_YEAR_COLORS[Number(value) <= 2023 ? "2023" : value];
+    const rgb = color
+      .slice(1)
+      .match(/../g)!
+      .map((part) => parseInt(part, 16));
+    await expect(
+      page
+        .getByRole("option", { name: value, exact: true })
+        .locator(".collection-filter-option-label"),
+    ).toHaveCSS("color", `rgb(${rgb.join(", ")})`);
+  }
+  await page.getByRole("option", { name: "2025", exact: true }).click();
+  const in2025 = data.cities.filter((city) =>
+    city.lastVisited?.startsWith("2025"),
+  );
+  await expect(page.locator(".city-row")).toHaveCount(in2025.length);
+  await expect(
+    page.locator(".city-row-name").filter({ hasText: "New York City" }),
+  ).toHaveCount(0);
+  await chooseFilter(page, "Filter by continent", "Europe");
+  await expect(page.locator(".city-row")).toHaveCount(
+    in2025.filter((city) => city.continent === "Europe").length,
+  );
+  await page
+    .locator(".city-overview-totals")
+    .getByRole("button", { name: /^Cities visited / })
+    .click();
+  await setMapFilter(page, "Complete");
+  await expect(page.locator(".city-row")).toHaveCount(
+    in2025.filter(
+      (city) => city.continent === "Europe" && city.status === "Complete",
+    ).length,
+  );
+  await page.getByLabel("Search cities and countries").fill("not-a-place");
+  await page
+    .getByRole("button", { name: "Clear filters", exact: true })
+    .click();
+  await expect(page.locator(".city-row")).toHaveCount(343);
+  await expect(year).toContainText("Year");
+  await expect(continent).toContainText("Continent");
+  await year.focus();
+  await page.keyboard.press("Home");
+  await page.keyboard.press("ArrowDown");
+  await page.keyboard.press("Enter");
+  await expect(year).toContainText("2026");
+  await expect(year).toBeFocused();
+  await year.click();
+  await page.keyboard.press("Escape");
+  await expect(year).toHaveAttribute("aria-expanded", "false");
+  await expect(year).toBeFocused();
+  await year.click();
+  await continent.click();
+  await expect(page.getByRole("listbox")).toHaveCount(1);
+  await expect(year).toHaveAttribute("aria-expanded", "false");
+  await page.keyboard.type("e");
+  await page.keyboard.press("Enter");
+  await expect(continent).toContainText("Europe");
+  await year.click();
+  await page.getByLabel("Search cities and countries").click();
+  await expect(page.getByRole("listbox")).toHaveCount(0);
+  for (const width of [320, 650, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await year.click();
+    const menu = (await page.getByRole("listbox").boundingBox())!;
+    expect(menu.x).toBeGreaterThanOrEqual(0);
+    expect(menu.x + menu.width).toBeLessThanOrEqual(width);
+    expect(menu.y + menu.height).toBeLessThanOrEqual(900);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    await page.keyboard.press("Tab");
+    await expect(page.getByRole("listbox")).toHaveCount(0);
+    const filterRow = (await page.locator(".city-filter-row").boundingBox())!;
+    expect(filterRow.height).toBe(24);
   }
 });
 
@@ -396,22 +547,22 @@ test("every status and continent filter and country search work on the full coll
   for (const [status, count] of [
     ["Complete", 253],
     ["Unfinished", 7],
-    ["Not Started", 65],
+    ["Not Started", 83],
     ["Update", 0],
   ] as const) {
-    await page.getByLabel("Filter by map status").selectOption(status);
+    await setMapFilter(page, status);
     await expect(page.locator(".city-row")).toHaveCount(count);
   }
-  await page.getByLabel("Filter by map status").selectOption("all");
+  await setMapFilter(page, "all");
   for (const continent of [
     ...new Set(data.cities.map((record) => record.continent)),
   ]) {
-    await page.getByLabel("Filter by continent").selectOption(continent);
+    await chooseFilter(page, "Filter by continent", continent);
     await expect(page.locator(".city-row")).toHaveCount(
       data.cities.filter((record) => record.continent === continent).length,
     );
   }
-  await page.getByLabel("Filter by continent").selectOption("all");
+  await chooseFilter(page, "Filter by continent", "All continents");
   for (const country of ["Russia", "Ukraine", "Svalbard", "Uganda"]) {
     await page.getByRole("textbox").fill(country);
     await expect(page.locator(".city-row")).toHaveCount(
@@ -726,12 +877,12 @@ test("real status edits persist and sync separately from demo edits without chan
   expect(saved.demo["moscow-russia"]).toBe("Update");
   expect(saved.collection["moscow-russia"]).toBe("Unfinished");
   await back(page);
-  await page.getByLabel("Filter by map status").selectOption("Unfinished");
+  await setMapFilter(page, "Unfinished");
   await expect(page.locator(".city-row")).toHaveCount(8);
   await expect(page.locator(".collection-bottom")).toHaveText(
     /Visited\s*97\s*countries\s*174\s*cities/,
   );
-  await page.getByLabel("Filter by map status").selectOption("all");
+  await setMapFilter(page, "all");
   await openCity(page, "Moscow");
   const other = await context.newPage();
   await other.goto("/?city=moscow-russia");
@@ -963,7 +1114,7 @@ test("country pages preserve city filters and fit narrow panels without overflow
 }) => {
   await page.goto("/");
   await page.getByLabel("Search cities and countries").fill("Adelaide");
-  await page.getByLabel("Filter by map status").selectOption("Unfinished");
+  await setMapFilter(page, "Unfinished");
   await page.getByRole("tab", { name: "Countries", exact: true }).click();
   await page
     .getByLabel("Search countries", { exact: true })
@@ -992,8 +1143,9 @@ test("country pages preserve city filters and fit narrow panels without overflow
   await expect(page.getByLabel("Search cities and countries")).toHaveValue(
     "Adelaide",
   );
-  await expect(page.getByLabel("Filter by map status")).toHaveValue(
-    "Unfinished",
+  await expect(mapFilterButton(page, "Unfinished")).toHaveAttribute(
+    "aria-pressed",
+    "true",
   );
   await page.getByRole("tab", { name: "Countries", exact: true }).click();
   await page.getByLabel("Search countries", { exact: true }).fill("Albania");

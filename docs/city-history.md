@@ -108,6 +108,19 @@ category identities. All displayed status names use the shared label mapping.
 The Complete category uses the same stronger green in badges, progress segments
 and progress filter buttons; other category colors are unchanged.
 
+The compact city filter row contains last-visited year and continent menus.
+Year filtering uses the latest departure shown in each city row, rather than
+matching any earlier stay. Options come from the collection's known latest
+dates, newest first, and use the same year colors as city dates (2023 and earlier
+share brown). Both filters combine with search, scoreboard controls and map
+progress buttons. Status filtering is available through those progress buttons.
+Menus support keyboard navigation, typeahead and dismissal, and remain within
+the viewport on narrow screens. Clear filters resets year and continent too.
+
+City rows show the last visit as year/month above the visit badge and actual
+days below it. Country dates retain their existing format. The visited city
+square is 36px with 5px gaps above and below, keeping the normal 72px row height.
+
 ## Expanded verified city batch
 
 The owner-verified `expanded_cities_visit_data_verified.xlsx` is retained in
