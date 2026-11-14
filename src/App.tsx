@@ -90,11 +90,7 @@ function readRoute(): {
         ? "countries"
         : "cities",
     country: p.get("country"),
-    countrySet:
-      p.get("countrySet") === "197" ||
-      ["XK", "TW"].includes(p.get("country") ?? "")
-        ? 197
-        : 195,
+    countrySet: p.get("countrySet") === "197" ? 197 : 195,
   };
 }
 export default function App() {
@@ -110,7 +106,7 @@ export default function App() {
   const [lastVisitYear, setLastVisitYear] = useState("all");
   const [visitedOnly, setVisitedOnly] = useState(false);
   const [citySort, setCitySort] = useState<CityScoreSort>("alphabetical");
-  const [countrySearch, setCountrySearch] = useState("");
+  const [countryPreview, setCountryPreview] = useState<string | null>(null);
   const [countryVisit, setCountryVisit] = useState("all");
   const [countryContinent, setCountryContinent] = useState("all");
   const [countryLastVisitYear, setCountryLastVisitYear] = useState("all");
@@ -227,14 +223,12 @@ export default function App() {
     () =>
       countrySeed.sample
         ? countryRecords
-        : countryRecords.filter((country) =>
-            inCountrySet(country, route.countrySet),
-          ),
-    [countryRecords, route.countrySet],
+        : countryRecords.filter((country) => inCountrySet(country, 197)),
+    [countryRecords],
   );
   const countryOrders = useMemo(
-    () => countryVisitOrders(countryRecords, route.countrySet),
-    [countryRecords, route.countrySet],
+    () => countryVisitOrders(countryRecords, 197),
+    [countryRecords],
   );
   const scopedCountry = countryRecords.find(
     (country) => country.code === route.country,
@@ -280,14 +274,10 @@ export default function App() {
       ].sort((a, b) => Number(b) - Number(a)),
     [countryLastVisits],
   );
-  const filteredCountries = useMemo(() => {
-    const query = searchText(countrySearch);
+  const countryScope = useMemo(() => {
     const matches = countriesInView.filter((country) => {
       const year = countryLastVisits.get(country.code)?.slice(0, 4);
       return (
-        searchText(
-          `${country.name} ${country.code} ${country.aliases?.join(" ") ?? ""}`,
-        ).includes(query) &&
         matchesVisit(country.visit, countryVisit) &&
         (countryContinent === "all" ||
           country.continent === countryContinent) &&
@@ -307,13 +297,38 @@ export default function App() {
     );
   }, [
     countriesInView,
-    countrySearch,
     countryVisit,
     countryContinent,
     countryLastVisitYear,
     countryLastVisits,
     countrySort,
   ]);
+  const filteredCountries = useMemo(
+    () =>
+      countryPreview
+        ? countryScope.filter((country) => country.code === countryPreview)
+        : countryScope,
+    [countryScope, countryPreview],
+  );
+  const countryScoreboard = useMemo(
+    () =>
+      countrySeed.sample
+        ? filteredCountries
+        : filteredCountries.filter((country) =>
+            inCountrySet(country, route.countrySet),
+          ),
+    [filteredCountries, route.countrySet],
+  );
+  const previewCountry = countryRecords.find(
+    (country) => country.code === countryPreview,
+  );
+  const previewCountryFromGlobe = useCallback(
+    (code: string | null) => {
+      if (code && countryView && !route.country && !route.city)
+        setCountryPreview(code);
+    },
+    [countryView, route.country, route.city],
+  );
   const cityScope = useMemo(() => {
     const query = searchText(search);
     return cities
@@ -353,14 +368,14 @@ export default function App() {
   const mapCities = useMemo(() => {
     if (countryView && scopedCountry) return countryCities;
     if (!countryView) return filtered;
-    const codes = new Set(filteredCountries.map((country) => country.code));
+    const codes = new Set(countryScope.map((country) => country.code));
     return cities.filter((city) => codes.has(countryKey(city)));
   }, [
     countryView,
     scopedCountry,
     countryCities,
     filtered,
-    filteredCountries,
+    countryScope,
     cities,
   ]);
   const changePanel = useCallback((panel: CollectionView) => {
@@ -372,6 +387,7 @@ export default function App() {
     if (panel === "countries") url.searchParams.set("panel", panel);
     else url.searchParams.delete("panel");
     window.history.pushState({}, "", url);
+    setCountryPreview(null);
     setRoute(readRoute());
   }, []);
   const openCountry = (code: string) => {
@@ -380,6 +396,7 @@ export default function App() {
     url.searchParams.set("panel", "countries");
     url.searchParams.set("country", code);
     window.history.pushState({}, "", url);
+    setCountryPreview(null);
     setRoute(readRoute());
   };
   const clearCountry = useCallback(() => {
@@ -389,16 +406,13 @@ export default function App() {
     for (const key of ["country", "city", "view"]) url.searchParams.delete(key);
     url.searchParams.set("panel", "countries");
     window.history.pushState({}, "", url);
+    setCountryPreview(null);
     setRoute(readRoute());
   }, []);
   const changeCountrySet = (set: CountrySet) => {
     const url = new URL(window.location.href);
     if (set === 197) url.searchParams.set("countrySet", "197");
     else url.searchParams.delete("countrySet");
-    if (scopedCountry && !inCountrySet(scopedCountry, set)) {
-      for (const key of ["country", "city", "view"])
-        url.searchParams.delete(key);
-    }
     window.history.pushState({}, "", url);
     setRoute(readRoute());
   };
@@ -406,17 +420,17 @@ export default function App() {
     const key = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
-        if (route.country) clearCountry();
+        if (countryView) changePanel("cities");
         else if (selected) navigate(null);
         setTimeout(() => searchRef.current?.focus(), 0);
       }
     };
     window.addEventListener("keydown", key);
     return () => window.removeEventListener("keydown", key);
-  }, [route.country, selected, navigate, clearCountry]);
+  }, [countryView, selected, navigate, changePanel]);
   const resetFilters = () => {
     if (countryView) {
-      setCountrySearch("");
+      setCountryPreview(null);
       setCountryVisit("all");
       setCountryContinent("all");
       setCountryLastVisitYear("all");
@@ -463,7 +477,8 @@ export default function App() {
             selectedCountry={scopedCountry?.code ?? null}
             onSelect={(id) => navigate(id)}
             onSelectCountry={openCountry}
-            countryCodes={countryRecords.map((country) => country.code)}
+            onHoverCountry={previewCountryFromGlobe}
+            countryCodes={countriesInView.map((country) => country.code)}
             geonames={data.geonames}
             viewControl={
               cloud.enabled ? (
@@ -524,7 +539,6 @@ export default function App() {
                 cities={countryCities}
                 countryCount={countriesInView.length}
                 visitOrder={countryOrders.get(scopedCountry.code) ?? null}
-                countrySet={countrySeed.sample ? undefined : route.countrySet}
                 onBack={clearCountry}
                 onSelectCity={(id) => navigate(id)}
               />
@@ -532,7 +546,11 @@ export default function App() {
               <>
                 {countryView ? (
                   <CountryCollectionSummary
-                    countries={filteredCountries}
+                    countries={countryScoreboard}
+                    countrySet={
+                      countrySeed.sample ? undefined : route.countrySet
+                    }
+                    onCountrySet={changeCountrySet}
                     visitedOnly={countryVisit === "visited"}
                     sort={countrySort}
                     onVisitedOnly={() =>
@@ -564,8 +582,8 @@ export default function App() {
                 )}
                 <CollectionHeader
                   view={route.panel}
-                  search={countryView ? countrySearch : search}
-                  onSearch={countryView ? setCountrySearch : setSearch}
+                  search={search}
+                  onSearch={setSearch}
                   continent={countryView ? countryContinent : continent}
                   onContinent={countryView ? setCountryContinent : setContinent}
                   continents={countryView ? countryContinents : continents}
@@ -582,8 +600,8 @@ export default function App() {
                     countryView ? filteredCountries.length : filtered.length
                   }
                   searchRef={searchRef}
-                  countrySet={countrySeed.sample ? undefined : route.countrySet}
-                  onCountrySet={changeCountrySet}
+                  countryPreview={previewCountry}
+                  onClearCountryPreview={() => setCountryPreview(null)}
                 />
                 <div
                   className="city-list"
@@ -646,7 +664,7 @@ export default function App() {
                       </h2>
                       <p>
                         {countryView
-                          ? "Try another country or visit status."
+                          ? "Try another year or continent, or hover over a country on the globe."
                           : "Try another place or a different map status."}
                       </p>
                       <button onClick={resetFilters}>

@@ -1,8 +1,9 @@
 import { useRef, type RefObject } from "react";
 import { Building2, CalendarDays, Globe2, Search, X } from "lucide-react";
-import type { CountrySet } from "../lib/countries";
+import type { CountryRecord } from "../lib/countries";
 import { VISIT_YEAR_COLORS } from "../lib/palette";
 import FilterDropdown from "./FilterDropdown";
+import { Flag } from "./CollectionItems";
 
 export type CollectionView = "cities" | "countries";
 
@@ -76,8 +77,8 @@ export default function CollectionHeader({
   lastVisitYears,
   count,
   searchRef,
-  countrySet,
-  onCountrySet,
+  countryPreview,
+  onClearCountryPreview,
 }: {
   view: CollectionView;
   search: string;
@@ -90,8 +91,8 @@ export default function CollectionHeader({
   lastVisitYears: string[];
   count: number;
   searchRef: RefObject<HTMLInputElement | null>;
-  countrySet?: CountrySet;
-  onCountrySet?: (set: CountrySet) => void;
+  countryPreview?: Pick<CountryRecord, "code" | "name">;
+  onClearCountryPreview?: () => void;
 }) {
   const countries = view === "countries";
   const noun = countries
@@ -115,31 +116,51 @@ export default function CollectionHeader({
     </span>
   );
   return (
-    <div className="collection-controls">
+    <div
+      className={`collection-controls${countries ? " country-controls" : ""}`}
+    >
       <h1 className="visually-hidden">{countries ? "Countries" : "Cities"}</h1>
-      <label className="search-field">
-        <Search size={16} aria-hidden="true" />
-        <input
-          ref={searchRef}
-          value={search}
-          onChange={(event) => onSearch(event.target.value)}
-          placeholder={countries ? "Find a country" : "Find a city or country"}
-          aria-label={
-            countries ? "Search countries" : "Search cities and countries"
-          }
-        />
-        {search ? (
+      {!countries && (
+        <label className="search-field">
+          <Search size={16} aria-hidden="true" />
+          <input
+            ref={searchRef}
+            value={search}
+            onChange={(event) => onSearch(event.target.value)}
+            placeholder="Find a city or country"
+            aria-label="Search cities and countries"
+          />
+          {search ? (
+            <button
+              type="button"
+              aria-label="Clear search"
+              onClick={() => onSearch("")}
+            >
+              <X size={14} />
+            </button>
+          ) : (
+            <kbd>⌘ K</kbd>
+          )}
+        </label>
+      )}
+      {countries && countryPreview && (
+        <div
+          className="country-globe-preview"
+          role="status"
+          aria-label="Country shown from globe"
+        >
+          <Globe2 size={12} aria-hidden="true" />
+          <Flag code={countryPreview.code} />
+          <strong>{countryPreview.name}</strong>
           <button
             type="button"
-            aria-label="Clear search"
-            onClick={() => onSearch("")}
+            aria-label="Show all countries"
+            onClick={onClearCountryPreview}
           >
-            <X size={14} />
+            <X size={12} aria-hidden="true" />
           </button>
-        ) : (
-          <kbd>⌘ K</kbd>
-        )}
-      </label>
+        </div>
+      )}
       <div
         className={`filter-row city-filter-row${countries ? " country-filter-row" : ""}`}
       >
@@ -172,22 +193,7 @@ export default function CollectionHeader({
             ...continents.map((value) => ({ value, label: value })),
           ]}
         />
-        {countries && countrySet && onCountrySet ? (
-          <div className="country-count-control">
-            <FilterDropdown
-              label="Country list size"
-              value={String(countrySet)}
-              onChange={(value) => onCountrySet(value === "197" ? 197 : 195)}
-              valueContent={resultCount}
-              options={[
-                { value: "195", label: "195" },
-                { value: "197", label: "197 (🇽🇰 & 🇹🇼)" },
-              ]}
-            />
-          </div>
-        ) : (
-          resultCount
-        )}
+        {resultCount}
       </div>
     </div>
   );

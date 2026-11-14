@@ -135,12 +135,18 @@ count remains one. The correction is included in the country ledger and
 
 The country collection shares the compact city scoreboard and visit-row style.
 Countries visited toggles visited-only results; Visits and Days spent toggle
-highest-first sorting with alphabetical ties. Search, continent and last-visited
-year filters combine independently from city filters. Year colors are shared;
+highest-first sorting with alphabetical ties. Globe hover, continent and last-visited
+year filters combine independently from city filters. The country search bar is
+replaced by the hovered country's name and a clear button. The result stays visible
+when moving into the panel. Hover does not change the camera, open a profile,
+filter globe pins or replace an already-open profile. Year colors are shared;
 2023 and earlier form one brown option. Country map progress is not shown.
 
-The country-set menu offers 195 and 197 (🇽🇰 & 🇹🇼). Statistics and filtering
-respect the selected set. The scoreboard sums known lifetime values when supplied
+The scoreboard embeds a compact denominator menu beside Countries visited, offering
+195 and 197 (🇽🇰 & 🇹🇼). The selected set affects only scoreboard totals; the list,
+profile visit order, globe pins and footer always use the full 197-country set.
+Country profiles retain the globe's raised outline independently of temporary
+hover highlights. The scoreboard sums known lifetime values when supplied
 and otherwise recorded history; a visited country with unknown totals retains
 its unknown values instead of receiving invented visits or days. Rows show the
 last date above a 34px visit square, with 3px above and 4px below the square, and

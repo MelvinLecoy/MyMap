@@ -1,4 +1,4 @@
-import { useId } from "react";
+import { useId, type ReactNode } from "react";
 
 export type CollectionScoreSort = "alphabetical" | "visits" | "days";
 export interface ScoreboardStat {
@@ -8,6 +8,7 @@ export interface ScoreboardStat {
   active: boolean;
   title: string;
   onClick: () => void;
+  valueControl?: ReactNode;
 }
 
 export default function CollectionScoreboard({
@@ -25,14 +26,21 @@ export default function CollectionScoreboard({
           <dt id={`${id}-${stat.key}-label`}>{stat.label}</dt>
           <dd>
             <button
+              className="scoreboard-stat-toggle"
               type="button"
               aria-labelledby={`${id}-${stat.key}-label ${id}-${stat.key}-value`}
               aria-pressed={stat.active}
               title={stat.title}
               onClick={stat.onClick}
             >
-              <span id={`${id}-${stat.key}-value`}>{stat.value}</span>
+              <span
+                className="scoreboard-stat-value"
+                id={`${id}-${stat.key}-value`}
+              >
+                {stat.value}
+              </span>
             </button>
+            {stat.valueControl}
           </dd>
         </div>
       ))}

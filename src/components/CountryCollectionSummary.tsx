@@ -1,4 +1,9 @@
-import { countryVisitSummary, type CountryRecord } from "../lib/countries";
+import {
+  countryVisitSummary,
+  type CountryRecord,
+  type CountrySet,
+} from "../lib/countries";
+import FilterDropdown from "./FilterDropdown";
 import CollectionScoreboard, {
   type CollectionScoreSort,
 } from "./CollectionScoreboard";
@@ -9,12 +14,16 @@ export default function CountryCollectionSummary({
   sort,
   onVisitedOnly,
   onSort,
+  countrySet,
+  onCountrySet,
 }: {
   countries: CountryRecord[];
   visitedOnly: boolean;
   sort: CollectionScoreSort;
   onVisitedOnly: () => void;
   onSort: (sort: CollectionScoreSort) => void;
+  countrySet?: CountrySet;
+  onCountrySet?: (set: CountrySet) => void;
 }) {
   const totals = countries.reduce(
     (sum, country) => {
@@ -53,6 +62,28 @@ export default function CountryCollectionSummary({
               ? "Show all countries"
               : "Show visited countries only",
             onClick: onVisitedOnly,
+            valueControl:
+              countrySet && onCountrySet ? (
+                <div className="country-scoreboard-scope">
+                  <FilterDropdown
+                    label="Country scoreboard scope"
+                    value={String(countrySet)}
+                    onChange={(value) =>
+                      onCountrySet(value === "197" ? 197 : 195)
+                    }
+                    valueContent={
+                      <>
+                        <span aria-hidden="true">/</span>
+                        {countrySet}
+                      </>
+                    }
+                    options={[
+                      { value: "195", label: "195" },
+                      { value: "197", label: "197 (🇽🇰 & 🇹🇼)" },
+                    ]}
+                  />
+                </div>
+              ) : undefined,
           },
           {
             key: "visits",

@@ -46,6 +46,7 @@ interface Props {
   selectedCountry?: string | null;
   onSelect: (id: string) => void;
   onSelectCountry: (code: string) => void;
+  onHoverCountry: (code: string | null) => void;
   countryCodes: string[];
   geonames: boolean;
   viewControl?: ReactNode;
@@ -57,6 +58,7 @@ export default function Globe({
   selectedCountry = null,
   onSelect,
   onSelectCountry,
+  onHoverCountry,
   countryCodes,
   geonames,
   viewControl,
@@ -71,16 +73,20 @@ export default function Globe({
     cities,
     countries,
     selected,
+    selectedCountry,
     onSelect,
     onSelectCountry,
+    onHoverCountry,
     countryCodes: new Set(countryCodes),
   });
   current.current = {
     cities,
     countries,
     selected,
+    selectedCountry,
     onSelect,
     onSelectCountry,
+    onHoverCountry,
     countryCodes: new Set(countryCodes),
   };
   const [ready, setReady] = useState(false);
@@ -280,6 +286,9 @@ export default function Globe({
         firstLabel,
         motionDuration,
       );
+      countryHover.current.setSelectedCountry(
+        current.current.selected ? null : current.current.selectedCountry,
+      );
       if (container.current) container.current.dataset.hoverCountry = "";
       for (const [id, minzoom, filter] of [
         ["large", 0, ["<=", ["get", "rank"], 3]],
@@ -432,8 +441,13 @@ export default function Globe({
       setRegional(map.getZoom() >= 3);
     };
     map.on("moveend", move);
+    let hoveredCountry: string | null = null;
     const hoverCountry = (code: string | null) => {
       countryHover.current?.setCountry(code);
+      if (code !== hoveredCountry) {
+        hoveredCountry = code;
+        current.current.onHoverCountry(code);
+      }
       if (container.current)
         container.current.dataset.hoverCountry = code ?? "";
     };
@@ -495,12 +509,16 @@ export default function Globe({
     };
     map.on("click", async (e) => {
       const f = pickCityFeature(e.point);
-      hoverCountry(null);
       if (!f || f.geometry.type !== "Point") {
         const code = pickCountry(e.point);
-        if (code) current.current.onSelectCountry(code);
+        if (code) {
+          countryHover.current?.setSelectedCountry(code);
+          current.current.onSelectCountry(code);
+        }
+        hoverCountry(null);
         return;
       }
+      hoverCountry(null);
       if (!f.properties.cluster) {
         if (f.properties.id) current.current.onSelect(f.properties.id);
         return;
@@ -594,6 +612,12 @@ export default function Globe({
     if (!ready || !map?.getLayer("atlas-land")) return;
     countryHover.current?.updateCountries(countries);
   }, [countries, ready]);
+  useEffect(() => {
+    if (ready)
+      countryHover.current?.setSelectedCountry(
+        selected ? null : selectedCountry,
+      );
+  }, [selectedCountry, selected, ready]);
   useEffect(() => {
     const map = mapRef.current;
     if (!ready || !map?.getLayer("city-pins")) return;
@@ -705,6 +729,7 @@ export default function Globe({
         data-testid="map-canvas"
         data-ready={ready}
         data-hover-country=""
+        data-selected-country={selected ? "" : (selectedCountry ?? "")}
       />
       <div className="map-topline">
         {viewControl ?? (

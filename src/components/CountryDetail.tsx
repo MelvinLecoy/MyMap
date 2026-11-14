@@ -6,7 +6,7 @@ import {
   CircleDashed,
   Crown,
 } from "lucide-react";
-import type { CountryRecord, CountrySet, CountryTrip } from "../lib/countries";
+import type { CountryRecord, CountryTrip } from "../lib/countries";
 import { formatVisitDate, VISIT_LABELS, type City } from "../lib/types";
 import { useCountryHeading } from "../lib/use-country-heading";
 import { CityRow, Flag } from "./CollectionItems";
@@ -62,7 +62,6 @@ export default function CountryDetail({
   onBack,
   onSelectCity,
   visitOrder = country.firstVisitOrder,
-  countrySet,
 }: {
   country: CountryRecord;
   cities: City[];
@@ -70,7 +69,6 @@ export default function CountryDetail({
   onBack: () => void;
   onSelectCity: (id: string) => void;
   visitOrder?: number | null;
-  countrySet?: CountrySet;
 }) {
   const rankFillId = `country-rank-${useId().replace(/:/g, "")}`;
   const headingRef = useCountryHeading(country.name, visitOrder);
@@ -126,8 +124,8 @@ export default function CountryDetail({
               <span
                 className="country-visit-rank"
                 role="note"
-                aria-label={`Visit order ${visitOrder}${countrySet ? ` in the ${countrySet}-country view` : ""}`}
-                title={`Visit order${countrySet ? ` (${countrySet} countries)` : ""}`}
+                aria-label={`Visit order ${visitOrder}`}
+                title="Visit order"
               >
                 <svg
                   className="country-rank-frame"
