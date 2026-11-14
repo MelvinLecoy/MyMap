@@ -1178,6 +1178,22 @@ test("countries open their own details and keep their tab through city details a
 test("whole-country hover stays stable over lifted land, opens its panel and clears during globe dragging", async ({
   page,
 }) => {
+  await page.addInitScript(() => {
+    const stats = { loads: 0, reloads: 0 };
+    Object.assign(window, { countryHoverWorkerStats: stats });
+    const post = Worker.prototype.postMessage;
+    Worker.prototype.postMessage = function (
+      this: Worker,
+      ...args: Parameters<Worker["postMessage"]>
+    ) {
+      const message = args[0];
+      if (message?.data?.source === "atlas-countries") {
+        if (message.type === "LT") stats.loads++;
+        if (message.type === "RT") stats.reloads++;
+      }
+      return post.apply(this, args);
+    } as Worker["postMessage"];
+  });
   await page.route("https://tiles.openfreemap.org/**", (route) =>
     route.abort(),
   );
@@ -1193,6 +1209,15 @@ test("whole-country hover stays stable over lifted land, opens its panel and cle
   const box = (await globe.boundingBox())!;
   const point = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
   const before = await globe.screenshot();
+  await page.evaluate(() => {
+    const stats = (
+      window as unknown as Window & {
+        countryHoverWorkerStats: { loads: number; reloads: number };
+      }
+    ).countryHoverWorkerStats;
+    if (!stats.loads) throw new Error("Country tile tracking is inactive");
+    stats.reloads = 0;
+  });
   await page.mouse.move(point.x, point.y);
   await expect(globe).toHaveAttribute("data-hover-country", "LY");
   await expect(page.locator(".maplibregl-canvas")).toHaveCSS(
@@ -1202,6 +1227,18 @@ test("whole-country hover stays stable over lifted land, opens its panel and cle
   await expect
     .poll(async () => Buffer.compare(await globe.screenshot(), before))
     .not.toBe(0);
+  // The full 160 ms lift must not rebuild country tiles and drop their outlines.
+  await page.waitForTimeout(200);
+  expect(
+    await page.evaluate(
+      () =>
+        (
+          window as unknown as Window & {
+            countryHoverWorkerStats: { reloads: number };
+          }
+        ).countryHoverWorkerStats.reloads,
+    ),
+  ).toBe(0);
   await page.mouse.move(point.x + 18, point.y + 12);
   await expect(globe).toHaveAttribute("data-hover-country", "LY");
   await page.mouse.click(point.x + 18, point.y + 12);

@@ -36,7 +36,7 @@ export function createCountryHover(
       source: "atlas-countries",
       paint: {
         "fill-color": "#173d3c",
-        "fill-opacity": onlyHovered(0),
+        "fill-opacity": onlyHovered(0.12),
         "fill-translate": [0, 1],
         "fill-translate-anchor": "viewport",
         "fill-opacity-transition": transition,
@@ -53,7 +53,7 @@ export function createCountryHover(
         "line-color": "#173d3c",
         "line-width": 3,
         "line-blur": 1.2,
-        "line-opacity": onlyHovered(0),
+        "line-opacity": onlyHovered(0.18),
         "line-translate": [0, 1],
         "line-translate-anchor": "viewport",
         "line-opacity-transition": transition,
@@ -102,7 +102,7 @@ export function createCountryHover(
       paint: {
         "line-color": MAP_COLORS.cityLabel,
         "line-width": 1.25,
-        "line-opacity": onlyHovered(0),
+        "line-opacity": onlyHovered(0.85),
         "line-translate": [0, 0],
         "line-translate-anchor": "viewport",
         "line-translate-transition": transition,
@@ -112,27 +112,14 @@ export function createCountryHover(
     beforeId,
   );
 
+  // Animate uniform translation only. Changing feature-state opacity expressions
+  // here rebuilds worker tiles and delays border rendering.
   function paint() {
     if (disposed || !map.getLayer("atlas-hover-land")) return;
     const offset: [number, number] = [0, duration(160) ? -2 * progress : 0];
     for (const id of ["atlas-hover-land", ...stripeIds])
       map.setPaintProperty(id, "fill-translate", offset);
     map.setPaintProperty("atlas-hover-outline", "line-translate", offset);
-    map.setPaintProperty(
-      "atlas-hover-outline",
-      "line-opacity",
-      onlyHovered(0.85 * progress),
-    );
-    map.setPaintProperty(
-      "atlas-hover-shadow",
-      "fill-opacity",
-      onlyHovered(0.12 * progress),
-    );
-    map.setPaintProperty(
-      "atlas-hover-shadow-edge",
-      "line-opacity",
-      onlyHovered(0.18 * progress),
-    );
   }
   function state(code: string, value: boolean) {
     if (map.getSource("atlas-countries"))
