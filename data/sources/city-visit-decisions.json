@@ -1,17 +1,18 @@
 {
   "approvedOn": "2026-11-13",
   "source": "City screenshots, checked against Travel Yearbook.xlsx, then corrected by the owner in chat",
-  "excludedCities": ["Southampton", "Reykjavik"],
+  "excludedCities": [
+    "Southampton",
+    "Reykjavik"
+  ],
   "keepScreenshotValues": [
     "Kuala Lumpur",
     "Brisbane",
     "Skopje",
     "Aqtau",
     "Miami",
-    "San Francisco",
     "Vancouver",
-    "Chicago",
-    "Orlando"
+    "Chicago"
   ],
   "corrections": [
     {
@@ -56,6 +57,30 @@
       "city": "Shanghai",
       "originalStart": "2026-08-30",
       "days": 1.5
+    },
+    {
+      "city": "Los Angeles",
+      "originalStart": "2022-01-30",
+      "end": "2022-02-02",
+      "days": 3.5
+    },
+    {
+      "city": "Orlando",
+      "originalStart": "2022-03-01",
+      "end": "2022-03-06",
+      "days": 5.5
+    },
+    {
+      "city": "Boston",
+      "originalStart": "2022-06-26",
+      "end": "2022-06-28",
+      "days": 2.5
+    },
+    {
+      "city": "San Francisco",
+      "originalStart": "2025-11-01",
+      "end": "2025-11-02",
+      "days": 2
     }
   ],
   "retainedEntries": [
@@ -70,6 +95,6 @@
   "expected": {
     "cities": 57,
     "stays": 111,
-    "days": 248
+    "days": 249.5
   }
 }

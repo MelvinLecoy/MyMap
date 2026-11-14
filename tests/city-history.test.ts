@@ -48,7 +48,16 @@ test("all approved screenshot entries survive, with only the approved correction
     "Panama City:2025-05-24": "2025-03-24",
     "Boston:2021-08-21": "2021-08-20",
   };
+  const changedEnds: Record<string, string> = {
+    "Los Angeles:2022-01-30": "2022-02-02",
+    "Orlando:2022-03-01": "2022-03-06",
+    "San Francisco:2025-11-01": "2025-11-02",
+  };
   const halfDays: Record<string, number> = {
+    "Los Angeles:2022-01-30": 3.5,
+    "Orlando:2022-03-01": 5.5,
+    "Boston:2022-06-26": 2.5,
+    "San Francisco:2025-11-01": 2,
     "London:2026-05-01": 2.5,
     "Seoul:2025-07-17": 3.5,
     "Auckland:2025-08-05": 3.5,
@@ -68,11 +77,11 @@ test("all approved screenshot entries survive, with only the approved correction
       .map((v) => {
         const key = `${card.city}:${v.start}`,
           arrival = dateChanges[key] ?? v.start;
-        const departure = dateChanges[key]
+        const departure = changedEnds[key] ?? (dateChanges[key]
           ? new Date(Date.parse(arrival) + (v.days - 1) * 86400000)
               .toISOString()
               .slice(0, 10)
-          : v.end;
+          : v.end);
         return { arrival, departure, daysSpent: halfDays[key] ?? v.days };
       })
       .sort((a, b) => a.arrival.localeCompare(b.arrival))
@@ -85,7 +94,7 @@ test("all approved screenshot entries survive, with only the approved correction
   assert.equal(history.length, 111);
   assert.equal(
     history.reduce((n, v) => n + v.days_spent, 0),
-    248,
+    249.5,
   );
   assert.equal(cities.length, 323);
   assert.equal(cities.filter((c) => c.visit === "visited").length, 57);
@@ -259,7 +268,7 @@ test("PostgreSQL imports city history atomically, preserves countries and edits,
     assert.equal(imported.visits.length, 111);
     assert.equal(
       imported.visits.reduce((n, v) => n + v.days_spent, 0),
-      248,
+      249.5,
     );
     assert.deepEqual(await countries(), countryBefore);
     for (const before of originalRows) {

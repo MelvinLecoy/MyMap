@@ -337,7 +337,7 @@ test("saving a city's map status updates progress and filters while retaining it
   await expect(page.locator(".city-overview-totals dd")).toHaveText([
     "57",
     "111",
-    "248",
+    "249.5",
   ]);
   await page
     .getByRole("group", { name: "Map progress filters" })
@@ -665,7 +665,7 @@ test("the editor can export every city with saved statuses and nullable coordina
   }) as Array<Record<string, string>>;
   expect(visits).toHaveLength(111);
   expect(new Set(visits.map((v) => v.CityId)).size).toBe(57);
-  expect(visits.reduce((n, v) => n + Number(v.DaysSpent), 0)).toBe(248);
+  expect(visits.reduce((n, v) => n + Number(v.DaysSpent), 0)).toBe(249.5);
   expect(
     visits.find(
       (v) =>

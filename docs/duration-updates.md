@@ -9,7 +9,9 @@ Czechia 4. Czechia's 12–13 May 2024 stay explicitly counts as one day. UK visi
 
 Shanghai's 30–31 August 2026 city stay becomes 1.5 days; its separate September
 stay remains one day. Singapore’s 11–12 September stay also becomes one day, giving 248 city-days over
-the existing 111 stays in 57 cities. Country and city durations remain independent.
+the existing 111 stays in 57 cities at that stage. A later set of four owner-approved
+Los Angeles, Orlando, Boston and San Francisco corrections brings the recorded
+city total to 249.5 days, with visit and city source files updated together. Country and city durations remain independent.
 
 Country period CSVs now accept optional DaysSpent. Blank means the inclusive
 calendar span; an explicit value overrides it. All country period, visit and
