@@ -32,7 +32,7 @@ test("current CSVs agree across city/country tables and detect changed fields, m
     countries: 198,
     countryVisits: 127,
     countryPeriods: 140,
-    countryDays: 315,
+    countryDays: 314.5,
   });
   const edited = structuredClone(data);
   edited.cities.cities[0].notes = "Unexpected edit";

@@ -71,7 +71,7 @@ columns are checked against these stays. See [the current three-table format](te
 and [database design](../docs/country-history.md).
 
 The 14 November country-only update records 126 dated visits plus one undated
-US entry, 140 actual stay periods and 315 country-days. The supplied additions
+US entry, 140 actual stay periods and 314.5 country-days. The supplied additions
 and Indonesia, Vietnam, Fiji, UK and Bosnia corrections are tracked in
 `sources/country-visit-updates-2026-11-14.json`. City data is unchanged. Country
 lifetime order and incomplete-history flags are preserved; see the current

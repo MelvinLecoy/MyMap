@@ -47,7 +47,7 @@ test("the verified yearbook imports 126 dated visits and one undated known visit
   );
   assert.equal(
     visited.reduce((n, c) => n + (c.recordedDaysSpent ?? 0), 0),
-    315,
+    314.5,
   );
   assert.equal(visited.flatMap((c) => c.visits ?? []).length, 127);
   assert.equal(

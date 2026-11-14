@@ -56,7 +56,7 @@ test("country schema, import, snapshot, permissions, integrity and reimport work
           "select count(*)::int as n,sum(coalesce(days_spent,departure_date-arrival_date+1))::float8 as days from country_visit_periods",
         )
       ).rows[0],
-      { n: 140, days: 315 },
+      { n: 140, days: 314.5 },
     );
     await db.exec(sql); // Full migration and seed are repeatable.
     await db.exec("set role anon;");

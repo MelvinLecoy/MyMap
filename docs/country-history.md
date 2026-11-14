@@ -82,7 +82,7 @@ website deployment and database migration are separate actions.
 See `data/sources/yearbook-provenance.json` and
 `data/templates/COUNTRY-VISITS.md`. Current totals: 198 database country/territory
 rows (197 canonical plus existing Svalbard), 127 visit rows (126 dated + one
-undated), 140 actual stays and 315 country-days. There are 98 known visited
+undated), 140 actual stays and 314.5 country-days. There are 98 known visited
 countries; 97 now have recorded dates. Lifetime ordering and unknown lifetime
 totals are retained. The 21 July 2025 Malaysia flag ambiguity remains documented.
 
@@ -128,3 +128,7 @@ commits it. The SQL accepts only the approved old/new histories and checks the
 complete city snapshot, all country metadata and all unrelated country history
 for exact preservation. The tracked data migration is
 `supabase/migrations/202611140004_country_visit_updates.sql`.
+
+Costa Rica was subsequently corrected to 6–7 April 2025, 1.5 days. Its visit
+count remains one. The correction is included in the country ledger and
+`202611140005_costa_rica_duration.sql`; other histories remain unchanged.
