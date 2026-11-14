@@ -11,7 +11,10 @@ Shanghai's 30–31 August 2026 city stay becomes 1.5 days; its separate Septembe
 stay remains one day. Singapore’s 11–12 September stay also becomes one day, giving 248 city-days over
 the existing 111 stays in 57 cities at that stage. A later set of four owner-approved
 Los Angeles, Orlando, Boston and San Francisco corrections brings the recorded
-city total to 249.5 days, with visit and city source files updated together. Country and city durations remain independent.
+city total to 249.5 days, with visit and city source files updated together.
+Subsequently, 13 stays in 12 newly visited cities add 16 summed city-days,
+bringing the total to 265.5 days over 124 stays in 69 visited cities. The full
+collection expands from 323 to 325 entries with Austin and San Antonio. Country and city durations remain independent.
 
 Country period CSVs now accept optional DaysSpent. Blank means the inclusive
 calendar span; an explicit value overrides it. All country period, visit and
