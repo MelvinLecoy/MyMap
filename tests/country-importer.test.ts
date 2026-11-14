@@ -25,7 +25,7 @@ const overviewHeader =
 const historyHeader =
   "CountryCode,VisitNumber,ArrivalDate,DepartureDate,DaysSpent,Notes\n";
 
-test("the verified yearbook imports 114 dated visits and six undated known visits without inventing lifetime totals", () => {
+test("the verified yearbook imports 126 dated visits and one undated known visit without inventing lifetime totals", () => {
   assert.equal(
     countries.filter((country) => inCountrySet(country, 195)).length,
     195,
@@ -43,19 +43,19 @@ test("the verified yearbook imports 114 dated visits and six undated known visit
   }
   assert.equal(
     visited.reduce((n, c) => n + (c.recordedVisits ?? 0), 0),
-    114,
+    126,
   );
   assert.equal(
     visited.reduce((n, c) => n + (c.recordedDaysSpent ?? 0), 0),
-    273.5,
+    315,
   );
-  assert.equal(visited.flatMap((c) => c.visits ?? []).length, 120);
+  assert.equal(visited.flatMap((c) => c.visits ?? []).length, 127);
   assert.equal(
     visited.flatMap((c) => c.visits?.flatMap((v) => v.periods ?? []) ?? [])
       .length,
-    127,
+    140,
   );
-  for (const code of ["CA", "DO", "HN", "IS", "JM", "US"]) {
+  for (const code of ["US"]) {
     const country = visited.find((c) => c.code === code)!;
     assert.equal(country.recordedVisits, null);
     assert.deepEqual(

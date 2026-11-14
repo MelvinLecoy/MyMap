@@ -39,7 +39,10 @@
     "build:demo": "tsx scripts/import-data.ts --demo && tsc --noEmit && vite build",
     "preview": "vite preview --host 0.0.0.0",
     "format": "prettier --write src scripts tests *.ts *.json *.md *.html",
-    "fonts:prepare": "tsx scripts/prepare-fonts.ts"
+    "fonts:prepare": "tsx scripts/prepare-fonts.ts",
+    "country:prepare-updates": "tsx scripts/apply-country-visit-updates.ts",
+    "country:verify-updates": "NODE_USE_ENV_PROXY=1 tsx scripts/apply-country-visit-updates.ts --dry-run",
+    "country:apply-updates": "NODE_USE_ENV_PROXY=1 tsx scripts/apply-country-visit-updates.ts --apply"
   },
   "dependencies": {
     "@fontsource-variable/dm-sans": "5.3.0",

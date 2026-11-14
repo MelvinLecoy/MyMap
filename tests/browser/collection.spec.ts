@@ -94,7 +94,7 @@ test("country and city duration exceptions are explicit while normal stays remai
   for (const [code, count, days, text] of [
     ["SG", "2", "7", "11 – 12 September 2026 (1 day)"],
     ["KR", "1", "6.5", "15 – 21 July 2025 (6.5 days)"],
-    ["GB", "3", "12.5", "1 – 3 May 2026 (2.5 days)"],
+    ["GB", "3", "13", "1 – 3 May 2026 (2.5 days)"],
     ["NZ", "1", "5.5", "5 – 8 August 2025 (3.5 days)"],
     ["CZ", "2", "4", "12 – 13 May 2024 (1 day)"],
   ]) {
@@ -106,14 +106,14 @@ test("country and city duration exceptions are explicit while normal stays remai
     await expect(page.locator(".country-visit-list")).toContainText(text);
     if (code === "GB") {
       await expect(page.locator(".country-visit-title").nth(0)).toContainText(
-        "9 days",
+        "9.5 days",
       );
       await expect(page.locator(".country-visit-title").nth(1)).toContainText(
         "1 day",
       );
-      await expect(
-        page.getByLabel("Actual stays for visit 1"),
-      ).not.toContainText("(");
+      await expect(page.getByLabel("Actual stays for visit 1")).toContainText(
+        "14 – 17 December 2023 (3.5 days)",
+      );
     }
     if (code === "NZ")
       await expect(
@@ -199,7 +199,7 @@ test("approved city histories show corrected dates and half-days on a narrow scr
   await expect(page.locator(".country-visit-list")).toContainText(
     "1 – 3 May 2026",
   );
-  await expect(page.locator(".country-statistics")).toContainText("12.5");
+  await expect(page.locator(".country-statistics")).toContainText("13");
 });
 async function openCity(page: Page, name: string) {
   await page
@@ -1138,11 +1138,11 @@ test("country history shows stays and corrected dates without explanatory copy o
   page,
 }) => {
   for (const [code, visits, days] of [
-    ["AT", 1, 3],
+    ["AT", 2, 5],
     ["DK", 1, 3],
     ["AU", 2, 14],
     ["NZ", 1, 5.5],
-    ["GB", 3, 12.5],
+    ["GB", 3, 13],
   ] as const) {
     await page.goto(`/?panel=countries&country=${code}`);
     await expect(page.locator(".country-statistics dd")).toHaveText([
@@ -1180,7 +1180,7 @@ test("country history shows stays and corrected dates without explanatory copy o
     if (code === "GB") {
       const first = page.locator(".country-visit-list > li").first();
       await expect(first.locator("ul > li")).toHaveText([
-        "14 – 16 December 2023",
+        "14 – 17 December 2023 (3.5 days)",
         "21 – 26 December 2023",
       ]);
       await expect(first.locator(":scope > p")).toHaveCount(0);

@@ -6,6 +6,7 @@ AM,Armenia,1,2025-05-23,2025-05-23,1,Recorded yearbook visit; actual stay period
 AU,Australia,1,2025-07-24,2025-08-03,10,Recorded yearbook visit; actual stay periods exclude intervening gaps.
 AU,Australia,2,2026-08-21,2026-08-24,4,Recorded yearbook visit; actual stay periods exclude intervening gaps.
 AT,Austria,1,2024-05-10,2024-05-12,3,Recorded yearbook visit; actual stay periods exclude intervening gaps.
+AT,Austria,2,2025-10-10,2025-10-11,2,
 AZ,Azerbaijan,1,2025-05-26,2025-05-26,1,Recorded yearbook visit; actual stay periods exclude intervening gaps.
 AZ,Azerbaijan,2,2026-05-19,2026-05-19,1,Recorded yearbook visit; actual stay periods exclude intervening gaps.
 BH,Bahrain,1,2025-06-02,2025-06-02,1,Recorded yearbook visit; actual stay periods exclude intervening gaps.
@@ -13,15 +14,18 @@ BE,Belgium,1,2024-08-01,2024-08-01,1,Recorded yearbook visit; actual stay period
 BE,Belgium,2,2025-05-09,2025-05-09,1,Recorded yearbook visit; actual stay periods exclude intervening gaps.
 BZ,Belize,1,2025-03-19,2025-03-21,3,Recorded yearbook visit; actual stay periods exclude intervening gaps.
 BO,Bolivia,1,2025-12-22,2025-12-25,4,Recorded yearbook visit; actual stay periods exclude intervening gaps.
-BA,Bosnia & Herzegovina,1,2026-05-03,2026-05-05,3,Recorded yearbook visit; actual stay periods exclude intervening gaps.
+BA,Bosnia & Herzegovina,1,2026-05-03,2026-05-05,2.5,Recorded yearbook visit; actual stay periods exclude intervening gaps.
 BR,Brazil,1,2025-04-08,2025-04-09,2,Recorded yearbook visit; actual stay periods exclude intervening gaps.
 BN,Brunei,1,2026-08-27,2026-08-27,1,Recorded yearbook visit; actual stay periods exclude intervening gaps.
 BG,Bulgaria,1,2025-05-11,2025-05-11,1,Recorded yearbook visit; actual stay periods exclude intervening gaps.
 KH,Cambodia,1,2026-08-09,2026-08-11,3,Recorded yearbook visit; actual stay periods exclude intervening gaps.
-CA,Canada,1,,,,Known visit from supplied country list; no qualifying yearbook dates. Counts and days remain unknown.
+CA,Canada,1,2022-06-29,2022-07-16,18,
+CA,Canada,2,2026-04-17,2026-04-19,3,
+CA,Canada,3,2026-07-11,2026-07-11,1,
 CL,Chile,1,2025-04-13,2025-04-13,1,Recorded yearbook visit; actual stay periods exclude intervening gaps.
-CN,China,1,2026-08-03,2026-08-07,5,Recorded yearbook visit; actual stay periods exclude intervening gaps.
-CN,China,2,2026-08-28,2026-09-01,4,Recorded yearbook visit; actual stay periods exclude intervening gaps.
+CN,China,1,2023-07-14,2023-07-17,4,
+CN,China,2,2026-08-03,2026-08-07,5,Recorded yearbook visit; actual stay periods exclude intervening gaps.
+CN,China,3,2026-08-28,2026-09-01,4,Recorded yearbook visit; actual stay periods exclude intervening gaps.
 CO,Colombia,1,2025-03-22,2025-03-23,2,Recorded yearbook visit; actual stay periods exclude intervening gaps.
 CR,Costa Rica,1,2025-04-06,2025-04-07,2,Recorded yearbook visit; actual stay periods exclude intervening gaps.
 HR,Croatia,1,2024-08-12,2024-08-14,3,Recorded yearbook visit; actual stay periods exclude intervening gaps.
@@ -29,27 +33,29 @@ CY,Cyprus,1,2025-05-13,2025-05-14,2,Recorded yearbook visit; actual stay periods
 CZ,Czechia,1,2024-05-05,2024-05-13,3,Recorded yearbook visit; actual stay periods exclude intervening gaps.
 CZ,Czechia,2,2026-07-26,2026-07-26,1,Recorded yearbook visit; actual stay periods exclude intervening gaps.
 DK,Denmark,1,2023-12-30,2024-01-01,3,Recorded yearbook visit; actual stay periods exclude intervening gaps.
-DO,Dominican Republic,1,,,,Known visit from supplied country list; no qualifying yearbook dates. Counts and days remain unknown.
+DO,Dominican Republic,1,2026-07-14,2026-07-15,1.5,
 EC,Ecuador,1,2025-12-26,2025-12-27,2,Recorded yearbook visit; actual stay periods exclude intervening gaps.
 EG,Egypt,1,2025-05-15,2025-05-16,2,Recorded yearbook visit; actual stay periods exclude intervening gaps.
 SV,El Salvador,1,2025-03-25,2025-03-25,1,Recorded yearbook visit; actual stay periods exclude intervening gaps.
 EE,Estonia,1,2026-06-01,2026-06-01,1,Recorded yearbook visit; actual stay periods exclude intervening gaps.
-FJ,Fiji,1,2025-08-04,2025-08-04,1,Recorded yearbook visit; actual stay periods exclude intervening gaps.
+FJ,Fiji,1,2025-08-04,2025-08-05,1.5,Recorded yearbook visit; actual stay periods exclude intervening gaps.
 FI,Finland,1,2026-05-31,2026-05-31,1,Recorded yearbook visit; actual stay periods exclude intervening gaps.
 FR,France,1,2024-07-29,2024-08-09,5,Recorded yearbook visit; actual stay periods exclude intervening gaps.
+FR,France,2,2025-10-07,2025-10-08,2,
 GE,Georgia,1,2025-05-24,2025-05-25,2,Recorded yearbook visit; actual stay periods exclude intervening gaps.
 DE,Germany,1,2024-05-06,2024-05-06,1,Recorded yearbook visit; actual stay periods exclude intervening gaps.
 DE,Germany,2,2024-08-01,2024-08-03,3,Recorded yearbook visit; actual stay periods exclude intervening gaps.
 GR,Greece,1,2024-08-10,2024-08-11,2,Recorded yearbook visit; actual stay periods exclude intervening gaps.
 GT,Guatemala,1,2025-12-28,2026-01-01,5,Recorded yearbook visit; actual stay periods exclude intervening gaps.
-HN,Honduras,1,,,,Known visit from supplied country list; no qualifying yearbook dates. Counts and days remain unknown.
+HN,Honduras,1,2026-09-26,2026-09-26,1,
 HU,Hungary,1,2024-05-09,2024-05-10,2,Recorded yearbook visit; actual stay periods exclude intervening gaps.
-IS,Iceland,1,,,,Known visit from supplied country list; no qualifying yearbook dates. Counts and days remain unknown.
-ID,Indonesia,1,2026-09-03,2026-09-06,4,Recorded yearbook visit; actual stay periods exclude intervening gaps.
+HU,Hungary,2,2025-10-09,2025-10-13,3,
+IS,Iceland,1,2025-10-14,2025-10-15,2,
+ID,Indonesia,1,2026-09-03,2026-09-07,4,Recorded yearbook visit; actual stay periods exclude intervening gaps.
 IE,Ireland,1,2025-05-10,2025-05-10,1,Recorded yearbook visit; actual stay periods exclude intervening gaps.
 IT,Italy,1,2024-01-10,2024-01-14,5,Recorded yearbook visit; actual stay periods exclude intervening gaps.
 IT,Italy,2,2024-08-15,2024-08-17,3,Recorded yearbook visit; actual stay periods exclude intervening gaps.
-JM,Jamaica,1,,,,Known visit from supplied country list; no qualifying yearbook dates. Counts and days remain unknown.
+JM,Jamaica,1,2026-07-12,2026-07-14,3,
 JP,Japan,1,2026-07-28,2026-08-02,6,Recorded yearbook visit; actual stay periods exclude intervening gaps.
 JO,Jordan,1,2025-05-18,2025-05-19,2,Recorded yearbook visit; actual stay periods exclude intervening gaps.
 KZ,Kazakhstan,1,2026-05-26,2026-05-30,5,Recorded yearbook visit; actual stay periods exclude intervening gaps.
@@ -66,6 +72,7 @@ MY,Malaysia,2,2026-08-18,2026-08-18,1,Recorded yearbook visit; actual stay perio
 MY,Malaysia,3,2026-09-07,2026-09-08,2,Recorded yearbook visit; actual stay periods exclude intervening gaps.
 MT,Malta,1,2026-05-06,2026-05-06,1,Recorded yearbook visit; actual stay periods exclude intervening gaps.
 MX,Mexico,1,2025-03-09,2025-03-12,4,Recorded yearbook visit; actual stay periods exclude intervening gaps.
+MX,Mexico,2,2026-04-04,2026-04-04,1,
 MD,Moldova,1,2025-05-13,2025-05-13,1,Recorded yearbook visit; actual stay periods exclude intervening gaps.
 MC,Monaco,1,2024-08-09,2024-08-09,1,Recorded yearbook visit; actual stay periods exclude intervening gaps.
 MN,Mongolia,1,2026-08-31,2026-08-31,1,Recorded yearbook visit; actual stay periods exclude intervening gaps.
@@ -110,7 +117,7 @@ TR,Turkey,2,2026-05-13,2026-05-18,6,Recorded yearbook visit; actual stay periods
 AE,United Arab Emirates,1,2025-05-27,2025-06-01,6,Recorded yearbook visit; actual stay periods exclude intervening gaps.
 AE,United Arab Emirates,2,2026-07-27,2026-07-27,1,Recorded yearbook visit; actual stay periods exclude intervening gaps.
 AE,United Arab Emirates,3,2026-08-12,2026-08-17,6,Recorded yearbook visit; actual stay periods exclude intervening gaps.
-GB,United Kingdom,1,2023-12-14,2023-12-26,9,Recorded yearbook visit; actual stay periods exclude intervening gaps.
+GB,United Kingdom,1,2023-12-14,2023-12-26,9.5,Recorded yearbook visit; actual stay periods exclude intervening gaps.
 GB,United Kingdom,2,2025-05-07,2025-05-07,1,Recorded yearbook visit; actual stay periods exclude intervening gaps.
 GB,United Kingdom,3,2026-05-01,2026-05-03,2.5,Recorded yearbook visit; actual stay periods exclude intervening gaps.
 US,United States,1,,,,Known visit from supplied country list; no qualifying yearbook dates. Counts and days remain unknown.
@@ -118,4 +125,4 @@ UY,Uruguay,1,2025-04-10,2025-04-10,1,Recorded yearbook visit; actual stay period
 UZ,Uzbekistan,1,2026-05-21,2026-05-24,4,Recorded yearbook visit; actual stay periods exclude intervening gaps.
 VA,Vatican City,1,2024-01-14,2024-01-14,1,Recorded yearbook visit; actual stay periods exclude intervening gaps.
 VA,Vatican City,2,2024-08-17,2024-08-17,1,Recorded yearbook visit; actual stay periods exclude intervening gaps.
-VN,Vietnam,1,2025-07-22,2025-07-23,2,Recorded yearbook visit; actual stay periods exclude intervening gaps.
+VN,Vietnam,1,2025-07-22,2025-07-23,1.5,Recorded yearbook visit; actual stay periods exclude intervening gaps.

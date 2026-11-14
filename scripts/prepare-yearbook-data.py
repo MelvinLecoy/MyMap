@@ -72,3 +72,7 @@ write("data/templates/countries-template.csv", overview)
 write("data/templates/country-visits-template.csv", history)
 write("data/templates/country-visit-periods-template.csv", stay_rows)
 print(f"Prepared {len(overview)} country rows, 114 dated visits + 6 undated known visits, {len(stay_rows)} actual stays and {provenance['recorded_country_days']} country-days.")
+
+# Preserve later owner-approved country additions after the historical rebuild.
+import runpy
+runpy.run_path(str(ROOT / "scripts/prepare-country-visit-updates.py"), run_name="__main__")

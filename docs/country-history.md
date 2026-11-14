@@ -81,9 +81,9 @@ website deployment and database migration are separate actions.
 
 See `data/sources/yearbook-provenance.json` and
 `data/templates/COUNTRY-VISITS.md`. Current totals: 198 database country/territory
-rows (197 canonical plus existing Svalbard), 120 visit rows (114 dated + six
-undated), 127 actual stays and 273.5 country-days. There are 98 known visited
-countries; 92 have dated yearbook records. Lifetime ordering and unknown lifetime
+rows (197 canonical plus existing Svalbard), 127 visit rows (126 dated + one
+undated), 140 actual stays and 315 country-days. There are 98 known visited
+countries; 97 now have recorded dates. Lifetime ordering and unknown lifetime
 totals are retained. The 21 July 2025 Malaysia flag ambiguity remains documented.
 
 ## Validation recorded for this change
@@ -101,3 +101,30 @@ a 320px layout. This cloud environment's Chrome cannot directly trust its
 HTTPS inspection certificate, so that check forwarded API requests through
 Node's managed proxy and trusted CA, with TLS verification retained. It did
 not substitute fixture data or disable certificate verification.
+
+## Country-only updates on 14 November 2026
+
+The source ledger `data/sources/country-visit-updates-2026-11-14.json` adds the
+supplied stays for France, Austria, Hungary, Iceland, Canada, China, Mexico,
+Jamaica, Dominican Republic and Honduras. Hungary's October stays are one visit
+with two actual periods and three days. The five newly dated countries replace
+undated placeholders; the United States remains undated. Lifetime totals and
+completeness flags are unchanged. China's older 2023 stay becomes visit 1,
+renumbering its two later visits without changing their actual dates or days.
+
+The owner also supplied these duration/date exceptions: Indonesia 3–7 September
+2026 (4 days), Vietnam 22–23 July 2025 (1.5 days), Fiji 4–5 August 2025
+(1.5 days), the UK's first stay 14–17 December 2023 (3.5 days), and Bosnia & Herzegovina
+3–5 May 2026 (2.5 days). Other UK
+stays are unchanged. UK visit 1 now totals 9.5 days, and its recorded total is
+13 days. Original country membership, ordering, lifetime fields and metadata
+remain unchanged, as do all city tables and CSVs.
+
+`python scripts/prepare-country-visit-updates.py` reapplies the ledger idempotently
+to the three country CSVs and country templates. The historical yearbook
+regenerator calls it after rebuilding its original data. `country:verify-updates`
+rehearses the scoped database transaction and rolls back; `country:apply-updates`
+commits it. The SQL accepts only the approved old/new histories and checks the
+complete city snapshot, all country metadata and all unrelated country history
+for exact preservation. The tracked data migration is
+`supabase/migrations/202611140004_country_visit_updates.sql`.

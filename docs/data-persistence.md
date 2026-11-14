@@ -4,8 +4,8 @@ The authoritative approved data is tracked in Git: `data/cities.csv`,
 `city-visit-history.csv`, `city-visit-periods.csv`, `countries.csv`, `country-visit-history.csv` and
 `country-visit-periods.csv`. The city source ledgers reproduce 174 visited cities,
 222 counted visits, 235 stays and 400.5 city-days. Prior corrections and approved
-batches are preserved. Country history remains incomplete and unchanged at 273.5
-recorded country-days.
+batches are preserved. Country history remains incomplete, with 315
+recorded country-days after the approved country-only updates.
 
 The website uses Supabase as its saved runtime data. A code deployment does not
 apply a SQL migration. Consequently, a new CSV bundle can briefly show the new
@@ -61,3 +61,8 @@ changes or failures. New batches are recorded in `data/sources/city-visit-batche
 The November 14 Seoul correction is applied atomically to the parent visit and
 actual stay before the 81-city batch is seeded. A different existing Seoul
 history causes a rollback instead of silently overwriting owner data.
+
+Country-only changes use `country:verify-updates` and `country:apply-updates`.
+These preserve all city data and country metadata while changing only the
+approved country histories. The standalone data verification still compares
+all six tables against the tracked CSVs.

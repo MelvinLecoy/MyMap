@@ -18,14 +18,29 @@ test("every verified country date, visit count and day total round-trips through
   const roundtrip = fromCountrySnapshot(toCountrySnapshot(countries));
   for (const row of reference) {
     const c = roundtrip.find((c) => c.code === row.CountryCode)!;
+    const update = JSON.parse(
+      readFileSync(
+        "data/sources/country-visit-updates-2026-11-14.json",
+        "utf8",
+      ),
+    );
+    const expected = update.expectedCountries[c.code];
     assert.equal(
       c.recordedVisits,
-      row.RecordedVisits ? Number(row.RecordedVisits) : null,
+      expected
+        ? expected[0]
+        : row.RecordedVisits
+          ? Number(row.RecordedVisits)
+          : null,
       c.code,
     );
     assert.equal(
       c.recordedDaysSpent,
-      row.RecordedDaysSpent ? Number(row.RecordedDaysSpent) : null,
+      expected
+        ? expected[1]
+        : row.RecordedDaysSpent
+          ? Number(row.RecordedDaysSpent)
+          : null,
       c.code,
     );
     const dates = c
@@ -35,7 +50,25 @@ test("every verified country date, visit count and day total round-trips through
         ),
       )
       .join(";");
-    assert.equal(dates, row.ActualDatePeriods, c.code);
+    if (!expected) assert.equal(dates, row.ActualDatePeriods, c.code);
+    else
+      for (const value of row.ActualDatePeriods.split(";").filter(Boolean)) {
+        const [start, end = start] = value.split("/");
+        const replacement = update.changes.find(
+          (p: { code: string; arrival: string; mode: string }) =>
+            p.code === c.code && p.arrival === start && p.mode === "replace",
+        );
+        assert.ok(
+          c
+            .visits!.flatMap((v) => v.periods ?? [])
+            .some(
+              (p) =>
+                p.arrival === start &&
+                p.departure === (replacement?.departure ?? end),
+            ),
+          c.code + ":" + value,
+        );
+      }
     assert.equal(c.timesVisited, null);
     assert.equal(c.totalDaysSpent, null);
     assert.equal(c.visitHistoryComplete, false);
