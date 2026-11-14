@@ -140,6 +140,57 @@ test("owner-provided additional city stays are exact and preserve the original s
   }
 });
 
+test("new city stays migrate idempotently without modifying existing map statuses", async () => {
+  const db = new PGlite();
+  try {
+    await db.exec(`create schema auth; create table auth.users(id uuid primary key);
+      create role anon; create role authenticated;
+      create function auth.uid() returns uuid language sql stable as
+      $select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$;
+      grant usage on schema auth to authenticated;`);
+    await db.exec(readFileSync("supabase/migrations/202611120001_atlas.sql", "utf8"));
+    await db.exec(countryDatabaseSql().sql);
+    const additional = JSON.parse(readFileSync("data/sources/city-visit-decisions.json", "utf8")) as {
+      additionalVisits: Array<{ city: string; country_code: string }>;
+    };
+    const addedIds = new Set(
+      additional.additionalVisits.map((item) =>
+        cities.find((c) => c.name === item.city && c.countryCode === item.country_code)!.id,
+      ),
+    );
+    const legacyRows = cities.filter((c) => !["austin-usa", "san-antonio-usa"].includes(c.id)).map(toCityRow);
+    await db.exec(seedSql(legacyRows));
+    await db.exec(readFileSync("supabase/migrations/202611130002_city_history.sql", "utf8"));
+    const oldVisits = history.filter((v) => !addedIds.has(v.city_id));
+    const encoded = JSON.stringify(oldVisits).replaceAll("'", "''");
+    await db.exec(`insert into public.city_visits (city_id,visit_number,arrival_date,departure_date,days_spent)
+      select city_id,visit_number,arrival_date,departure_date,days_spent
+      from jsonb_populate_recordset(null::public.city_visits,'${encoded}'::jsonb);`);
+    assert.equal(oldVisits.length, 111);
+    const migration = readFileSync("supabase/migrations/202611130005_city_visit_additions.sql", "utf8");
+    await db.exec(migration);
+    const snapshot = async () => readCitySnapshot((
+      await db.query<{ result: unknown }>("select public.atlas_city_snapshot() as result")
+    ).rows[0].result);
+    const result = await snapshot();
+    assert.equal(result.cities.length, 325);
+    assert.equal(result.visits.length, 124);
+    assert.equal(result.visits.reduce((n, v) => n + v.days_spent, 0), 265.5);
+    await db.exec(migration);
+    assert.deepEqual(await snapshot(), result, "Reapplying exact approved changes must be a no-op");
+    await db.exec("update public.cities set map_status='Update' where id='dallas-usa';");
+    await db.exec(migration);
+    assert.equal(
+      (await db.query<{ map_status: string }>("select map_status from public.cities where id='dallas-usa'")).rows[0].map_status,
+      "Update",
+    );
+    await db.exec("update public.city_visits set days_spent=0.5 where city_id='dallas-usa' and visit_number=1;");
+    await assert.rejects(db.exec(migration), /conflict|differs/i);
+  } finally {
+    await db.close();
+  }
+});
+
 test("city CSVs and cloud snapshots round-trip half-days without changing city metadata", () => {
   const metadata = importCities(exportCitiesCsv(cities)).data.cities;
   assert.deepEqual(
