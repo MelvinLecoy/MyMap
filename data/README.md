@@ -7,6 +7,10 @@ The original screenshot transcription is retained, and 12 later owner-provided
 city histories are preserved in the source correction ledger. See
 [city history format, source decisions and database import](../docs/city-history.md).
 
+Run `npm run data:verify-live` to compare the tracked data with Supabase across
+all five tables. Use `data:verify-sync` / `data:sync-approved` for the guarded,
+atomic city update. See [persistence and restart checks](../docs/data-persistence.md).
+
 The Countries panel now reads the personal history in two tracked CSVs:
 
 - `countries.csv`: one overview row for each of the 197 countries, with continent,

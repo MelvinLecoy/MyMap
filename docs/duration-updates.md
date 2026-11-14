@@ -26,8 +26,8 @@ and checks cached visit totals against the sum of actual durations.
 The website appends a duration only when it differs from the inclusive date
 span, such as `(1 day)` or `(3.5 days)`. Ordinary dates have no annotation.
 Every visit and country summary uses actual durations. The shared 2025 color
-is `#887200` for date labels and globe stripes; it provides at least 4.5:1
-contrast against the panel background. Other year colors and country fills stay
+is now `#b19800` for date labels and globe stripes, balanced between the earlier
+neon yellow and muted gold. Other year colors and country fills stay
 unchanged.
 
 The Cities panel adds visit/day statistics and a map-progress overview. Progress

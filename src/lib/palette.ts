@@ -28,7 +28,7 @@ export const MAP_COLORS = {
 
 export const VISIT_YEAR_COLORS: Readonly<Record<string, string>> = {
   2026: "#26784f",
-  2025: "#887200",
+  2025: "#b19800",
   2024: "#e67e00",
   2023: "#573122",
 };

@@ -313,6 +313,59 @@ test("visitors see saved data and cannot use browser overrides to change the pub
   await expect(page.getByText("Loading latest…")).toHaveCount(0);
 });
 
+test("current approved history survives a cold load, reload and unavailable database", async ({
+  context,
+  page,
+}) => {
+  const state = store();
+  await backend(context, state);
+  const loaded = page.waitForResponse((r) =>
+    r.url().includes("/rpc/atlas_city_snapshot"),
+  );
+  await page.goto("/");
+  await loaded;
+  await expect(page.locator(".city-overview-totals dd")).toHaveText([
+    "69",
+    "124",
+    "265.5",
+  ]);
+  await page.reload();
+  await expect(page.locator(".city-overview-totals dd")).toHaveText([
+    "69",
+    "124",
+    "265.5",
+  ]);
+  state.failRead = true;
+  await page.reload();
+  await expect(
+    page.getByText(/Couldn’t refresh the saved collection/),
+  ).toBeVisible();
+  await expect(page.locator(".city-overview-totals dd")).toHaveText([
+    "69",
+    "124",
+    "265.5",
+  ]);
+  await page.goto("/?city=san-francisco-usa");
+  await expect(page.locator(".city-statistics dd")).toHaveText(["2", "5"]);
+  await expect(page.locator(".city-visit-list")).toContainText(
+    "1 – 2 November 2025",
+  );
+  await page.goto("/?city=austin-usa");
+  await expect(page.locator(".city-statistics dd")).toHaveText(["1", "1"]);
+  await expect(page.locator(".city-visit-list")).toContainText(
+    "16 December 2024",
+  );
+  await expect(
+    page.getByText(/Couldn’t refresh the saved collection/),
+  ).toBeVisible();
+  state.failRead = false;
+  await page.getByRole("button", { name: "Retry", exact: true }).click();
+  await expect(
+    page.getByText(/Couldn’t refresh the saved collection/),
+  ).toHaveCount(0);
+  await expect(page.locator(".city-statistics dd")).toHaveText(["1", "1"]);
+});
+
 test("saving a city's map status updates progress and filters while retaining its visit stats", async ({
   context,
   page,

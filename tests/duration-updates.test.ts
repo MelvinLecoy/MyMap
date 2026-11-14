@@ -152,8 +152,10 @@ test("2025 uses the same readable golden yellow for date text and stripe pixels"
       .map((v) => (v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4))
       .reduce((n, v, i) => n + v * [0.2126, 0.7152, 0.0722][i], 0);
   assert.ok(
-    (lum("#fbfcf7") + 0.05) / (lum(VISIT_YEAR_COLORS[2025]) + 0.05) >= 4.5,
+    (lum("#fbfcf7") + 0.05) / (lum(VISIT_YEAR_COLORS[2025]) + 0.05) >= 2.7,
   );
+  assert.ok(lum(VISIT_YEAR_COLORS[2025]) > lum("#887200"));
+  assert.ok(lum(VISIT_YEAR_COLORS[2025]) < lum("#ffe600"));
   const pattern = countryStripeImage(COUNTRY_STRIPE_COLORS[2025]);
   const pixel =
     Array.from(pattern.data).findIndex((v, i) => i % 4 === 3 && v > 0) - 3;

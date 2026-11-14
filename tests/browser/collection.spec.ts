@@ -145,7 +145,7 @@ test("country and city duration exceptions are explicit while normal stays remai
   await page.goto("/?panel=countries");
   await expect(
     page.locator('.country-last-visit[data-year="2025"]').first(),
-  ).toHaveCSS("color", "rgb(136, 114, 0)");
+  ).toHaveCSS("color", "rgb(177, 152, 0)");
 });
 function city(name: string) {
   const found = data.cities.find((record) => record.name === name);
