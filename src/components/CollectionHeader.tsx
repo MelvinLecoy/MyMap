@@ -228,7 +228,11 @@ export default function CollectionHeader({
               onChange={onLastVisitYear}
               icon={CalendarDays}
               options={[
-                { value: "all", label: "All years", shortLabel: "Year" },
+                {
+                  value: "all",
+                  label: "All years",
+                  shortLabel: "Year last visited",
+                },
                 ...lastVisitYears.map((value) => ({
                   value,
                   label: value === "2023" ? "2023 or before" : value,

@@ -314,7 +314,7 @@ test("compact year and continent menus filter latest visits, retain year colors 
     .getByRole("button", { name: "Clear filters", exact: true })
     .click();
   await expect(page.locator(".city-row")).toHaveCount(343);
-  await expect(year).toContainText("Year");
+  await expect(year).toContainText("Year last visited");
   await expect(continent).toContainText("Continent");
   await year.focus();
   await page.keyboard.press("Home");

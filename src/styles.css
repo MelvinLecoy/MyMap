@@ -2095,13 +2095,26 @@ h2 {
   gap: 6px;
 }
 .city-filter-row > .collection-filter:first-child {
-  flex: 0 1 83px;
+  flex: 0 0 125px;
 }
 .city-filter-row > .collection-filter:nth-child(2) {
   flex: 1 1 101px;
 }
 .city-filter-row > .collection-count {
   padding-left: 7px;
+}
+@container (max-width: 300px) {
+  .collection-controls .city-filter-row {
+    gap: 4px;
+  }
+  .city-filter-row > .collection-filter:first-child {
+    flex-basis: 108px;
+  }
+  .city-filter-row
+    .collection-filter-trigger
+    > svg:not(.collection-filter-chevron) {
+    display: none;
+  }
 }
 .collection-controls .status-filter,
 .collection-controls .continent-filter {
