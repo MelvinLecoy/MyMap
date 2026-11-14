@@ -23,7 +23,7 @@ test("the published collection preserves all rows and links from the updated CSV
     metadata.sourceSha256,
   );
   assert.equal(raw.length, 321);
-  assert.equal(normalized.length, raw.length + 2);
+  assert.equal(normalized.length, raw.length + 4);
   const approved = new Set(
     data.cities.filter((c) => c.visits?.length).map((c) => c.id),
   );
@@ -51,7 +51,7 @@ test("the published collection preserves all rows and links from the updated CSV
     );
   }
   assert.equal(data.demo, false);
-  assert.equal(new Set(data.cities.map((city) => city.id)).size, 323);
+  assert.equal(new Set(data.cities.map((city) => city.id)).size, 325);
   const mapIds = data.cities
     .filter((c) => c.map)
     .map((city) => {
@@ -64,7 +64,7 @@ test("the published collection preserves all rows and links from the updated CSV
       .filter((c) => !c.map)
       .map((c) => c.id)
       .sort(),
-    ["rome-italy", "vatican-city-vatican-city"],
+    ["austin-usa", "rome-italy", "san-antonio-usa", "vatican-city-vatican-city"],
   );
   const nice = data.cities.find((city) => city.name === "Nice")!;
   assert.equal(
@@ -117,9 +117,9 @@ test("reviewed coordinates cover 319 distinct places and leave only the two requ
 test("the real collection contains only approved city visits and no sample notes or colors", () => {
   assert.equal(
     data.cities.filter((city) => city.visit === "visited").length,
-    57,
+    69,
   );
-  assert.equal(data.cities.filter((city) => city.lastVisited).length, 57);
+  assert.equal(data.cities.filter((city) => city.lastVisited).length, 69);
   assert.ok(data.cities.every((city) => !city.notes && !city.pinColor));
   assert.ok(data.countries.every((country) => !country.color));
   assert.equal(
@@ -132,6 +132,6 @@ test("the real collection contains only approved city visits and no sample notes
   );
   assert.equal(
     data.cities.filter((city) => city.status === "Not Started").length,
-    63,
+    65,
   );
 });
