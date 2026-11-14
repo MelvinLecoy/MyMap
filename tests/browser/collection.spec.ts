@@ -30,7 +30,7 @@ test("city overview, compact visit rows, map progress filters and city details u
   await expect(page.locator(".city-overview-totals dd")).toHaveText([
     "57",
     "111",
-    "248",
+    "249.5",
   ]);
   await expect(page.locator(".city-map-progress-heading")).toContainText(
     "253 / 323 complete",
@@ -66,7 +66,7 @@ test("city overview, compact visit rows, map progress filters and city details u
     await expect(page.locator(".city-overview-totals dd")).toHaveText([
       "57",
       "111",
-      "248",
+      "249.5",
     ]);
     expect(
       await page.evaluate(
@@ -176,7 +176,10 @@ test("approved city histories show corrected dates and half-days on a narrow scr
     ["singapore-singapore", "11 – 12 September 2026", "7"],
     ["prague-czechia", "5 – 6 May 2024", "4"],
     ["panama-city-panama", "24 March 2025", "2"],
-    ["boston-usa", "20 August 2021", "5"],
+    ["boston-usa", "20 August 2021", "4.5"],
+    ["los-angeles-usa", "30 January 2022", "7.5"],
+    ["orlando-usa", "1 – 6 March 2022", "5.5"],
+    ["san-francisco-usa", "1 – 2 November 2025", "5"],
     ["rome-italy", "16 – 17 August 2024", "3"],
     ["vatican-city-vatican-city", "17 August 2024", "2"],
   ]) {
