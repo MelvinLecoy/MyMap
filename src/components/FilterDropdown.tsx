@@ -6,6 +6,7 @@ import {
   useState,
   type CSSProperties,
   type KeyboardEvent,
+  type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
 import { Check, ChevronDown, type LucideIcon } from "lucide-react";
@@ -32,12 +33,14 @@ export default function FilterDropdown({
   onChange,
   options,
   icon: Icon,
+  valueContent,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   options: FilterOption[];
   icon?: LucideIcon;
+  valueContent?: ReactNode;
 }) {
   const id = useId();
   const listId = `${id}-options`;
@@ -245,7 +248,7 @@ export default function FilterDropdown({
           className="collection-filter-value"
           style={{ color: selected?.color }}
         >
-          {selected?.shortLabel ?? selected?.label ?? label}
+          {valueContent ?? selected?.shortLabel ?? selected?.label ?? label}
         </span>
         <ChevronDown
           className="collection-filter-chevron"

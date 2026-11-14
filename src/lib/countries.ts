@@ -47,6 +47,13 @@ export interface CountryRecord extends Omit<CountrySeed, "visit"> {
   cityCount: number;
 }
 
+export function countryVisitSummary(country: CountrySeed) {
+  return {
+    visits: country.timesVisited ?? country.recordedVisits ?? null,
+    days: country.totalDaysSpent ?? country.recordedDaysSpent ?? null,
+  };
+}
+
 export function latestCountryVisit(country: Pick<CountrySeed, "visits">) {
   return (
     (country.visits ?? [])

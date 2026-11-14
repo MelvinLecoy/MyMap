@@ -567,7 +567,7 @@ h2 {
   text-align: left;
   position: relative;
 }
-.city-row {
+:is(.city-row, .country-row) {
   padding-block: 3px;
 }
 :is(.city-row, .country-row):after {
@@ -612,67 +612,20 @@ h2 {
   background: #dff1e6;
   color: #28654e;
 }
-.country-row .visit-marker-visited {
-  background: #ace0c0;
-  color: #165b37;
-  box-shadow: inset 0 0 0 1px #7bbf98;
-}
-.country-visit-summary {
-  display: grid;
-  grid-template-rows: 40px 10px;
-  row-gap: 6px;
-  justify-items: center;
-  width: 48px;
-  height: 56px;
-}
-.country-row .country-count-badge {
-  width: 40px;
-  height: 40px;
-  min-height: 0;
-  padding: 7px 5px;
-  gap: 1px;
-  border-radius: 8px;
-  transform: translateY(1px);
-}
-.country-visit-count {
-  font-family: "DM Sans Variable", sans-serif;
-  font-size: 18px;
-  font-weight: 950;
-  line-height: 15px;
-  letter-spacing: -0.4px;
-  font-variant-numeric: tabular-nums;
-}
-.country-visit-label {
-  font-size: 9px;
-  font-weight: 600;
-  line-height: 10px;
-}
-.country-last-visit {
-  display: block;
-  width: 48px;
-  height: 10px;
-  color: var(--muted);
-  font-size: 10px;
-  font-weight: 600;
-  line-height: 10px;
-  text-align: center;
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
-}
 .city-row-body {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   min-width: 0;
 }
-.city-visit-summary {
+:is(.city-visit-summary, .country-visit-summary) {
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 48px;
   height: 62px;
 }
-.city-row .city-count-badge {
+:is(.city-row .city-count-badge, .country-row .country-count-badge) {
   width: 34px;
   height: 34px;
   min-height: 0;
@@ -683,17 +636,17 @@ h2 {
   border-radius: 8px;
   box-shadow: inset 0 0 0 1px #a2cdb3;
 }
-.city-count-badge strong {
+:is(.city-count-badge, .country-count-badge) strong {
   font-size: 16px;
   font-weight: 900;
   line-height: 16px;
   font-variant-numeric: tabular-nums;
 }
-.city-count-badge > span {
+:is(.city-count-badge, .country-count-badge) > span {
   font-size: 8.5px;
   line-height: 9px;
 }
-.city-last-visit {
+:is(.city-last-visit, .country-last-visit) {
   height: 10px;
   flex-shrink: 0;
   font-size: 9px;
@@ -706,17 +659,18 @@ h2 {
   align-items: center;
   justify-content: flex-end;
 }
-.city-row-duration {
+:is(.city-row-duration, .country-row-duration) {
   color: var(--muted);
   font-size: 10px;
   line-height: 10px;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
-.city-visit-summary .city-row-duration {
+:is(.city-visit-summary, .country-visit-summary)
+  :is(.city-row-duration, .country-row-duration) {
   margin-top: 4px;
 }
-.city-row-duration strong {
+:is(.city-row-duration, .country-row-duration) strong {
   color: var(--text);
   font-size: 10px;
   font-weight: 750;
@@ -2194,19 +2148,53 @@ h2 {
   width: 100%;
   cursor: pointer;
 }
-.country-count-control:focus-within {
-  outline: 2px solid var(--accent);
-  outline-offset: 3px;
-}
 .country-city-count {
-  padding: 5px 7px;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  padding: 4px 7px;
+  border: 1px solid var(--line);
   border-radius: 6px;
-  background: #edf2ee;
+  background: var(--surface);
   color: var(--muted);
   font-size: 9px;
-  font-weight: 550;
   line-height: 12px;
   white-space: nowrap;
+}
+.country-city-count strong {
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.country-city-count[data-empty="true"] {
+  background: transparent;
+  border-color: transparent;
+}
+.country-city-count[data-empty="true"] strong {
+  color: var(--muted);
+  font-weight: 600;
+}
+.country-overview-totals > div {
+  padding-inline: 4px;
+}
+.collection-controls .country-filter-row {
+  gap: 4px;
+}
+.country-count-control .collection-count {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  gap: 3px;
+  font-size: 10px;
+}
+@container (max-width: 330px) {
+  .country-overview-totals dt {
+    font-size: 9px;
+  }
+  .country-filter-row .country-count-control .collection-count > span {
+    display: none;
+  }
 }
 .country-sample-note {
   display: flex;

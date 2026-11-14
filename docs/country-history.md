@@ -132,3 +132,16 @@ for exact preservation. The tracked data migration is
 Costa Rica was subsequently corrected to 6–7 April 2025, 1.5 days. Its visit
 count remains one. The correction is included in the country ledger and
 `202611140005_costa_rica_duration.sql`; other histories remain unchanged.
+
+The country collection shares the compact city scoreboard and visit-row style.
+Countries visited toggles visited-only results; Visits and Days spent toggle
+highest-first sorting with alphabetical ties. Search, continent and last-visited
+year filters combine independently from city filters. Year colors are shared;
+2023 and earlier form one brown option. Country map progress is not shown.
+
+The country-set menu offers 195 and 197 (🇽🇰 & 🇹🇼). Statistics and filtering
+respect the selected set. The scoreboard sums known lifetime values when supplied
+and otherwise recorded history; a visited country with unknown totals retains
+its unknown values instead of receiving invented visits or days. Rows show the
+last date above a 34px visit square, with 3px above and 4px below the square, and
+days underneath. Known city counts use compact outlined badges with bold numbers.

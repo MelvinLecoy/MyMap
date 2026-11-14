@@ -14,6 +14,7 @@ import {
 import {
   countryDisplayName,
   latestCountryVisit,
+  countryVisitSummary,
   type CountryRecord,
 } from "../lib/countries";
 import { VISIT_YEAR_COLORS } from "../lib/palette";
@@ -72,46 +73,35 @@ export function VisitMarker({
 
 export function CountryVisitMarker({ country }: { country: CountryRecord }) {
   if (country.visit !== "visited") return <VisitMarker visit={country.visit} />;
-  const count = country.timesVisited ?? country.recordedVisits;
+  const summary = countryVisitSummary(country);
+  const count = summary.visits;
   const label = count == null ? "Visited" : count === 1 ? "Visit" : "Visits";
   const latest = latestCountryVisit(country);
-  const month =
-    latest && /^\d{4}-\d{2}/.test(latest)
-      ? [
-          "Jan",
-          "Feb",
-          "Mar",
-          "Apr",
-          "May",
-          "Jun",
-          "Jul",
-          "Aug",
-          "Sep",
-          "Oct",
-          "Nov",
-          "Dec",
-        ][Number(latest.slice(5, 7)) - 1]
-      : null;
-  const date = month && latest ? `${month} ${latest.slice(2, 4)}` : "";
+  const year = latest?.slice(0, 4);
   return (
-    <span
-      className="country-visit-summary"
-      title={`${count ?? "Unknown"} ${count === 1 ? "visit" : "visits"}${date ? ` · Last visit ${date}` : ""}`}
-    >
+    <span className="country-visit-summary">
+      <span
+        className="country-last-visit"
+        data-year={year}
+        style={{
+          color: year
+            ? VISIT_YEAR_COLORS[Number(year) <= 2023 ? "2023" : year]
+            : undefined,
+        }}
+        aria-hidden={!latest}
+      >
+        <span className="visually-hidden">Last visited </span>
+        {latest ? formatShortVisitDate(latest) : ""}
+      </span>
       <span className="visit-marker visit-marker-visited country-count-badge">
         <strong className="country-visit-count">{count ?? "—"}</strong>
         <span className="country-visit-label">{label}</span>
       </span>
-      <span
-        className="country-last-visit"
-        data-year={date ? latest?.slice(0, 4) : undefined}
-        style={{
-          color: latest ? VISIT_YEAR_COLORS[latest.slice(0, 4)] : undefined,
-        }}
-        aria-hidden={!date}
-      >
-        {date}
-      </span>
+      {summary.days != null && (
+        <span className="country-row-duration">
+          <strong>{summary.days}</strong> {summary.days === 1 ? "day" : "days"}
+        </span>
+      )}
     </span>
   );
 }

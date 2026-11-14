@@ -19,6 +19,7 @@ import CityVisitHistory from "./components/CityVisitHistory";
 import CityCollectionSummary, {
   type CityScoreSort,
 } from "./components/CityCollectionSummary";
+import CountryCollectionSummary from "./components/CountryCollectionSummary";
 import {
   CityRow,
   CountryVisitMarker,
@@ -36,6 +37,8 @@ import {
   countryDisplayName,
   countryVisitOrders,
   countryKey,
+  latestCountryVisit,
+  countryVisitSummary,
   inCountrySet,
   mergeCountryVisits,
   matchesVisit,
@@ -110,6 +113,8 @@ export default function App() {
   const [countrySearch, setCountrySearch] = useState("");
   const [countryVisit, setCountryVisit] = useState("all");
   const [countryContinent, setCountryContinent] = useState("all");
+  const [countryLastVisitYear, setCountryLastVisitYear] = useState("all");
+  const [countrySort, setCountrySort] = useState<CityScoreSort>("alphabetical");
   const [statusOverrides, setStatusOverrides] = useState(() =>
     readStatusOverrides(statusStorageKey),
   );
@@ -252,17 +257,63 @@ export default function App() {
       ].sort(),
     [countriesInView],
   );
+  const countryLastVisits = useMemo(
+    () =>
+      new globalThis.Map(
+        countriesInView.map((country) => [
+          country.code,
+          latestCountryVisit(country),
+        ]),
+      ),
+    [countriesInView],
+  );
+  const countryLastVisitYears = useMemo(
+    () =>
+      [
+        ...new Set(
+          [...countryLastVisits.values()]
+            .filter((date) => date != null)
+            .map((date) =>
+              Number(date.slice(0, 4)) <= 2023 ? "2023" : date.slice(0, 4),
+            ),
+        ),
+      ].sort((a, b) => Number(b) - Number(a)),
+    [countryLastVisits],
+  );
   const filteredCountries = useMemo(() => {
     const query = searchText(countrySearch);
-    return countriesInView.filter(
-      (country) =>
+    const matches = countriesInView.filter((country) => {
+      const year = countryLastVisits.get(country.code)?.slice(0, 4);
+      return (
         searchText(
           `${country.name} ${country.code} ${country.aliases?.join(" ") ?? ""}`,
         ).includes(query) &&
         matchesVisit(country.visit, countryVisit) &&
-        (countryContinent === "all" || country.continent === countryContinent),
+        (countryContinent === "all" ||
+          country.continent === countryContinent) &&
+        (countryLastVisitYear === "all" ||
+          (year != null &&
+            (countryLastVisitYear === "2023"
+              ? Number(year) <= 2023
+              : year === countryLastVisitYear)))
+      );
+    });
+    if (countrySort === "alphabetical") return matches;
+    return matches.sort(
+      (a, b) =>
+        (countryVisitSummary(b)[countrySort] ?? 0) -
+          (countryVisitSummary(a)[countrySort] ?? 0) ||
+        a.name.localeCompare(b.name),
     );
-  }, [countriesInView, countrySearch, countryVisit, countryContinent]);
+  }, [
+    countriesInView,
+    countrySearch,
+    countryVisit,
+    countryContinent,
+    countryLastVisitYear,
+    countryLastVisits,
+    countrySort,
+  ]);
   const cityScope = useMemo(() => {
     const query = searchText(search);
     return cities
@@ -368,6 +419,8 @@ export default function App() {
       setCountrySearch("");
       setCountryVisit("all");
       setCountryContinent("all");
+      setCountryLastVisitYear("all");
+      setCountrySort("alphabetical");
     } else {
       setSearch("");
       setStatus("all");
@@ -475,7 +528,23 @@ export default function App() {
               />
             ) : !selected ? (
               <>
-                {!countryView && (
+                {countryView ? (
+                  <CountryCollectionSummary
+                    countries={filteredCountries}
+                    visitedOnly={countryVisit === "visited"}
+                    sort={countrySort}
+                    onVisitedOnly={() =>
+                      setCountryVisit((current) =>
+                        current === "visited" ? "all" : "visited",
+                      )
+                    }
+                    onSort={(sort) =>
+                      setCountrySort((current) =>
+                        current === sort ? "alphabetical" : sort,
+                      )
+                    }
+                  />
+                ) : (
                   <CityCollectionSummary
                     cities={filtered}
                     scope={cityProgressScope}
@@ -495,14 +564,18 @@ export default function App() {
                   view={route.panel}
                   search={countryView ? countrySearch : search}
                   onSearch={countryView ? setCountrySearch : setSearch}
-                  status={countryView ? countryVisit : status}
-                  onStatus={countryView ? setCountryVisit : setStatus}
                   continent={countryView ? countryContinent : continent}
                   onContinent={countryView ? setCountryContinent : setContinent}
                   continents={countryView ? countryContinents : continents}
-                  lastVisitYear={lastVisitYear}
-                  onLastVisitYear={setLastVisitYear}
-                  lastVisitYears={lastVisitYears}
+                  lastVisitYear={
+                    countryView ? countryLastVisitYear : lastVisitYear
+                  }
+                  onLastVisitYear={
+                    countryView ? setCountryLastVisitYear : setLastVisitYear
+                  }
+                  lastVisitYears={
+                    countryView ? countryLastVisitYears : lastVisitYears
+                  }
                   count={
                     countryView ? filteredCountries.length : filtered.length
                   }
@@ -538,9 +611,14 @@ export default function App() {
                               <span>{country.continent}</span>
                             </span>
                           </span>
-                          <span className="country-city-count">
-                            {country.cityCount}{" "}
-                            {country.cityCount === 1 ? "city" : "cities"}
+                          <span
+                            className="country-city-count"
+                            data-empty={country.cityCount === 0}
+                          >
+                            <strong>{country.cityCount}</strong>{" "}
+                            <span>
+                              {country.cityCount === 1 ? "city" : "cities"}
+                            </span>
                           </span>
                           <ChevronRight
                             className="row-chevron"
