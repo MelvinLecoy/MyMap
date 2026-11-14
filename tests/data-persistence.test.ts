@@ -24,11 +24,11 @@ test("current CSVs agree across city/country tables and detect changed fields, m
     ),
   );
   assert.deepEqual(report.counts, {
-    cities: 327,
-    visitedCities: 90,
-    cityVisits: 137,
-    cityStays: 150,
-    cityDays: 305.5,
+    cities: 340,
+    visitedCities: 171,
+    cityVisits: 219,
+    cityStays: 232,
+    cityDays: 393.5,
     countries: 198,
     countryVisits: 120,
     countryPeriods: 127,
@@ -114,6 +114,19 @@ test("approved main-branch changes synchronize atomically, survive a new read, r
             "san-antonio-usa",
             "niagara-falls-usa",
             "detroit-usa",
+            "basel-switzerland",
+            "bath-uk",
+            "como-italy",
+            "gold-coast-australia",
+            "interlaken-switzerland",
+            "jerash-jordan",
+            "johor-bahru-malaysia",
+            "cologne-germany",
+            "kunming-china",
+            "lugano-switzerland",
+            "portsmouth-uk",
+            "southampton-uk",
+            "sunshine-coast-australia",
           ].includes(c.id),
       );
     const additions = new Set([
@@ -151,6 +164,10 @@ test("approved main-branch changes synchronize atomically, survive a new read, r
       v.daysSpent = days;
       c.lastVisited = cityVisitSummary(c.visits!).lastVisited;
     }
+    const seoul = previous.find((c) => c.id === "seoul-south-korea")!;
+    seoul.visits![0].departure = "2025-07-20";
+    seoul.visits![0].daysSpent = 3.5;
+    seoul.lastVisited = "2025-07-20";
     await db.exec(seedSql(previous.map(toCityRow)));
     await db.exec(`begin;${citySeedSql(previous, true)}commit;`);
     const before = await load();

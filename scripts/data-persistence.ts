@@ -22,7 +22,7 @@ export function dataPersistenceSql() {
         `execute $approved_patch_${i}$${body(file)}$approved_patch_${i}$;`,
     )
     .join("\n");
-  let sql = `begin;\nselect pg_advisory_xact_lock(202611140001);\n${legacyCitySchemaSql()}\ncreate temporary table persistence_country_before on commit drop as select public.atlas_country_snapshot() as data;\ndo $patches$ begin if to_regclass('public.city_visit_periods') is null and exists(select 1 from public.city_visits) then\n${apply}\nend if;end $patches$;\nset constraints all immediate;\nset constraints all deferred;\n${body("202611140002_city_visit_periods.sql")}\n${citySeedSql(cityCollection())}\n`;
+  let sql = `begin;\nselect pg_advisory_xact_lock(202611140001);\n${legacyCitySchemaSql()}\ncreate temporary table persistence_country_before on commit drop as select public.atlas_country_snapshot() as data;\ndo $patches$ begin if to_regclass('public.city_visit_periods') is null and exists(select 1 from public.city_visits) then\n${apply}\nend if;end $patches$;\nset constraints all immediate;\nset constraints all deferred;\n${body("202611140002_city_visit_periods.sql")}\n${body("202611140003_seoul_visit_correction.sql")}\n${citySeedSql(cityCollection())}\n`;
   for (const [table, rows] of [
     ["cities", expected.cities.cities],
     ["city_visits", expected.cities.visits],

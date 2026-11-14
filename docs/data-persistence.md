@@ -2,8 +2,8 @@
 
 The authoritative approved data is tracked in Git: `data/cities.csv`,
 `city-visit-history.csv`, `city-visit-periods.csv`, `countries.csv`, `country-visit-history.csv` and
-`country-visit-periods.csv`. The city source ledgers reproduce 90 visited cities,
-137 counted visits, 150 stays and 305.5 city-days. Prior corrections and approved
+`country-visit-periods.csv`. The city source ledgers reproduce 171 visited cities,
+219 counted visits, 232 stays and 393.5 city-days. Prior corrections and approved
 batches are preserved. Country history remains incomplete and unchanged at 273.5
 recorded country-days.
 
@@ -57,3 +57,7 @@ Every owner-approved data batch updates GitHub CSVs, Supabase and the deployed
 site together. Data-only updates use focused import/database checks, a build
 and a brief live check; broader browser regressions are reserved for related UI
 changes or failures. New batches are recorded in `data/sources/city-visit-batches.json`.
+
+The November 14 Seoul correction is applied atomically to the parent visit and
+actual stay before the 81-city batch is seeded. A different existing Seoul
+history causes a rollback instead of silently overwriting owner data.

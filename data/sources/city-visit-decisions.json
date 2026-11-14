@@ -41,7 +41,9 @@
     {
       "city": "Seoul",
       "originalStart": "2025-07-17",
-      "days": 3.5
+      "days": 4.5,
+      "end": "2025-07-21",
+      "approvedOn": "2026-11-14"
     },
     {
       "city": "Auckland",
@@ -95,7 +97,7 @@
   "expected": {
     "cities": 69,
     "stays": 124,
-    "days": 265.5,
+    "days": 266.5,
     "visits": 112
   },
   "additionalVisits": [

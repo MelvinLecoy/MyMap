@@ -24,7 +24,7 @@ test("the published collection preserves all rows and links from the updated CSV
     metadata.sourceSha256,
   );
   assert.equal(raw.length, 321);
-  assert.equal(normalized.length, raw.length + 6);
+  assert.equal(normalized.length, raw.length + 19);
   const approved = new Set(
     data.cities.filter((c) => c.visits?.length).map((c) => c.id),
   );
@@ -52,7 +52,7 @@ test("the published collection preserves all rows and links from the updated CSV
     );
   }
   assert.equal(data.demo, false);
-  assert.equal(new Set(data.cities.map((city) => city.id)).size, 327);
+  assert.equal(new Set(data.cities.map((city) => city.id)).size, 340);
   const mapIds = data.cities
     .filter((c) => c.map)
     .map((city) => {
@@ -67,10 +67,23 @@ test("the published collection preserves all rows and links from the updated CSV
       .sort(),
     [
       "austin-usa",
+      "basel-switzerland",
+      "bath-uk",
+      "cologne-germany",
+      "como-italy",
       "detroit-usa",
+      "gold-coast-australia",
+      "interlaken-switzerland",
+      "jerash-jordan",
+      "johor-bahru-malaysia",
+      "kunming-china",
+      "lugano-switzerland",
       "niagara-falls-usa",
+      "portsmouth-uk",
       "rome-italy",
       "san-antonio-usa",
+      "southampton-uk",
+      "sunshine-coast-australia",
       "vatican-city-vatican-city",
     ],
   );
@@ -125,9 +138,9 @@ test("reviewed coordinates cover 319 distinct places and leave only the two requ
 test("the real collection contains only approved city visits and no sample notes or colors", () => {
   assert.equal(
     data.cities.filter((city) => city.visit === "visited").length,
-    90,
+    171,
   );
-  assert.equal(data.cities.filter((city) => city.lastVisited).length, 90);
+  assert.equal(data.cities.filter((city) => city.lastVisited).length, 171);
   assert.ok(data.cities.every((city) => !city.notes && !city.pinColor));
   assert.ok(data.countries.every((country) => !country.color));
   assert.equal(
@@ -140,6 +153,6 @@ test("the real collection contains only approved city visits and no sample notes
   );
   assert.equal(
     data.cities.filter((city) => city.status === "Not Started").length,
-    67,
+    80,
   );
 });

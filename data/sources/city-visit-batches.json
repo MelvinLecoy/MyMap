@@ -430,13 +430,1627 @@
           ]
         }
       ]
+    },
+    {
+      "id": "yellow-cities-81",
+      "sourceFile": "yellow_cities_81_visit_data.xlsx",
+      "sourceSha256": "bc6b8c0eab3a38328f18b5815604f446edf09feea5b1a97cebc4088c948c4276",
+      "dateInterpretation": "Inclusive dates; duration-only departures use arrival + ceil(days) - 1. Commas separate stays, then apply the existing six-day city visit rule.",
+      "expected": {
+        "cities": 81,
+        "stays": 82,
+        "visits": 82,
+        "days": 87
+      },
+      "newCities": [
+        {
+          "cityid": "basel-switzerland",
+          "cities": "Basel",
+          "country": "Switzerland",
+          "countrycode": "CH",
+          "continent": "Europe",
+          "region": "Western Europe",
+          "subregion": "",
+          "status": "Not Started",
+          "link": "",
+          "visited": "No",
+          "latitude": "47.55839",
+          "longitude": "7.57327"
+        },
+        {
+          "cityid": "bath-uk",
+          "cities": "Bath",
+          "country": "UK",
+          "countrycode": "GB",
+          "continent": "Europe",
+          "region": "",
+          "subregion": "",
+          "status": "Not Started",
+          "link": "",
+          "visited": "No",
+          "latitude": "51.3751",
+          "longitude": "-2.36172"
+        },
+        {
+          "cityid": "como-italy",
+          "cities": "Como",
+          "country": "Italy",
+          "countrycode": "IT",
+          "continent": "Europe",
+          "region": "Southern Europe",
+          "subregion": "",
+          "status": "Not Started",
+          "link": "",
+          "visited": "No",
+          "latitude": "45.80819",
+          "longitude": "9.0832"
+        },
+        {
+          "cityid": "gold-coast-australia",
+          "cities": "Gold Coast",
+          "country": "Australia",
+          "countrycode": "AU",
+          "continent": "Oceania",
+          "region": "",
+          "subregion": "",
+          "status": "Not Started",
+          "link": "",
+          "visited": "No",
+          "latitude": "-28.00029",
+          "longitude": "153.43088"
+        },
+        {
+          "cityid": "interlaken-switzerland",
+          "cities": "Interlaken",
+          "country": "Switzerland",
+          "countrycode": "CH",
+          "continent": "Europe",
+          "region": "Western Europe",
+          "subregion": "",
+          "status": "Not Started",
+          "link": "",
+          "visited": "No",
+          "latitude": "46.68387",
+          "longitude": "7.86638"
+        },
+        {
+          "cityid": "jerash-jordan",
+          "cities": "Jerash",
+          "country": "Jordan",
+          "countrycode": "JO",
+          "continent": "Asia",
+          "region": "Middle East",
+          "subregion": "",
+          "status": "Not Started",
+          "link": "",
+          "visited": "No",
+          "latitude": "32.28082",
+          "longitude": "35.89929"
+        },
+        {
+          "cityid": "johor-bahru-malaysia",
+          "cities": "Johor Bahru",
+          "country": "Malaysia",
+          "countrycode": "MY",
+          "continent": "Asia",
+          "region": "Southeast Asia",
+          "subregion": "",
+          "status": "Not Started",
+          "link": "",
+          "visited": "No",
+          "latitude": "1.4655",
+          "longitude": "103.7578"
+        },
+        {
+          "cityid": "cologne-germany",
+          "cities": "Cologne",
+          "country": "Germany",
+          "countrycode": "DE",
+          "continent": "Europe",
+          "region": "Western Europe",
+          "subregion": "",
+          "status": "Not Started",
+          "link": "",
+          "visited": "No",
+          "latitude": "50.93333",
+          "longitude": "6.95"
+        },
+        {
+          "cityid": "kunming-china",
+          "cities": "Kunming",
+          "country": "China",
+          "countrycode": "CN",
+          "continent": "Asia",
+          "region": "East Asia",
+          "subregion": "",
+          "status": "Not Started",
+          "link": "",
+          "visited": "No",
+          "latitude": "25.03889",
+          "longitude": "102.71833"
+        },
+        {
+          "cityid": "lugano-switzerland",
+          "cities": "Lugano",
+          "country": "Switzerland",
+          "countrycode": "CH",
+          "continent": "Europe",
+          "region": "Western Europe",
+          "subregion": "",
+          "status": "Not Started",
+          "link": "",
+          "visited": "No",
+          "latitude": "46.01008",
+          "longitude": "8.96004"
+        },
+        {
+          "cityid": "portsmouth-uk",
+          "cities": "Portsmouth",
+          "country": "UK",
+          "countrycode": "GB",
+          "continent": "Europe",
+          "region": "",
+          "subregion": "",
+          "status": "Not Started",
+          "link": "",
+          "visited": "No",
+          "latitude": "50.79899",
+          "longitude": "-1.09125"
+        },
+        {
+          "cityid": "southampton-uk",
+          "cities": "Southampton",
+          "country": "UK",
+          "countrycode": "GB",
+          "continent": "Europe",
+          "region": "",
+          "subregion": "",
+          "status": "Not Started",
+          "link": "",
+          "visited": "No",
+          "latitude": "50.90395",
+          "longitude": "-1.40428"
+        },
+        {
+          "cityid": "sunshine-coast-australia",
+          "cities": "Sunshine Coast",
+          "country": "Australia",
+          "countrycode": "AU",
+          "continent": "Oceania",
+          "region": "",
+          "subregion": "",
+          "status": "Not Started",
+          "link": "",
+          "visited": "No",
+          "latitude": "-26.65682",
+          "longitude": "153.07955"
+        }
+      ],
+      "coordinateSource": {
+        "dataset": "GeoNames cities500 via geonamescache 3.0.2",
+        "cities": [
+          {
+            "geonameid": 2661604,
+            "name": "Basel",
+            "countrycode": "CH",
+            "latitude": 47.55839,
+            "longitude": 7.57327,
+            "population": 177595
+          },
+          {
+            "geonameid": 2656173,
+            "name": "Bath",
+            "countrycode": "GB",
+            "latitude": 51.3751,
+            "longitude": -2.36172,
+            "population": 101557
+          },
+          {
+            "geonameid": 3178229,
+            "name": "Como",
+            "countrycode": "IT",
+            "latitude": 45.80819,
+            "longitude": 9.0832,
+            "population": 84808
+          },
+          {
+            "geonameid": 2165087,
+            "name": "Gold Coast",
+            "countrycode": "AU",
+            "latitude": -28.00029,
+            "longitude": 153.43088,
+            "population": 640778
+          },
+          {
+            "geonameid": 2660253,
+            "name": "Interlaken",
+            "countrycode": "CH",
+            "latitude": 46.68387,
+            "longitude": 7.86638,
+            "population": 5067
+          },
+          {
+            "geonameid": 248875,
+            "name": "Jarash",
+            "countrycode": "JO",
+            "latitude": 32.28082,
+            "longitude": 35.89929,
+            "population": 27046
+          },
+          {
+            "geonameid": 1732752,
+            "name": "Johor Bahru",
+            "countrycode": "MY",
+            "latitude": 1.4655,
+            "longitude": 103.7578,
+            "population": 858118
+          },
+          {
+            "geonameid": 2886242,
+            "name": "Köln",
+            "countrycode": "DE",
+            "latitude": 50.93333,
+            "longitude": 6.95,
+            "population": 1024621
+          },
+          {
+            "geonameid": 1804651,
+            "name": "Kunming",
+            "countrycode": "CN",
+            "latitude": 25.03889,
+            "longitude": 102.71833,
+            "population": 3855346
+          },
+          {
+            "geonameid": 2659836,
+            "name": "Lugano",
+            "countrycode": "CH",
+            "latitude": 46.01008,
+            "longitude": 8.96004,
+            "population": 63185
+          },
+          {
+            "geonameid": 2639996,
+            "name": "Portsmouth",
+            "countrycode": "GB",
+            "latitude": 50.79899,
+            "longitude": -1.09125,
+            "population": 208100
+          },
+          {
+            "geonameid": 2637487,
+            "name": "Southampton",
+            "countrycode": "GB",
+            "latitude": 50.90395,
+            "longitude": -1.40428,
+            "population": 269781
+          },
+          {
+            "geonameid": 10630449,
+            "name": "Sunshine Coast",
+            "countrycode": "AU",
+            "latitude": -26.65682,
+            "longitude": 153.07955,
+            "population": 398840
+          }
+        ]
+      },
+      "notes": [
+        "Andorra matches Andorra la Vella.",
+        "Parenthetical names and diacritics match existing stable city IDs.",
+        "The newly supplied Southampton stay is 22-25 December 2023 (4 days); it supersedes exclusion of the older screenshot entry."
+      ],
+      "cities": [
+        {
+          "city": "Almaty",
+          "sourceCity": "Almaty",
+          "city_id": "almaty-kazakhstan",
+          "country_code": "KZ",
+          "visits": [
+            {
+              "start": "2026-05-30",
+              "end": "2026-05-30",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            2
+          ]
+        },
+        {
+          "city": "Amman",
+          "sourceCity": "Amman",
+          "city_id": "amman-jordan",
+          "country_code": "JO",
+          "visits": [
+            {
+              "start": "2025-05-19",
+              "end": "2025-05-19",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            3
+          ]
+        },
+        {
+          "city": "Andorra la Vella",
+          "sourceCity": "Andorra",
+          "city_id": "andorra-la-vella-andorra",
+          "country_code": "AD",
+          "visits": [
+            {
+              "start": "2025-05-08",
+              "end": "2025-05-08",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            4
+          ]
+        },
+        {
+          "city": "Barcelona",
+          "sourceCity": "Barcelona",
+          "city_id": "barcelona-spain",
+          "country_code": "ES",
+          "visits": [
+            {
+              "start": "2024-01-09",
+              "end": "2024-01-09",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            5
+          ]
+        },
+        {
+          "city": "Basel",
+          "sourceCity": "Basel",
+          "city_id": "basel-switzerland",
+          "country_code": "CH",
+          "visits": [
+            {
+              "start": "2024-08-04",
+              "end": "2024-08-04",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            6
+          ]
+        },
+        {
+          "city": "Bath",
+          "sourceCity": "Bath",
+          "city_id": "bath-uk",
+          "country_code": "GB",
+          "visits": [
+            {
+              "start": "2023-12-21",
+              "end": "2023-12-21",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            7
+          ]
+        },
+        {
+          "city": "Belgrade",
+          "sourceCity": "Belgrade",
+          "city_id": "belgrade-serbia",
+          "country_code": "RS",
+          "visits": [
+            {
+              "start": "2025-05-11",
+              "end": "2025-05-11",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            8
+          ]
+        },
+        {
+          "city": "Berlin",
+          "sourceCity": "Berlin",
+          "city_id": "berlin-germany",
+          "country_code": "DE",
+          "visits": [
+            {
+              "start": "2024-08-01",
+              "end": "2024-08-02",
+              "days": 2
+            }
+          ],
+          "sourceRows": [
+            9
+          ]
+        },
+        {
+          "city": "Bled",
+          "sourceCity": "Bled",
+          "city_id": "bled-slovenia",
+          "country_code": "SI",
+          "visits": [
+            {
+              "start": "2026-06-07",
+              "end": "2026-06-07",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            10
+          ]
+        },
+        {
+          "city": "Bogota",
+          "sourceCity": "Bogotá",
+          "city_id": "bogota-colombia",
+          "country_code": "CO",
+          "visits": [
+            {
+              "start": "2025-03-22",
+              "end": "2025-03-22",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            11
+          ]
+        },
+        {
+          "city": "Bratislava",
+          "sourceCity": "Bratislava",
+          "city_id": "bratislava-slovakia",
+          "country_code": "SK",
+          "visits": [
+            {
+              "start": "2024-05-10",
+              "end": "2024-05-10",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            12
+          ]
+        },
+        {
+          "city": "Bristol",
+          "sourceCity": "Bristol",
+          "city_id": "bristol-uk",
+          "country_code": "GB",
+          "visits": [
+            {
+              "start": "2023-12-15",
+              "end": "2023-12-15",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            13
+          ]
+        },
+        {
+          "city": "Bandar Seri Begawan",
+          "sourceCity": "BSB (Bandar Seri Begawan)",
+          "city_id": "bandar-seri-begawan-brunei",
+          "country_code": "BN",
+          "visits": [
+            {
+              "start": "2026-08-27",
+              "end": "2026-08-27",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            14
+          ]
+        },
+        {
+          "city": "Bucharest",
+          "sourceCity": "Bucharest",
+          "city_id": "bucharest-romania",
+          "country_code": "RO",
+          "visits": [
+            {
+              "start": "2025-05-12",
+              "end": "2025-05-12",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            15
+          ]
+        },
+        {
+          "city": "Budva",
+          "sourceCity": "Budva",
+          "city_id": "budva-montenegro",
+          "country_code": "ME",
+          "visits": [
+            {
+              "start": "2026-06-04",
+              "end": "2026-06-04",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            16
+          ]
+        },
+        {
+          "city": "Bukhara",
+          "sourceCity": "Bukhara",
+          "city_id": "bukhara-uzbekistan",
+          "country_code": "UZ",
+          "visits": [
+            {
+              "start": "2026-05-23",
+              "end": "2026-05-23",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            17
+          ]
+        },
+        {
+          "city": "Cardiff",
+          "sourceCity": "Cardiff",
+          "city_id": "cardiff-uk",
+          "country_code": "GB",
+          "visits": [
+            {
+              "start": "2023-12-21",
+              "end": "2023-12-21",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            18
+          ]
+        },
+        {
+          "city": "Chisinau",
+          "sourceCity": "Chișinău",
+          "city_id": "chisinau-moldova",
+          "country_code": "MD",
+          "visits": [
+            {
+              "start": "2025-05-13",
+              "end": "2025-05-13",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            19
+          ]
+        },
+        {
+          "city": "Como",
+          "sourceCity": "Como",
+          "city_id": "como-italy",
+          "country_code": "IT",
+          "visits": [
+            {
+              "start": "2024-08-15",
+              "end": "2024-08-15",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            20
+          ]
+        },
+        {
+          "city": "Dresden",
+          "sourceCity": "Dresden",
+          "city_id": "dresden-germany",
+          "country_code": "DE",
+          "visits": [
+            {
+              "start": "2024-05-06",
+              "end": "2024-05-06",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            21
+          ]
+        },
+        {
+          "city": "Dublin",
+          "sourceCity": "Dublin",
+          "city_id": "dublin-ireland",
+          "country_code": "IE",
+          "visits": [
+            {
+              "start": "2025-05-10",
+              "end": "2025-05-10",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            22
+          ]
+        },
+        {
+          "city": "Dubrovnik",
+          "sourceCity": "Dubrovnik",
+          "city_id": "dubrovnik-croatia",
+          "country_code": "HR",
+          "visits": [
+            {
+              "start": "2024-08-12",
+              "end": "2024-08-12",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            23
+          ]
+        },
+        {
+          "city": "Dushanbe",
+          "sourceCity": "Dushanbe",
+          "city_id": "dushanbe-tajikistan",
+          "country_code": "TJ",
+          "visits": [
+            {
+              "start": "2026-05-20",
+              "end": "2026-05-20",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            24
+          ]
+        },
+        {
+          "city": "Firenze",
+          "sourceCity": "Firenze (Florence)",
+          "city_id": "firenze-italy",
+          "country_code": "IT",
+          "visits": [
+            {
+              "start": "2024-01-12",
+              "end": "2024-01-12",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            25
+          ]
+        },
+        {
+          "city": "Gold Coast",
+          "sourceCity": "Gold Coast",
+          "city_id": "gold-coast-australia",
+          "country_code": "AU",
+          "visits": [
+            {
+              "start": "2025-07-24",
+              "end": "2025-07-24",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            26
+          ]
+        },
+        {
+          "city": "Guatemala City",
+          "sourceCity": "Guatemala City",
+          "city_id": "guatemala-city-guatemala",
+          "country_code": "GT",
+          "visits": [
+            {
+              "start": "2025-12-28",
+              "end": "2025-12-28",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            27
+          ]
+        },
+        {
+          "city": "Helsinki",
+          "sourceCity": "Helsinki",
+          "city_id": "helsinki-finland",
+          "country_code": "FI",
+          "visits": [
+            {
+              "start": "2026-05-31",
+              "end": "2026-05-31",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            28
+          ]
+        },
+        {
+          "city": "Ho Chi Minh City",
+          "sourceCity": "Ho Chi Minh City",
+          "city_id": "ho-chi-minh-city-vietnam",
+          "country_code": "VN",
+          "visits": [
+            {
+              "start": "2025-07-22",
+              "end": "2025-07-22",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            29
+          ]
+        },
+        {
+          "city": "Interlaken",
+          "sourceCity": "Interlaken",
+          "city_id": "interlaken-switzerland",
+          "country_code": "CH",
+          "visits": [
+            {
+              "start": "2023-12-18",
+              "end": "2023-12-19",
+              "days": 2
+            },
+            {
+              "start": "2024-08-05",
+              "end": "2024-08-05",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            30,
+            31
+          ]
+        },
+        {
+          "city": "Jerash",
+          "sourceCity": "Jerash",
+          "city_id": "jerash-jordan",
+          "country_code": "JO",
+          "visits": [
+            {
+              "start": "2025-05-18",
+              "end": "2025-05-18",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            32
+          ]
+        },
+        {
+          "city": "Johor Bahru",
+          "sourceCity": "Johor Bahru",
+          "city_id": "johor-bahru-malaysia",
+          "country_code": "MY",
+          "visits": [
+            {
+              "start": "2026-08-18",
+              "end": "2026-08-18",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            33
+          ]
+        },
+        {
+          "city": "Cologne",
+          "sourceCity": "Köln (Cologne)",
+          "city_id": "cologne-germany",
+          "country_code": "DE",
+          "visits": [
+            {
+              "start": "2024-08-01",
+              "end": "2024-08-01",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            34
+          ]
+        },
+        {
+          "city": "Kotor",
+          "sourceCity": "Kotor",
+          "city_id": "kotor-montenegro",
+          "country_code": "ME",
+          "visits": [
+            {
+              "start": "2026-06-05",
+              "end": "2026-06-05",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            35
+          ]
+        },
+        {
+          "city": "Kunming",
+          "sourceCity": "Kunming",
+          "city_id": "kunming-china",
+          "country_code": "CN",
+          "visits": [
+            {
+              "start": "2026-08-07",
+              "end": "2026-08-07",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            36
+          ]
+        },
+        {
+          "city": "Kuwait City",
+          "sourceCity": "Kuwait City",
+          "city_id": "kuwait-city-kuwait",
+          "country_code": "KW",
+          "visits": [
+            {
+              "start": "2025-06-06",
+              "end": "2025-06-06",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            37
+          ]
+        },
+        {
+          "city": "Kyoto",
+          "sourceCity": "Kyoto",
+          "city_id": "kyoto-japan",
+          "country_code": "JP",
+          "visits": [
+            {
+              "start": "2026-07-30",
+              "end": "2026-07-30",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            38
+          ]
+        },
+        {
+          "city": "Lima",
+          "sourceCity": "Lima",
+          "city_id": "lima-peru",
+          "country_code": "PE",
+          "visits": [
+            {
+              "start": "2025-04-14",
+              "end": "2025-04-14",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            39
+          ]
+        },
+        {
+          "city": "Lugano",
+          "sourceCity": "Lugano",
+          "city_id": "lugano-switzerland",
+          "country_code": "CH",
+          "visits": [
+            {
+              "start": "2024-08-15",
+              "end": "2024-08-15",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            40
+          ]
+        },
+        {
+          "city": "Luxembourg",
+          "sourceCity": "Luxembourg",
+          "city_id": "luxembourg-luxembourg",
+          "country_code": "LU",
+          "visits": [
+            {
+              "start": "2025-05-09",
+              "end": "2025-05-09",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            41
+          ]
+        },
+        {
+          "city": "Madrid",
+          "sourceCity": "Madrid",
+          "city_id": "madrid-spain",
+          "country_code": "ES",
+          "visits": [
+            {
+              "start": "2024-01-08",
+              "end": "2024-01-08",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            42
+          ]
+        },
+        {
+          "city": "Malmo",
+          "sourceCity": "Malmö",
+          "city_id": "malmo-sweden",
+          "country_code": "SE",
+          "visits": [
+            {
+              "start": "2024-01-01",
+              "end": "2024-01-01",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            43
+          ]
+        },
+        {
+          "city": "Managua",
+          "sourceCity": "Managua",
+          "city_id": "managua-nicaragua",
+          "country_code": "NI",
+          "visits": [
+            {
+              "start": "2025-03-26",
+              "end": "2025-03-26",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            44
+          ]
+        },
+        {
+          "city": "Manama",
+          "sourceCity": "Manama",
+          "city_id": "manama-bahrain",
+          "country_code": "BH",
+          "visits": [
+            {
+              "start": "2025-06-02",
+              "end": "2025-06-02",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            45
+          ]
+        },
+        {
+          "city": "Manila",
+          "sourceCity": "Manila",
+          "city_id": "manila-philippines",
+          "country_code": "PH",
+          "visits": [
+            {
+              "start": "2026-09-02",
+              "end": "2026-09-02",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            46
+          ]
+        },
+        {
+          "city": "Medellin",
+          "sourceCity": "Medellín",
+          "city_id": "medellin-colombia",
+          "country_code": "CO",
+          "visits": [
+            {
+              "start": "2025-03-23",
+              "end": "2025-03-23",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            47
+          ]
+        },
+        {
+          "city": "Monaco",
+          "sourceCity": "Monaco",
+          "city_id": "monaco-monaco",
+          "country_code": "MC",
+          "visits": [
+            {
+              "start": "2024-08-09",
+              "end": "2024-08-09",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            48
+          ]
+        },
+        {
+          "city": "Monterrey",
+          "sourceCity": "Monterrey",
+          "city_id": "monterrey-mexico",
+          "country_code": "MX",
+          "visits": [
+            {
+              "start": "2025-03-09",
+              "end": "2025-03-09",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            49
+          ]
+        },
+        {
+          "city": "Montevideo",
+          "sourceCity": "Montevideo",
+          "city_id": "montevideo-uruguay",
+          "country_code": "UY",
+          "visits": [
+            {
+              "start": "2025-04-10",
+              "end": "2025-04-10",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            50
+          ]
+        },
+        {
+          "city": "Mostar",
+          "sourceCity": "Mostar",
+          "city_id": "mostar-bosnia",
+          "country_code": "BA",
+          "visits": [
+            {
+              "start": "2026-05-04",
+              "end": "2026-05-04",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            51
+          ]
+        },
+        {
+          "city": "Munich",
+          "sourceCity": "Munich",
+          "city_id": "munich-germany",
+          "country_code": "DE",
+          "visits": [
+            {
+              "start": "2024-08-03",
+              "end": "2024-08-03",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            52
+          ]
+        },
+        {
+          "city": "Nice",
+          "sourceCity": "Nice",
+          "city_id": "nice-france",
+          "country_code": "FR",
+          "visits": [
+            {
+              "start": "2024-08-09",
+              "end": "2024-08-09",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            53
+          ]
+        },
+        {
+          "city": "Ohrid",
+          "sourceCity": "Ohrid",
+          "city_id": "ohrid-north-macedonia",
+          "country_code": "MK",
+          "visits": [
+            {
+              "start": "2026-06-03",
+              "end": "2026-06-03",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            54
+          ]
+        },
+        {
+          "city": "Oslo",
+          "sourceCity": "Oslo",
+          "city_id": "oslo-norway",
+          "country_code": "NO",
+          "visits": [
+            {
+              "start": "2024-01-04",
+              "end": "2024-01-04",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            55
+          ]
+        },
+        {
+          "city": "Phnom Penh",
+          "sourceCity": "Phnom Penh",
+          "city_id": "phnom-penh-cambodia",
+          "country_code": "KH",
+          "visits": [
+            {
+              "start": "2026-08-11",
+              "end": "2026-08-11",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            56
+          ]
+        },
+        {
+          "city": "Pisa",
+          "sourceCity": "Pisa",
+          "city_id": "pisa-italy",
+          "country_code": "IT",
+          "visits": [
+            {
+              "start": "2024-01-12",
+              "end": "2024-01-12",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            57
+          ]
+        },
+        {
+          "city": "Podgorica",
+          "sourceCity": "Podgorica",
+          "city_id": "podgorica-montenegro",
+          "country_code": "ME",
+          "visits": [
+            {
+              "start": "2026-06-06",
+              "end": "2026-06-06",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            58
+          ]
+        },
+        {
+          "city": "Porto",
+          "sourceCity": "Porto",
+          "city_id": "porto-portugal",
+          "country_code": "PT",
+          "visits": [
+            {
+              "start": "2024-08-20",
+              "end": "2024-08-20",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            59
+          ]
+        },
+        {
+          "city": "Portsmouth",
+          "sourceCity": "Portsmouth",
+          "city_id": "portsmouth-uk",
+          "country_code": "GB",
+          "visits": [
+            {
+              "start": "2023-12-26",
+              "end": "2023-12-26",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            60
+          ]
+        },
+        {
+          "city": "Pristina",
+          "sourceCity": "Pristina",
+          "city_id": "pristina-kosovo",
+          "country_code": "XK",
+          "visits": [
+            {
+              "start": "2026-05-12",
+              "end": "2026-05-12",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            61
+          ]
+        },
+        {
+          "city": "Riga",
+          "sourceCity": "Riga",
+          "city_id": "riga-latvia",
+          "country_code": "LV",
+          "visits": [
+            {
+              "start": "2026-06-01",
+              "end": "2026-06-01",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            62
+          ]
+        },
+        {
+          "city": "Samarkand",
+          "sourceCity": "Samarkand",
+          "city_id": "samarkand-uzbekistan",
+          "country_code": "UZ",
+          "visits": [
+            {
+              "start": "2026-05-22",
+              "end": "2026-05-22",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            63
+          ]
+        },
+        {
+          "city": "San Marino",
+          "sourceCity": "San Marino",
+          "city_id": "san-marino-san-marino",
+          "country_code": "SM",
+          "visits": [
+            {
+              "start": "2024-08-18",
+              "end": "2024-08-18",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            64
+          ]
+        },
+        {
+          "city": "San Salvador",
+          "sourceCity": "San Salvador",
+          "city_id": "san-salvador-el-salvador",
+          "country_code": "SV",
+          "visits": [
+            {
+              "start": "2025-03-25",
+              "end": "2025-03-25",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            65
+          ]
+        },
+        {
+          "city": "Santiago",
+          "sourceCity": "Santiago",
+          "city_id": "santiago-chile",
+          "country_code": "CL",
+          "visits": [
+            {
+              "start": "2025-04-13",
+              "end": "2025-04-13",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            66
+          ]
+        },
+        {
+          "city": "Sevilla",
+          "sourceCity": "Sevilla (Seville)",
+          "city_id": "sevilla-spain",
+          "country_code": "ES",
+          "visits": [
+            {
+              "start": "2024-08-21",
+              "end": "2024-08-21",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            67
+          ]
+        },
+        {
+          "city": "Sofia",
+          "sourceCity": "Sofia",
+          "city_id": "sofia-bulgaria",
+          "country_code": "BG",
+          "visits": [
+            {
+              "start": "2025-05-11",
+              "end": "2025-05-11",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            68
+          ]
+        },
+        {
+          "city": "Southampton",
+          "sourceCity": "Southampton",
+          "city_id": "southampton-uk",
+          "country_code": "GB",
+          "visits": [
+            {
+              "start": "2023-12-22",
+              "end": "2023-12-25",
+              "days": 4
+            }
+          ],
+          "sourceRows": [
+            69
+          ]
+        },
+        {
+          "city": "Strasbourg",
+          "sourceCity": "Strasbourg",
+          "city_id": "strasbourg-france",
+          "country_code": "FR",
+          "visits": [
+            {
+              "start": "2024-08-05",
+              "end": "2024-08-05",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            70
+          ]
+        },
+        {
+          "city": "Sunshine Coast",
+          "sourceCity": "Sunshine Coast",
+          "city_id": "sunshine-coast-australia",
+          "country_code": "AU",
+          "visits": [
+            {
+              "start": "2025-07-25",
+              "end": "2025-07-25",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            71
+          ]
+        },
+        {
+          "city": "Tallinn",
+          "sourceCity": "Tallinn",
+          "city_id": "tallinn-estonia",
+          "country_code": "EE",
+          "visits": [
+            {
+              "start": "2026-06-01",
+              "end": "2026-06-01",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            72
+          ]
+        },
+        {
+          "city": "Tirana",
+          "sourceCity": "Tirana",
+          "city_id": "tirana-albania",
+          "country_code": "AL",
+          "visits": [
+            {
+              "start": "2026-06-02",
+              "end": "2026-06-02",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            73
+          ]
+        },
+        {
+          "city": "Ulaanbaatar",
+          "sourceCity": "Ulaanbaatar",
+          "city_id": "ulaanbaatar-mongolia",
+          "country_code": "MN",
+          "visits": [
+            {
+              "start": "2026-08-31",
+              "end": "2026-08-31",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            74
+          ]
+        },
+        {
+          "city": "Vaduz",
+          "sourceCity": "Vaduz",
+          "city_id": "vaduz-liechtenstein",
+          "country_code": "LI",
+          "visits": [
+            {
+              "start": "2024-08-19",
+              "end": "2024-08-19",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            75
+          ]
+        },
+        {
+          "city": "Valletta",
+          "sourceCity": "Valletta",
+          "city_id": "valletta-malta",
+          "country_code": "MT",
+          "visits": [
+            {
+              "start": "2026-05-06",
+              "end": "2026-05-06",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            76
+          ]
+        },
+        {
+          "city": "Venice",
+          "sourceCity": "Venice",
+          "city_id": "venice-italy",
+          "country_code": "IT",
+          "visits": [
+            {
+              "start": "2024-01-11",
+              "end": "2024-01-11",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            77
+          ]
+        },
+        {
+          "city": "Vientiane",
+          "sourceCity": "Vientiane",
+          "city_id": "vientiane-laos",
+          "country_code": "LA",
+          "visits": [
+            {
+              "start": "2026-08-08",
+              "end": "2026-08-08",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            78
+          ]
+        },
+        {
+          "city": "Vilnius",
+          "sourceCity": "Vilnius",
+          "city_id": "vilnius-lithuania",
+          "country_code": "LT",
+          "visits": [
+            {
+              "start": "2026-06-02",
+              "end": "2026-06-02",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            79
+          ]
+        },
+        {
+          "city": "Wellington",
+          "sourceCity": "Wellington",
+          "city_id": "wellington-new-zealand",
+          "country_code": "NZ",
+          "visits": [
+            {
+              "start": "2025-07-29",
+              "end": "2025-07-29",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            80
+          ]
+        },
+        {
+          "city": "Wroclaw",
+          "sourceCity": "Wrocław",
+          "city_id": "wroclaw-poland",
+          "country_code": "PL",
+          "visits": [
+            {
+              "start": "2024-05-07",
+              "end": "2024-05-07",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            81
+          ]
+        },
+        {
+          "city": "Yangon",
+          "sourceCity": "Yangon",
+          "city_id": "yangon-myanmar",
+          "country_code": "MM",
+          "visits": [
+            {
+              "start": "2026-08-26",
+              "end": "2026-08-26",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            82
+          ]
+        },
+        {
+          "city": "Yerevan",
+          "sourceCity": "Yerevan",
+          "city_id": "yerevan-armenia",
+          "country_code": "AM",
+          "visits": [
+            {
+              "start": "2025-05-23",
+              "end": "2025-05-23",
+              "days": 1
+            }
+          ],
+          "sourceRows": [
+            83
+          ]
+        }
+      ]
     }
   ],
   "expectedCollection": {
-    "cities": 90,
-    "visits": 137,
-    "stays": 150,
-    "days": 305.5,
-    "entries": 327
+    "cities": 171,
+    "visits": 219,
+    "stays": 232,
+    "days": 393.5,
+    "entries": 340
   }
 }

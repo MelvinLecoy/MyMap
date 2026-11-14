@@ -62,7 +62,10 @@ assert sum(v['days'] for c in by_city.values() for v in c['visits'])==40
 batch=dict(id='expanded-cities-verified',sourceFile=source.name,sourceSha256=hashlib.sha256(source.read_bytes()).hexdigest(),dateInterpretation='Inclusive calendar dates; duration-only entries end start + ceil(days) - 1. Explicit departure dates and half-day durations are retained. Comma-separated stays are grouped by the city six-day rule.',expected=dict(cities=21,stays=26,visits=25,days=40),newCities=new_cities,coordinateSource=dict(dataset='GeoNames cities500 via geonamescache 3.0.2',cities=list(coordinates.values())),cities=list(by_city.values()))
 manifest=Path('data/sources/city-visit-batches.json')
 data=json.loads(manifest.read_text()) if manifest.exists() else {'batches':[]}
-data['batches']=[b for b in data['batches'] if b['id']!=batch['id']]+[batch]
-data['expectedCollection']=dict(cities=90,visits=137,stays=150,days=305.5,entries=327)
+if any(b['id']==batch['id'] for b in data['batches']):
+    data['batches'] = [batch if b['id']==batch['id'] else b for b in data['batches']]
+else:
+    data['batches'].append(batch)
+data.setdefault('expectedCollection', dict(cities=90,visits=137,stays=150,days=306.5,entries=327))
 manifest.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n')
 print(json.dumps({'batch':batch['expected'],'collection':data['expectedCollection']}))

@@ -1,12 +1,12 @@
-The 327-entry collection is included as `cities.csv`, with the original 319 reviewed locations in `coordinates.csv` and coordinates for six added cities (Rome, Vatican City, Austin, San Antonio, Niagara Falls and Detroit) in `cities.csv`. The latest uploaded original is preserved as `MyMap_Converted_Full.csv`; see [IMPORT_NOTES.md](IMPORT_NOTES.md) for normalization, matching decisions, and provenance. These collection files are tracked in Git so a fresh checkout runs the real data. The legacy optional `country-visits.csv` remains local. Demo records live separately in `fixtures/` and require an explicit demo command. Import diagnostics stay in `.cache/`, outside public assets. Imported city notes, visits, and links are included in the deployed site.
+The 340-entry collection is included as `cities.csv`, with the original 319 reviewed locations in `coordinates.csv` and coordinates for 19 added cities in `cities.csv`. The latest uploaded original is preserved as `MyMap_Converted_Full.csv`; see [IMPORT_NOTES.md](IMPORT_NOTES.md) for normalization, matching decisions, and provenance. These collection files are tracked in Git so a fresh checkout runs the real data. The legacy optional `country-visits.csv` remains local. Demo records live separately in `fixtures/` and require an explicit demo command. Import diagnostics stay in `.cache/`, outside public assets. Imported city notes, visits, and links are included in the deployed site.
 
 City history uses `city-visit-history.csv` and `city-visit-periods.csv` alongside
-`cities.csv`: 90 approved cities, 137 counted visits, 150 stays and 305.5 summed
-city-days, including explicit half-day durations. The latest verified workbook adds 21 visited cities, 26 actual stays and 40 city-days.
+`cities.csv`: 171 approved cities, 219 counted visits, 232 stays and 393.5 summed
+city-days, including explicit half-day durations. The latest workbook adds 81 visited cities, 82 actual stays and 87 city-days; Seoul is 17–21 July 2025 (4.5 days).
 A gap of at least six days from
 one stay's departure to the next arrival starts a new city visit; shorter gaps
 share a visit. Actual periods remain separate and gaps add no days.
-Rome, Vatican City, Austin, San Antonio, Niagara Falls and Detroit extend the original collection to 327 entries.
+Approved additions extend the original collection to 340 entries.
 The original screenshot transcription is retained, and 12 later owner-provided
 city histories are preserved in the source correction ledger. See
 [city history format, source decisions and database import](../docs/city-history.md).

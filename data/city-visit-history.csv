@@ -2,7 +2,10 @@ CityId,Cities,CountryCode,VisitNumber,ArrivalDate,DepartureDate,DaysSpent
 abu-dhabi-uae,Abu Dhabi,AE,1,2025-06-01,2025-06-01,1
 abu-dhabi-uae,Abu Dhabi,AE,2,2026-08-15,2026-08-16,2
 aktau-kazakhstan,Aktau,KZ,1,2026-05-28,2026-05-29,2
+almaty-kazakhstan,Almaty,KZ,1,2026-05-30,2026-05-30,1
+amman-jordan,Amman,JO,1,2025-05-19,2025-05-19,1
 amsterdam-netherlands,Amsterdam,NL,1,2023-12-27,2023-12-29,3
+andorra-la-vella-andorra,Andorra la Vella,AD,1,2025-05-08,2025-05-08,1
 antigua-guatemala,Antigua,GT,1,2025-12-30,2026-01-01,2
 astana-kazakhstan,Astana,KZ,1,2026-05-26,2026-05-27,2
 athens-greece,Athens,GR,1,2024-08-10,2024-08-11,2
@@ -12,26 +15,43 @@ austin-usa,Austin,US,1,2024-12-16,2024-12-16,1
 baku-azerbaijan,Baku,AZ,1,2025-05-26,2025-05-26,1
 baku-azerbaijan,Baku,AZ,2,2026-05-19,2026-05-19,1
 baltimore-usa,Baltimore,US,1,2026-07-11,2026-07-11,1
+bandar-seri-begawan-brunei,Bandar Seri Begawan,BN,1,2026-08-27,2026-08-27,1
 bangkok-thailand,Bangkok,TH,1,2025-06-08,2025-06-09,2
+barcelona-spain,Barcelona,ES,1,2024-01-09,2024-01-09,1
+basel-switzerland,Basel,CH,1,2024-08-04,2024-08-04,1
+bath-uk,Bath,GB,1,2023-12-21,2023-12-21,1
+belgrade-serbia,Belgrade,RS,1,2025-05-11,2025-05-11,1
 belize-city-belize,Belize City,BZ,1,2025-03-19,2025-03-21,3
+berlin-germany,Berlin,DE,1,2024-08-01,2024-08-02,2
 bern-switzerland,Bern,CH,1,2023-12-20,2023-12-20,1
 bern-switzerland,Bern,CH,2,2024-08-05,2024-08-08,3
 bern-switzerland,Bern,CH,3,2024-08-15,2024-08-19,2
 bishkek-kyrgyzstan,Bishkek,KG,1,2026-05-25,2026-05-26,2
+bled-slovenia,Bled,SI,1,2026-06-07,2026-06-07,1
+bogota-colombia,Bogota,CO,1,2025-03-22,2025-03-22,1
 boston-usa,Boston,US,1,2021-08-15,2021-08-20,2
 boston-usa,Boston,US,2,2022-06-26,2022-06-28,2.5
+bratislava-slovakia,Bratislava,SK,1,2024-05-10,2024-05-10,1
 brisbane-australia,Brisbane,AU,1,2025-07-24,2025-07-27,4
+bristol-uk,Bristol,GB,1,2023-12-15,2023-12-15,1
 brussels-belgium,Brussels,BE,1,2024-08-01,2024-08-01,1
 brussels-belgium,Brussels,BE,2,2025-05-09,2025-05-09,1
+bucharest-romania,Bucharest,RO,1,2025-05-12,2025-05-12,1
 budapest-hungary,Budapest,HU,1,2024-05-09,2024-05-10,2
 budapest-hungary,Budapest,HU,2,2025-10-09,2025-10-13,3
+budva-montenegro,Budva,ME,1,2026-06-04,2026-06-04,1
 buenos-aires-argentina,Buenos Aires,AR,1,2025-04-11,2025-04-12,2
+bukhara-uzbekistan,Bukhara,UZ,1,2026-05-23,2026-05-23,1
 busan-south-korea,Busan,KR,1,2025-07-15,2025-07-17,3
 cairo-egypt,Cairo,EG,1,2025-05-15,2025-05-16,2
+cardiff-uk,Cardiff,GB,1,2023-12-21,2023-12-21,1
 chicago-usa,Chicago,US,1,2022-05-09,2022-05-11,3
 chicago-usa,Chicago,US,2,2022-11-11,2022-11-12,2
 chicago-usa,Chicago,US,3,2022-12-20,2022-12-26,7
+chisinau-moldova,Chisinau,MD,1,2025-05-13,2025-05-13,1
+cologne-germany,Cologne,DE,1,2024-08-01,2024-08-01,1
 colombo-sri-lanka,Colombo,LK,1,2026-09-10,2026-09-11,2
+como-italy,Como,IT,1,2024-08-15,2024-08-15,1
 copenhagen-denmark,Copenhagen,DK,1,2023-12-30,2024-01-01,3
 cusco-peru,Cusco,PE,1,2025-12-18,2025-12-21,4
 dallas-usa,Dallas,US,1,2024-12-17,2024-12-17,1
@@ -39,25 +59,43 @@ dallas-usa,Dallas,US,2,2025-04-02,2025-04-02,1
 denver-usa,Denver,US,1,2024-12-14,2024-12-15,2
 detroit-usa,Detroit,US,1,2026-04-17,2026-04-17,1
 doha-qatar,Doha,QA,1,2025-06-04,2025-06-05,2
+dresden-germany,Dresden,DE,1,2024-05-06,2024-05-06,1
 dubai-uae,Dubai,AE,1,2025-05-27,2025-05-31,5
 dubai-uae,Dubai,AE,2,2026-07-27,2026-07-27,1
 dubai-uae,Dubai,AE,3,2026-08-12,2026-08-17,4
+dublin-ireland,Dublin,IE,1,2025-05-10,2025-05-10,1
+dubrovnik-croatia,Dubrovnik,HR,1,2024-08-12,2024-08-12,1
+dushanbe-tajikistan,Dushanbe,TJ,1,2026-05-20,2026-05-20,1
+firenze-italy,Firenze,IT,1,2024-01-12,2024-01-12,1
 geneva-switzerland,Geneva,CH,1,2023-12-17,2023-12-17,1
 geneva-switzerland,Geneva,CH,2,2024-08-06,2024-08-07,2
+gold-coast-australia,Gold Coast,AU,1,2025-07-24,2025-07-24,1
+guatemala-city-guatemala,Guatemala City,GT,1,2025-12-28,2025-12-28,1
+helsinki-finland,Helsinki,FI,1,2026-05-31,2026-05-31,1
+ho-chi-minh-city-vietnam,Ho Chi Minh City,VN,1,2025-07-22,2025-07-22,1
 houston-usa,Houston,US,1,2024-12-16,2024-12-17,2
 houston-usa,Houston,US,2,2025-04-02,2025-04-02,1
+interlaken-switzerland,Interlaken,CH,1,2023-12-18,2023-12-19,2
+interlaken-switzerland,Interlaken,CH,2,2024-08-05,2024-08-05,1
 istanbul-turkey,Istanbul,TR,1,2025-05-20,2025-05-22,3
 istanbul-turkey,Istanbul,TR,2,2026-05-13,2026-05-18,4
+jerash-jordan,Jerash,JO,1,2025-05-18,2025-05-18,1
+johor-bahru-malaysia,Johor Bahru,MY,1,2026-08-18,2026-08-18,1
 kathmandu-nepal,Kathmandu,NP,1,2026-09-09,2026-09-10,2
 kingston-jamaica,Kingston,JM,1,2026-07-13,2026-07-14,2
+kotor-montenegro,Kotor,ME,1,2026-06-05,2026-06-05,1
 krakow-poland,Krakow,PL,1,2024-05-07,2024-05-08,2
 krong-siem-reap-cambodia,Krong Siem Reap,KH,1,2026-08-09,2026-08-10,2
 kuala-lumpur-malaysia,Kuala Lumpur,MY,1,2025-07-21,2025-07-21,1
 kuala-lumpur-malaysia,Kuala Lumpur,MY,2,2026-09-07,2026-09-08,2
+kunming-china,Kunming,CN,1,2026-08-07,2026-08-07,1
+kuwait-city-kuwait,Kuwait City,KW,1,2025-06-06,2025-06-06,1
+kyoto-japan,Kyoto,JP,1,2026-07-30,2026-07-30,1
 la-paz-bolivia,La Paz,BO,1,2025-12-22,2025-12-23,2
 lausanne-switzerland,Lausanne,CH,1,2023-12-20,2023-12-20,1
 lausanne-switzerland,Lausanne,CH,2,2024-08-06,2024-08-06,1
 lausanne-switzerland,Lausanne,CH,3,2024-08-19,2024-08-19,1
+lima-peru,Lima,PE,1,2025-04-14,2025-04-14,1
 lisbon-portugal,Lisbon,PT,1,2024-01-05,2024-01-07,3
 ljubljana-slovenia,Ljubljana,SI,1,2026-06-06,2026-06-07,2
 london-uk,London,GB,1,2023-12-14,2023-12-16,2
@@ -68,15 +106,28 @@ los-angeles-usa,Los Angeles,US,1,2022-01-30,2022-02-02,3.5
 los-angeles-usa,Los Angeles,US,2,2023-05-03,2023-05-03,1
 los-angeles-usa,Los Angeles,US,3,2025-05-06,2025-05-06,1
 los-angeles-usa,Los Angeles,US,4,2026-04-07,2026-04-08,2
+lugano-switzerland,Lugano,CH,1,2024-08-15,2024-08-15,1
+luxembourg-luxembourg,Luxembourg,LU,1,2025-05-09,2025-05-09,1
 luzern-switzerland,Luzern,CH,1,2023-12-20,2023-12-20,1
 luzern-switzerland,Luzern,CH,2,2024-08-06,2024-08-06,1
+madrid-spain,Madrid,ES,1,2024-01-08,2024-01-08,1
+malmo-sweden,Malmo,SE,1,2024-01-01,2024-01-01,1
+managua-nicaragua,Managua,NI,1,2025-03-26,2025-03-26,1
+manama-bahrain,Manama,BH,1,2025-06-02,2025-06-02,1
+manila-philippines,Manila,PH,1,2026-09-02,2026-09-02,1
+medellin-colombia,Medellin,CO,1,2025-03-23,2025-03-23,1
 melbourne-australia,Melbourne,AU,1,2025-08-01,2025-08-03,3
 mexico-city-mexico,Mexico City,MX,1,2025-03-10,2025-03-12,3
 miami-usa,Miami,US,1,2022-02-25,2022-03-01,5
 miami-usa,Miami,US,2,2025-03-27,2025-03-27,1
 milan-italy,Milan,IT,1,2024-01-10,2024-01-10,1
 milan-italy,Milan,IT,2,2024-08-15,2024-08-15,1
+monaco-monaco,Monaco,MC,1,2024-08-09,2024-08-09,1
 montego-bay-jamaica,Montego Bay,JM,1,2026-07-12,2026-07-12,1
+monterrey-mexico,Monterrey,MX,1,2025-03-09,2025-03-09,1
+montevideo-uruguay,Montevideo,UY,1,2025-04-10,2025-04-10,1
+mostar-bosnia,Mostar,BA,1,2026-05-04,2026-05-04,1
+munich-germany,Munich,DE,1,2024-08-03,2024-08-03,1
 muscat-oman,Muscat,OM,1,2025-06-02,2025-06-03,2
 nadi-fiji,Nadi,FJ,1,2025-08-04,2025-08-05,1.5
 new-york-city-usa,New York City,US,1,2021-12-20,2022-01-01,13
@@ -86,53 +137,84 @@ new-york-city-usa,New York City,US,4,2025-12-12,2025-12-12,1
 new-york-city-usa,New York City,US,5,2026-04-10,2026-04-12,3
 new-york-city-usa,New York City,US,6,2026-06-08,2026-06-08,1
 niagara-falls-usa,Niagara Falls,US,1,2021-08-23,2021-08-24,2
+nice-france,Nice,FR,1,2024-08-09,2024-08-09,1
+ohrid-north-macedonia,Ohrid,MK,1,2026-06-03,2026-06-03,1
 orlando-usa,Orlando,US,1,2022-03-01,2022-03-06,5.5
 osaka-japan,Osaka,JP,1,2026-07-28,2026-07-29,2
+oslo-norway,Oslo,NO,1,2024-01-04,2024-01-04,1
 ottawa-canada,Ottawa,CA,1,2026-07-11,2026-07-11,1
 panama-city-panama,Panama City,PA,1,2025-03-21,2025-03-24,2
 paris-france,Paris,FR,1,2024-07-29,2024-07-31,3
 paris-france,Paris,FR,2,2025-10-07,2025-10-08,2
 philadelphia-usa,Philadelphia,US,1,2026-07-09,2026-07-10,2
+phnom-penh-cambodia,Phnom Penh,KH,1,2026-08-11,2026-08-11,1
+pisa-italy,Pisa,IT,1,2024-01-12,2024-01-12,1
+podgorica-montenegro,Podgorica,ME,1,2026-06-06,2026-06-06,1
+porto-portugal,Porto,PT,1,2024-08-20,2024-08-20,1
+portsmouth-uk,Portsmouth,GB,1,2023-12-26,2023-12-26,1
 prague-czechia,Prague,CZ,1,2024-05-05,2024-05-06,2
 prague-czechia,Prague,CZ,2,2024-05-13,2024-05-13,1
 prague-czechia,Prague,CZ,3,2026-07-26,2026-07-26,1
+pristina-kosovo,Pristina,XK,1,2026-05-12,2026-05-12,1
 quito-ecuador,Quito,EC,1,2025-12-26,2025-12-27,2
+riga-latvia,Riga,LV,1,2026-06-01,2026-06-01,1
 rio-de-janeiro-brazil,Rio de Janeiro,BR,1,2025-04-08,2025-04-09,2
 riyadh-saudi-arabia,Riyadh,SA,1,2025-05-17,2025-05-17,1
 riyadh-saudi-arabia,Riyadh,SA,2,2025-06-07,2025-06-07,1
 rome-italy,Rome,IT,1,2024-01-14,2024-01-14,1
 rome-italy,Rome,IT,2,2024-08-16,2024-08-17,2
+samarkand-uzbekistan,Samarkand,UZ,1,2026-05-22,2026-05-22,1
 san-antonio-usa,San Antonio,US,1,2024-12-16,2024-12-16,1
 san-diego-usa,San Diego,US,1,2026-04-04,2026-04-05,2
 san-francisco-usa,San Francisco,US,1,2022-01-27,2022-01-29,3
 san-francisco-usa,San Francisco,US,2,2025-11-01,2025-11-02,2
 san-jose-costa-rica,San Jose,CR,1,2025-04-06,2025-04-07,1.5
+san-marino-san-marino,San Marino,SM,1,2024-08-18,2024-08-18,1
 san-pedro-sula-honduras,San Pedro Sula,HN,1,2026-09-26,2026-09-26,1
+san-salvador-el-salvador,San Salvador,SV,1,2025-03-25,2025-03-25,1
+santiago-chile,Santiago,CL,1,2025-04-13,2025-04-13,1
 santo-domingo-dominican-republic,Santo Domingo,DO,1,2026-07-15,2026-07-15,1
 sarajevo-bosnia,Sarajevo,BA,1,2026-05-04,2026-05-05,2
 seattle-usa,Seattle,US,1,2022-07-17,2022-07-18,2
-seoul-south-korea,Seoul,KR,1,2025-07-17,2025-07-20,3.5
+seoul-south-korea,Seoul,KR,1,2025-07-17,2025-07-21,4.5
+sevilla-spain,Sevilla,ES,1,2024-08-21,2024-08-21,1
 shanghai-china,Shanghai,CN,1,2026-08-30,2026-09-01,2.5
 singapore-singapore,Singapore,SG,1,2025-07-22,2025-07-22,1
 singapore-singapore,Singapore,SG,2,2026-08-18,2026-08-25,4
 singapore-singapore,Singapore,SG,3,2026-09-03,2026-09-03,1
 singapore-singapore,Singapore,SG,4,2026-09-11,2026-09-12,1
 skopje-north-macedonia,Skopje,MK,1,2026-05-07,2026-05-12,6
+sofia-bulgaria,Sofia,BG,1,2025-05-11,2025-05-11,1
+southampton-uk,Southampton,GB,1,2023-12-22,2023-12-25,4
+strasbourg-france,Strasbourg,FR,1,2024-08-05,2024-08-05,1
+sunshine-coast-australia,Sunshine Coast,AU,1,2025-07-25,2025-07-25,1
 sydney-australia,Sydney,AU,1,2025-07-29,2025-07-31,3
 sydney-australia,Sydney,AU,2,2026-08-21,2026-08-24,4
+tallinn-estonia,Tallinn,EE,1,2026-06-01,2026-06-01,1
 tashkent-uzbekistan,Tashkent,UZ,1,2026-05-21,2026-05-24,2
 tbilisi-georgia,Tbilisi,GE,1,2025-05-24,2025-05-25,2
 tijuana-mexico,Tijuana,MX,1,2026-04-04,2026-04-04,1
+tirana-albania,Tirana,AL,1,2026-06-02,2026-06-02,1
 tokyo-japan,Tokyo,JP,1,2026-07-31,2026-08-02,3
 toronto-canada,Toronto,CA,1,2026-04-17,2026-04-19,3
 tromso-norway,Tromso,NO,1,2024-01-02,2024-01-03,2
+ulaanbaatar-mongolia,Ulaanbaatar,MN,1,2026-08-31,2026-08-31,1
+vaduz-liechtenstein,Vaduz,LI,1,2024-08-19,2024-08-19,1
+valletta-malta,Valletta,MT,1,2026-05-06,2026-05-06,1
 vancouver-canada,Vancouver,CA,1,2022-06-29,2022-07-16,18
 vatican-city-vatican-city,Vatican City,VA,1,2024-01-14,2024-01-14,1
 vatican-city-vatican-city,Vatican City,VA,2,2024-08-17,2024-08-17,1
+venice-italy,Venice,IT,1,2024-01-11,2024-01-11,1
 vienna-austria,Vienna,AT,1,2024-05-10,2024-05-11,2
 vienna-austria,Vienna,AT,2,2025-10-10,2025-10-11,2
+vientiane-laos,Vientiane,LA,1,2026-08-08,2026-08-08,1
+vilnius-lithuania,Vilnius,LT,1,2026-06-02,2026-06-02,1
 washington-dc-usa,Washington DC,US,1,2026-06-24,2026-06-24,1
 washington-dc-usa,Washington DC,US,2,2026-07-08,2026-07-11,2
+wellington-new-zealand,Wellington,NZ,1,2025-07-29,2025-07-29,1
+wroclaw-poland,Wroclaw,PL,1,2024-05-07,2024-05-07,1
+yangon-myanmar,Yangon,MM,1,2026-08-26,2026-08-26,1
+yerevan-armenia,Yerevan,AM,1,2025-05-23,2025-05-23,1
 zagreb-croatia,Zagreb,HR,1,2024-08-13,2024-08-14,2
 zurich-switzerland,Zurich,CH,1,2024-08-04,2024-08-04,1
 zurich-switzerland,Zurich,CH,2,2024-08-15,2024-08-15,1

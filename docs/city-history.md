@@ -1,8 +1,8 @@
 # City visit history
 
-The approved city history contains **90 cities, 137 counted visits, 150 actual stays
-and 305.5 summed city-days**. Southampton and Reykjavík are excluded. Rome,
-Vatican City, Austin, San Antonio, Niagara Falls and Detroit extend the collection to 327 cities.
+The approved city history contains **171 cities, 219 counted visits, 232 actual stays
+and 393.5 summed city-days**. Reykjavík remains excluded. The collection
+contains 340 cities, including the later supplied Southampton history.
 
 A new city visit starts when the next arrival is **at least six calendar days after
 the previous departure**. A shorter gap joins the same visit. Measure each gap
@@ -26,9 +26,9 @@ Builds validate the six-day grouping, numbering, bounds, duration sums and city
 summaries. LastVisited remains the latest actual departure.
 
 DaysSpent is explicit and supports increments of 0.5. It is never rounded or
-recalculated from the inclusive date span. The explicit duration corrections retain
-the screenshot's date bounds: London 1–3 May 2026 (2.5), Seoul 17–20 July 2025
-(3.5), Auckland 5–8 August 2025 (3.5), Singapore 11–12 September 2026 (1 day),
+recalculated from the inclusive date span. Current owner-approved date bounds
+and durations include: London 1–3 May 2026 (2.5), Seoul 17–21 July 2025
+(4.5), Auckland 5–8 August 2025 (3.5), Singapore 11–12 September 2026 (1 day),
 and Shanghai 30–31 August 2026 (1.5).
 The owner did not specify which date was partial, so no time or daily allocation
 is invented. Auckland's separate 28 July stay remains one day.
@@ -117,3 +117,25 @@ for the same city merge chronologically; a later approved batch replaces an
 older entry with the same arrival date. Each batch update must reach GitHub
 CSVs, Supabase and the deployed website together. Use the focused data checks,
 build and brief live verification described in AGENTS.md.
+
+## Yellow workbook and Seoul correction
+
+`yellow_cities_81_visit_data.xlsx` supplies 82 stays across 81 newly visited cities,
+adding 87 city-days. Both sheets describe the same stays and are imported once.
+Interlaken retains two visits. Southampton uses the new 22–25 December 2023
+four-day stay, replacing the earlier exclusion of the screenshot entry. All
+81 identities are resolved; 68 reuse existing city records and 13 receive new
+records with GeoNames coordinates and no invented map links. Andorra maps to
+Andorra la Vella, while parenthetical and accented names retain stable IDs.
+
+Run `python scripts/prepare-yellow-city-batch.py` to reproduce the workbook
+transcription and `npm run city:prepare-data` to regenerate the CSVs. The source
+workbook, SHA-256, identity mappings and coordinate provenance are tracked in
+`data/sources/city-visit-batches.json`.
+
+The owner separately corrected Seoul to 17–21 July 2025, 4.5 days, and a latest
+visit date of 21 July. This is stored in the original correction ledger and both
+city history CSVs. `202611140003_seoul_visit_correction.sql` accepts only the
+published old or approved new row, updates both the counted visit and its stay,
+and leaves unrelated history, metadata and country tables unchanged. The current
+city import/synchronization commands apply it before seeding the new batch.

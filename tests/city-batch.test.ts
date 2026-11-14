@@ -57,19 +57,24 @@ test("the verified expanded workbook survives in the CSVs with inclusive dates, 
     const v = added.find((c) => c.id === id)!.visits![0];
     assert.deepEqual([v.arrival, v.departure, v.daysSpent], [start, end, 1.5]);
   }
-  const old = cities.filter((c) => !ids.has(c.id));
+  const allBatchIds = new Set(
+    manifest.batches.flatMap((b: { cities: { city_id: string }[] }) =>
+      b.cities.map((c) => c.city_id),
+    ),
+  );
+  const old = cities.filter((c) => !allBatchIds.has(c.id));
   assert.equal(toCityVisitRows(old).length, 112);
   assert.equal(toCityPeriodRows(old).length, 124);
   assert.equal(
     toCityVisitRows(old).reduce((n, v) => n + v.days_spent, 0),
-    265.5,
+    266.5,
   );
-  assert.equal(cities.length, 327);
-  assert.equal(cities.filter((c) => c.visit === "visited").length, 90);
-  assert.equal(toCityVisitRows(cities).length, 137);
-  assert.equal(toCityPeriodRows(cities).length, 150);
+  assert.equal(cities.length, 340);
+  assert.equal(cities.filter((c) => c.visit === "visited").length, 171);
+  assert.equal(toCityVisitRows(cities).length, 219);
+  assert.equal(toCityPeriodRows(cities).length, 232);
   assert.equal(
     toCityVisitRows(cities).reduce((n, v) => n + v.days_spent, 0),
-    305.5,
+    393.5,
   );
 });
