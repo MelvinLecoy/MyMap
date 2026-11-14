@@ -1,8 +1,10 @@
-The 323-entry collection is included as `cities.csv`, with the original 319 reviewed locations in `coordinates.csv` and coordinates for the two newly added cities in `cities.csv`. The latest uploaded original is preserved as `MyMap_Converted_Full.csv`; see [IMPORT_NOTES.md](IMPORT_NOTES.md) for normalization, matching decisions, and provenance. These collection files are tracked in Git so a fresh checkout runs the real data. The legacy optional `country-visits.csv` remains local. Demo records live separately in `fixtures/` and require an explicit demo command. Import diagnostics stay in `.cache/`, outside public assets. Imported city notes, visits, and links are included in the deployed site.
+The 325-entry collection is included as `cities.csv`, with the original 319 reviewed locations in `coordinates.csv` and coordinates for four added cities (Rome, Vatican City, Austin and San Antonio) in `cities.csv`. The latest uploaded original is preserved as `MyMap_Converted_Full.csv`; see [IMPORT_NOTES.md](IMPORT_NOTES.md) for normalization, matching decisions, and provenance. These collection files are tracked in Git so a fresh checkout runs the real data. The legacy optional `country-visits.csv` remains local. Demo records live separately in `fixtures/` and require an explicit demo command. Import diagnostics stay in `.cache/`, outside public assets. Imported city notes, visits, and links are included in the deployed site.
 
-City history now uses `city-visit-history.csv` alongside `cities.csv`: 57 approved
-cities, 111 stays, 249.5 days, including explicit half-day durations. Rome and
-Vatican City extend the original collection to 323 entries. See
+City history now uses `city-visit-history.csv` alongside `cities.csv`: 69 approved
+cities, 124 stays, 265.5 summed city-days, including explicit half-day durations.
+Rome, Vatican City, Austin and San Antonio extend the original collection to 325 entries.
+The original screenshot transcription is retained, and 12 later owner-provided
+city histories are preserved in the source correction ledger. See
 [city history format, source decisions and database import](../docs/city-history.md).
 
 The Countries panel now reads the personal history in two tracked CSVs:
