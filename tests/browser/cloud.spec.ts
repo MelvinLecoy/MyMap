@@ -5,7 +5,11 @@ import { toCityRow, type CityRow } from "../../src/lib/cloud-data";
 import type { AtlasData } from "../../src/lib/types";
 import { COLLECTION_STATUS_STORAGE_KEY } from "../../src/lib/status-storage";
 import { toCountrySnapshot } from "../../src/lib/country-cloud-data";
-import { toCityVisitRows } from "../../src/lib/city-cloud-data";
+import {
+  toCityVisitRows,
+  toCityPeriodRows,
+  toCityStayRows,
+} from "../../src/lib/city-cloud-data";
 import type { CountrySeed } from "../../src/lib/countries";
 
 const atlas = JSON.parse(
@@ -65,6 +69,7 @@ function store() {
     ),
     failRead: false,
     cityVisits: toCityVisitRows(atlas.cities),
+    cityPeriods: toCityPeriodRows(atlas.cities),
     countrySnapshot: toCountrySnapshot(countrySeeds),
     failCountryRead: false,
     failWrite: false,
@@ -196,6 +201,7 @@ async function backend(
               a.id.localeCompare(b.id),
             ),
             visits: state.cityVisits,
+            periods: state.cityPeriods,
           });
     if (url.pathname === "/auth/v1/token") {
       if (url.searchParams.get("grant_type") === "pkce" && state.callbackError)
@@ -326,13 +332,13 @@ test("current approved history survives a cold load, reload and unavailable data
   await loaded;
   await expect(page.locator(".city-overview-totals dd")).toHaveText([
     "69",
-    "124",
+    "112",
     "265.5",
   ]);
   await page.reload();
   await expect(page.locator(".city-overview-totals dd")).toHaveText([
     "69",
-    "124",
+    "112",
     "265.5",
   ]);
   state.failRead = true;
@@ -342,7 +348,7 @@ test("current approved history survives a cold load, reload and unavailable data
   ).toBeVisible();
   await expect(page.locator(".city-overview-totals dd")).toHaveText([
     "69",
-    "124",
+    "112",
     "265.5",
   ]);
   await page.goto("/?city=san-francisco-usa");
@@ -377,7 +383,7 @@ test("saving a city's map status updates progress and filters while retaining it
   await expect(picker).toBeEnabled();
   await picker.selectOption("Complete");
   await expect(picker).toBeEnabled();
-  await expect(page.locator(".city-statistics dd")).toHaveText(["2", "2.5"]);
+  await expect(page.locator(".city-statistics dd")).toHaveText(["1", "2.5"]);
   await page
     .getByRole("button", {
       name: `All cities (${atlas.cities.length})`,
@@ -389,7 +395,7 @@ test("saving a city's map status updates progress and filters while retaining it
   );
   await expect(page.locator(".city-overview-totals dd")).toHaveText([
     "69",
-    "124",
+    "112",
     "265.5",
   ]);
   await page
@@ -400,12 +406,12 @@ test("saving a city's map status updates progress and filters while retaining it
   const row = page.locator(".city-row");
   await expect(row.locator(".status")).toHaveText("Complete");
   await expect(row.locator(".city-row-duration")).toHaveText("2.5 days");
-  await expect(row.locator(".city-count-badge")).toContainText("2");
+  await expect(row.locator(".city-count-badge")).toContainText("1");
   expect(
     state.cityVisits.find(
       (v) => v.city_id === "shanghai-china" && v.visit_number === 1,
     )!.days_spent,
-  ).toBe(1.5);
+  ).toBe(2.5);
 });
 
 test("country details retain editor saves and viewer permissions in their nested cities", async ({
@@ -583,7 +589,11 @@ test("a refresh that started before a save cannot replace the confirmed status",
       await held;
       return route.fulfill({
         contentType: "application/json",
-        body: JSON.stringify({ cities: old, visits: state.cityVisits }),
+        body: JSON.stringify({
+          cities: old,
+          visits: state.cityVisits,
+          periods: state.cityPeriods,
+        }),
         headers: { "access-control-allow-origin": "*" },
       });
     },
@@ -716,7 +726,32 @@ test("the editor can export every city with saved statuses and nullable coordina
     columns: true,
     bom: true,
   }) as Array<Record<string, string>>;
-  expect(visits).toHaveLength(124);
+  expect(visits).toHaveLength(112);
+  const periodDownload = page.waitForEvent("download");
+  await page
+    .getByRole("button", { name: "City stay periods CSV", exact: true })
+    .click();
+  const periodPath = await (await periodDownload).path();
+  const periods = parse(readFileSync(periodPath!, "utf8"), {
+    columns: true,
+    bom: true,
+  }) as Array<Record<string, string>>;
+  expect(periods).toHaveLength(124);
+  expect(periods.reduce((n, p) => n + Number(p.DaysSpent), 0)).toBe(265.5);
+  expect(
+    periods
+      .filter((p) => p.CityId === "shanghai-china")
+      .map((p) => [
+        p.VisitNumber,
+        p.PeriodNumber,
+        p.ArrivalDate,
+        p.DepartureDate,
+        p.DaysSpent,
+      ]),
+  ).toEqual([
+    ["1", "1", "2026-08-30", "2026-08-31", "1.5"],
+    ["1", "2", "2026-09-01", "2026-09-01", "1"],
+  ]);
   expect(new Set(visits.map((v) => v.CityId)).size).toBe(69);
   expect(visits.reduce((n, v) => n + Number(v.DaysSpent), 0)).toBe(265.5);
   expect(
@@ -735,7 +770,7 @@ test("live city history survives saves and reloads, refreshes coherently, and re
   await backend(context, state, ownerId);
   await page.goto("/?city=london-uk");
   const history = page.locator(".city-visit-list");
-  await expect(history.locator("li")).toHaveCount(5);
+  await expect(history.locator(":scope > li")).toHaveCount(4);
   await expect(history).toContainText("2.5 days");
   const picker = page.getByLabel("Map status", { exact: true });
   await expect(picker).toBeEnabled();
@@ -746,7 +781,10 @@ test("live city history survives saves and reloads, refreshes coherently, and re
   await expect(picker).toHaveValue("Update");
   await expect(history).toContainText("2.5 days");
   state.cityVisits.find(
-    (v) => v.city_id === "london-uk" && v.visit_number === 5,
+    (v) => v.city_id === "london-uk" && v.visit_number === 4,
+  )!.days_spent = 1.5;
+  state.cityPeriods.find(
+    (p) => p.city_id === "london-uk" && p.visit_number === 4,
   )!.days_spent = 1.5;
   await page.evaluate(() => window.dispatchEvent(new Event("focus")));
   await expect(history).toContainText("1.5 days");
@@ -760,7 +798,10 @@ test("live city history survives saves and reloads, refreshes coherently, and re
   await expect(history).toContainText("1.5 days");
   state.failRead = false;
   state.cityVisits.find(
-    (v) => v.city_id === "london-uk" && v.visit_number === 5,
+    (v) => v.city_id === "london-uk" && v.visit_number === 4,
+  )!.days_spent = 2.5;
+  state.cityPeriods.find(
+    (p) => p.city_id === "london-uk" && p.visit_number === 4,
   )!.days_spent = 2.5;
   await page.getByRole("button", { name: "Retry", exact: true }).click();
   await expect(picker).toBeEnabled();
@@ -1435,4 +1476,53 @@ test("country outages retain a usable snapshot, retry recovers, and failed refre
     page.getByText("Couldn’t refresh country history.", { exact: false }),
   ).toBeVisible();
   await expect(page.locator(".country-statistics dd")).toHaveText(["2", "13"]);
+});
+
+test("legacy responses group consistently and a broken period snapshot retains the last confirmed history", async ({
+  context,
+  page,
+}) => {
+  const state = store();
+  await backend(context, state, ownerId);
+  let legacy = true;
+  await page.route(
+    `${fixtureOrigin}/rest/v1/rpc/atlas_city_snapshot`,
+    async (route) => {
+      if (route.request().method() !== "POST" || !legacy)
+        return route.fallback();
+      return route.fulfill({
+        contentType: "application/json",
+        headers: { "access-control-allow-origin": "*" },
+        body: JSON.stringify({
+          cities: [...state.rows.values()],
+          visits: toCityStayRows(atlas.cities),
+        }),
+      });
+    },
+  );
+  await page.goto("/?city=shanghai-china");
+  await expect(page.locator(".city-statistics dd")).toHaveText(["1", "2.5"]);
+  await expect(
+    page
+      .getByRole("list", { name: "Stays for visit 1", exact: true })
+      .locator("li"),
+  ).toHaveText(["30 – 31 August 2026 (1.5 days)", "1 September 2026"]);
+  const picker = page.getByLabel("Map status", { exact: true });
+  await expect(picker).toBeEnabled();
+  legacy = false;
+  state.cityPeriods.find(
+    (p) => p.city_id === "shanghai-china" && p.period_number === 1,
+  )!.days_spent = 2;
+  await page.evaluate(() => window.dispatchEvent(new Event("focus")));
+  await expect(
+    page.getByText(/Couldn’t refresh the saved collection/),
+  ).toBeVisible();
+  await expect(page.locator(".city-statistics dd")).toHaveText(["1", "2.5"]);
+  await expect(picker).toBeDisabled();
+  state.cityPeriods.find(
+    (p) => p.city_id === "shanghai-china" && p.period_number === 1,
+  )!.days_spent = 1.5;
+  await page.getByRole("button", { name: "Retry", exact: true }).click();
+  await expect(picker).toBeEnabled();
+  await expect(page.locator(".city-statistics dd")).toHaveText(["1", "2.5"]);
 });

@@ -1,11 +1,11 @@
-import { readFileSync } from "node:fs";
-import { cityCollection, citySeedSql } from "./city-database.js";
+import {
+  cityCollection,
+  citySeedSql,
+  legacyCitySchemaSql,
+  migrationBody as body,
+} from "./city-database.js";
 import { csvData } from "./data-integrity.js";
 
-const body = (file: string) =>
-  readFileSync(`supabase/migrations/${file}`, "utf8")
-    .replace(/^\s*begin;\s*$/im, "")
-    .replace(/commit;\s*$/i, "");
 const literal = (value: unknown) =>
   `'${JSON.stringify(value).replaceAll("'", "''")}'::jsonb`;
 
@@ -22,10 +22,11 @@ export function dataPersistenceSql() {
         `execute $approved_patch_${i}$${body(file)}$approved_patch_${i}$;`,
     )
     .join("\n");
-  let sql = `begin;\nselect pg_advisory_xact_lock(202611140001);\n${body("202611130002_city_history.sql")}\ncreate temporary table persistence_country_before on commit drop as select public.atlas_country_snapshot() as data;\ndo $patches$ begin if exists(select 1 from public.city_visits) then\n${apply}\nend if;end $patches$;\n${citySeedSql(cityCollection())}\n`;
+  let sql = `begin;\nselect pg_advisory_xact_lock(202611140001);\n${legacyCitySchemaSql()}\ncreate temporary table persistence_country_before on commit drop as select public.atlas_country_snapshot() as data;\ndo $patches$ begin if to_regclass('public.city_visit_periods') is null and exists(select 1 from public.city_visits) then\n${apply}\nend if;end $patches$;\nset constraints all immediate;\nset constraints all deferred;\n${body("202611140002_city_visit_periods.sql")}\n${citySeedSql(cityCollection())}\n`;
   for (const [table, rows] of [
     ["cities", expected.cities.cities],
     ["city_visits", expected.cities.visits],
+    ["city_visit_periods", expected.cities.periods],
     ["countries", expected.countries.countries],
     ["country_visits", expected.countries.visits],
     ["country_visit_periods", expected.countries.periods],

@@ -25,6 +25,9 @@ try {
       cityVisits: demo
         ? undefined
         : readFileSync("data/city-visit-history.csv", "utf8"),
+      cityPeriods: demo
+        ? undefined
+        : readFileSync("data/city-visit-periods.csv", "utf8"),
     },
   );
   mkdirSync("src/generated", { recursive: true });

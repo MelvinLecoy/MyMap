@@ -5,6 +5,7 @@ import {
   attachCityVisits,
   readCitySnapshot,
   type CityVisitRow,
+  type CityPeriodRow,
 } from "./city-cloud-data";
 import {
   COLLECTION_STATUS_STORAGE_KEY,
@@ -28,6 +29,7 @@ export function useRemoteAtlas(
 ) {
   const [rows, setRows] = useState<CityRow[]>([]);
   const [visits, setVisits] = useState<CityVisitRow[]>([]);
+  const [periods, setPeriods] = useState<CityPeriodRow[]>([]);
   const rowsRef = useRef(rows);
   const [ready, setReady] = useState(false);
   const [loading, setLoading] = useState(Boolean(client));
@@ -69,6 +71,7 @@ export function useRemoteAtlas(
       if (alive.current && version === writeVersion.current) {
         replaceRows(snapshot.cities);
         setVisits(snapshot.visits);
+        setPeriods(snapshot.periods);
         setReady(true);
         setLoadError("");
       }
@@ -223,12 +226,12 @@ export function useRemoteAtlas(
   const cities = useMemo(
     () =>
       (ready
-        ? attachCityVisits(rows.map(fromCityRow), visits)
+        ? attachCityVisits(rows.map(fromCityRow), visits, periods)
         : initial.cities
       ).map((city) =>
         pending[city.id] ? { ...city, status: pending[city.id] } : city,
       ),
-    [initial, ready, rows, visits, pending],
+    [initial, ready, rows, visits, periods, pending],
   );
 
   const migration = useMemo<StatusImport[]>(() => {

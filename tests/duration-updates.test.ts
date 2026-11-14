@@ -204,7 +204,17 @@ test("the live-format upgrade changes only approved rows, supports exact halves,
     const old = structuredClone(plan.before);
     old.periods.forEach((p) => delete p.days_spent);
     await db.exec(countrySeedSql(old));
-    const cities = cityCollection();
+    const cities = cityCollection().map((c) => ({
+      ...c,
+      visits: c.visits
+        ?.flatMap((v) => v.periods ?? [v])
+        .map((p, i) => ({
+          number: i + 1,
+          arrival: p.arrival,
+          departure: p.departure,
+          daysSpent: p.daysSpent,
+        })),
+    }));
     cities
       .find((c) => c.id === "shanghai-china")!
       .visits!.find((v) => v.arrival === "2026-08-30")!.daysSpent = 2;
@@ -212,7 +222,7 @@ test("the live-format upgrade changes only approved rows, supports exact halves,
       .find((c) => c.id === "singapore-singapore")!
       .visits!.find((v) => v.arrival === "2026-09-11")!.daysSpent = 1.5;
     await db.exec(seedSql(cities.map(toCityRow)));
-    await db.exec(`begin;${citySeedSql(cities)}commit;`);
+    await db.exec(`begin;${citySeedSql(cities, true)}commit;`);
     const before = await load();
     await db.exec(plan.sql.replace(/commit;\s*$/i, "rollback;"));
     assert.deepEqual(await load(), before);

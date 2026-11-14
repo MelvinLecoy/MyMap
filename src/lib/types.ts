@@ -6,11 +6,14 @@ export const MAP_STATUSES = [
 ] as const;
 export type MapStatus = (typeof MAP_STATUSES)[number];
 export type VisitStatus = "visited" | "planned" | "not-visited" | "unknown";
-export interface CityVisit {
+export interface CityStayPeriod {
   number: number;
   arrival: string;
   departure: string;
   daysSpent: number;
+}
+export interface CityVisit extends CityStayPeriod {
+  periods?: CityStayPeriod[];
 }
 export interface City {
   id: string;

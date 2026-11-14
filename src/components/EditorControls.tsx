@@ -16,7 +16,10 @@ import {
 } from "lucide-react";
 import CollectionFooter from "./CollectionFooter";
 import { exportCitiesCsv } from "../lib/cloud-data";
-import { exportCityVisitsCsv } from "../lib/city-cloud-data";
+import {
+  exportCityPeriodsCsv,
+  exportCityVisitsCsv,
+} from "../lib/city-cloud-data";
 import {
   MIN_PASSWORD_LENGTH,
   type RemoteAtlas,
@@ -161,14 +164,16 @@ export default function EditorControls({
           : view === "import"
             ? "Import saved statuses"
             : "Editor sign in";
-  const download = (history = false) => {
+  const download = (kind: "cities" | "visits" | "periods" = "cities") => {
     const url = URL.createObjectURL(
       new Blob(
         [
           "\ufeff",
-          history
-            ? exportCityVisitsCsv(cloud.cities)
-            : exportCitiesCsv(cloud.cities),
+          kind === "periods"
+            ? exportCityPeriodsCsv(cloud.cities)
+            : kind === "visits"
+              ? exportCityVisitsCsv(cloud.cities)
+              : exportCitiesCsv(cloud.cities),
         ],
         {
           type: "text/csv;charset=utf-8",
@@ -177,7 +182,7 @@ export default function EditorControls({
     );
     const link = document.createElement("a");
     link.href = url;
-    link.download = `ciudad-mundo-${history ? "city-visits-" : ""}${new Date().toISOString().slice(0, 10)}.csv`;
+    link.download = `ciudad-mundo-${kind === "cities" ? "" : `city-${kind}-`}${new Date().toISOString().slice(0, 10)}.csv`;
     link.click();
     window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
@@ -269,9 +274,19 @@ export default function EditorControls({
               <Download size={16} aria-hidden="true" />
               Cities CSV
             </button>
-            <button className="editor-primary" onClick={() => download(true)}>
+            <button
+              className="editor-primary"
+              onClick={() => download("visits")}
+            >
               <Download size={16} aria-hidden="true" />
               City visit history CSV
+            </button>
+            <button
+              className="editor-primary"
+              onClick={() => download("periods")}
+            >
+              <Download size={16} aria-hidden="true" />
+              City stay periods CSV
             </button>
           </div>
         ) : view !== "import" ? (

@@ -2366,6 +2366,15 @@ h2 {
   color: var(--muted);
   line-height: 1.6;
 }
+.city-stay-periods {
+  margin: 7px 0 0;
+  padding-left: 18px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.city-stay-periods li + li {
+  margin-top: 4px;
+}
 .editor-export-options {
   display: grid;
   gap: 10px;

@@ -1,8 +1,12 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
-const sql = readFileSync(
+const legacySql = readFileSync(
   "supabase/migrations/202611130005_city_visit_additions.sql",
   "utf8",
+);
+const sql = legacySql.replace(
+  /begin;/i,
+  `begin;\nselect pg_advisory_xact_lock(202611140001);\ndo $legacy_guard$ begin if to_regclass('public.city_visit_periods') is not null then raise exception 'Historical patch predates city grouping. Use data:sync-approved for the current CSVs.';end if;end $legacy_guard$;`,
 );
 mkdirSync(".cache", { recursive: true });
 writeFileSync(".cache/city-additions-ready.sql", sql);

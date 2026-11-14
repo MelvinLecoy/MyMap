@@ -10,6 +10,7 @@ const coordinates = readCSV(readFileSync("data/coordinates.csv", "utf8"));
 const { data, issues } = importCities(readFileSync("data/cities.csv", "utf8"), {
   coordinates: readFileSync("data/coordinates.csv", "utf8"),
   cityVisits: readFileSync("data/city-visit-history.csv", "utf8"),
+  cityPeriods: readFileSync("data/city-visit-periods.csv", "utf8"),
 });
 
 test("the published collection preserves all rows and links from the updated CSV", () => {
@@ -64,7 +65,12 @@ test("the published collection preserves all rows and links from the updated CSV
       .filter((c) => !c.map)
       .map((c) => c.id)
       .sort(),
-    ["austin-usa", "rome-italy", "san-antonio-usa", "vatican-city-vatican-city"],
+    [
+      "austin-usa",
+      "rome-italy",
+      "san-antonio-usa",
+      "vatican-city-vatican-city",
+    ],
   );
   const nice = data.cities.find((city) => city.name === "Nice")!;
   assert.equal(

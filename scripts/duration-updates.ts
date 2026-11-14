@@ -3,7 +3,7 @@ import { countryCollection } from "./country-database.js";
 import { cityCollection } from "./city-database.js";
 import { calculateRecordedHistory } from "../src/lib/country-history.js";
 import { toCountrySnapshot } from "../src/lib/country-cloud-data.js";
-import { toCityVisitRows } from "../src/lib/city-cloud-data.js";
+import { toCityStayRows } from "../src/lib/city-cloud-data.js";
 
 export function durationUpdatePlan() {
   const countries = countryCollection(),
@@ -45,7 +45,7 @@ export function durationUpdatePlan() {
   calculateRecordedHistory(previousCountries);
   const before = toCountrySnapshot(previousCountries),
     after = toCountrySnapshot(countries);
-  const cityAfter = toCityVisitRows(cities),
+  const cityAfter = toCityStayRows(cities),
     cityBefore = structuredClone(cityAfter);
   cityBefore.find(
     (v) => v.city_id === "shanghai-china" && v.arrival_date === "2026-08-30",
@@ -156,6 +156,6 @@ end $check$;
   return {
     ...plan,
     counts,
-    sql: `begin;\nselect pg_advisory_xact_lock(202611130003);\n${sql}\ncommit;\n`,
+    sql: `begin;\nselect pg_advisory_xact_lock(202611140001);\ndo $legacy_guard$ begin if to_regclass('public.city_visit_periods') is not null then raise exception 'Historical patch predates city grouping. Use data:sync-approved for the current CSVs.';end if;end $legacy_guard$;\n${sql}\ncommit;\n`,
   };
 }

@@ -1,11 +1,14 @@
 # Supabase-backed atlas
 
-Cities and their individual stays now load through `atlas_city_snapshot()`.
-The new `city_visits` table supports exact half-day durations. See
+Cities, counted visits and actual stays load through `atlas_city_snapshot()`.
+`city_visits` stores six-day visit groups and `city_visit_periods` preserves their
+individual stays and exact half-day durations. See
 [city history format and guarded import](city-history.md) for the separate
 `city:prepare`, `city:verify-live` and `city:apply` commands. Country data remains
-independent. Export offers Cities CSV and City visit history CSV; keep both to
-retain the complete city collection and its stays.
+independent. Export offers Cities CSV, City visit history CSV and City stay
+periods CSV; keep all three to retain the complete history and its gaps.
+`data:verify-sync`, `data:sync-approved` and `data:verify-live` maintain agreement
+across all six city/country tables without changing incomplete country history.
 
 Country history is stored separately in `countries`, `country_visits` and
 `country_visit_periods`, with a coherent public snapshot and the same editor

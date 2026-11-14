@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { readCSV } from "./importer.js";
 import { parse } from "csv-parse/sync";
+import { CITY_VISIT_GAP_DAYS, groupCityStays } from "../src/lib/city-visits.js";
 
 interface SourceCard {
   city: string;
@@ -21,9 +22,14 @@ const decisions = JSON.parse(
     end?: string;
     days?: number;
   }[];
-  expected: { cities: number; stays: number; days: number };
+  expected: { cities: number; visits: number; stays: number; days: number };
+  visitGapDays: number;
   excludedCities: string[];
-  additionalVisits: { city: string; country_code: string; visits: SourceCard["visits"] }[];
+  additionalVisits: {
+    city: string;
+    country_code: string;
+    visits: SourceCard["visits"];
+  }[];
 };
 const csv = (rows: unknown[][]) =>
   rows
@@ -110,6 +116,7 @@ const aliases: Record<string, string> = {
   "Antigua Guatemala": "antigua-guatemala",
 };
 const history: unknown[][] = [];
+const periods: unknown[][] = [];
 let totalDays = 0,
   cityCount = 0;
 const applied = new Set<number>();
@@ -143,19 +150,38 @@ for (const card of [
       };
     })
     .sort((a, b) => a.start.localeCompare(b.start));
-  for (const [index, stay] of stays.entries())
+  const visits = groupCityStays(
+    stays.map((s) => ({
+      arrival: s.start,
+      departure: s.end,
+      daysSpent: s.days,
+    })),
+  );
+  for (const visit of visits) {
     history.push([
       city.cityid,
       city.cities,
       city.countrycode,
-      index + 1,
-      stay.start,
-      stay.end,
-      stay.days,
+      visit.number,
+      visit.arrival,
+      visit.departure,
+      visit.daysSpent,
     ]);
+    for (const period of visit.periods!)
+      periods.push([
+        city.cityid,
+        city.cities,
+        city.countrycode,
+        visit.number,
+        period.number,
+        period.arrival,
+        period.departure,
+        period.daysSpent,
+      ]);
+  }
   city.visited = "Yes";
   city.lastvisited = stays.at(-1)!.end;
-  city.recordedvisits = String(stays.length);
+  city.recordedvisits = String(visits.length);
   city.recordeddaysspent = String(stays.reduce((n, s) => n + s.days, 0));
   totalDays += Number(city.recordeddaysspent);
   cityCount++;
@@ -163,7 +189,9 @@ for (const card of [
 if (
   applied.size !== decisions.corrections.length ||
   cityCount !== decisions.expected.cities ||
-  history.length !== decisions.expected.stays ||
+  history.length !== decisions.expected.visits ||
+  periods.length !== decisions.expected.stays ||
+  decisions.visitGapDays !== CITY_VISIT_GAP_DAYS ||
   totalDays !== decisions.expected.days
 )
   throw new Error("Approved city history totals or corrections did not match.");
@@ -209,10 +237,32 @@ writeFileSync(
     ),
   ]),
 );
+writeFileSync(
+  "data/city-visit-periods.csv",
+  csv([
+    [
+      "CityId",
+      "Cities",
+      "CountryCode",
+      "VisitNumber",
+      "PeriodNumber",
+      "ArrivalDate",
+      "DepartureDate",
+      "DaysSpent",
+    ],
+    ...periods.sort(
+      (a, b) =>
+        String(a[0]).localeCompare(String(b[0])) ||
+        Number(a[3]) - Number(b[3]) ||
+        Number(a[4]) - Number(b[4]),
+    ),
+  ]),
+);
 console.log(
   JSON.stringify({
     cities: cityCount,
-    stays: history.length,
+    visits: history.length,
+    stays: periods.length,
     days: totalDays,
     collection: metadata.length,
   }),

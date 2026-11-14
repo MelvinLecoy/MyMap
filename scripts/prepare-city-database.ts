@@ -1,6 +1,9 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { cityDatabaseSql } from "./city-database.js";
-import { toCityVisitRows } from "../src/lib/city-cloud-data.js";
+import {
+  toCityPeriodRows,
+  toCityVisitRows,
+} from "../src/lib/city-cloud-data.js";
 
 const { cities, sql } = cityDatabaseSql();
 const visits = toCityVisitRows(cities);
@@ -9,7 +12,8 @@ writeFileSync(".cache/city-history-ready.sql", sql);
 console.log(
   JSON.stringify({
     cities: new Set(visits.map((v) => v.city_id)).size,
-    stays: visits.length,
+    visits: visits.length,
+    stays: toCityPeriodRows(cities).length,
     days: visits.reduce((n, v) => n + v.days_spent, 0),
     collection: cities.length,
   }),

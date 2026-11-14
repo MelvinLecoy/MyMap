@@ -17,6 +17,9 @@ import {
   exportCityVisitsCsv,
   readCitySnapshot,
   toCityVisitRows,
+  toCityPeriodRows,
+  toCityStayRows,
+  exportCityPeriodsCsv,
 } from "../src/lib/city-cloud-data.js";
 import {
   cityVisitSummary,
@@ -25,7 +28,18 @@ import {
 } from "../src/lib/city-visits.js";
 
 const cities = cityCollection(),
-  history = toCityVisitRows(cities);
+  history = toCityStayRows(cities),
+  groups = toCityVisitRows(cities),
+  periods = toCityPeriodRows(cities);
+const stays = (city: (typeof cities)[number]) =>
+  (city.visits ?? [])
+    .flatMap((v) => v.periods ?? [v])
+    .map((p, i) => ({
+      number: i + 1,
+      arrival: p.arrival,
+      departure: p.departure,
+      daysSpent: p.daysSpent,
+    }));
 const find = (id: string) => cities.find((c) => c.id === id)!;
 
 test("all approved screenshot entries survive, with only the approved corrections", () => {
@@ -88,12 +102,14 @@ test("all approved screenshot entries survive, with only the approved correction
       })
       .sort((a, b) => a.arrival.localeCompare(b.arrival))
       .map((v, i) => ({ number: i + 1, ...v }));
-    assert.deepEqual(city.visits, expected, card.city);
+    assert.deepEqual(stays(city), expected, card.city);
     assert.equal(city.lastVisited, expected.at(-1)!.departure);
   }
   assert.equal(cards.filter((c) => !c.excluded).length, 57);
   assert.equal(cities.filter((c) => c.visits?.length).length, 69);
   assert.equal(history.length, 124);
+  assert.equal(groups.length, 112);
+  assert.equal(periods.length, 124);
   assert.equal(
     history.reduce((n, v) => n + v.days_spent, 0),
     265.5,
@@ -127,7 +143,12 @@ test("owner-provided additional city stays are exact and preserve the original s
     source.additionalVisits.reduce((n, city) => n + city.visits.length, 0),
     13,
   );
-  assert.deepEqual(source.expected, { cities: 69, stays: 124, days: 265.5 });
+  assert.deepEqual(source.expected, {
+    cities: 69,
+    visits: 112,
+    stays: 124,
+    days: 265.5,
+  });
   for (const item of source.additionalVisits) {
     const city = cities.find(
       (c) => c.name === item.city && c.countryCode === item.country_code,
@@ -141,7 +162,7 @@ test("owner-provided additional city stays are exact and preserve the original s
         departure: v.end,
         daysSpent: v.days,
       }));
-    assert.deepEqual(city.visits, expected, item.city);
+    assert.deepEqual(stays(city), expected, item.city);
     assert.equal(city.lastVisited, expected.at(-1)!.departure, item.city);
   }
   for (const id of ["austin-usa", "san-antonio-usa"]) {
@@ -205,7 +226,8 @@ test("new city stays migrate idempotently without modifying existing map statuse
       );
     const result = await snapshot();
     assert.equal(result.cities.length, 325);
-    assert.equal(result.visits.length, 124);
+    assert.equal(result.visits.length, 112);
+    assert.equal(result.periods.length, 124);
     assert.equal(
       result.visits.reduce((n, v) => n + v.days_spent, 0),
       265.5,
@@ -240,15 +262,24 @@ test("new city stays migrate idempotently without modifying existing map statuse
 test("city CSVs and cloud snapshots round-trip half-days without changing city metadata", () => {
   const metadata = importCities(exportCitiesCsv(cities)).data.cities;
   assert.deepEqual(
-    importCityHistory(exportCityVisitsCsv(cities), metadata),
+    importCityHistory(
+      exportCityVisitsCsv(cities),
+      metadata,
+      exportCityPeriodsCsv(cities),
+    ),
     cities,
   );
   const snapshot = readCitySnapshot({
     cities: cities.map(toCityRow),
-    visits: history,
+    visits: groups,
+    periods,
   });
   assert.deepEqual(
-    attachCityVisits(snapshot.cities.map(fromCityRow), snapshot.visits),
+    attachCityVisits(
+      snapshot.cities.map(fromCityRow),
+      snapshot.visits,
+      snapshot.periods,
+    ),
     cities,
   );
   assert.equal(
@@ -271,8 +302,12 @@ test("city CSVs and cloud snapshots round-trip half-days without changing city m
   );
   assert.throws(
     () =>
-      readCitySnapshot({ cities: snapshot.cities, visits: history.slice(1) }),
-    /numbering|summary/,
+      readCitySnapshot({
+        cities: snapshot.cities,
+        visits: groups.slice(1),
+        periods,
+      }),
+    /numbering|summary|unknown visit/,
   );
   assert.throws(
     () => attachCityVisits(cities, [{ ...history[0], city_id: "unknown" }]),
@@ -303,6 +338,7 @@ test("city CSVs and cloud snapshots round-trip half-days without changing city m
       importCityHistory(
         exportCityVisitsCsv(cities).replace('"2.5"', '"2.25"'),
         metadata,
+        exportCityPeriodsCsv(cities),
       ),
     /half-day/,
   );
@@ -310,10 +346,13 @@ test("city CSVs and cloud snapshots round-trip half-days without changing city m
     () =>
       importCities(
         readFileSync("data/cities.csv", "utf8").replace(
-          "Yes,2026-05-03,5,6.5",
-          "Yes,2026-05-03,5,7",
+          "Yes,2026-05-03,4,6.5",
+          "Yes,2026-05-03,4,7",
         ),
-        { cityVisits: readFileSync("data/city-visit-history.csv", "utf8") },
+        {
+          cityVisits: readFileSync("data/city-visit-history.csv", "utf8"),
+          cityPeriods: readFileSync("data/city-visit-periods.csv", "utf8"),
+        },
       ),
     /totals differ/,
   );
@@ -399,7 +438,8 @@ test("PostgreSQL imports city history atomically, preserves countries and edits,
     await db.exec(sql);
     const imported = await fetch();
     assert.equal(imported.cities.length, 325);
-    assert.equal(imported.visits.length, 124);
+    assert.equal(imported.visits.length, 112);
+    assert.equal(imported.periods.length, 124);
     assert.equal(
       imported.visits.reduce((n, v) => n + v.days_spent, 0),
       265.5,
@@ -424,7 +464,7 @@ test("PostgreSQL imports city history atomically, preserves countries and edits,
       "Idempotent import must preserve revisions, not just values",
     );
     await db.exec("set role anon;");
-    assert.equal((await fetch()).visits.length, 124);
+    assert.equal((await fetch()).visits.length, 112);
     await fails(
       "update city_visits set days_spent=3 where city_id='london-uk'",
       /permission denied/,
@@ -452,24 +492,24 @@ test("PostgreSQL imports city history atomically, preserves countries and edits,
       `select set_config('request.jwt.claim.sub','${owner}',false);`,
     );
     await fails(
-      "update city_visits set days_spent=2.25 where city_id='london-uk' and visit_number=5",
+      "update city_visits set days_spent=2.25 where city_id='london-uk' and visit_number=4",
       /check constraint/,
     );
     await fails(
-      "update city_visits set days_spent=4 where city_id='london-uk' and visit_number=5",
+      "update city_visits set days_spent=4 where city_id='london-uk' and visit_number=4",
       /check constraint/,
     );
     await fails(
-      "update city_visits set arrival_date='2026-02-30' where city_id='london-uk' and visit_number=5",
+      "update city_visits set arrival_date='2026-02-30' where city_id='london-uk' and visit_number=4",
       /out of range/,
     );
     await fails(
-      "update city_visits set visit_number=8 where city_id='london-uk' and visit_number=5",
-      /numbered/,
+      "update city_visits set visit_number=8 where city_id='london-uk' and visit_number=4",
+      /numbered|foreign key/,
     );
     await fails(
       "update city_visits set departure_date='2025-08-05' where city_id='auckland-new-zealand' and visit_number=1",
-      /overlap/,
+      /overlap|periods|six days/,
     );
     await fails(
       "insert into city_visits values('unknown',1,'2026-01-01','2026-01-01',1)",
@@ -492,12 +532,12 @@ test("PostgreSQL imports city history atomically, preserves countries and edits,
       "Map status saves must retain all history",
     );
     await db.exec(
-      "update city_visits set days_spent=3 where city_id='london-uk' and visit_number=5;",
+      "begin;update city_visits set days_spent=3 where city_id='london-uk' and visit_number=4;update city_visit_periods set days_spent=3 where city_id='london-uk' and visit_number=4;commit;",
     );
     const edited = await fetch();
     assert.equal(
       edited.visits.find(
-        (v) => v.city_id === "london-uk" && v.visit_number === 5,
+        (v) => v.city_id === "london-uk" && v.visit_number === 4,
       )!.days_spent,
       3,
     );
@@ -514,7 +554,7 @@ test("PostgreSQL imports city history atomically, preserves countries and edits,
       `set role authenticated;select set_config('request.jwt.claim.sub','${owner}',false);`,
     );
     await db.exec(
-      "delete from city_visits where city_id='london-uk' and visit_number=5;",
+      "delete from city_visits where city_id='london-uk' and visit_number=4;",
     );
     assert.equal(
       (await fetch()).cities.find((c) => c.id === "london-uk")!.last_visited,
@@ -526,7 +566,7 @@ test("PostgreSQL imports city history atomically, preserves countries and edits,
       null,
     );
     await db.exec(
-      "insert into city_visits values('moscow-russia',1,'2026-01-01','2026-01-01',0.5),('moscow-russia',2,'2026-01-02','2026-01-02',1);",
+      "begin;insert into city_visits values('moscow-russia',1,'2026-01-01','2026-01-02',1.5);insert into city_visit_periods values('moscow-russia',1,1,'2026-01-01','2026-01-01',0.5),('moscow-russia',1,2,'2026-01-02','2026-01-02',1);commit;",
     );
     const newHistory = await fetch();
     const moscow = newHistory.cities.find((c) => c.id === "moscow-russia")!;
@@ -535,7 +575,7 @@ test("PostgreSQL imports city history atomically, preserves countries and edits,
     assert.equal(moscow.notes, "Unrelated visit");
     assert.equal(
       newHistory.visits.filter((v) => v.city_id === "moscow-russia").length,
-      2,
+      1,
     );
     assert.deepEqual(await countries(), countryBefore);
   } finally {

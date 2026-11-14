@@ -91,11 +91,12 @@
     }
   ],
   "halfDays": "Keep the screenshot date bounds; a fractional duration does not identify which date was a half-day.",
-  "visitCounting": "Each approved screenshot entry is a city stay; the country 14-day grouping rule is not applied.",
+  "visitCounting": "A new city visit starts when the next arrival is at least six calendar days after the previous departure. Shorter gaps merge visit counts; original stay periods and explicit days are preserved, and gaps add no days.",
   "expected": {
     "cities": 69,
     "stays": 124,
-    "days": 265.5
+    "days": 265.5,
+    "visits": 112
   },
   "additionalVisits": [
     {
@@ -236,5 +237,6 @@
       ]
     }
   ],
-  "additionalVisitsSource": "Owner-supplied city dates and durations, 2026-11-13; no original screenshot records were altered."
+  "additionalVisitsSource": "Owner-supplied city dates and durations, 2026-11-13; no original screenshot records were altered.",
+  "visitGapDays": 6
 }

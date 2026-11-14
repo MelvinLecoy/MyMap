@@ -33,14 +33,32 @@ export default function CityVisitHistory({ visits }: { visits?: CityVisit[] }) {
                   {visit.daysSpent} {visit.daysSpent === 1 ? "day" : "days"}
                 </span>
               </div>
-              <p>
-                {formatCityVisitRange(visit)}
-                {visitDurationAnnotation(
-                  visit.arrival,
-                  visit.departure,
-                  visit.daysSpent,
-                )}
-              </p>
+              {(visit.periods?.length ?? 0) > 1 ? (
+                <ul
+                  className="city-stay-periods"
+                  aria-label={`Stays for visit ${visit.number}`}
+                >
+                  {visit.periods!.map((period) => (
+                    <li key={period.number}>
+                      {formatCityVisitRange(period)}
+                      {visitDurationAnnotation(
+                        period.arrival,
+                        period.departure,
+                        period.daysSpent,
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>
+                  {formatCityVisitRange(visit)}
+                  {visitDurationAnnotation(
+                    visit.arrival,
+                    visit.departure,
+                    visit.daysSpent,
+                  )}
+                </p>
+              )}
             </li>
           ))}
       </ol>

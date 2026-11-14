@@ -1,15 +1,29 @@
 # City visit history
 
-The approved city history contains **69 cities, 124 stays and 265.5 summed city-days**. Each
-screenshot entry remains a separate city stay. Southampton and Reykjavík are
-excluded. Rome, Vatican City, Austin and San Antonio were absent from the original
-collection and are added without invented map links; the collection now has 325 cities.
+The approved city history contains **69 cities, 112 counted visits, 124 actual stays
+and 265.5 summed city-days**. Southampton and Reykjavík are excluded. Rome,
+Vatican City, Austin and San Antonio extend the collection to 325 cities.
 
-`data/city-visit-history.csv` stores CityId, Cities, CountryCode, VisitNumber,
-ArrivalDate, DepartureDate and DaysSpent. VisitNumber runs chronologically from
-1 within each city. `data/cities.csv` retains the city metadata and includes
-Visited, LastVisited, RecordedVisits and RecordedDaysSpent. Builds validate
-those summaries against the history. LastVisited is the latest departure date.
+A new city visit starts when the next arrival is **at least six calendar days after
+the previous departure**. A shorter gap joins the same visit. Measure each gap
+from the immediately preceding stay's departure, using exact dates in UTC. The
+actual stays remain separate and gaps never add days. For example, Singapore's
+18–20 and 25 August 2026 stays are one visit with four days, while the 3 September
+stay starts another visit. This city rule does not change the country threshold
+of 14 days or any country history.
+
+Three tracked CSVs are required to preserve the full city history:
+
+- `data/cities.csv`: metadata, Visited, LastVisited, RecordedVisits and RecordedDaysSpent.
+- `data/city-visit-history.csv`: one counted visit per row, with CityId, Cities,
+  CountryCode, VisitNumber, ArrivalDate, DepartureDate and DaysSpent. Bounds
+  enclose the actual periods; DaysSpent sums only their explicit durations.
+- `data/city-visit-periods.csv`: one actual stay per row, with the same identifiers,
+  VisitNumber, PeriodNumber, ArrivalDate, DepartureDate and explicit DaysSpent.
+
+VisitNumber starts at 1 per city; PeriodNumber starts at 1 per counted visit.
+Builds validate the six-day grouping, numbering, bounds, duration sums and city
+summaries. LastVisited remains the latest actual departure.
 
 DaysSpent is explicit and supports increments of 0.5. It is never rounded or
 recalculated from the inclusive date span. The explicit duration corrections retain
@@ -29,24 +43,32 @@ Denver, Austin, San Antonio, San Diego, Tijuana, Baltimore, Ottawa, Montego Bay,
 Santo Domingo and San Pedro Sula adds 12 newly visited cities and 16 summed
 city-days. The baseline transcription and approval ledger are tracked in
 `data/sources/city-screenshot-transcription.json` and `city-visit-decisions.json`.
-`npm run city:prepare-data` reproduces both city CSVs from those sources,
+`npm run city:prepare-data` reproduces all three city CSVs from those sources,
 including `additionalVisits` in the approved decision ledger. This
 is a source preparation command, not a synchronization from the live database.
 
-`public.city_visits` has a composite primary key (city_id, visit_number), a
-foreign key to cities, exact date bounds, and a numeric duration constrained to
-positive half-days within the date span. Deferred constraints reject overlapping
-or incorrectly numbered histories. History writes synchronize the parent city's
-visit status and latest date without changing map status, notes, links, or pin
-color. Once history exists, conflicting direct summary edits are rejected.
-Deleting the final history entry clears the latest date but retains the known
-visited status. The country grouping rule does not apply to these city entries.
+`public.city_visits` stores counted visits with primary key (city_id,
+visit_number). `public.city_visit_periods` stores their actual stays with primary
+key (city_id, visit_number, period_number) and a cascading foreign key to the visit.
+Both constrain exact dates and positive half-day durations. Deferred constraints
+require each visit to match its periods' bounds and summed days, consecutive
+numbering, non-overlapping stays, gaps under six days inside a visit and gaps of
+six days or more between visits. History writes synchronize only the parent
+city's visit status and latest date. Conflicting direct summary edits are rejected.
+Deleting the final visit clears the latest date but retains known visited status.
+
+`202611140002_city_visit_periods.sql` converts legacy stay rows atomically and
+idempotently. It proves that every original stay, city metadata field, revision
+and the complete country snapshot are preserved. Prior city patches run before
+this conversion when necessary; historical patch commands reject the grouped
+schema and direct operators to `data:sync-approved`.
 
 Public visitors can read history. Only the existing atlas editor can write it.
-`atlas_city_snapshot()` returns cities and stays in one database statement. The
+`atlas_city_snapshot()` returns cities, counted visits and actual periods in one database statement. The
 website refreshes that snapshot and retains history through map status saves,
-imports, outages and reloads. City details show visit totals and individual
-stays; Export offers separate city and city-history CSV downloads. Browser
+imports, outages and reloads. City details show visit totals and each actual stay under its counted visit, without
+a redundant enclosing range. Export offers city, counted-visit and actual-period
+CSV downloads. Browser
 editing of visit dates/durations is not introduced by this import.
 
 `npm run city:prepare` writes `.cache/city-history-ready.sql`.
@@ -59,19 +81,13 @@ does not alter timestamps. Country tables and their complete snapshot are
 compared inside the transaction and must remain identical.
 
 This change does not propagate city dates or durations into country history.
-The subsequent four-city owner corrections have a separate guarded migration,
-`202611130004_city_visit_owner_corrections.sql`, which must be applied to the live
-Supabase database in addition to deploying the updated CSV bundle.
-Use `npm run city:verify-corrections` for a transactionally rolled-back live
-check, then `npm run city:apply-corrections` to commit it using the configured
-Supabase management credential. The later 12-city additions use the separate
-`202611130005_city_visit_additions.sql` migration with
-`npm run city:verify-additions` and `npm run city:apply-additions`.
-The four-city corrections and the additions are both needed for the live database.
-`npm run city:prepare-data` regenerates the
-corrected local CSVs first; it does not edit the live database.
-The owner's subsequent country-specific corrections are applied separately by
-`history:apply-updates`; see [duration updates](duration-updates.md).
+Use `npm run data:verify-sync` to rehearse the complete current synchronization
+and roll it back, then `npm run data:sync-approved` to commit. Both apply any
+needed legacy patches before the grouping migration and require exact agreement
+with all six canonical CSV tables. `npm run data:verify-live` verifies a fresh
+snapshot. These commands preserve country history and reject unexported edits.
+Older correction/addition/duration commands are retained for historical
+migrations only and must not be applied after city grouping.
 
 The Cities panel shows visit totals and map progress for the current search and
 filters. Progress chips share the map-status filter used by the globe. City rows

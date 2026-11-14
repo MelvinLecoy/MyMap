@@ -4,6 +4,7 @@ import { fromCityRow, toCityRow } from "../src/lib/cloud-data.js";
 import {
   readCitySnapshot,
   toCityVisitRows,
+  toCityPeriodRows,
   type CitySnapshot,
 } from "../src/lib/city-cloud-data.js";
 import {
@@ -20,7 +21,11 @@ export interface PersistentData {
 export function csvData(): PersistentData {
   const cities = cityCollection();
   return {
-    cities: { cities: cities.map(toCityRow), visits: toCityVisitRows(cities) },
+    cities: {
+      cities: cities.map(toCityRow),
+      visits: toCityVisitRows(cities),
+      periods: toCityPeriodRows(cities),
+    },
     countries: toCountrySnapshot(countryCollection()),
   };
 }
@@ -33,10 +38,15 @@ export function verifyData(value: PersistentData, expected = csvData()) {
     cities: {
       cities: citySnapshot.cities.map((row) => toCityRow(fromCityRow(row))),
       visits: citySnapshot.visits,
+      periods: citySnapshot.periods,
     },
     countries: toCountrySnapshot(countries),
   };
   const issues: string[] = [];
+  if (!Array.isArray(value.cities.periods))
+    issues.push(
+      "city_visit_periods: missing from database snapshot; apply the city grouping migration.",
+    );
   const compare = (
     name: string,
     rows: object[],
@@ -69,6 +79,12 @@ export function verifyData(value: PersistentData, expected = csvData()) {
     "city_id",
     "visit_number",
   ]);
+  compare(
+    "city_visit_periods",
+    actual.cities.periods,
+    expected.cities.periods,
+    ["city_id", "visit_number", "period_number"],
+  );
   compare(
     "countries",
     actual.countries.countries,
@@ -105,7 +121,8 @@ export function verifyData(value: PersistentData, expected = csvData()) {
       visitedCities: actual.cities.cities.filter(
         (c) => c.visit_status === "visited",
       ).length,
-      cityStays: actual.cities.visits.length,
+      cityVisits: actual.cities.visits.length,
+      cityStays: actual.cities.periods.length,
       cityDays: actual.cities.visits.reduce((n, v) => n + v.days_spent, 0),
       countries: countries.length,
       countryVisits: actual.countries.visits.length,

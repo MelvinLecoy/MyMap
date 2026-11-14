@@ -1,9 +1,9 @@
 # CSV, database and restart consistency
 
 The authoritative approved data is tracked in Git: `data/cities.csv`,
-`city-visit-history.csv`, `countries.csv`, `country-visit-history.csv` and
+`city-visit-history.csv`, `city-visit-periods.csv`, `countries.csv`, `country-visit-history.csv` and
 `country-visit-periods.csv`. The city source ledger reproduces 69 visited cities,
-124 stays and 265.5 city-days. The four recent corrections and 13 additional
+112 counted visits, 124 stays and 265.5 city-days. The four recent corrections and 13 additional
 stays are preserved. Country history remains incomplete and unchanged at 273.5
 recorded country-days.
 
@@ -13,10 +13,12 @@ data and then be replaced by an older successful database response if the
 approved data migrations have not been applied. This was the mismatch corrected
 here: Git contained 124 city stays, while Supabase still contained 111.
 
-`npm run data:verify-sync` exercises both approved city patches and the complete
+`npm run data:verify-sync` exercises any needed legacy city patches, the six-day grouping migration and the complete
 CSV equality checks in a transaction, then rolls everything back.
-`npm run data:sync-approved` commits that same transaction. Existing histories
-receive the guarded four-city correction and 12-city additions. An empty city
+`npm run data:sync-approved` commits that same transaction. Legacy histories
+receive the guarded four-city correction and 12-city additions before their actual
+stays move into `city_visit_periods` under the recalculated `city_visits`. Histories
+already using periods skip those historical patches. An empty city
 history is rebuilt from the current approved CSVs. Country history is compared
 before and after and must remain byte-for-byte equal as JSON. Unrecognized
 edits, extra records or differing business fields cause a rollback; they are
@@ -25,7 +27,9 @@ never silently discarded.
 `npm run data:verify-live` reads fresh city and country snapshots and compares
 all CSV business fields, including locations, map links, statuses, notes,
 visit dates and durations. It checks city-to-country references, recorded
-counts/totals, stay durations, numbering and parent summaries. Database revision
+counts/totals, all six tables, stay durations, numbering, six-day city grouping and
+parent summaries. Country grouping remains 14 days. City visits sum their actual
+period durations, excluding gaps, and preserve explicit half-days. Database revision
 timestamps are independent of the CSV fields. The full operator report is
 written to `.cache/data-integrity-report.json`.
 

@@ -29,7 +29,7 @@ test("city overview, compact visit rows, map progress filters and city details u
   await page.goto("/");
   await expect(page.locator(".city-overview-totals dd")).toHaveText([
     "69",
-    "124",
+    "112",
     "265.5",
   ]);
   await expect(page.locator(".city-map-progress-heading")).toContainText(
@@ -46,17 +46,17 @@ test("city overview, compact visit rows, map progress filters and city details u
   await page.getByLabel("Search cities and countries").fill("Shanghai");
   await expect(page.locator(".city-overview-totals dd")).toHaveText([
     "1",
-    "2",
+    "1",
     "2.5",
   ]);
   const row = page.locator(".city-row");
-  await expect(row.locator(".city-count-badge")).toContainText("2");
+  await expect(row.locator(".city-count-badge")).toContainText("1");
   await expect(row.locator(".city-row-duration")).toHaveText("2.5 days");
   await expect(row.locator(".city-last-visit")).toContainText("Sep 26");
   await expect(row.locator(".status")).toHaveText("Unfinished");
   expect((await row.boundingBox())!.height).toBeLessThanOrEqual(73);
   await row.click();
-  await expect(page.locator(".city-statistics dd")).toHaveText(["2", "2.5"]);
+  await expect(page.locator(".city-statistics dd")).toHaveText(["1", "2.5"]);
   await expect(page.locator(".city-visit-list")).toContainText(
     "30 – 31 August 2026 (1.5 days)",
   );
@@ -65,7 +65,7 @@ test("city overview, compact visit rows, map progress filters and city details u
     await page.goto("/");
     await expect(page.locator(".city-overview-totals dd")).toHaveText([
       "69",
-      "124",
+      "112",
       "265.5",
     ]);
     expect(
@@ -127,13 +127,13 @@ test("country and city duration exceptions are explicit while normal stays remai
     }
   }
   await page.goto("/?city=shanghai-china");
-  await expect(page.locator(".city-statistics dd")).toHaveText(["2", "2.5"]);
+  await expect(page.locator(".city-statistics dd")).toHaveText(["1", "2.5"]);
   await expect(page.locator(".city-visit-list")).toContainText(
     "30 – 31 August 2026 (1.5 days)",
   );
-  await expect(
-    page.locator(".city-visit-list li").first().locator("p"),
-  ).toHaveText("1 September 2026");
+  await expect(page.locator(".city-stay-periods li").last()).toHaveText(
+    "1 September 2026",
+  );
   await page.setViewportSize({ width: 320, height: 900 });
   await page.goto("/?panel=countries&country=NZ");
   await expect(page.locator(".country-visit-list")).toContainText("(3.5 days)");
@@ -1199,4 +1199,64 @@ test("country history shows stays and corrected dates without explanatory copy o
       () => document.documentElement.scrollWidth <= innerWidth,
     ),
   ).toBe(true);
+});
+
+test("grouped city visits show only actual periods, preserve partial days and fit mobile", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    const original = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (
+      this: HTMLCanvasElement,
+      type: string,
+      ...args: unknown[]
+    ) {
+      return type.includes("webgl")
+        ? null
+        : original.apply(this, [type, ...args] as never);
+    } as typeof original;
+  });
+  for (const width of [320, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const [id, count, days, group, periods] of [
+      ["london-uk", "4", "6.5", 1, ["14 December 2023", "16 December 2023"]],
+      [
+        "shanghai-china",
+        "1",
+        "2.5",
+        1,
+        ["30 – 31 August 2026 (1.5 days)", "1 September 2026"],
+      ],
+      ["bern-switzerland", "3", "6", 2, ["5 August 2024", "7 – 8 August 2024"]],
+      ["boston-usa", "2", "4.5", 1, ["15 August 2021", "20 August 2021"]],
+      ["panama-city-panama", "1", "2", 1, ["21 March 2025", "24 March 2025"]],
+      [
+        "singapore-singapore",
+        "4",
+        "7",
+        2,
+        ["18 – 20 August 2026", "25 August 2026"],
+      ],
+    ] as const) {
+      await page.goto(`/?city=${id}`);
+      await expect(page.locator(".city-statistics dd")).toHaveText([
+        count,
+        days,
+      ]);
+      const history = page.locator(".city-visit-list");
+      await expect(history.locator(":scope > li")).toHaveCount(Number(count));
+      const actual = page.getByRole("list", {
+        name: `Stays for visit ${group}`,
+        exact: true,
+      });
+      await expect(actual.locator("li")).toHaveText([...periods]);
+      await expect(actual.locator("..").locator(":scope > p")).toHaveCount(0);
+      await expect(history).not.toContainText("Actual stays");
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      ).toBe(true);
+    }
+  }
 });

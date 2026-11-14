@@ -9,14 +9,24 @@ import { countryDatabaseSql } from "../scripts/country-database";
 import { seedSql } from "../scripts/supabase-data";
 import { toCityRow } from "../src/lib/cloud-data";
 import { cityVisitSummary } from "../src/lib/city-visits";
+import { toCityStayRows } from "../src/lib/city-cloud-data";
 
 test("current CSVs agree across city/country tables and detect changed fields, missing stays and broken relationships", () => {
   const data = csvData(),
     report = verifyData(data);
   assert.equal(report.matches, true);
+  const legacy = structuredClone(data);
+  delete (legacy.cities as Partial<typeof legacy.cities>).periods;
+  legacy.cities.visits = toCityStayRows(cityCollection());
+  assert.ok(
+    verifyData(legacy).issues.some((issue) =>
+      issue.includes("missing from database snapshot"),
+    ),
+  );
   assert.deepEqual(report.counts, {
     cities: 325,
     visitedCities: 69,
+    cityVisits: 112,
     cityStays: 124,
     cityDays: 265.5,
     countries: 198,
@@ -30,6 +40,9 @@ test("current CSVs agree across city/country tables and detect changed fields, m
   const missing = structuredClone(data);
   missing.cities.visits = missing.cities.visits.filter(
     (v) => v.city_id !== "seattle-usa",
+  );
+  missing.cities.periods = missing.cities.periods.filter(
+    (p) => p.city_id !== "seattle-usa",
   );
   assert.ok(
     verifyData(missing).issues.some((x) =>
@@ -82,9 +95,19 @@ test("approved main-branch changes synchronize atomically, survive a new read, r
     await db.exec(
       readFileSync("supabase/migrations/202611130002_city_history.sql", "utf8"),
     );
-    const previous = cityCollection().filter(
-      (c) => !["austin-usa", "san-antonio-usa"].includes(c.id),
-    );
+    const previous = cityCollection()
+      .map((c) => ({
+        ...c,
+        visits: c.visits
+          ?.flatMap((v) => v.periods ?? [v])
+          .map((p, i) => ({
+            number: i + 1,
+            arrival: p.arrival,
+            departure: p.departure,
+            daysSpent: p.daysSpent,
+          })),
+      }))
+      .filter((c) => !["austin-usa", "san-antonio-usa"].includes(c.id));
     const additions = new Set([
       "Seattle",
       "Dallas",
@@ -116,7 +139,7 @@ test("approved main-branch changes synchronize atomically, survive a new read, r
       c.lastVisited = cityVisitSummary(c.visits!).lastVisited;
     }
     await db.exec(seedSql(previous.map(toCityRow)));
-    await db.exec(`begin;${citySeedSql(previous)}commit;`);
+    await db.exec(`begin;${citySeedSql(previous, true)}commit;`);
     const before = await load();
     assert.equal(verifyData(before).counts.cityDays, 248);
     assert.equal(verifyData(before).matches, false);

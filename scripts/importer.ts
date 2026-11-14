@@ -175,6 +175,7 @@ export function importCities(
     coordinates?: string;
     countryVisits?: string;
     cityVisits?: string;
+    cityPeriods?: string;
   } = {},
 ): { data: AtlasData; issues: Issue[] } {
   const issues: Issue[] = [];
@@ -293,7 +294,7 @@ export function importCities(
     };
   });
   const preparedCities = options.cityVisits
-    ? importCityHistory(options.cityVisits, cities)
+    ? importCityHistory(options.cityVisits, cities, options.cityPeriods)
     : cities;
   if (options.cityVisits)
     for (const { values: r } of readCSV(csv)) {
