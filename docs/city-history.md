@@ -1,9 +1,9 @@
 # City visit history
 
-The approved city history contains **57 cities, 111 stays and 249.5 days**. Each
+The approved city history contains **69 cities, 124 stays and 265.5 summed city-days**. Each
 screenshot entry remains a separate city stay. Southampton and Reykjavík are
-excluded. Rome and Vatican City were absent from the original collection and
-are added without invented map links; the collection now has 323 cities.
+excluded. Rome, Vatican City, Austin and San Antonio were absent from the original
+collection and are added without invented map links; the collection now has 325 cities.
 
 `data/city-visit-history.csv` stores CityId, Cities, CountryCode, VisitNumber,
 ArrivalDate, DepartureDate and DaysSpent. VisitNumber runs chronologically from
@@ -24,9 +24,13 @@ The three corrected starts are Prague 5 May 2024 (two days), Panama City
 corrections adjust Los Angeles 30 January–2 February 2022 (3.5 days), Orlando
 1–6 March 2022 (5.5 days), Boston 26–28 June 2022 (2.5 days), and San Francisco
 1–2 November 2025 (2 days). All other screenshot entries are preserved,
-including the midnight-related exceptions approved by the owner. The baseline transcription and approval ledger are tracked in
+including the midnight-related exceptions approved by the owner. A subsequent 13 stays supplied for Seattle, Dallas (two stays),
+Denver, Austin, San Antonio, San Diego, Tijuana, Baltimore, Ottawa, Montego Bay,
+Santo Domingo and San Pedro Sula adds 12 newly visited cities and 16 summed
+city-days. The baseline transcription and approval ledger are tracked in
 `data/sources/city-screenshot-transcription.json` and `city-visit-decisions.json`.
-`npm run city:prepare-data` reproduces both city CSVs from those sources. This
+`npm run city:prepare-data` reproduces both city CSVs from those sources,
+including `additionalVisits` in the approved decision ledger. This
 is a source preparation command, not a synchronization from the live database.
 
 `public.city_visits` has a composite primary key (city_id, visit_number), a
@@ -48,7 +52,7 @@ editing of visit dates/durations is not introduced by this import.
 `npm run city:prepare` writes `.cache/city-history-ready.sql`.
 `npm run city:verify-live` runs the migration and import in a transaction that
 rolls back. `npm run city:apply` commits it. Both require the existing configured
-Supabase project and management credential. Only the 57 approved cities' visit
+Supabase project and management credential. Only approved cities' visit
 fields are updated; all other city fields/rows are checked for preservation.
 An existing conflicting history stops the import. Repeating an identical import
 does not alter timestamps. Country tables and their complete snapshot are
@@ -60,7 +64,11 @@ The subsequent four-city owner corrections have a separate guarded migration,
 Supabase database in addition to deploying the updated CSV bundle.
 Use `npm run city:verify-corrections` for a transactionally rolled-back live
 check, then `npm run city:apply-corrections` to commit it using the configured
-Supabase management credential. `npm run city:prepare-data` regenerates the
+Supabase management credential. The later 12-city additions use the separate
+`202611130005_city_visit_additions.sql` migration with
+`npm run city:verify-additions` and `npm run city:apply-additions`.
+The four-city corrections and the additions are both needed for the live database.
+`npm run city:prepare-data` regenerates the
 corrected local CSVs first; it does not edit the live database.
 The owner's subsequent country-specific corrections are applied separately by
 `history:apply-updates`; see [duration updates](duration-updates.md).
