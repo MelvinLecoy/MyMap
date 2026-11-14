@@ -94,6 +94,20 @@ filters. Progress chips share the map-status filter used by the globe. City rows
 show visit count, latest month/year, days spent and map status without increasing
 the 72px row height. Map status saves retain all visit history.
 
+The compact scoreboard also provides toggle controls. Cities visited limits the
+current results and globe pins to visited cities and combines with search,
+continent and map status. Visits and Days spent sort highest first, using city
+name alphabetically for ties; selecting the same score again restores
+alphabetical order. The visited filter and one score sort can be active together.
+Clear filters resets both controls.
+
+Map-status labels are Complete, Usable, Update and Not Started. Their existing
+stored keys remain Complete, Update, Unfinished and Not Started respectively, so
+existing CSVs, database rows, browser overrides and status saves retain their
+category identities. All displayed status names use the shared label mapping.
+The Complete category uses the same stronger green in badges, progress segments
+and progress filter buttons; other category colors are unchanged.
+
 ## Expanded verified city batch
 
 The owner-verified `expanded_cities_visit_data_verified.xlsx` is retained in

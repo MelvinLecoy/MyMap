@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import CollectionFooter from "./CollectionFooter";
 import { exportCitiesCsv } from "../lib/cloud-data";
+import { MAP_STATUS_LABELS } from "../lib/types";
 import {
   exportCityPeriodsCsv,
   exportCityVisitsCsv,
@@ -489,7 +490,8 @@ export default function EditorControls({
                   <span>
                     <strong>{change.name}</strong>
                     <small>
-                      {change.previous} → {change.status}
+                      {MAP_STATUS_LABELS[change.previous]} →{" "}
+                      {MAP_STATUS_LABELS[change.status]}
                     </small>
                   </span>
                 </label>

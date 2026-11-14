@@ -36,9 +36,7 @@ test("city overview, compact visit rows, map progress filters and city details u
     "253 / 343 complete",
   );
   const filters = page.getByRole("group", { name: "Map progress filters" });
-  await filters
-    .getByRole("button", { name: "Unfinished 7", exact: true })
-    .click();
+  await filters.getByRole("button", { name: "Update 7", exact: true }).click();
   await expect(page.getByLabel("Filter by map status")).toHaveValue(
     "Unfinished",
   );
@@ -53,7 +51,7 @@ test("city overview, compact visit rows, map progress filters and city details u
   await expect(row.locator(".city-count-badge")).toContainText("1");
   await expect(row.locator(".city-row-duration")).toHaveText("2.5 days");
   await expect(row.locator(".city-last-visit")).toContainText("Sep 26");
-  await expect(row.locator(".status")).toHaveText("Unfinished");
+  await expect(row.locator(".status")).toHaveText("Update");
   expect((await row.boundingBox())!.height).toBeLessThanOrEqual(73);
   await row.click();
   await expect(page.locator(".city-statistics dd")).toHaveText(["1", "2.5"]);
@@ -73,6 +71,134 @@ test("city overview, compact visit rows, map progress filters and city details u
         () => document.documentElement.scrollWidth <= innerWidth,
       ),
     ).toBe(true);
+  }
+});
+
+test("scoreboard toggles compose with filters and sort visits and half-days with alphabetical ties", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    const get = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (
+      this: HTMLCanvasElement,
+      type: string,
+      ...args: unknown[]
+    ) {
+      return type.includes("webgl")
+        ? null
+        : get.apply(this, [type, ...args] as never);
+    } as typeof get;
+  });
+  await page.goto("/");
+  const scores = page.locator(".city-overview-totals");
+  const visited = scores.getByRole("button", { name: /^Cities visited / });
+  const visits = scores.getByRole("button", { name: /^Visits / });
+  const days = scores.getByRole("button", { name: /^Days spent / });
+  const names = page.locator(".city-row-name");
+  const filters = page.getByRole("group", { name: "Map progress filters" });
+  await expect(scores.getByRole("button", { pressed: false })).toHaveCount(3);
+  await expect(filters.locator("button > span")).toHaveText([
+    "Complete",
+    "Usable",
+    "Update",
+    "Not Started",
+  ]);
+  await expect(page.locator(".city-map-progress-bar")).toHaveAttribute(
+    "aria-label",
+    "253 Complete, 0 Usable, 7 Update, 83 Not Started",
+  );
+  await expect(
+    page.locator(".city-map-progress-bar .status-complete"),
+  ).toHaveCSS("background-color", "rgb(8, 127, 70)");
+  for (const button of await filters.getByRole("button").all()) {
+    expect(
+      await button.locator("span").evaluate((el) => getComputedStyle(el).color),
+    ).toBe(
+      await button
+        .locator("strong")
+        .evaluate((el) => getComputedStyle(el).color),
+    );
+  }
+  const alphabetical = data.cities
+    .map((city) => city.name)
+    .sort((a, b) => a.localeCompare(b));
+  await expect(names).toHaveText(alphabetical);
+  // Clicking the quiet label area activates the whole scoreboard cell.
+  await scores
+    .locator(":scope > div")
+    .first()
+    .click({
+      position: { x: 16, y: 27 },
+    });
+  await expect(visited).toHaveAttribute("aria-pressed", "true");
+  await expect(names).toHaveCount(174);
+  await expect(page.locator(".city-row .visit-marker-not-yet")).toHaveCount(0);
+  await expect(page.locator(".city-map-progress-heading")).toContainText(
+    "/ 174 complete",
+  );
+  await visits.click();
+  await expect(visits).toHaveAttribute("aria-pressed", "true");
+  await expect(names.nth(0)).toHaveText("New York City");
+  await expect(names.nth(1)).toHaveText("London");
+  await expect(names.nth(2)).toHaveText("Los Angeles");
+  await expect(names.nth(3)).toHaveText("Singapore");
+  await days.click();
+  await expect(days).toHaveAttribute("aria-pressed", "true");
+  await expect(visits).toHaveAttribute("aria-pressed", "false");
+  await expect(names.nth(0)).toHaveText("New York City");
+  await expect(names.nth(1)).toHaveText("Vancouver");
+  await expect(names.nth(2)).toHaveText("Chicago");
+  await expect(names.nth(4)).toHaveText("Los Angeles");
+  await expect(names.nth(5)).toHaveText("Istanbul");
+  await expect(names.nth(6)).toHaveText("Singapore");
+  await expect(names.nth(7)).toHaveText("Sydney");
+  await days.click();
+  await expect(days).toHaveAttribute("aria-pressed", "false");
+  await expect(names).toHaveText(
+    data.cities
+      .filter((city) => city.visit === "visited")
+      .map((city) => city.name)
+      .sort((a, b) => a.localeCompare(b)),
+  );
+  await visits.click();
+  await visits.click();
+  await expect(visits).toHaveAttribute("aria-pressed", "false");
+  await filters.getByRole("button", { name: /^Update / }).click();
+  await expect(page.getByLabel("Filter by map status")).toHaveValue(
+    "Unfinished",
+  );
+  const visitedUpdates = data.cities.filter(
+    (city) => city.visit === "visited" && city.status === "Unfinished",
+  );
+  await expect(names).toHaveCount(visitedUpdates.length);
+  await filters.getByRole("button", { name: /^Update / }).click();
+  await expect(names).toHaveCount(174);
+  await page.getByLabel("Search cities and countries").fill("Shanghai");
+  await expect(scores.locator("dd")).toHaveText(["1", "1", "2.5"]);
+  await page.getByRole("button", { name: "Clear search", exact: true }).click();
+  await visited.focus();
+  await page.keyboard.press("Space");
+  await expect(visited).toHaveAttribute("aria-pressed", "false");
+  await expect(names).toHaveText(alphabetical);
+  await filters.getByRole("button", { name: /^Usable / }).click();
+  await expect(page.getByLabel("Filter by map status")).toHaveValue("Update");
+  await expect(names).toHaveCount(0);
+  await page
+    .getByRole("button", { name: "Clear filters", exact: true })
+    .click();
+  await expect(names).toHaveText(alphabetical);
+  for (const width of [320, 650, 1440]) {
+    await page.setViewportSize({ width, height: 1000 });
+    await expect(scores).toHaveCSS("height", "49px");
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    await visits.click();
+    await expect(names.first()).toHaveText("New York City");
+    await visits.click();
+    await expect(names.first()).toHaveText(alphabetical[0]);
   }
 });
 

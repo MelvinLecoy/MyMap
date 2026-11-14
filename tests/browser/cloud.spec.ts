@@ -439,7 +439,7 @@ test("country details retain editor saves and viewer permissions in their nested
   await expect(
     page.getByRole("heading", { name: "Albania", exact: true }),
   ).toBeVisible();
-  await expect(page.locator(".country-city-list .status")).toHaveText("Update");
+  await expect(page.locator(".country-city-list .status")).toHaveText("Usable");
   await page.getByRole("button", { name: "Viewer", exact: true }).click();
   await expect(
     page.getByRole("button", { name: "Viewer", exact: true }),

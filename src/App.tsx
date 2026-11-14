@@ -16,7 +16,9 @@ import MapViewer from "./components/MapViewer";
 import CityName from "./components/CityName";
 import CountryDetail from "./components/CountryDetail";
 import CityVisitHistory from "./components/CityVisitHistory";
-import CityCollectionSummary from "./components/CityCollectionSummary";
+import CityCollectionSummary, {
+  type CityScoreSort,
+} from "./components/CityCollectionSummary";
 import {
   CityRow,
   CountryVisitMarker,
@@ -50,6 +52,7 @@ import { useRemoteAtlas } from "./lib/use-remote-atlas";
 import { useRemoteCountries } from "./lib/use-remote-countries";
 import { supabase } from "./lib/supabase";
 import { deriveCountries } from "./lib/cloud-data";
+import { cityVisitSummary } from "./lib/city-visits";
 import {
   COLLECTION_STATUS_STORAGE_KEY,
   MAP_STATUS_STORAGE_KEY,
@@ -59,6 +62,7 @@ import {
 } from "./lib/status-storage";
 import {
   MAP_STATUSES,
+  MAP_STATUS_LABELS,
   formatVisitDate,
   type AtlasData,
   type MapStatus,
@@ -100,6 +104,8 @@ export default function App() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("all");
   const [continent, setContinent] = useState("all");
+  const [visitedOnly, setVisitedOnly] = useState(false);
+  const [citySort, setCitySort] = useState<CityScoreSort>("alphabetical");
   const [countrySearch, setCountrySearch] = useState("");
   const [countryVisit, setCountryVisit] = useState("all");
   const [countryContinent, setCountryContinent] = useState("all");
@@ -244,11 +250,24 @@ export default function App() {
       )
       .sort((a, b) => a.name.localeCompare(b.name));
   }, [search, continent, cities, scopedCountry]);
-  const filtered = useMemo(
-    () =>
-      cityScope.filter((city) => status === "all" || city.status === status),
-    [cityScope, status],
+  const cityProgressScope = useMemo(
+    () => cityScope.filter((city) => !visitedOnly || city.visit === "visited"),
+    [cityScope, visitedOnly],
   );
+  const filtered = useMemo(() => {
+    const matches = cityProgressScope.filter(
+      (city) => status === "all" || city.status === status,
+    );
+    if (citySort === "alphabetical") return matches;
+    const scores = new globalThis.Map(
+      matches.map((city) => [city.id, cityVisitSummary(city.visits ?? [])]),
+    );
+    return matches.sort(
+      (a, b) =>
+        scores.get(b.id)![citySort] - scores.get(a.id)![citySort] ||
+        a.name.localeCompare(b.name),
+    );
+  }, [cityProgressScope, status, citySort]);
   const mapCities = useMemo(() => {
     if (countryView && scopedCountry) return countryCities;
     if (!countryView) return filtered;
@@ -322,6 +341,8 @@ export default function App() {
       setSearch("");
       setStatus("all");
       setContinent("all");
+      setVisitedOnly(false);
+      setCitySort("alphabetical");
       if (route.country) clearCountry();
     }
   };
@@ -425,9 +446,17 @@ export default function App() {
                 {!countryView && (
                   <CityCollectionSummary
                     cities={filtered}
-                    scope={cityScope}
+                    scope={cityProgressScope}
                     status={status}
                     onStatus={setStatus}
+                    visitedOnly={visitedOnly}
+                    sort={citySort}
+                    onVisitedOnly={() => setVisitedOnly((value) => !value)}
+                    onSort={(sort) =>
+                      setCitySort((current) =>
+                        current === sort ? "alphabetical" : sort,
+                      )
+                    }
                   />
                 )}
                 <CollectionHeader
@@ -640,7 +669,9 @@ export default function App() {
                           }}
                         >
                           {MAP_STATUSES.map((value) => (
-                            <option key={value}>{value}</option>
+                            <option key={value} value={value}>
+                              {MAP_STATUS_LABELS[value]}
+                            </option>
                           ))}
                         </select>
                         <ChevronDown size={15} aria-hidden="true" />

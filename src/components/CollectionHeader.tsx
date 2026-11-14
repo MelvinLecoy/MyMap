@@ -7,7 +7,7 @@ import {
   ChevronDown,
   X,
 } from "lucide-react";
-import { MAP_STATUSES } from "../lib/types";
+import { MAP_STATUSES, MAP_STATUS_LABELS } from "../lib/types";
 import type { CountrySet } from "../lib/countries";
 
 export type CollectionView = "cities" | "countries";
@@ -203,7 +203,10 @@ export default function CollectionHeader({
                 ]
               : [
                   { value: "all", label: "All map statuses" },
-                  ...MAP_STATUSES.map((value) => ({ value, label: value })),
+                  ...MAP_STATUSES.map((value) => ({
+                    value,
+                    label: MAP_STATUS_LABELS[value],
+                  })),
                 ]
           }
         />

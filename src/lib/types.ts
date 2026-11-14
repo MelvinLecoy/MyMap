@@ -5,6 +5,13 @@ export const MAP_STATUSES = [
   "Not Started",
 ] as const;
 export type MapStatus = (typeof MAP_STATUSES)[number];
+// Keep stored status keys stable while naming their categories consistently in the UI.
+export const MAP_STATUS_LABELS: Record<MapStatus, string> = {
+  Complete: "Complete",
+  Update: "Usable",
+  Unfinished: "Update",
+  "Not Started": "Not Started",
+};
 export type VisitStatus = "visited" | "planned" | "not-visited" | "unknown";
 export interface CityStayPeriod {
   number: number;

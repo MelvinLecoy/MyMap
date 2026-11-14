@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import {
   VISIT_LABELS,
+  MAP_STATUS_LABELS,
   type City,
   type MapStatus,
   type VisitStatus,
@@ -36,7 +37,7 @@ export function Status({ status }: { status: MapStatus }) {
     <span
       className={`status status-${status.toLowerCase().replaceAll(" ", "-")}`}
     >
-      {status}
+      {MAP_STATUS_LABELS[status]}
     </span>
   );
 }
