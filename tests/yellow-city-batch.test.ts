@@ -29,7 +29,7 @@ test("all 81 supplied cities retain exact stays, country identities and new-city
   assert.equal(periods.length, 82);
   assert.equal(
     visits.reduce((n, v) => n + v.days_spent, 0),
-    87,
+    87.5,
   );
   for (const source of batch.cities) {
     const city = added.find((c) => c.id === source.city_id)!;
@@ -39,7 +39,10 @@ test("all 81 supplied cities retain exact stays, country identities and new-city
       periods
         .filter((p) => p.city_id === city.id)
         .map((p) => [p.arrival_date, p.departure_date, p.days_spent]),
-      source.visits.map((v: { start: string; end: string; days: number }) => [
+      (source.city_id === "ho-chi-minh-city-vietnam"
+        ? [{ start: "2025-07-22", end: "2025-07-23", days: 1.5 }]
+        : source.visits
+      ).map((v: { start: string; end: string; days: number }) => [
         v.start,
         v.end,
         v.days,
@@ -77,6 +80,6 @@ test("all 81 supplied cities retain exact stays, country identities and new-city
   assert.equal(toCityPeriodRows(cities).length, 235);
   assert.equal(
     toCityVisitRows(cities).reduce((n, v) => n + v.days_spent, 0),
-    400.5,
+    401,
   );
 });

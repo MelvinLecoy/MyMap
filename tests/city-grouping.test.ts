@@ -125,7 +125,7 @@ test("all affected city counts follow the six-day rule without changing any stay
   assert.deepEqual(values(periods), values(stays));
   assert.equal(
     visits.reduce((n, v) => n + v.days_spent, 0),
-    400.5,
+    401,
   );
   const legacy = readCitySnapshot({
     cities: cities.map(toCityRow),

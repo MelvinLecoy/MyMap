@@ -28,7 +28,7 @@ test("current CSVs agree across city/country tables and detect changed fields, m
     visitedCities: 174,
     cityVisits: 222,
     cityStays: 235,
-    cityDays: 400.5,
+    cityDays: 401,
     countries: 198,
     countryVisits: 127,
     countryPeriods: 140,

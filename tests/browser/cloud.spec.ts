@@ -333,13 +333,13 @@ test("current approved history survives a cold load, reload and unavailable data
   await expect(page.locator(".city-overview-totals dd")).toHaveText([
     "174",
     "222",
-    "400.5",
+    "401",
   ]);
   await page.reload();
   await expect(page.locator(".city-overview-totals dd")).toHaveText([
     "174",
     "222",
-    "400.5",
+    "401",
   ]);
   state.failRead = true;
   await page.reload();
@@ -349,7 +349,7 @@ test("current approved history survives a cold load, reload and unavailable data
   await expect(page.locator(".city-overview-totals dd")).toHaveText([
     "174",
     "222",
-    "400.5",
+    "401",
   ]);
   await page.goto("/?city=san-francisco-usa");
   await expect(page.locator(".city-statistics dd")).toHaveText(["2", "5"]);
@@ -396,7 +396,7 @@ test("saving a city's map status updates progress and filters while retaining it
   await expect(page.locator(".city-overview-totals dd")).toHaveText([
     "174",
     "222",
-    "400.5",
+    "401",
   ]);
   await page
     .getByRole("group", { name: "Map progress filters" })
@@ -737,7 +737,7 @@ test("the editor can export every city with saved statuses and nullable coordina
     bom: true,
   }) as Array<Record<string, string>>;
   expect(periods).toHaveLength(235);
-  expect(periods.reduce((n, p) => n + Number(p.DaysSpent), 0)).toBe(400.5);
+  expect(periods.reduce((n, p) => n + Number(p.DaysSpent), 0)).toBe(401);
   expect(
     periods
       .filter((p) => p.CityId === "shanghai-china")
@@ -753,7 +753,7 @@ test("the editor can export every city with saved statuses and nullable coordina
     ["1", "2", "2026-09-01", "2026-09-01", "1"],
   ]);
   expect(new Set(visits.map((v) => v.CityId)).size).toBe(174);
-  expect(visits.reduce((n, v) => n + Number(v.DaysSpent), 0)).toBe(400.5);
+  expect(visits.reduce((n, v) => n + Number(v.DaysSpent), 0)).toBe(401);
   expect(
     visits.find(
       (v) =>

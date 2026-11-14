@@ -1,7 +1,7 @@
 # City visit history
 
 The approved city history contains **174 cities, 222 counted visits, 235 actual stays
-and 400.5 summed city-days**. The collection contains 343 cities, including the later supplied Southampton
+and 401 summed city-days**. The collection contains 343 cities, including the later supplied Southampton
 and Reykjavik histories.
 
 A new city visit starts when the next arrival is **at least six calendar days after
@@ -173,3 +173,8 @@ The later chat batch adds Huizhou (14–17 July 2023, 4 days), Las Vegas, Nevada
 2 days). These three new records have GeoNames coordinates and are preserved
 in the batch ledger. The new Reykjavik instruction supersedes exclusion of
 the earlier screenshot entry.
+
+The later owner correction records Ho Chi Minh City on 22–23 July 2025 as
+1.5 days. An appended source batch overrides the earlier 22 July stay, and
+the scoped migration updates the counted visit and actual period together.
+Country history and all unrelated city records remain unchanged.

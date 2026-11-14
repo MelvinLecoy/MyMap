@@ -75,6 +75,6 @@ test("the verified expanded workbook survives in the CSVs with inclusive dates, 
   assert.equal(toCityPeriodRows(cities).length, 235);
   assert.equal(
     toCityVisitRows(cities).reduce((n, v) => n + v.days_spent, 0),
-    400.5,
+    401,
   );
 });

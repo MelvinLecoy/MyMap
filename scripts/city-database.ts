@@ -95,7 +95,7 @@ export function cityDatabaseSql() {
   const cities = cityCollection();
   return {
     cities,
-    sql: `begin;\nselect pg_advisory_xact_lock(202611140001);\n${legacyCitySchemaSql()}\n${migrationBody("202611140002_city_visit_periods.sql")}\n${migrationBody("202611140003_seoul_visit_correction.sql")}\n${citySeedSql(cities)}\ncommit;\n`,
+    sql: `begin;\nselect pg_advisory_xact_lock(202611140001);\n${legacyCitySchemaSql()}\n${migrationBody("202611140002_city_visit_periods.sql")}\n${migrationBody("202611140003_seoul_visit_correction.sql")}\n${migrationBody("202611140006_ho_chi_minh_city_duration.sql")}\n${citySeedSql(cities)}\ncommit;\n`,
   };
 }
 

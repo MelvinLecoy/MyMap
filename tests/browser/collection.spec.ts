@@ -36,7 +36,7 @@ test("city overview, compact visit rows, map progress filters and city details u
   await expect(page.locator(".city-overview-totals dd")).toHaveText([
     "174",
     "222",
-    "400.5",
+    "401",
   ]);
   await expect(page.locator(".city-map-progress-heading")).toContainText(
     "253 / 343 complete",
@@ -71,7 +71,7 @@ test("city overview, compact visit rows, map progress filters and city details u
     await expect(page.locator(".city-overview-totals dd")).toHaveText([
       "174",
       "222",
-      "400.5",
+      "401",
     ]);
     expect(
       await page.evaluate(

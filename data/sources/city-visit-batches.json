@@ -2172,13 +2172,40 @@
         "Lad Vegas interpreted as Las Vegas, Nevada.",
         "The newly supplied Reykjavik stay supersedes exclusion of its earlier screenshot entry."
       ]
+    },
+    {
+      "id": "ho-chi-minh-owner-correction-2026-11-14",
+      "source": "Owner chat: Ho Chi Minh City 22–23 July 2025 (1.5d).",
+      "dateInterpretation": "Explicit arrival/departure and credited duration replace the earlier stay with the same arrival; all other city and country data stays unchanged.",
+      "expected": {
+        "cities": 1,
+        "stays": 1,
+        "visits": 1,
+        "days": 1.5
+      },
+      "newCities": [],
+      "cities": [
+        {
+          "city": "Ho Chi Minh City",
+          "sourceCity": "Ho Chi Minh City",
+          "city_id": "ho-chi-minh-city-vietnam",
+          "country_code": "VN",
+          "visits": [
+            {
+              "start": "2025-07-22",
+              "end": "2025-07-23",
+              "days": 1.5
+            }
+          ]
+        }
+      ]
     }
   ],
   "expectedCollection": {
     "cities": 174,
     "visits": 222,
     "stays": 235,
-    "days": 400.5,
+    "days": 401,
     "entries": 343
   }
 }

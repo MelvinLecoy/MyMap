@@ -138,7 +138,7 @@ test("all approved screenshot entries survive, with only the approved correction
   assert.equal(periods.length, 235);
   assert.equal(
     history.reduce((n, v) => n + v.days_spent, 0),
-    400.5,
+    401,
   );
   assert.equal(cities.length, 343);
   assert.equal(cities.filter((c) => c.visit === "visited").length, 174);
@@ -256,7 +256,7 @@ test("new city stays migrate idempotently without modifying existing map statuse
     assert.equal(result.periods.length, 235);
     assert.equal(
       result.visits.reduce((n, v) => n + v.days_spent, 0),
-      400.5,
+      401,
     );
     await db.exec(migration);
     assert.deepEqual(
@@ -473,7 +473,7 @@ test("PostgreSQL imports city history atomically, preserves countries and edits,
     assert.equal(imported.periods.length, 235);
     assert.equal(
       imported.visits.reduce((n, v) => n + v.days_spent, 0),
-      400.5,
+      401,
     );
     assert.deepEqual(await countries(), countryBefore);
     for (const before of originalRows) {
