@@ -17,7 +17,7 @@ bern-switzerland,Bern,CH,4,2024-08-15,2024-08-15,1
 bern-switzerland,Bern,CH,5,2024-08-19,2024-08-19,1
 boston-usa,Boston,US,1,2021-08-15,2021-08-15,1
 boston-usa,Boston,US,2,2021-08-20,2021-08-20,1
-boston-usa,Boston,US,3,2022-06-26,2022-06-28,3
+boston-usa,Boston,US,3,2022-06-26,2022-06-28,2.5
 brisbane-australia,Brisbane,AU,1,2025-07-24,2025-07-27,4
 budapest-hungary,Budapest,HU,1,2024-05-09,2024-05-10,2
 budapest-hungary,Budapest,HU,2,2025-10-09,2025-10-09,1
@@ -56,7 +56,7 @@ london-uk,London,GB,2,2023-12-16,2023-12-16,1
 london-uk,London,GB,3,2023-12-23,2023-12-23,1
 london-uk,London,GB,4,2025-05-07,2025-05-07,1
 london-uk,London,GB,5,2026-05-01,2026-05-03,2.5
-los-angeles-usa,Los Angeles,US,1,2022-01-30,2022-02-01,3
+los-angeles-usa,Los Angeles,US,1,2022-01-30,2022-02-02,3.5
 los-angeles-usa,Los Angeles,US,2,2023-05-03,2023-05-03,1
 los-angeles-usa,Los Angeles,US,3,2025-05-06,2025-05-06,1
 los-angeles-usa,Los Angeles,US,4,2026-04-07,2026-04-08,2
@@ -72,7 +72,7 @@ new-york-city-usa,New York City,US,3,2025-11-26,2025-11-29,4
 new-york-city-usa,New York City,US,4,2025-12-12,2025-12-12,1
 new-york-city-usa,New York City,US,5,2026-04-10,2026-04-12,3
 new-york-city-usa,New York City,US,6,2026-06-08,2026-06-08,1
-orlando-usa,Orlando,US,1,2022-03-01,2022-03-05,5
+orlando-usa,Orlando,US,1,2022-03-01,2022-03-06,5.5
 osaka-japan,Osaka,JP,1,2026-07-28,2026-07-29,2
 panama-city-panama,Panama City,PA,1,2025-03-21,2025-03-21,1
 panama-city-panama,Panama City,PA,2,2025-03-24,2025-03-24,1
@@ -85,7 +85,7 @@ prague-czechia,Prague,CZ,3,2026-07-26,2026-07-26,1
 rome-italy,Rome,IT,1,2024-01-14,2024-01-14,1
 rome-italy,Rome,IT,2,2024-08-16,2024-08-17,2
 san-francisco-usa,San Francisco,US,1,2022-01-27,2022-01-29,3
-san-francisco-usa,San Francisco,US,2,2025-11-01,2025-11-01,1
+san-francisco-usa,San Francisco,US,2,2025-11-01,2025-11-02,2
 seoul-south-korea,Seoul,KR,1,2025-07-17,2025-07-20,3.5
 shanghai-china,Shanghai,CN,1,2026-08-30,2026-08-31,1.5
 shanghai-china,Shanghai,CN,2,2026-09-01,2026-09-01,1
