@@ -128,6 +128,8 @@ Country and city visit histories share a light timeline. Years and visits run ne
 
 Country timelines list the cities whose actual dated stays overlap each segment, deduplicated and ordered by arrival. Captions wrap above compact segments. Matching uses individual stay periods and leaves unknown dates unmatched; place records are excluded. City profile timelines keep their existing presentation.
 
+Visit rows within a history share the height of its tallest entry, including across year groups. CSS subgrids keep the heights equal as captions wrap or the panel changes width. Content stays centered with equal top and bottom padding; separators do not add to a row's height. City rows keep 8px vertical padding and country rows keep 10px. No DOM measurements or resize-driven React updates are required.
+
 The static sources are:
 
 - `data/country-metrics.csv`: exact raw values and full-precision cached indices for all 250 workbook entities (197 countries and 53 territories), keyed by country/territory code. GDP is stored in USD billions. The additional `GdpPerCapitaUsd` and `GdpPerCapitaIndex` columns store the calculated USD-per-person figures and indices.

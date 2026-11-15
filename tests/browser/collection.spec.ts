@@ -2693,6 +2693,65 @@ test("country history shows stays and corrected dates without explanatory copy o
   ).toBe(true);
 });
 
+test("visit history rows have equal heights and balanced padding across year groups", async ({
+  page,
+}) => {
+  await withoutGlobe(page);
+  for (const width of [320, 390, 1440]) {
+    await page.setViewportSize({ width, height: 1100 });
+    for (const query of [
+      "city=dubai-uae",
+      "city=london-uk",
+      "city=shanghai-china",
+      "city=singapore-singapore",
+      "panel=countries&country=CA",
+      "panel=countries&country=CH",
+      "panel=countries&country=SG",
+    ]) {
+      await page.goto(`/?${query}`);
+      await expect(page.locator(".visit-timeline-entry").first()).toBeVisible();
+      await page.evaluate(() => document.fonts.ready);
+      const layout = await page
+        .locator(".visit-timeline-entry")
+        .evaluateAll((rows) =>
+          rows.map((row) => {
+            const bounds = row.getBoundingClientRect();
+            const content = row
+              .querySelector(".visit-months")!
+              .getBoundingClientRect();
+            const style = getComputedStyle(row);
+            return {
+              height: bounds.height,
+              top: style.paddingTop,
+              bottom: style.paddingBottom,
+              balance: Math.abs(
+                content.top - bounds.top - (bounds.bottom - content.bottom),
+              ),
+              overflow: row.scrollHeight > row.clientHeight + 1,
+            };
+          }),
+        );
+      expect(
+        Math.max(...layout.map((row) => row.height)) -
+          Math.min(...layout.map((row) => row.height)),
+        `${width}px ${query} row heights`,
+      ).toBeLessThanOrEqual(0.02);
+      expect(
+        layout.every(
+          (row) =>
+            row.top === row.bottom && row.balance <= 0.02 && !row.overflow,
+        ),
+        `${width}px ${query} centered content`,
+      ).toBe(true);
+      expect(
+        await page
+          .locator(".visit-timeline")
+          .evaluate((element) => element.scrollWidth <= element.clientWidth),
+      ).toBe(true);
+    }
+  }
+});
+
 test("country stay segments name matching cities above the plot and fit narrow panels", async ({
   page,
 }) => {

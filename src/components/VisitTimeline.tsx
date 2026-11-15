@@ -90,93 +90,109 @@ export default memo(function VisitTimeline({
     () => visitTimelineYears(visits, kind === "country" ? cities : undefined),
     [visits, kind, cities],
   );
+  let nextRow = 1;
   return (
     <ol
       className={`visit-timeline ${kind}-visit-list`}
       aria-label="Visits by year, newest first"
+      style={{
+        gridTemplateRows: years
+          .map((group) => `repeat(${group.visits.length}, 1fr)`)
+          .join(" 12px "),
+      }}
     >
-      {years.map((group) => (
-        <li
-          className="visit-timeline-year"
-          key={group.year ?? "unknown"}
-          data-year={group.year ?? "unknown"}
-          style={{ "--visit-year": group.color } as CSSProperties}
-        >
-          <div className="visit-year-marker">
-            <span
-              className="visit-year-circle"
-              aria-label={group.year ?? "Year not recorded"}
-            >
-              {group.year ?? "—"}
-            </span>
-            {group.visits.length > 1 && (
-              <span className="visit-year-count">
-                {group.visits.length} visits
-              </span>
-            )}
-          </div>
-          <ol
-            className="visit-year-card"
-            aria-label={
-              group.year ? `Visits in ${group.year}` : "Undated visits"
+      {years.map((group) => {
+        const firstRow = nextRow;
+        nextRow += group.visits.length + 1;
+        return (
+          <li
+            className="visit-timeline-year"
+            key={group.year ?? "unknown"}
+            data-year={group.year ?? "unknown"}
+            style={
+              {
+                "--visit-year": group.color,
+                "--visit-rows": group.visits.length,
+                gridRow: `${firstRow} / span ${group.visits.length}`,
+              } as CSSProperties
             }
           >
-            {group.visits.map((visit) => (
-              <li
-                className="visit-timeline-entry"
-                key={visit.number}
-                data-visit-number={visit.number}
-                aria-label={`Visit ${visit.number}`}
+            <div className="visit-year-marker">
+              <span
+                className="visit-year-circle"
+                aria-label={group.year ?? "Year not recorded"}
               >
-                <div
-                  className="visit-months"
-                  role="list"
-                  aria-label={`${kind === "country" ? "Actual stays" : "Stays"} for visit ${visit.number}`}
-                >
-                  {visit.months.map((row, index) => (
-                    <div
-                      className="visit-month-row"
-                      key={`${row.key}-${index}`}
-                    >
-                      <div className="visit-month-label" aria-hidden="true">
-                        {row.labels.map((label, i) => (
-                          <span key={label}>
-                            {i > 0 && <small>–</small>}
-                            {label}
-                          </span>
-                        ))}
-                      </div>
-                      <div className="visit-month-periods">
-                        {row.periods.map((stay) => (
-                          <StaySegment key={stay.number} stay={stay} />
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <span
-                  className="visit-total"
-                  aria-label={
-                    visit.days == null
-                      ? "Duration not recorded"
-                      : `${visit.days} ${visit.days === 1 ? "day" : "days"} in visit ${visit.number}`
-                  }
-                  title={
-                    visit.days == null
-                      ? "Duration not recorded"
-                      : `${visit.days} ${visit.days === 1 ? "day" : "days"}`
-                  }
-                >
-                  <span className="visit-total-clock" aria-hidden="true">
-                    🕒
-                  </span>
-                  <strong>{visit.days ?? "—"}</strong>
+                {group.year ?? "—"}
+              </span>
+              {group.visits.length > 1 && (
+                <span className="visit-year-count">
+                  {group.visits.length} visits
                 </span>
-              </li>
-            ))}
-          </ol>
-        </li>
-      ))}
+              )}
+            </div>
+            <ol
+              className="visit-year-card"
+              aria-label={
+                group.year ? `Visits in ${group.year}` : "Undated visits"
+              }
+            >
+              {group.visits.map((visit) => (
+                <li
+                  className="visit-timeline-entry"
+                  key={visit.number}
+                  data-visit-number={visit.number}
+                  aria-label={`Visit ${visit.number}`}
+                >
+                  <div
+                    className="visit-months"
+                    role="list"
+                    aria-label={`${kind === "country" ? "Actual stays" : "Stays"} for visit ${visit.number}`}
+                  >
+                    {visit.months.map((row, index) => (
+                      <div
+                        className="visit-month-row"
+                        key={`${row.key}-${index}`}
+                      >
+                        <div className="visit-month-label" aria-hidden="true">
+                          {row.labels.map((label, i) => (
+                            <span key={label}>
+                              {i > 0 && <small>–</small>}
+                              {label}
+                            </span>
+                          ))}
+                        </div>
+                        <div className="visit-month-periods">
+                          {row.periods.map((stay) => (
+                            <StaySegment key={stay.number} stay={stay} />
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <span
+                    className="visit-total"
+                    aria-label={
+                      visit.days == null
+                        ? "Duration not recorded"
+                        : `${visit.days} ${visit.days === 1 ? "day" : "days"} in visit ${visit.number}`
+                    }
+                    title={
+                      visit.days == null
+                        ? "Duration not recorded"
+                        : `${visit.days} ${visit.days === 1 ? "day" : "days"}`
+                    }
+                  >
+                    <span className="visit-total-clock" aria-hidden="true">
+                      🕒
+                    </span>
+                    <strong>{visit.days ?? "—"}</strong>
+                  </span>
+                </li>
+              ))}
+            </ol>
+          </li>
+        );
+      })}
     </ol>
   );
 });
