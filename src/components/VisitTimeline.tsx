@@ -337,6 +337,30 @@ function StayRow({
             if (monthRow.style.getPropertyValue(name) !== next)
               monthRow.style.setProperty(name, next);
           }
+          const date = element
+            .querySelector(".visit-period-date-point,.visit-period-date-start")
+            ?.getBoundingClientRect();
+          const previousClearance =
+            parseFloat(
+              monthRow.style.getPropertyValue("--visit-date-clearance"),
+            ) || 0;
+          let clearance = 0;
+          if (date) {
+            for (const label of month.children) {
+              const box = label.getBoundingClientRect();
+              if (date.left < box.right && date.right > box.left)
+                clearance = Math.max(
+                  clearance,
+                  box.bottom + 3 - date.top + previousClearance,
+                );
+            }
+          }
+          const nextClearance = `${Math.max(0, clearance)}px`;
+          if (
+            monthRow.style.getPropertyValue("--visit-date-clearance") !==
+            nextClearance
+          )
+            monthRow.style.setProperty("--visit-date-clearance", nextClearance);
           const entry = monthRow.closest<HTMLElement>(".visit-timeline-entry")!;
           const total = entry.querySelector<HTMLElement>(".visit-total")!;
           const points = [
@@ -513,7 +537,13 @@ export default memo(function VisitTimeline({
           width,
           Math.min(
             64,
-            Math.ceil(canvas.measureText(city.textContent ?? "").width) + 1,
+            Math.ceil(
+              Math.max(
+                ...String(city.textContent ?? "")
+                  .split(/\s+/)
+                  .map((word) => canvas.measureText(word).width),
+              ),
+            ) + 1,
           ),
         );
       }
@@ -533,17 +563,6 @@ export default memo(function VisitTimeline({
       aria-label="Visits by year, newest first"
       style={
         {
-          "--visit-country-gutter":
-            kind === "country" &&
-            years.some((year) =>
-              year.visits.some((visit) =>
-                visit.months.some((row) =>
-                  row.periods.some((stay) => stay.monthDates),
-                ),
-              ),
-            )
-              ? "20px"
-              : "0px",
           gridTemplateRows: years
             .map((group) => `repeat(${group.visits.length}, auto)`)
             .join(" 12px "),

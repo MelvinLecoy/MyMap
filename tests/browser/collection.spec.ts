@@ -3211,7 +3211,7 @@ test("country histories share aligned columns and compact multi-month visits bef
   await withoutGlobe(page);
   for (const width of [320, 375, 390, 601, 1440, 1920]) {
     await page.setViewportSize({ width, height: 1100 });
-    for (const code of ["CN", "GB", "AU", "NZ", "DO", "LA"]) {
+    for (const code of ["CN", "GB", "AU", "NZ", "DO", "LA", "GT"]) {
       await page.goto(`/?panel=countries&country=${code}`);
       await page.evaluate(() => document.fonts.ready);
       await expect
@@ -3228,7 +3228,38 @@ test("country histories share aligned columns and compact multi-month visits bef
             const months = [...root.querySelectorAll(".visit-month-label")].map(
               (month) => month.getBoundingClientRect(),
             );
+            const compact = [
+              ...root.querySelectorAll(".visit-month-row"),
+            ].every((row) => {
+              const heading = row
+                .querySelector(".visit-month-heading")!
+                .getBoundingClientRect();
+              const first = row
+                .querySelector(".visit-period-point")!
+                .getBoundingClientRect();
+              const date = row
+                .querySelector(
+                  ".visit-period-date-point,.visit-period-date-start",
+                )!
+                .getBoundingClientRect();
+              const clear = [
+                ...row.querySelectorAll(
+                  ".visit-month-label span,.visit-month-label small",
+                ),
+              ].every((label) => {
+                const box = label.getBoundingClientRect();
+                return (
+                  date.left >= box.right ||
+                  date.right <= box.left ||
+                  date.top >= box.bottom + 2.9
+                );
+              });
+              return (
+                Math.abs(center(first) - heading.right - 10.5) < 0.15 && clear
+              );
+            });
             return (
+              compact &&
               points.every(
                 (point) => Math.abs(center(point) - center(points[0])) < 0.15,
               ) &&
@@ -3250,6 +3281,11 @@ test("country histories share aligned columns and compact multi-month visits bef
         await expect(visit.locator(".visit-period-track")).toHaveCount(1);
       }
       if (["DO", "LA"].includes(code)) {
+        expect(
+          await page
+            .locator(".visit-month-heading")
+            .evaluate((element) => element.getBoundingClientRect().width),
+        ).toBeLessThanOrEqual(44);
         await expect(page.locator(".visit-month-city")).toHaveCSS(
           "line-height",
           "11px",

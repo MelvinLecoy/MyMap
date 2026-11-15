@@ -3130,7 +3130,7 @@ h2 {
   text-align: center;
 }
 .country-visit-list .visit-month-periods {
-  padding-left: var(--visit-country-gutter, 0px);
+  padding-left: 0;
   padding-top: var(--visit-caption-top, 0px);
 }
 .country-visit-list .visit-month-periods:has(.visit-period--month-dates) {
@@ -3138,6 +3138,9 @@ h2 {
 }
 .country-visit-list .visit-period--month-dates {
   padding-inline: 0;
+}
+.country-visit-list .visit-period-dates {
+  margin-top: calc(2px + var(--visit-date-clearance, 0px));
 }
 .country-visit-list
   .visit-timeline-entry[data-timeline-axis="single"]
