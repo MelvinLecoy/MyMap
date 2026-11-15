@@ -3116,6 +3116,7 @@ h2 {
 }
 .country-visit-list .visit-month-row {
   grid-template-columns: var(--visit-city-column, 32px) minmax(0, 1fr);
+  column-gap: 7px;
   align-items: start;
 }
 .country-visit-list .visit-month-heading {

@@ -3255,7 +3255,7 @@ test("country histories share aligned columns and compact multi-month visits bef
                 );
               });
               return (
-                Math.abs(center(first) - heading.right - 10.5) < 0.15 && clear
+                  Math.abs(center(first) - heading.right - 11.5) < 0.15 && clear
               );
             });
             return (
