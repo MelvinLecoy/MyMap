@@ -148,11 +148,11 @@ test("the real collection contains only approved city visits and no sample notes
   assert.ok(data.countries.every((country) => !country.color));
   assert.equal(
     data.cities.filter((city) => city.status === "Complete").length,
-    253,
+    219,
   );
   assert.equal(
     data.cities.filter((city) => city.status === "Unfinished").length,
-    7,
+    28,
   );
   assert.equal(
     data.cities.filter((city) => city.status === "Not Started").length,

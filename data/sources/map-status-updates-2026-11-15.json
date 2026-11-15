@@ -1,0 +1,210 @@
+{
+  "source": "Existing editor-saved database values, mirrored into the CSV fallback without updating city or country database rows.",
+  "nonStatusFieldsSha256": "0d7388f690f3b2d5be22d059f78bf32a4b1b20ac2208fcf4aaba510bc3dc0458",
+  "changes": [
+    {
+      "id": "amman-jordan",
+      "name": "Amman",
+      "previous": "Done",
+      "status": "Unfinished"
+    },
+    {
+      "id": "baku-azerbaijan",
+      "name": "Baku",
+      "previous": "Done",
+      "status": "Update"
+    },
+    {
+      "id": "athens-greece",
+      "name": "Athens",
+      "previous": "Done",
+      "status": "Unfinished"
+    },
+    {
+      "id": "algiers-algeria",
+      "name": "Algiers",
+      "previous": "Done",
+      "status": "Update"
+    },
+    {
+      "id": "brisbane-australia",
+      "name": "Brisbane",
+      "previous": "Done",
+      "status": "Unfinished"
+    },
+    {
+      "id": "antigua-guatemala",
+      "name": "Antigua",
+      "previous": "Done",
+      "status": "Unfinished"
+    },
+    {
+      "id": "barcelona-spain",
+      "name": "Barcelona",
+      "previous": "Done",
+      "status": "Unfinished"
+    },
+    {
+      "id": "andorra-la-vella-andorra",
+      "name": "Andorra la Vella",
+      "previous": "Done",
+      "status": "Unfinished"
+    },
+    {
+      "id": "belize-city-belize",
+      "name": "Belize City",
+      "previous": "Done",
+      "status": "Unfinished"
+    },
+    {
+      "id": "brno-czechia",
+      "name": "Brno",
+      "previous": "Done",
+      "status": "Unfinished"
+    },
+    {
+      "id": "budva-montenegro",
+      "name": "Budva",
+      "previous": "Done",
+      "status": "Unfinished"
+    },
+    {
+      "id": "astana-kazakhstan",
+      "name": "Astana",
+      "previous": "Done",
+      "status": "Update"
+    },
+    {
+      "id": "almaty-kazakhstan",
+      "name": "Almaty",
+      "previous": "Done",
+      "status": "Update"
+    },
+    {
+      "id": "bukhara-uzbekistan",
+      "name": "Bukhara",
+      "previous": "Done",
+      "status": "Update"
+    },
+    {
+      "id": "bishkek-kyrgyzstan",
+      "name": "Bishkek",
+      "previous": "Done",
+      "status": "Update"
+    },
+    {
+      "id": "auckland-new-zealand",
+      "name": "Auckland",
+      "previous": "Done",
+      "status": "Unfinished"
+    },
+    {
+      "id": "busan-south-korea",
+      "name": "Busan",
+      "previous": "Done",
+      "status": "Unfinished"
+    },
+    {
+      "id": "abu-dhabi-uae",
+      "name": "Abu Dhabi",
+      "previous": "Done",
+      "status": "Update"
+    },
+    {
+      "id": "bangkok-thailand",
+      "name": "Bangkok",
+      "previous": "Done",
+      "status": "Unfinished"
+    },
+    {
+      "id": "bratislava-slovakia",
+      "name": "Bratislava",
+      "previous": "Done",
+      "status": "Unfinished"
+    },
+    {
+      "id": "bergen-norway",
+      "name": "Bergen",
+      "previous": "Done",
+      "status": "Unfinished"
+    },
+    {
+      "id": "berlin-germany",
+      "name": "Berlin",
+      "previous": "Done",
+      "status": "Update"
+    },
+    {
+      "id": "bucharest-romania",
+      "name": "Bucharest",
+      "previous": "Done",
+      "status": "Unfinished"
+    },
+    {
+      "id": "belgrade-serbia",
+      "name": "Belgrade",
+      "previous": "Done",
+      "status": "Update"
+    },
+    {
+      "id": "brussels-belgium",
+      "name": "Brussels",
+      "previous": "Done",
+      "status": "Unfinished"
+    },
+    {
+      "id": "boston-usa",
+      "name": "Boston",
+      "previous": "Done",
+      "status": "Unfinished"
+    },
+    {
+      "id": "amsterdam-netherlands",
+      "name": "Amsterdam",
+      "previous": "Done",
+      "status": "Unfinished"
+    },
+    {
+      "id": "bern-switzerland",
+      "name": "Bern",
+      "previous": "Done",
+      "status": "Unfinished"
+    },
+    {
+      "id": "bordeaux-france",
+      "name": "Bordeaux",
+      "previous": "Done",
+      "status": "Unfinished"
+    },
+    {
+      "id": "aktau-kazakhstan",
+      "name": "Aktau",
+      "previous": "Done",
+      "status": "Update"
+    },
+    {
+      "id": "brest-belarus",
+      "name": "Brest",
+      "previous": "Done",
+      "status": "Update"
+    },
+    {
+      "id": "bandar-seri-begawan-brunei",
+      "name": "Bandar Seri Begawan",
+      "previous": "Done",
+      "status": "Update"
+    },
+    {
+      "id": "avignon-france",
+      "name": "Avignon",
+      "previous": "Done",
+      "status": "Unfinished"
+    },
+    {
+      "id": "baltimore-usa",
+      "name": "Baltimore",
+      "previous": "Done",
+      "status": "Update"
+    }
+  ]
+}
