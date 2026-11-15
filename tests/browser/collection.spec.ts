@@ -2693,7 +2693,7 @@ test("country history shows stays and corrected dates without explanatory copy o
   ).toBe(true);
 });
 
-test("visit history rows have equal heights and balanced padding across year groups", async ({
+test("visit history rows keep their default height and only grow for extra content", async ({
   page,
 }) => {
   await withoutGlobe(page);
@@ -2704,9 +2704,11 @@ test("visit history rows have equal heights and balanced padding across year gro
       "city=london-uk",
       "city=shanghai-china",
       "city=singapore-singapore",
+      "city=new-york-city-usa",
       "panel=countries&country=CA",
       "panel=countries&country=CH",
       "panel=countries&country=SG",
+      "panel=countries&country=DK",
     ]) {
       await page.goto(`/?${query}`);
       await expect(page.locator(".visit-timeline-entry").first()).toBeVisible();
@@ -2720,8 +2722,15 @@ test("visit history rows have equal heights and balanced padding across year gro
               .querySelector(".visit-months")!
               .getBoundingClientRect();
             const style = getComputedStyle(row);
+            const total = row
+              .querySelector(".visit-total")!
+              .getBoundingClientRect();
             return {
               height: bounds.height,
+              expectedHeight:
+                Math.max(content.height, total.height) +
+                parseFloat(style.paddingTop) +
+                parseFloat(style.paddingBottom),
               top: style.paddingTop,
               bottom: style.paddingBottom,
               balance: Math.abs(
@@ -2732,10 +2741,15 @@ test("visit history rows have equal heights and balanced padding across year gro
           }),
         );
       expect(
-        Math.max(...layout.map((row) => row.height)) -
-          Math.min(...layout.map((row) => row.height)),
-        `${width}px ${query} row heights`,
-      ).toBeLessThanOrEqual(0.02);
+        layout.every(
+          (row) => Math.abs(row.height - row.expectedHeight) <= 0.02,
+        ),
+        `${width}px ${query} content only determines its own row height`,
+      ).toBe(true);
+      if (query === "city=dubai-uae")
+        expect(layout.map((row) => row.height)).toEqual([46, 46, 46]);
+      if (query === "panel=countries&country=SG")
+        expect(layout.map((row) => row.height)).toEqual([90, 50]);
       expect(
         layout.every(
           (row) =>
@@ -2748,6 +2762,99 @@ test("visit history rows have equal heights and balanced padding across year gro
           .locator(".visit-timeline")
           .evaluate((element) => element.scrollWidth <= element.clientWidth),
       ).toBe(true);
+      const anchors = await page.locator(".visit-timeline").evaluate((root) => {
+        const center = (box: DOMRect) => box.left + box.width / 2;
+        let dates = true,
+          ranges = true,
+          connections = true,
+          borders = true;
+        for (const period of root.querySelectorAll(".visit-period")) {
+          const points = [
+            ...period.querySelectorAll(".visit-period-point"),
+          ].map((point) => point.getBoundingClientRect());
+          const labels = [
+            ...period.querySelectorAll(
+              ".visit-period-date-point, .visit-period-date-start, .visit-period-date-end",
+            ),
+          ].map((label) => label.getBoundingClientRect());
+          dates &&=
+            points.length === labels.length &&
+            points.every(
+              (point, index) =>
+                Math.abs(center(point) - center(labels[index])) <= 0.1,
+            );
+          if (points.length === 2)
+            ranges &&=
+              Math.abs(
+                period
+                  .querySelector(".visit-period-axis")!
+                  .getBoundingClientRect().width - 84,
+              ) <= 0.02;
+        }
+        for (const group of root.querySelectorAll(".visit-timeline-year")) {
+          borders &&=
+            getComputedStyle(group.querySelector(".visit-year-card")!)
+              .outlineColor ===
+            getComputedStyle(group.querySelector(".visit-year-circle")!).color;
+        }
+        for (const row of root.querySelectorAll(".visit-month-periods")) {
+          const origin = row.getBoundingClientRect();
+          const periods = [...row.querySelectorAll(".visit-period")];
+          const lines = [
+            ...row.querySelectorAll<SVGLineElement>(".visit-period-gap"),
+          ];
+          let expected = 0;
+          for (let index = 1; index < periods.length; index++) {
+            const previous = [
+              ...periods[index - 1].querySelectorAll(".visit-period-point"),
+            ]
+              .at(-1)!
+              .getBoundingClientRect();
+            const next = periods[index]
+              .querySelector(".visit-period-point")!
+              .getBoundingClientRect();
+            const sameRow =
+              Math.abs(
+                previous.top + previous.height / 2 - next.top - next.height / 2,
+              ) <= 0.5;
+            const line = lines.find(
+              (item) => item.dataset.to === String(index),
+            );
+            if (!sameRow) {
+              connections &&= !line;
+              continue;
+            }
+            expected++;
+            if (!line) {
+              connections = false;
+              continue;
+            }
+            const [dash, gap] = line
+              .getAttribute("stroke-dasharray")!
+              .split(" ")
+              .map(Number);
+            connections &&=
+              Math.abs(line.x1.baseVal.value + origin.left - previous.right) <=
+                0.1 &&
+              Math.abs(line.x2.baseVal.value + origin.left - next.left) <=
+                0.1 &&
+              Math.abs(4 * dash + 3 * gap - (next.left - previous.right)) <=
+                0.02 &&
+              gap === 1;
+          }
+          connections &&= lines.length === expected;
+        }
+        return { dates, ranges, connections, borders };
+      });
+      expect(
+        anchors,
+        `${width}px ${query} circle-aligned labels and connected dashes`,
+      ).toEqual({
+        dates: true,
+        ranges: true,
+        connections: true,
+        borders: true,
+      });
     }
   }
 });

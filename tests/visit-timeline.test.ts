@@ -89,6 +89,7 @@ test("cross-month groups retain one visit total and gaps contribute no days", ()
   assert.equal(sg.months[1].periods[1].exceptional, true);
   const denmark = visitTimelineYears(country("DK"))[0];
   assert.equal(denmark.year, "2024");
+  assert.deepEqual(denmark.visits[0].months[0].labels, ["JAN", "DEC"]);
   const stay = denmark.visits[0].months[0].periods[0];
   assert.deepEqual(
     [stay.startLabel, stay.endLabel, stay.days, stay.exceptional],

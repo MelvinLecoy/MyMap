@@ -2860,6 +2860,8 @@ h2 {
   line-height: 1.7;
 }
 .visit-timeline {
+  --visit-range-width: 84px;
+  --visit-gap-width: 15px;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   margin: 12px 0 0;
@@ -2879,8 +2881,8 @@ h2 {
 .visit-timeline-year::before {
   content: "";
   position: absolute;
-  top: calc(100% / var(--visit-rows) / 2);
-  bottom: calc(-12px - 100% / var(--visit-rows) / 2);
+  top: 23px;
+  bottom: -35px;
   left: 16px;
   border-left: 1px solid var(--line);
 }
@@ -2892,10 +2894,11 @@ h2 {
   z-index: 1;
   grid-column: 1;
   grid-row: 1;
-  align-self: center;
+  align-self: start;
   display: grid;
   justify-items: center;
   gap: 4px;
+  padding-top: 6px;
 }
 .visit-year-circle {
   display: grid;
@@ -2931,7 +2934,7 @@ h2 {
   margin: 0;
   padding: 0 1px;
   list-style: none;
-  outline: 1px solid var(--line);
+  outline: 1px solid var(--visit-year);
   outline-offset: -1px;
   border-radius: 8px;
   background: var(--surface);
@@ -2985,44 +2988,38 @@ h2 {
   opacity: 0.7;
 }
 .visit-month-periods {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
-  gap: 9px 0;
+  gap: 9px var(--visit-gap-width);
   min-width: 0;
 }
 .visit-period {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: start;
   gap: 4px;
-  flex: 1 1 64px;
-  min-width: 56px;
-  max-width: 96px;
-}
-.visit-period:has(.visit-period-gap) {
-  flex-basis: 75px;
-  max-width: 107px;
-  padding-left: 21px;
+  flex: 0 0 var(--visit-range-width);
+  min-width: var(--visit-range-width);
+  max-width: var(--visit-range-width);
 }
 .visit-period--single {
-  flex: 0 0 24px;
-  min-width: 24px;
+  flex: 0 0 9px;
+  min-width: 9px;
 }
-.visit-period--single:has(.visit-period-gap) {
-  flex-basis: 35px;
+.visit-period--single-exception {
+  flex-basis: 36px;
+  min-width: 36px;
 }
-.visit-period--single-exception,
-.visit-period--single-exception:has(.visit-period-gap) {
-  flex-basis: 58px;
-  min-width: 48px;
-}
-.visit-period--with-cities {
+.visit-period--single.visit-period--with-cities {
   flex-basis: 72px;
   min-width: 72px;
 }
-.visit-period--with-cities:has(.visit-period-gap) {
-  flex-basis: 83px;
-  min-width: 83px;
+.visit-period--month-dates {
+  box-sizing: content-box;
+  padding-inline: 20px;
 }
 .visit-period-cities {
   margin-bottom: 4px;
@@ -3036,17 +3033,18 @@ h2 {
   min-width: 0;
   flex: 1;
 }
-.visit-period-gap {
+.visit-period-connections {
   position: absolute;
-  top: 7px;
-  right: 100%;
-  width: 21px;
-  height: 1px;
-  background: repeating-linear-gradient(
-    to right,
-    var(--visit-year) 0 4px,
-    transparent 4px 8px
-  );
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.visit-period-gap {
+  stroke: var(--visit-year);
+  stroke-width: 1px;
+  stroke-linecap: butt;
   opacity: 0.9;
 }
 .visit-period-axis {
@@ -3086,9 +3084,8 @@ h2 {
   line-height: 0;
 }
 .visit-period-dates {
-  display: flex;
-  justify-content: space-between;
-  gap: 5px;
+  position: relative;
+  height: 13px;
   margin-top: 2px;
   color: var(--text);
   font-size: 9px;
@@ -3097,9 +3094,20 @@ h2 {
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
-.visit-period-dates--point {
-  justify-content: flex-start;
-  gap: 2px;
+.visit-period-date-start,
+.visit-period-date-end,
+.visit-period-date-point {
+  position: absolute;
+  top: 0;
+}
+.visit-period-date-start,
+.visit-period-date-point {
+  left: 4.5px;
+  transform: translateX(-50%);
+}
+.visit-period-date-end {
+  right: 4.5px;
+  transform: translateX(50%);
 }
 .visit-period-fallback {
   color: var(--muted);

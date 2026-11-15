@@ -128,7 +128,7 @@ Country and city visit histories share a light timeline. Years and visits run ne
 
 Country timelines list the cities whose actual dated stays overlap each segment, deduplicated and ordered by arrival. Captions wrap above compact segments. Matching uses individual stay periods and leaves unknown dates unmatched; place records are excluded. City profile timelines keep their existing presentation.
 
-Visit rows within a history share the height of its tallest entry, including across year groups. CSS subgrids keep the heights equal as captions wrap or the panel changes width. Content stays centered with equal top and bottom padding; separators do not add to a row's height. City rows keep 8px vertical padding and country rows keep 10px. No DOM measurements or resize-driven React updates are required.
+Ordinary visit rows keep their compact default height. Rows with multiple months or wrapped content grow independently, without stretching other visits or year groups. Content stays centered with equal top and bottom padding; separators do not add to a row's height. City rows keep 8px vertical padding and country rows keep 10px. Range segments share a compact 84px length in both city and country timelines, including month/year labels. December–January headings display January above December while endpoint dates stay chronological. Dates are centered on their circles. Four dash strokes join the measured circle edges on the same visual line; wrapped stays start a fresh line. A row-local ResizeObserver updates only the SVG connectors when layout changes, with no React state updates or map rerenders. Box outlines use the panel year color.
 
 The static sources are:
 

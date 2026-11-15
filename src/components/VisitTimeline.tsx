@@ -1,9 +1,16 @@
-import { memo, useMemo, type CSSProperties } from "react";
+import {
+  memo,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  type CSSProperties,
+} from "react";
 import {
   visitTimelineYears,
   type HistoryVisit,
   type TimelineStay,
   type HistoryCity,
+  type TimelineMonth,
 } from "../lib/visit-timeline";
 
 function StaySegment({ stay }: { stay: TimelineStay }) {
@@ -15,10 +22,11 @@ function StaySegment({ stay }: { stay: TimelineStay }) {
     );
   const units = stay.days === 1 ? "day" : "days";
   const pointStay = stay.single || stay.days === 1;
+  const monthDates = stay.arrival?.slice(0, 7) !== stay.departure?.slice(0, 7);
   return (
     <div
       role="listitem"
-      className={`visit-period${pointStay ? " visit-period--single" : ""}${stay.days === 1 ? " visit-period--one-day" : ""}${stay.exceptional && pointStay ? " visit-period--single-exception" : ""}${stay.cities.length ? " visit-period--with-cities" : ""}`}
+      className={`visit-period${pointStay ? " visit-period--single" : ""}${stay.days === 1 ? " visit-period--one-day" : ""}${stay.exceptional && pointStay ? " visit-period--single-exception" : ""}${stay.cities.length ? " visit-period--with-cities" : ""}${monthDates ? " visit-period--month-dates" : ""}`}
       data-duration={stay.days ?? undefined}
       data-exception={stay.exceptional || undefined}
     >
@@ -38,13 +46,6 @@ function StaySegment({ stay }: { stay: TimelineStay }) {
             : `, ${stay.days} ${units}${stay.exceptional ? ", recorded duration" : ""}`}
         </span>
         <div className="visit-period-axis" aria-hidden="true">
-          {stay.precedingGap && (
-            <span
-              className="visit-period-gap"
-              title="Separate stays; no connecting days added"
-              aria-hidden="true"
-            />
-          )}
           <span className="visit-period-point" />
           {!pointStay && <span className="visit-period-line" />}
           {(!pointStay || stay.exceptional) && stay.days != null && (
@@ -60,19 +61,103 @@ function StaySegment({ stay }: { stay: TimelineStay }) {
             </>
           )}
         </div>
-        <div
-          className={`visit-period-dates${pointStay && !stay.single ? " visit-period-dates--point" : ""}`}
-          aria-hidden="true"
-        >
-          <time dateTime={stay.arrival!}>{stay.startLabel}</time>
-          {!stay.single && (
+        <div className="visit-period-dates" aria-hidden="true">
+          {pointStay ? (
+            <span className="visit-period-date-point">
+              <time dateTime={stay.arrival!}>{stay.startLabel}</time>
+              {!stay.single && (
+                <>
+                  –<time dateTime={stay.departure!}>{stay.endLabel}</time>
+                </>
+              )}
+            </span>
+          ) : (
             <>
-              {pointStay && <span>–</span>}
-              <time dateTime={stay.departure!}>{stay.endLabel}</time>
+              <time
+                className="visit-period-date-start"
+                dateTime={stay.arrival!}
+              >
+                {stay.startLabel}
+              </time>
+              <time
+                className="visit-period-date-end"
+                dateTime={stay.departure!}
+              >
+                {stay.endLabel}
+              </time>
             </>
           )}
         </div>
       </div>
+    </div>
+  );
+}
+
+function StayRow({ row }: { row: TimelineMonth }) {
+  const container = useRef<HTMLDivElement>(null);
+  const connections = useRef<SVGSVGElement>(null);
+  useLayoutEffect(() => {
+    const element = container.current!;
+    const svg = connections.current!;
+    svg.replaceChildren();
+    if (row.periods.length < 2) return;
+    let active = true;
+    const draw = () => {
+      if (!active) return;
+      const origin = element.getBoundingClientRect();
+      const periods = [
+        ...element.querySelectorAll<HTMLElement>(".visit-period"),
+      ];
+      const lines: SVGLineElement[] = [];
+      for (let index = 1; index < periods.length; index++) {
+        const previous = periods[index - 1].querySelectorAll(
+          ".visit-period-point",
+        );
+        const next = periods[index].querySelector(".visit-period-point");
+        if (!previous.length || !next) continue;
+        const start = previous[previous.length - 1].getBoundingClientRect();
+        const end = next.getBoundingClientRect();
+        const startY = start.top + start.height / 2;
+        const endY = end.top + end.height / 2;
+        const length = end.left - start.right;
+        // A wrapped stay starts a new visual line; never leave floating dashes.
+        if (Math.abs(startY - endY) > 0.5 || length <= 3) continue;
+        const line = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "line",
+        );
+        line.classList.add("visit-period-gap");
+        line.setAttribute("x1", String(start.right - origin.left));
+        line.setAttribute("x2", String(end.left - origin.left));
+        line.setAttribute("y1", String(startY - origin.top));
+        line.setAttribute("y2", String(endY - origin.top));
+        line.setAttribute("stroke-dasharray", `${(length - 3) / 4} 1`);
+        line.dataset.from = String(index - 1);
+        line.dataset.to = String(index);
+        lines.push(line);
+      }
+      svg.replaceChildren(...lines);
+    };
+    const observer = new ResizeObserver(draw);
+    observer.observe(element);
+    draw();
+    void document.fonts.ready.then(draw);
+    return () => {
+      active = false;
+      observer.disconnect();
+    };
+  }, [row.periods]);
+  return (
+    <div className="visit-month-periods" ref={container}>
+      <svg
+        ref={connections}
+        className="visit-period-connections"
+        aria-hidden="true"
+        focusable="false"
+      />
+      {row.periods.map((stay) => (
+        <StaySegment key={stay.number} stay={stay} />
+      ))}
     </div>
   );
 }
@@ -97,7 +182,7 @@ export default memo(function VisitTimeline({
       aria-label="Visits by year, newest first"
       style={{
         gridTemplateRows: years
-          .map((group) => `repeat(${group.visits.length}, 1fr)`)
+          .map((group) => `repeat(${group.visits.length}, auto)`)
           .join(" 12px "),
       }}
     >
@@ -112,7 +197,6 @@ export default memo(function VisitTimeline({
             style={
               {
                 "--visit-year": group.color,
-                "--visit-rows": group.visits.length,
                 gridRow: `${firstRow} / span ${group.visits.length}`,
               } as CSSProperties
             }
@@ -161,11 +245,7 @@ export default memo(function VisitTimeline({
                             </span>
                           ))}
                         </div>
-                        <div className="visit-month-periods">
-                          {row.periods.map((stay) => (
-                            <StaySegment key={stay.number} stay={stay} />
-                          ))}
-                        </div>
+                        <StayRow row={row} />
                       </div>
                     ))}
                   </div>
