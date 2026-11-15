@@ -1,4 +1,4 @@
-"""Copy the owner's cached workbook values to CSV. No index or median calculation."""
+"""Base extraction for npm run country:prepare-reference; GDP-per-capita preparation follows."""
 
 import csv
 import hashlib
@@ -90,11 +90,11 @@ write_csv(ROOT / "data/country-metric-medians.csv", ["Region", "Countries", "Gdp
 
 meta_path = ROOT / "data/sources/country-reference.json"
 metadata = json.loads(meta_path.read_text())
-metadata["metrics"] = "Raw figures and precomputed indices copied from the owner's Raw Data sheet, verified against Index Scores. GDP is already expressed in USD billions. Missing values remain empty; numeric zero remains zero. No formula is evaluated or implemented."
+metadata["metrics"] = "Original raw figures and precomputed indices copied from the owner's Raw Data sheet, verified against Index Scores. GDP is expressed in USD billions. Missing values remain empty; numeric zero remains zero. The GDP-per-capita preparation step follows this base extraction."
 metadata["comparisons"] = "World and continental raw/index medians are copied from Medians 197, not calculated. The workbook uses UN M49 continents (Turkey and Cyprus in Asia). These statistical comparison groups do not change existing travel categories."
 metadata["profileExclusions"] = {"SJ": "Owner requested Svalbard remain untouched. The workbook row combines Svalbard and Jan Mayen, so its figures are retained only in the source CSV, not applied to the Svalbard profile."}
 metadata["workbook"] = {"path": str(WORKBOOK.relative_to(ROOT)), "sha256": hashlib.sha256(WORKBOOK.read_bytes()).hexdigest(), "sheets": ["Raw Data", "Index Scores", "Medians 197"], "countries": 197, "territories": 53}
-metadata["methodReference"] = {"path": "docs/COUNTRY_METRIC_INDEX.md", "sha256": hashlib.sha256((ROOT / "docs/COUNTRY_METRIC_INDEX.md").read_bytes()).hexdigest(), "status": "Archived for future reference only; the application uses the supplied cached values and does not implement this formula."}
+metadata["methodReference"] = {"path": "docs/COUNTRY_METRIC_INDEX.md", "sha256": hashlib.sha256((ROOT / "docs/COUNTRY_METRIC_INDEX.md").read_bytes()).hexdigest(), "status": "The original three metrics use cached workbook values. The following offline GDP-per-capita preparation step applies model V1 as requested by the owner; no formula runs in the application."}
 metadata["missingGdp"] = [row[0] for row in output if row[2] != "Territory" and row[8] == ""]
 metadata["sources"].pop("world-bank-population", None)
 metadata["sources"].pop("world-bank-gdp", None)

@@ -37,6 +37,7 @@ export function importCountryReference(
     population: figures(row, "population", "populationindex"),
     area: figures(row, "totalareakm2", "areaindex"),
     gdp: figures(row, "gdpusdbillions", "gdpindex"),
+    gdpPerCapita: figures(row, "gdppercapitausd", "gdppercapitaindex"),
   });
   const metricRows = new Map<
     string,
@@ -58,6 +59,8 @@ export function importCountryReference(
     "AreaIndex",
     "GdpUsdBillions",
     "GdpIndex",
+    "GdpPerCapitaUsd",
+    "GdpPerCapitaIndex",
   ])) {
     if (
       !/^[A-Z]{2}$/.test(row.countrycode) ||
@@ -94,6 +97,8 @@ export function importCountryReference(
     "PopulationIndex",
     "TotalAreaKm2",
     "AreaIndex",
+    "GdpPerCapitaUsd",
+    "GdpPerCapitaIndex",
   ])) {
     const count = Number(row.countries);
     if (
@@ -169,6 +174,7 @@ export function importCountryReference(
               population: { value: null, index: null },
               area: { value: null, index: null },
               gdp: { value: null, index: null },
+              gdpPerCapita: { value: null, index: null },
             }
           : supplied.metrics,
         facts: list("fact"),

@@ -7,6 +7,9 @@
     "node": ">=22.12.0"
   },
   "scripts": {
+    "country:prepare-reference": "python3 scripts/extract-country-metric-workbook.py && tsx scripts/prepare-country-gdp-per-capita.ts",
+    "country:prepare-gdp-per-capita": "tsx scripts/prepare-country-gdp-per-capita.ts",
+    "country:verify-gdp-per-capita": "tsx scripts/prepare-country-gdp-per-capita.ts --check",
     "places:prepare": "tsx scripts/sync-places.ts",
     "places:prepare-outline": "NODE_USE_ENV_PROXY=1 tsx scripts/prepare-place-outline.ts",
     "places:verify-live": "NODE_USE_ENV_PROXY=1 tsx scripts/sync-places.ts --verify",

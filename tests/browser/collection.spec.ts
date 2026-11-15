@@ -2244,7 +2244,7 @@ test("supplied workbook metrics and median rows render offline without changing 
   await page.goto("/?panel=countries&country=CH");
   await expect(page.locator(".country-reference-value")).toHaveText([
     "9M",
-    "41.3K km²",
+    "41.3K",
     "1,140B",
   ]);
   await expect(
@@ -2258,7 +2258,11 @@ test("supplied workbook metrics and median rows render offline without changing 
   await expect(
     page.locator(".country-reference-medians--index strong"),
   ).toHaveText(["27.9", "21.8", "28.4", "21.6", "23.4", "38.2"]);
-  await expect(page.locator(".country-reference-unit")).toHaveText(["km²"]);
+  await expect(page.locator('[data-metric="area"] dt')).toHaveText(
+    "Total area (km²)",
+  );
+  await expect(page.locator(".country-reference-unit")).toHaveCount(0);
+  await expect(page.getByText("🌍 med.", { exact: true })).toHaveCount(6);
   await expect(
     page.locator(
       ".country-reference-vintage, .country-reference-info, .country-reference-explanation",
@@ -2324,13 +2328,133 @@ test("supplied workbook metrics and median rows render offline without changing 
   await expect(
     page.locator('[data-metric="gdp"] .country-reference-value'),
   ).toHaveText("1,020B");
+  for (const [code, population] of [
+    ["CN", "1.41B"],
+    ["IN", "1.48B"],
+  ]) {
+    await page.goto(`/?panel=countries&country=${code}`);
+    await expect(
+      page.locator('[data-metric="population"] .country-reference-value'),
+    ).toHaveText(population);
+  }
   await page.goto("/?panel=countries&country=SJ");
   await expect(page.locator(".country-reference-value")).toHaveText([
     "N/A",
-    "N/A km²",
+    "N/A",
     "N/A",
   ]);
   await expect(page.getByRole("meter")).toHaveCount(0);
+});
+
+test("GDP toggles to saved per-capita figures in the same third column and remembers the choice", async ({
+  page,
+}) => {
+  await withoutGlobe(page);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.route("https://gbgkxgdreftzhxeprryc.supabase.co/**", (route) =>
+    route.abort(),
+  );
+  await page.goto("/?panel=countries&country=CH");
+  const columns = page.locator(".country-reference-metric");
+  await expect(columns).toHaveCount(3);
+  await page
+    .getByRole("button", { name: "Show GDP per capita", exact: true })
+    .click();
+  const perCapita = page.locator('[data-metric="gdpPerCapita"]');
+  await expect(columns).toHaveCount(3);
+  await expect(page.locator('[data-metric="gdp"]')).toHaveCount(0);
+  await expect(page.locator(".country-reference-value")).toHaveText([
+    "9M",
+    "41.3K",
+    "127K",
+  ]);
+  await expect(
+    perCapita.locator(".country-reference-medians--raw strong"),
+  ).toHaveText(["8.53K", "41.34K"]);
+  await expect(perCapita.locator(".country-index-label strong")).toHaveText(
+    "87.2 / 100",
+  );
+  await expect(
+    perCapita.locator(".country-reference-medians--index strong"),
+  ).toHaveText(["35.6", "65.0"]);
+  await expect(
+    page.getByRole("button", { name: "Show total GDP", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
+  for (const width of [320, 390, 1440]) {
+    await page.setViewportSize({ width, height: 1100 });
+    expect(
+      await columns.evaluateAll((elements) => {
+        const bounds = elements.map((element) =>
+          element.getBoundingClientRect(),
+        );
+        const indexRows = elements.map(
+          (element) =>
+            element
+              .querySelector(".country-index-label")!
+              .getBoundingClientRect().top,
+        );
+        return (
+          bounds.every((rect) => Math.abs(rect.top - bounds[0].top) < 1) &&
+          indexRows.every((top) => Math.abs(top - indexRows[0]) < 1) &&
+          elements.every((element) =>
+            [
+              ...element.querySelectorAll(
+                "dt, .country-reference-value, .country-reference-medians strong",
+              ),
+            ].every(
+              (child) =>
+                child.getBoundingClientRect().right <=
+                element.getBoundingClientRect().right + 1,
+            ),
+          ) &&
+          elements.every((element) =>
+            [...element.querySelectorAll(".country-reference-medians p")].every(
+              (row) => {
+                const label = row
+                  .querySelector("span")!
+                  .getBoundingClientRect();
+                const value = row
+                  .querySelector("strong")!
+                  .getBoundingClientRect();
+                return (
+                  Math.abs(label.top - value.top) < 3 &&
+                  label.right + 1 <= value.left
+                );
+              },
+            ),
+          ) &&
+          document.documentElement.scrollWidth <= innerWidth
+        );
+      }),
+    ).toBe(true);
+  }
+  await page.reload();
+  await expect(perCapita.locator(".country-reference-value")).toHaveText(
+    "127K",
+  );
+  await page.goto("/?panel=countries&country=CN");
+  await expect(perCapita.locator(".country-reference-value")).toHaveText(
+    "15.25K",
+  );
+  await expect(
+    page.locator('[data-metric="population"] .country-reference-value'),
+  ).toHaveText("1.41B");
+  await page.goto("/?panel=countries&country=SJ");
+  await expect(page.locator(".country-reference-value")).toHaveText([
+    "N/A",
+    "N/A",
+    "N/A",
+  ]);
+  await expect(page.getByRole("meter")).toHaveCount(0);
+  await page
+    .getByRole("button", { name: "Show total GDP", exact: true })
+    .click();
+  await page.goto("/?panel=countries&country=CH");
+  await expect(page.locator(".country-reference-value")).toHaveText([
+    "9M",
+    "41.3K",
+    "1,140B",
+  ]);
 });
 
 test("country history shows stays and corrected dates without explanatory copy or notes", async ({

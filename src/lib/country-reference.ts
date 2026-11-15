@@ -1,4 +1,9 @@
-export const COUNTRY_METRICS = ["population", "area", "gdp"] as const;
+export const COUNTRY_METRICS = [
+  "population",
+  "area",
+  "gdp",
+  "gdpPerCapita",
+] as const;
 export type CountryMetric = (typeof COUNTRY_METRICS)[number];
 export interface ReferenceValue {
   value: number | null;
@@ -29,7 +34,7 @@ export interface CountryReferenceData {
   sources: Record<string, ReferenceSource>;
 }
 
-/** Static lookups only. All raw figures, indices and medians come from the workbook. */
+/** Static lookups only. All figures, indices and medians are prepared in CSV. */
 export function createCountryReferenceLookup(data: CountryReferenceData) {
   return {
     ...data,
@@ -77,7 +82,11 @@ function smartRounded(value: number) {
 }
 
 /** GDP is supplied in billions and always stays in B, including trillion-sized economies. */
-export function formatCountryValue(metric: CountryMetric, value: number) {
+export function formatCountryValue(
+  metric: CountryMetric,
+  value: number,
+  fixedDecimals?: number,
+) {
   if (metric === "gdp") return { amount: smartRounded(value), suffix: "B" };
   const scales =
     metric === "area"
@@ -95,7 +104,10 @@ export function formatCountryValue(metric: CountryMetric, value: number) {
   let position = scales.findIndex(([scale]) => value >= scale);
   if (position < 0) position = scales.length - 1;
   return {
-    amount: smartRounded(value / scales[position][0]),
+    amount:
+      fixedDecimals === undefined
+        ? smartRounded(value / scales[position][0])
+        : (value / scales[position][0]).toFixed(fixedDecimals),
     suffix: scales[position][1],
   };
 }
@@ -103,11 +115,14 @@ export function formatCountryValue(metric: CountryMetric, value: number) {
 export const formatMetricIndex = (value: number) => value.toFixed(1);
 
 export function continentMedianLabel(continent: string) {
-  const name =
-    continent === "North America"
-      ? "N. Am."
-      : continent === "South America"
-        ? "S. Am."
-        : continent;
-  return name ? `${name} median` : "Cont. median";
+  const shortNames: Record<string, string> = {
+    Africa: "AF",
+    Asia: "AS",
+    Europe: "EU",
+    "North America": "NA",
+    "South America": "SA",
+    Oceania: "OC",
+    Antarctica: "AN",
+  };
+  return `${shortNames[continent] ?? "Cont."} med.`;
 }

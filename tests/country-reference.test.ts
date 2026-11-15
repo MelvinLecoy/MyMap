@@ -5,9 +5,17 @@ import { createHash } from "node:crypto";
 import { importCountryReference } from "../scripts/country-reference-importer";
 import { importCountryHistory } from "../scripts/country-importer";
 import { readCSV } from "../scripts/importer";
+import {
+  gdpPerCapita,
+  indexedPool,
+  median,
+  metricIndex,
+} from "../scripts/country-metric-index";
+import { derivedPerCapita } from "../scripts/prepare-country-gdp-per-capita";
 import starter from "../data/countries.sample.json";
 import provenance from "../data/sources/country-reference.json";
 import {
+  continentMedianLabel,
   countryMetricContext,
   createCountryReferenceLookup,
   formatCountryValue,
@@ -131,6 +139,27 @@ test("missing data stays missing, zero stays zero, and Svalbard's combined-terri
 });
 
 test("smart formatting follows the requested examples, retains middle hundredths and keeps every GDP in billions", () => {
+  for (const [continent, short] of [
+    ["Africa", "AF"],
+    ["Asia", "AS"],
+    ["Europe", "EU"],
+    ["North America", "NA"],
+    ["South America", "SA"],
+    ["Oceania", "OC"],
+  ])
+    assert.equal(continentMedianLabel(continent), `${short} med.`);
+  assert.deepEqual(formatCountryValue("population", 1412914089, 2), {
+    amount: "1.41",
+    suffix: "B",
+  });
+  assert.deepEqual(formatCountryValue("population", 1476625576, 2), {
+    amount: "1.48",
+    suffix: "B",
+  });
+  assert.deepEqual(formatCountryValue("gdpPerCapita", 126557.01204667334), {
+    amount: "127",
+    suffix: "K",
+  });
   assert.deepEqual(formatCountryValue("population", 9090000), {
     amount: "9.1",
     suffix: "M",
@@ -170,6 +199,94 @@ test("smart formatting follows the requested examples, retains middle hundredths
   assert.equal(formatMetricIndex(0), "0.0");
   assert.equal(formatMetricIndex(100), "100.0");
   assert.equal(formatMetricIndex(59.31460246556111), "59.3");
+});
+
+test("offline model V1 handles ties, missing values, valid zeros and separate comparison pools", () => {
+  assert.equal(metricIndex(100, 100, 1, 4), 100);
+  assert.equal(metricIndex(0, 100, 4, 4), 0);
+  assert.equal(metricIndex(0, 0, 1, 2), null);
+  assert.equal(metricIndex(100, 100, 1, 1), null);
+  assert.equal(gdpPerCapita(2, 1000000), 2000);
+  assert.equal(gdpPerCapita(0, 1000000), 0);
+  assert.equal(gdpPerCapita(null, 1000000), null);
+  assert.equal(gdpPerCapita(2, null), null);
+  assert.equal(gdpPerCapita(2, 0), null);
+  assert.equal(median([null, 2, 6, 10, 20]), 8);
+  const tied = indexedPool([
+    { code: "A", value: 100 },
+    { code: "B", value: 50 },
+    { code: "C", value: 50 },
+    { code: "D", value: 0 },
+    { code: "E", value: null },
+  ]);
+  assert.equal(tied.count, 4);
+  assert.deepEqual(
+    [...tied.scores.values()].map((item) => item.rank),
+    [1, 2, 2, 4],
+  );
+  const prepared = derivedPerCapita(
+    "CountryCode,Category,Continent,GdpUsdBillions,Population\nAA,195,Europe,0.002,1000\nBB,197,Europe,0.002,2000\nCC,195,Asia,0.001,1000\nDD,195,Asia,,1000\nEE,Territory,Europe,1,1000\nFF,Territory,Europe,0.5,1000\n",
+    "Region\nGlobal\nEurope\nAsia\n",
+  );
+  assert.equal(prepared.countryPool.count, 3);
+  assert.equal(prepared.territoryPool.count, 2);
+  assert.equal(prepared.metrics.get("AA")!.index, 100);
+  assert.equal(prepared.metrics.get("EE")!.index, 100);
+  assert.deepEqual(prepared.metrics.get("DD"), { value: null, index: null });
+  assert.equal(prepared.medians.get("Global")!.value, 1000);
+  assert.equal(prepared.medians.get("Europe")!.value, 1500);
+  assert.equal(
+    prepared.medians.get("Europe")!.index,
+    (100 + prepared.metrics.get("BB")!.index!) / 2,
+  );
+  assert.equal(
+    prepared.medians.get("Asia")!.index,
+    prepared.metrics.get("CC")!.index,
+  );
+});
+
+test("GDP per capita is stored at full precision with independent country medians and static profile lookups", () => {
+  const swiss = countryMetricContext(lookup, "CH", "gdpPerCapita");
+  assert.equal(swiss.value, 126557.01204667334);
+  assert.equal(swiss.index, 87.15988504555487);
+  assert.equal(swiss.worldMedian, 8530.008307145341);
+  assert.equal(swiss.continentalMedian, 41338.486629811196);
+  assert.equal(swiss.worldMedianIndex, 35.630267938667494);
+  assert.equal(swiss.continentalMedianIndex, 65.02643289864008);
+  assert.equal(countryMetricContext(lookup, "MC", "gdpPerCapita").index, 100);
+  assert.equal(countryMetricContext(lookup, "ER", "gdpPerCapita").value, null);
+  assert.equal(countryMetricContext(lookup, "VA", "gdpPerCapita").index, null);
+  assert.equal(countryMetricContext(lookup, "SJ", "gdpPerCapita").value, null);
+  const prepared = derivedPerCapita(metrics, medians);
+  assert.equal(prepared.countryPool.count, 195);
+  assert.equal(prepared.territoryPool.count, 39);
+  for (const { values: row } of readCSV(metrics)) {
+    const expected = prepared.metrics.get(row.countrycode)!;
+    assert.equal(
+      row.gdppercapitausd,
+      expected.value === null ? "" : String(expected.value),
+    );
+    assert.equal(
+      row.gdppercapitaindex,
+      expected.index === null ? "" : String(expected.index),
+    );
+  }
+  for (const { values: row } of readCSV(medians)) {
+    const expected = prepared.medians.get(row.region)!;
+    assert.equal(Number(row.gdppercapitausd), expected.value);
+    assert.equal(Number(row.gdppercapitaindex), expected.index);
+  }
+  // The browser must trust the saved hard stats, rather than recalculate them.
+  const changed = createCountryReferenceLookup(
+    load(
+      metrics.replace("126557.01204667334,87.15988504555487", "123456,12.3"),
+    ),
+  );
+  assert.equal(
+    countryMetricContext(changed, "CH", "gdpPerCapita").value,
+    123456,
+  );
+  assert.equal(countryMetricContext(changed, "CH", "gdpPerCapita").index, 12.3);
 });
 
 test("reference imports reject incomplete joins, invalid supplied numbers and incomplete median tables", () => {
