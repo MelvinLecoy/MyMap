@@ -2790,7 +2790,10 @@ test("visit history rows keep their default height and only grow for extra conte
               Math.abs(
                 period
                   .querySelector(".visit-period-axis")!
-                  .getBoundingClientRect().width - 84,
+                  .getBoundingClientRect().width -
+                  (period.classList.contains("visit-period--month-dates")
+                    ? 84
+                    : 76),
               ) <= 0.02;
         }
         for (const group of root.querySelectorAll(".visit-timeline-year")) {

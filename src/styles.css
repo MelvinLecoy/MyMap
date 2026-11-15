@@ -2860,7 +2860,7 @@ h2 {
   line-height: 1.7;
 }
 .visit-timeline {
-  --visit-range-width: 84px;
+  --visit-range-width: 76px;
   --visit-gap-width: 19px;
   --visit-marker-offset: 7px;
   display: grid;
@@ -3022,6 +3022,7 @@ h2 {
   min-width: 72px;
 }
 .visit-period--month-dates {
+  --visit-range-width: 84px;
   box-sizing: content-box;
   padding-inline: 20px;
 }
