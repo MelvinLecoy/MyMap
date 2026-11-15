@@ -1,54 +1,11 @@
 import { ArrowLeft, CalendarDays } from "lucide-react";
-import { type CountryRecord, type CountryTrip } from "../lib/countries";
-import { formatVisitDate, type City } from "../lib/types";
+import { type CountryRecord } from "../lib/countries";
+import { type City } from "../lib/types";
 import { useCountryHeading } from "../lib/use-country-heading";
 import { CityRow, Flag, CountryVisitOrderBadge } from "./CollectionItems";
-import { visitDurationAnnotation } from "../lib/visit-duration";
+import VisitTimeline from "./VisitTimeline";
 import { isPlace } from "../lib/places";
 import CountryReferenceOverview from "./CountryReferenceOverview";
-
-function VisitDates({
-  visit,
-  compact = false,
-}: {
-  visit: CountryTrip;
-  compact?: boolean;
-}) {
-  const duration = visitDurationAnnotation(
-    visit.arrival,
-    visit.departure,
-    visit.daysSpent,
-  );
-  if (visit.arrival && visit.departure && visit.arrival !== visit.departure) {
-    let arrival = formatVisitDate(visit.arrival);
-    if (visit.arrival.length === 10 && visit.departure.length === 10) {
-      if (visit.arrival.slice(0, 7) === visit.departure.slice(0, 7))
-        arrival = String(Number(visit.arrival.slice(8)));
-      else if (
-        compact &&
-        visit.arrival.slice(0, 4) === visit.departure.slice(0, 4)
-      )
-        arrival = arrival.replace(/ \d{4}$/, "");
-    }
-    return (
-      <>
-        {arrival} – {formatVisitDate(visit.departure)}
-        {duration}
-      </>
-    );
-  }
-  if (visit.arrival)
-    return (
-      <>
-        {formatVisitDate(visit.arrival)}
-        {duration}
-        {!visit.departure && " · Departure not recorded"}
-      </>
-    );
-  if (visit.departure)
-    return <>Arrival not recorded · {formatVisitDate(visit.departure)}</>;
-  return <>Dates not recorded</>;
-}
 
 export default function CountryDetail({
   country,
@@ -69,9 +26,7 @@ export default function CountryDetail({
   const visitedCityCount = cities.filter(
     (city) => !isPlace(city) && city.visit === "visited",
   ).length;
-  const visits = [...(country.visits ?? [])].sort(
-    (a, b) => a.number - b.number,
-  );
+  const visits = country.visits ?? [];
   const nameParts = country.name.split(/(\s+)/);
   return (
     <>
@@ -172,44 +127,7 @@ export default function CountryDetail({
             Visit history
           </h2>
           {visits.length ? (
-            <ol className="country-visit-list">
-              {visits.map((visit) => (
-                <li key={visit.number}>
-                  <div className="country-visit-title">
-                    <strong>Visit {visit.number}</strong>
-                    <span>
-                      {visit.daysSpent == null
-                        ? "Duration not recorded"
-                        : `${visit.daysSpent} ${visit.daysSpent === 1 ? "day" : "days"}`}
-                    </span>
-                  </div>
-                  {visit.periods && visit.periods.length > 1 ? (
-                    <ul
-                      className="country-stay-periods"
-                      aria-label={`Actual stays for visit ${visit.number}`}
-                    >
-                      {visit.periods.map((period) => (
-                        <li key={period.number}>
-                          <VisitDates
-                            compact
-                            visit={{
-                              number: period.number,
-                              arrival: period.arrival,
-                              departure: period.departure,
-                              daysSpent: period.daysSpent ?? null,
-                            }}
-                          />
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p>
-                      <VisitDates visit={visit} />
-                    </p>
-                  )}
-                </li>
-              ))}
-            </ol>
+            <VisitTimeline visits={visits} kind="country" />
           ) : (
             <p className="country-history-empty">
               Visit dates and durations haven’t been added yet.

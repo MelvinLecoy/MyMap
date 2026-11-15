@@ -2808,45 +2808,6 @@ h2 {
   font-size: 14px;
   font-weight: 650;
 }
-.city-visit-list {
-  margin: 10px 0 0;
-  padding: 0;
-  list-style: none;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--surface);
-}
-.city-visit-list > li {
-  padding: 12px;
-  font-size: 12px;
-}
-.city-visit-list > li + li {
-  border-top: 1px solid var(--line);
-}
-.city-visit-title {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 6px;
-}
-.city-visit-title span {
-  color: var(--accent);
-}
-.city-visit-list p {
-  margin: 5px 0 0;
-  color: var(--muted);
-  line-height: 1.6;
-}
-.city-stay-periods {
-  margin: 7px 0 0;
-  padding-left: 18px;
-  color: var(--muted);
-  line-height: 1.6;
-}
-.city-stay-periods li + li {
-  margin-top: 4px;
-}
 .editor-export-options {
   display: grid;
   gap: 10px;
@@ -2898,35 +2859,219 @@ h2 {
   font-size: 12px;
   line-height: 1.7;
 }
-.country-visit-list {
-  margin: 10px 0 0;
+.visit-timeline {
+  margin: 12px 0 0;
+  padding: 0 0 4px;
+  list-style: none;
+  font-family: "DM Sans Variable", sans-serif;
+}
+.visit-timeline-year {
+  position: relative;
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  align-items: start;
+  gap: 8px;
+}
+.visit-timeline-year + .visit-timeline-year {
+  margin-top: 12px;
+}
+.visit-timeline-year::before {
+  content: "";
+  position: absolute;
+  top: 23px;
+  bottom: -13px;
+  left: 16px;
+  border-left: 1px solid var(--line);
+}
+.visit-timeline-year:last-child::before {
+  bottom: 0;
+}
+.visit-year-marker {
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  padding-top: 7px;
+}
+.visit-year-circle {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1.5px solid var(--visit-year);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--visit-year);
+  font-size: 10.5px;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+}
+.visit-year-count {
+  padding: 1px 0;
+  background: var(--surface);
+  color: var(--visit-year);
+  font-size: 8px;
+  line-height: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.visit-year-card {
+  min-width: 0;
+  margin: 0;
   padding: 0;
   list-style: none;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--surface);
 }
-.country-visit-list > li {
-  padding: 12px;
-  font-size: 11px;
+.visit-timeline-entry {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 8px;
 }
-.country-visit-list > li + li {
+.visit-timeline-entry + .visit-timeline-entry {
   border-top: 1px solid var(--line);
 }
-.country-visit-title {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
+.visit-months {
+  min-width: 0;
+  display: grid;
+  gap: 10px;
+}
+.visit-month-row {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr);
+  align-items: center;
   gap: 6px;
 }
-.country-visit-title span {
-  color: var(--accent);
+.visit-month-label {
+  display: grid;
+  color: var(--visit-year);
+  font-size: 9px;
+  font-weight: 750;
+  line-height: 12px;
 }
-.country-visit-list p {
-  margin: 5px 0 0;
+.visit-month-label span,
+.visit-month-label small {
+  display: block;
+}
+.visit-month-label small {
+  font-size: 7px;
+  line-height: 7px;
+  opacity: 0.7;
+}
+.visit-month-periods {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: start;
+  gap: 9px 0;
+  min-width: 0;
+}
+.visit-period {
+  display: flex;
+  align-items: start;
+  gap: 4px;
+  flex: 1 1 64px;
+  min-width: 56px;
+}
+.visit-period:has(.visit-period-gap) {
+  flex-basis: 75px;
+}
+.visit-period--single {
+  flex: 0 0 24px;
+  min-width: 24px;
+}
+.visit-period--single:has(.visit-period-gap) {
+  flex-basis: 35px;
+}
+.visit-period--single-exception,
+.visit-period--single-exception:has(.visit-period-gap) {
+  flex-basis: 58px;
+  min-width: 48px;
+}
+.visit-period-plot {
+  min-width: 0;
+  flex: 1;
+}
+.visit-period-gap {
+  flex: 0 0 7px;
+  margin-top: 8px;
+  border-top: 2px dotted var(--visit-year);
+  opacity: 0.65;
+}
+.visit-period-axis {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  min-height: 18px;
+  color: var(--visit-year);
+}
+.visit-period-point {
+  flex: 0 0 9px;
+  width: 9px;
+  height: 9px;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  background: var(--surface);
+}
+.visit-period-line {
+  flex: 1;
+  min-width: 3px;
+  border-top: 1.5px solid currentColor;
+}
+.visit-period-duration {
+  flex: none;
+  font-size: 11px;
+  line-height: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.visit-period-duration sup {
+  font-size: 0.7em;
+  line-height: 0;
+}
+.visit-period-dates {
+  display: flex;
+  justify-content: space-between;
+  gap: 5px;
+  margin-top: 2px;
+  color: var(--text);
+  font-size: 9px;
+  line-height: 13px;
+  font-weight: 550;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.visit-period-fallback {
   color: var(--muted);
-  line-height: 1.6;
+  font-size: 10px;
+  line-height: 15px;
+  overflow-wrap: anywhere;
+}
+.visit-total {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-width: 36px;
+  padding: 3px 4px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  color: var(--visit-year);
+  font-size: 11px;
+  line-height: 16px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.visit-total strong {
+  font-weight: 700;
+}
+.visit-total-clock {
+  font-family:
+    "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+  font-size: 11px;
 }
 .country-cities {
   margin-top: 24px;
@@ -3005,17 +3150,6 @@ h2 {
 .country-history-scope {
   margin: 12px 18px;
 }
-.country-stay-periods {
-  margin: 5px 0 0;
-  padding-left: 18px;
-  color: var(--muted);
-  font-size: inherit;
-  line-height: 1.6;
-}
-.country-stay-periods li + li {
-  margin-top: 4px;
-}
-
 /* Compact, portalled collection filters. */
 .collection-filter {
   display: inline-flex;
