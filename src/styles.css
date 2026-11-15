@@ -567,6 +567,10 @@ h2 {
 }
 :is(.city-row, .country-row) {
   padding-block: 3px;
+  transition:
+    background 0.2s,
+    color 0.2s,
+    transform 0.2s;
 }
 :is(.city-row, .country-row):after {
   content: "";

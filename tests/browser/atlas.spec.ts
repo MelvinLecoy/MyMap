@@ -412,7 +412,7 @@ test("city list and map links survive unavailable WebGL", async ({ page }) => {
   await expect(page.getByRole("button", { name: "View My Map" })).toBeVisible();
 });
 
-test("clusters expand and visible pins select their city", async ({ page }) => {
+test("visible individual pins select their city", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator('[data-testid="map-canvas"]')).toHaveAttribute(
     "data-ready",
@@ -421,13 +421,6 @@ test("clusters expand and visible pins select their city", async ({ page }) => {
   await page.waitForLoadState("networkidle");
   const canvas = page.locator(".maplibregl-canvas");
   const box = (await canvas.boundingBox())!;
-  const initialPosition = await page.locator(".coordinates").textContent();
-  // The Central European demo cluster in the documented initial camera.
-  await page.mouse.click(
-    box.x + box.width / 2 - 13,
-    box.y + box.height / 2 - 54,
-  );
-  await expect(page.locator(".coordinates")).not.toHaveText(initialPosition!);
   await page.locator(".city-row").filter({ hasText: "Kyiv" }).click();
   await expect(page.locator(".coordinates")).toHaveText(/50.5° N.*30.5° E/);
   await page.getByRole("button", { name: "All cities (5)" }).click();

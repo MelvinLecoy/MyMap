@@ -1514,6 +1514,87 @@ test("countries open their own details and keep their tab through city details a
   ).toBeVisible();
 });
 
+test("country and city rows support native new tabs while ordinary clicks preserve panel state", async ({
+  page,
+  context,
+}) => {
+  await context.addInitScript(() => {
+    const original = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (
+      this: HTMLCanvasElement,
+      type: string,
+      ...args: unknown[]
+    ) {
+      return type.includes("webgl")
+        ? null
+        : original.apply(this, [type, ...args] as never);
+    } as typeof original;
+  });
+  await page.goto("/?panel=countries&countrySet=197");
+  const alphabetical = page.getByRole("button", {
+    name: "Sort countries alphabetically",
+    exact: true,
+  });
+  await alphabetical.click();
+  const kosovo = page
+    .locator("a.country-row")
+    .filter({ has: page.getByText("Kosovo", { exact: true }) });
+  await expect(kosovo).toHaveAttribute("href", /country=XK/);
+  await kosovo.click({ button: "right" });
+  await page.keyboard.press("Escape");
+  await expect(page).not.toHaveURL(/country=XK/);
+  const countryPopup = context.waitForEvent("page");
+  await kosovo.click({ modifiers: ["ControlOrMeta"] });
+  const countryTab = await countryPopup;
+  await expect(
+    countryTab.getByRole("heading", { name: "Kosovo", exact: true }),
+  ).toBeVisible();
+  await expect(countryTab).toHaveURL(/countrySet=197/);
+  await expect(countryTab.locator(".country-visit-rank")).toHaveText("#74*");
+  await expect(page).not.toHaveURL(/country=XK/);
+  await countryTab.close();
+  await kosovo.click();
+  await expect(
+    page.getByRole("heading", { name: "Kosovo", exact: true }),
+  ).toBeVisible();
+  const city = page.locator("a.city-row").first();
+  const cityName = await city.locator(".city-row-name").innerText();
+  await expect(city).toHaveAttribute("href", /country=XK/);
+  const cityPopup = context.waitForEvent("page");
+  await city.click({ button: "middle" });
+  const cityTab = await cityPopup;
+  await expect(
+    cityTab.getByRole("heading", { name: cityName, exact: true }),
+  ).toBeVisible();
+  await expect(cityTab).toHaveURL(/country=XK/);
+  await expect(cityTab).toHaveURL(/countrySet=197/);
+  await expect(
+    cityTab.getByRole("tab", { name: "Countries", exact: true }),
+  ).toHaveAttribute("aria-selected", "true");
+  await expect(page).not.toHaveURL(/city=/);
+  await cityTab.close();
+  await page
+    .getByRole("button", { name: "All countries (198)", exact: true })
+    .click();
+  await expect(alphabetical).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator(".country-row .city-row-name").first()).toHaveText(
+    "Afghanistan",
+  );
+  await page.getByRole("tab", { name: "Cities", exact: true }).click();
+  const globalCity = page.locator("a.city-row").first();
+  const globalName = await globalCity.locator(".city-row-name").innerText();
+  const globalPopup = context.waitForEvent("page");
+  await globalCity.click({ modifiers: ["ControlOrMeta"] });
+  const globalTab = await globalPopup;
+  await expect(
+    globalTab.getByRole("heading", { name: globalName, exact: true }),
+  ).toBeVisible();
+  expect(new URL(globalTab.url()).searchParams.has("country")).toBe(false);
+  await expect(globalTab).toHaveURL(/countrySet=197/);
+  await expect(page).not.toHaveURL(/city=/);
+  await globalTab.close();
+});
+
 test("whole-country hover stays stable over lifted land, opens its panel and clears during globe dragging", async ({
   page,
 }) => {

@@ -31,6 +31,10 @@ import {
   VisitMarker,
 } from "./components/CollectionItems";
 import CollectionFooter from "./components/CollectionFooter";
+import {
+  countryProfileHref,
+  followProfileLink,
+} from "./lib/profile-navigation";
 import CollectionHeader, {
   CollectionTabs,
   type CollectionView,
@@ -668,11 +672,15 @@ export default function App() {
                   )}
                   {countryView
                     ? filteredCountries.map((country) => (
-                        <button
+                        <a
                           key={country.code}
-                          type="button"
+                          href={countryProfileHref(country.code)}
                           className="country-row"
-                          onClick={() => openCountry(country.code)}
+                          onClick={(event) =>
+                            followProfileLink(event, () =>
+                              openCountry(country.code),
+                            )
+                          }
                         >
                           <CountryVisitMarker country={country} />
                           <span className="city-row-body">
@@ -696,7 +704,7 @@ export default function App() {
                               aria-hidden="true"
                             />
                           </span>
-                        </button>
+                        </a>
                       ))
                     : filtered.map((city) => (
                         <CityRow

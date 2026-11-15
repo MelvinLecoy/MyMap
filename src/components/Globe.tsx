@@ -340,44 +340,7 @@ export default function Globe({
       map.addSource("atlas-cities", {
         type: "geojson",
         data: cityFeatures(current.current.cities),
-        cluster: true,
-        clusterRadius: MAP_CONFIG.clusterRadius,
-        clusterMaxZoom: MAP_CONFIG.clusterMaxZoom,
-      });
-      map.addLayer({
-        id: "city-cluster-ring",
-        type: "circle",
-        source: "atlas-cities",
-        filter: ["has", "point_count"],
-        paint: {
-          "circle-radius": 16,
-          "circle-color": MAP_COLORS.clusterHalo,
-          "circle-opacity": 0.12,
-        },
-      });
-      map.addLayer({
-        id: "city-clusters",
-        type: "circle",
-        source: "atlas-cities",
-        filter: ["has", "point_count"],
-        paint: {
-          "circle-radius": 10.5,
-          "circle-color": MAP_COLORS.clusterFill,
-          "circle-stroke-width": 2,
-          "circle-stroke-color": MAP_COLORS.clusterStroke,
-        },
-      });
-      map.addLayer({
-        id: "city-cluster-counts",
-        type: "symbol",
-        source: "atlas-cities",
-        filter: ["has", "point_count"],
-        layout: {
-          "text-field": ["get", "point_count_abbreviated"],
-          "text-font": ["Open Sans Semibold"],
-          "text-size": 11,
-        },
-        paint: { "text-color": MAP_COLORS.clusterText },
+        cluster: false,
       });
       map.addLayer({
         id: "city-selection-halo",
@@ -394,7 +357,6 @@ export default function Globe({
         id: "city-pins",
         type: "circle",
         source: "atlas-cities",
-        filter: ["!", ["has", "point_count"]],
         paint: {
           "circle-radius": [
             "interpolate",
@@ -422,7 +384,6 @@ export default function Globe({
         type: "symbol",
         source: "atlas-cities",
         minzoom: MAP_CONFIG.labelMinZoom,
-        filter: ["!", ["has", "point_count"]],
         layout: {
           "text-field": ["get", "name"],
           "text-font": [LABEL_FONTS.city],
@@ -474,11 +435,11 @@ export default function Globe({
       if (!map.getSource("atlas-cities") || !map.getLayer("city-pins"))
         return undefined;
       const rendered = map.queryRenderedFeatures([point.x, point.y], {
-        layers: ["city-clusters", "city-pins"],
+        layers: ["city-pins"],
       });
       if (rendered[0]) return rendered[0];
       // MapLibre 5's globe hit testing can miss rendered circles at orbit scale.
-      // Project the existing clustered source features for a screen-space fallback.
+      // Project the existing city features for a screen-space fallback.
       const center = map.getCenter();
       const radians = Math.PI / 180;
       const sinCenter = Math.sin(center.lat * radians);
@@ -501,10 +462,7 @@ export default function Globe({
           projected.x - point.x,
           projected.y - point.y,
         );
-        if (
-          distance <= (feature.properties.cluster ? 21 : 14) &&
-          distance < closestDistance
-        ) {
+        if (distance <= 14 && distance < closestDistance) {
           closest = feature;
           closestDistance = distance;
         }
@@ -520,7 +478,7 @@ export default function Globe({
         );
       return (feature?.properties.code as string | undefined) ?? null;
     };
-    map.on("click", async (e) => {
+    map.on("click", (e) => {
       cancelHoverPick();
       const f = pickCityFeature(e.point);
       if (!f || f.geometry.type !== "Point") {
@@ -533,22 +491,7 @@ export default function Globe({
         return;
       }
       hoverCountry(null);
-      if (!f.properties.cluster) {
-        if (f.properties.id) current.current.onSelect(f.properties.id);
-        return;
-      }
-      try {
-        const zoom = await (
-          map.getSource("atlas-cities") as GeoJSONSource
-        ).getClusterExpansionZoom(f.properties.cluster_id);
-        map.easeTo({
-          center: f.geometry.coordinates as [number, number],
-          zoom: Math.min(zoom + 0.3, MAP_CONFIG.maxZoom),
-          duration: motionDuration(700),
-        });
-      } catch {
-        /* A simultaneous filter change can replace a cluster. */
-      }
+      if (f.properties.id) current.current.onSelect(f.properties.id);
     });
     const handleHover = (e: MapMouseEvent) => {
       if (map.isMoving() || !current.current.hoverAvailable) {

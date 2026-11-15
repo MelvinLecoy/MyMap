@@ -21,6 +21,7 @@ import {
 import { VISIT_YEAR_COLORS } from "../lib/palette";
 import { cityVisitSummary } from "../lib/city-visits";
 import { formatShortVisitDate } from "../lib/types";
+import { cityProfileHref, followProfileLink } from "../lib/profile-navigation";
 
 export function Flag({ code }: { code: string | null }) {
   return (
@@ -181,8 +182,7 @@ export function CountryCityCount({ count }: { count: number }) {
       <svg viewBox="0 0 48 44" aria-hidden="true">
         <path d="M22.3 3Q24 0 25.7 3L45 38Q46.5 41 43 41H5Q1.5 41 3 38Z" />
       </svg>
-      <strong>{count}</strong>{" "}
-      <span>{count === 1 ? "city" : "cities"}</span>
+      <strong>{count}</strong> <span>{count === 1 ? "city" : "cities"}</span>
     </span>
   );
 }
@@ -232,10 +232,10 @@ export function CityRow({
   onSelect: (id: string) => void;
 }) {
   return (
-    <button
-      type="button"
+    <a
+      href={cityProfileHref(city)}
       className="city-row"
-      onClick={() => onSelect(city.id)}
+      onClick={(event) => followProfileLink(event, () => onSelect(city.id))}
     >
       <CityVisitMarker city={city} />
       <span className="city-row-body">
@@ -252,6 +252,6 @@ export function CityRow({
         <Status status={city.status} />
       </span>
       <ChevronRight className="row-chevron" size={14} aria-hidden="true" />
-    </button>
+    </a>
   );
 }
