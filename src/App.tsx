@@ -647,7 +647,6 @@ export default function App() {
                 key={scopedCountry.code}
                 country={scopedCountry}
                 cities={countryCities}
-                countryCount={countriesInView.length}
                 visitOrder={countryOrders.get(scopedCountry.code) ?? null}
                 onBack={clearCountry}
                 onSelectCity={(id) => navigate(id)}

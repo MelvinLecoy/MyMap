@@ -3,6 +3,8 @@ import { importCities } from "./importer.js";
 import { importCountryHistory } from "./country-importer.js";
 import countryStarter from "../data/countries.sample.json";
 import { importPlaces } from "./place-importer";
+import { importCountryReference } from "./country-reference-importer";
+import countryReferenceSources from "../data/sources/country-reference.json";
 const demo =
   process.argv.includes("--demo") ||
   (process.argv.includes("--demo-fallback") && !existsSync("data/cities.csv"));
@@ -56,6 +58,17 @@ try {
   writeFileSync(
     "src/generated/countries.json",
     JSON.stringify({ sample: demo, countries: countryHistory }, null, 2) + "\n",
+  );
+  writeFileSync(
+    "src/generated/country-reference.json",
+    JSON.stringify(
+      importCountryReference(
+        readFileSync("data/country-metrics.csv", "utf8"),
+        readFileSync("data/country-highlights.csv", "utf8"),
+        countryHistory,
+        countryReferenceSources.sources,
+      ),
+    ) + "\n",
   );
   writeFileSync(
     "src/generated/atlas.json",

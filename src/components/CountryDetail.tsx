@@ -1,21 +1,11 @@
-import { useId } from "react";
-import {
-  ArrowLeft,
-  CalendarDays,
-  CircleCheck,
-  CircleDashed,
-  Crown,
-} from "lucide-react";
-import {
-  countryVisitOrderLabel,
-  type CountryRecord,
-  type CountryTrip,
-} from "../lib/countries";
-import { formatVisitDate, VISIT_LABELS, type City } from "../lib/types";
+import { ArrowLeft, CalendarDays } from "lucide-react";
+import { type CountryRecord, type CountryTrip } from "../lib/countries";
+import { formatVisitDate, type City } from "../lib/types";
 import { useCountryHeading } from "../lib/use-country-heading";
-import { CityRow, Flag } from "./CollectionItems";
+import { CityRow, Flag, CountryVisitOrderBadge } from "./CollectionItems";
 import { visitDurationAnnotation } from "../lib/visit-duration";
 import { isPlace } from "../lib/places";
+import CountryReferenceOverview from "./CountryReferenceOverview";
 
 function VisitDates({
   visit,
@@ -63,43 +53,36 @@ function VisitDates({
 export default function CountryDetail({
   country,
   cities,
-  countryCount,
   onBack,
   onSelectCity,
   visitOrder = country.firstVisitOrder,
 }: {
   country: CountryRecord;
   cities: City[];
-  countryCount: number;
   onBack: () => void;
   onSelectCity: (id: string) => void;
   visitOrder?: number | null;
 }) {
-  const rankFillId = `country-rank-${useId().replace(/:/g, "")}`;
-  const orderLabel =
-    visitOrder == null
-      ? null
-      : countryVisitOrderLabel(country.code, visitOrder);
   const headingRef = useCountryHeading(country.name, visitOrder);
   const placeCount = cities.filter(isPlace).length;
   const cityCount = cities.length - placeCount;
+  const visitedCityCount = cities.filter(
+    (city) => !isPlace(city) && city.visit === "visited",
+  ).length;
   const visits = [...(country.visits ?? [])].sort(
     (a, b) => a.number - b.number,
   );
-  const visitLabel =
-    country.visit === "unknown" ? "Not recorded" : VISIT_LABELS[country.visit];
-  const VisitIcon =
-    country.visit === "visited"
-      ? CircleCheck
-      : country.visit === "planned"
-        ? CalendarDays
-        : CircleDashed;
   return (
     <>
       <div className="detail-top country-detail-top">
-        <button type="button" className="back-to-cities" onClick={onBack}>
+        <button
+          type="button"
+          className="back-to-cities"
+          aria-label="Back to countries"
+          title="Back to countries"
+          onClick={onBack}
+        >
           <ArrowLeft size={15} aria-hidden="true" />
-          All countries ({countryCount})
         </button>
       </div>
       <div className="country-detail" key={country.code}>
@@ -107,98 +90,34 @@ export default function CountryDetail({
           className="detail-place-card country-place-card"
           aria-label={`${country.name} information`}
         >
-          <div className="country-place-meta">
-            <p className="detail-geography">{country.continent || "Country"}</p>
-            <span
-              className="country-status-badge"
-              data-visit={country.visit}
-              aria-label={`Visit status: ${visitLabel}`}
-            >
-              <VisitIcon size={13} strokeWidth={2} aria-hidden="true" />
-              {visitLabel}
-            </span>
-          </div>
           <div className="country-detail-heading" ref={headingRef}>
-            <Flag code={country.code} />
-            <h1>
-              {country.name.split(/(\s+)/).map((part, index) =>
-                /^\s+$/.test(part) ? (
-                  part
-                ) : (
-                  <span key={index} className="country-name-word">
-                    {part}
-                  </span>
-                ),
-              )}
-            </h1>
-            {visitOrder != null && (
-              <span
-                className="country-visit-rank"
-                role="note"
-                aria-label={`Visit order ${orderLabel}`}
-                title={
-                  country.code === "XK"
-                    ? "Visit order · * Included in the 197-country set"
-                    : "Visit order"
-                }
-              >
-                <svg
-                  className="country-rank-frame"
-                  viewBox="0 0 64 64"
-                  aria-hidden="true"
-                >
-                  <defs>
-                    <linearGradient id={rankFillId} x1="0" y1="0" x2="1" y2="1">
-                      <stop offset="0%" stopColor="#fffef8" />
-                      <stop offset="100%" stopColor="#f5e6bf" />
-                    </linearGradient>
-                  </defs>
-                  <circle
-                    cx="32"
-                    cy="32"
-                    r="30.5"
-                    fill={`url(#${rankFillId})`}
-                  />
-                  <path
-                    d="M48 5A31 31 0 1 1 16 5"
-                    fill="none"
-                    stroke="#bea05c"
-                    strokeWidth="1.15"
-                    strokeLinecap="round"
-                  />
-                  <path
-                    d="M45 9A26.5 26.5 0 1 1 19 9"
-                    fill="none"
-                    stroke="#dfc78d"
-                    strokeWidth="0.85"
-                    strokeLinecap="round"
-                  />
-                </svg>
-                <Crown
-                  className="country-rank-crown"
-                  size={25}
-                  strokeWidth={1.8}
-                  aria-hidden="true"
-                />
-                <span
-                  className="country-rank-number"
-                  data-digits={String(visitOrder).length}
-                >
-                  <span className="country-order-hash" aria-hidden="true">
-                    #
-                  </span>
-                  <span className="country-rank-digits">{visitOrder}</span>
-                  {country.code === "XK" && (
-                    <sup className="country-order-asterisk">*</sup>
-                  )}
-                </span>
-              </span>
-            )}
+            <div className="country-detail-identity">
+              <p className="detail-geography">
+                <Flag code={country.code} />
+                {country.continent || "Country"}
+              </p>
+              <h1>
+                {country.name.split(/(\s+)/).map((part, index) =>
+                  /^\s+$/.test(part) ? (
+                    part
+                  ) : (
+                    <span key={index} className="country-name-word">
+                      {part}
+                    </span>
+                  ),
+                )}
+              </h1>
+            </div>
+            <CountryVisitOrderBadge
+              code={country.code}
+              order={visitOrder ?? null}
+            />
           </div>
+          <CountryReferenceOverview code={country.code} />
         </section>
 
         <dl
-          className="country-statistics"
+          className="country-statistics country-travel-scoreboard"
           aria-label="Country visit statistics"
         >
           {(
@@ -206,7 +125,7 @@ export default function CountryDetail({
               [
                 country.timesVisited == null && country.recordedVisits != null
                   ? "Recorded visits"
-                  : "Times visited",
+                  : "Visits",
                 country.timesVisited ?? country.recordedVisits,
                 "visits",
               ],
@@ -218,13 +137,19 @@ export default function CountryDetail({
                 country.totalDaysSpent ?? country.recordedDaysSpent,
                 "days",
               ],
+              ["Cities visited", visitedCityCount, "cities"],
             ] as const
           ).map(([label, value, kind]) => (
             <div key={kind}>
               <dt>{label}</dt>
               <dd>
                 {value == null ? (
-                  <span className="country-value-missing">Not recorded</span>
+                  <span
+                    className="country-value-missing"
+                    aria-label="Not recorded"
+                  >
+                    —
+                  </span>
                 ) : (
                   value
                 )}

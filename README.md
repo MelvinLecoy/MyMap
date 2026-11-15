@@ -118,6 +118,22 @@ Atlas assets in `public/atlas/` are generated from **Natural Earth 5.1.2** Admin
 
 City pins do not cluster. Pin labels start at zoom 4 and the maximum zoom is 10, configured in `src/lib/map-style.ts`. The single MapLibre instance updates its existing GeoJSON source on filtering, resizes with its container, and cleans up on unmount. The viewer overlays it rather than destroying it, preserving the current camera.
 
+## Country profiles
+
+Country profiles use a bundled Fraunces title and the same visit-order shield as country rows. The first card contains population, total surface area and nominal GDP, their global standing, per-country world and continent averages, and three columns of facts, cities and attractions. The separate travel scoreboard reads existing country visit totals and counts visited city records; places do not increase that city count. Missing visit history remains missing.
+
+Reference data has a separate, static source of truth:
+
+- `data/country-metrics.csv`: one row per country code, raw numeric values, reporting years, source IDs and explicit eligibility for global comparisons.
+- `data/country-highlights.csv`: ordered facts, leading populated places and editorial attraction selections, joined by the same country codes. City-states appear once rather than being filled with invented extra cities.
+- `data/sources/country-reference.json`: definitions, citations, pinned upstream snapshots, checksums and coverage limits.
+
+`npm run build` validates all 198 records and generates the bundled reference JSON. No reference-data API calls, database tables, polling or per-profile downloads are needed. The existing Supabase history and map-status tables remain independent and unchanged. Country filters and the 195/197 travel counter never change the fixed 197-country reference population; Svalbard is excluded from those comparisons.
+
+Global standing is an empirical percentile on a 1–100 scale, using the midrank of tied values with the endpoints anchored at 1 and 100. The world's largest country for each metric scores 100; a standing of 90 means above roughly 90% of countries, not 90% of the largest country's output. Arithmetic averages include only available country values, once per country. Dates remain visible because the latest available reporting year can differ. Values use two decimal places and K/M/B/T suffixes; standing rounds to an integer, or one decimal below 1.
+
+Population and GDP come from frozen World Bank series; Taiwan and Vatican City population use undated GeoNames estimates. Comparable GDP is unavailable in the selected World Bank series for Taiwan, North Korea and Vatican City, and Svalbard-only metrics are left empty instead of importing the combined Svalbard and Jan Mayen totals. The information dialog explains comparisons, coverage and sources. Attraction lists are editorial selections; they do not claim visitor-count rankings.
+
 ## Places
 
 Places such as Patagonia are separate from city records. They use a diamond pin labeled only with their name, list every associated country, and reuse the city profile. Selecting the pin raises its preloaded outline by two pixels; the outline stays selected in the profile and fits narrow screens. Country and city visit histories and city statistics remain independent. Map progress includes both city and place maps, while the result counter shows their counts separately.

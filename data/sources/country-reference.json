@@ -1,0 +1,58 @@
+{
+  "preparedOn": "2026-11-15",
+  "metrics": "Latest reported positive value in each frozen World Bank series. Population of Vatican City and Taiwan uses undated GeoNames estimates. Missing comparable GDP and Svalbard-only statistics are left empty. GDP is nominal, current US dollars. Area includes inland water; no area vintage is implied.",
+  "comparisons": "Country-based empirical standing: 1 + 99 * (lower-valued countries + (tied countries - 1) / 2) / (available countries - 1). Lowest=1, highest=100; ties share their midrank. The 197-country reference set is fixed, independent of filters. Svalbard is excluded. Arithmetic means use only available values. Years can differ, explicitly shown on each metric.",
+  "citySelection": "Largest GeoNames populated places by stored population, unique names; these are not uniform metropolitan-area definitions. One city for Monaco, Singapore and Vatican City.",
+  "missingGdp": [
+    "KP",
+    "SJ",
+    "TW",
+    "VA"
+  ],
+  "sources": {
+    "world-bank-population": {
+      "label": "World Bank · Population",
+      "url": "https://data.worldbank.org/indicator/SP.POP.TOTL",
+      "snapshotUrl": "https://raw.githubusercontent.com/datasets/population/d4b1a4a9a17e2123baf0ef119de05bceced1ab1b/data/population.csv",
+      "sha256": "2c697c3e668c8cb06ee467cd0d475b37b52844fdc48cb7725b79b58f18bf0b02",
+      "license": "World Bank CC BY 4.0; DataHub PDDL"
+    },
+    "world-bank-gdp": {
+      "label": "World Bank · GDP, current US$",
+      "url": "https://data.worldbank.org/indicator/NY.GDP.MKTP.CD",
+      "snapshotUrl": "https://raw.githubusercontent.com/datasets/gdp/36d761dc5617982d3e50b213e02b9a1b47c4e958/data/gdp.csv",
+      "sha256": "8d84ef6bcaccf740c01c5ed7566aae8f7b149d0e2c20001e441efd3cb5b2fa86",
+      "license": "CC BY 4.0"
+    },
+    "country-info": {
+      "label": "Country information · mledoze/countries",
+      "url": "https://github.com/mledoze/countries",
+      "snapshotUrl": "https://raw.githubusercontent.com/mledoze/countries/fa4f62182d19ff4f8b325cde6387c9cd9d80955a/countries.json",
+      "sha256": "0d92fb23b43ae080bd439f5dc5d61a8845395fdd0af1479b433c59fe079bd6fd",
+      "license": "Open Database License"
+    },
+    "geonames": {
+      "label": "GeoNames · Countries and populated places",
+      "url": "https://www.geonames.org/",
+      "snapshotUrl": "https://pypi.org/project/geonamescache/3.0.2/",
+      "sha256": "b830e8942f2d58c7e68782dcf4dff2ffe8c4104a35ee881ed1ad4023cefcdba4",
+      "license": "GeoNames CC BY 4.0; geonamescache MIT"
+    },
+    "unesco": {
+      "label": "UNESCO World Heritage Centre",
+      "url": "https://whc.unesco.org/en/list/",
+      "snapshotUrl": "https://github.com/rich-iannone/UWHS/tree/4b05bf5f2813bcf66a744a9963567bc856c2a33e",
+      "sha256": "71cf06d89001efa5c4a860d291ed75cee5dd131055bcc27f6d857b81f9a38a16",
+      "note": "2014 property names used as editorial highlights; this is not a current inventory of inscribed sites."
+    },
+    "editorial": {
+      "label": "Editorial highlights · destination guides",
+      "url": "https://en.wikivoyage.org/",
+      "note": "Curated highlights, not a visitor-count ranking. City-states list the city once. Svalbard facts refer to the archipelago, not the joint Svalbard and Jan Mayen statistical unit."
+    }
+  },
+  "csvSha256": {
+    "data/country-metrics.csv": "ce179876207e4997e4ed5e4211a66a04bf16cd421eb6371ba88a7044608ee87a",
+    "data/country-highlights.csv": "9f7ff509383271f60049f2f2ce6bb7651d6cf2062f49a1b79ea761fa98b6a4be"
+  }
+}
