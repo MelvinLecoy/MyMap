@@ -962,7 +962,10 @@ export default function App() {
                       </div>
                     )}
                   </div>
-                  <CityVisitHistory visits={selected.visits} />
+                  <CityVisitHistory
+                    visits={selected.visits}
+                    countryCode={selected.countryCode}
+                  />
                   {cloud.enabled &&
                     profileCloud.saveError?.id === selected.id && (
                       <p className="status-save-error" role="alert">

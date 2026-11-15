@@ -932,13 +932,14 @@ test("country and city duration exceptions are explicit while normal stays remai
       await expect(stays.nth(2)).toContainText("3 September 2026");
       await expect(stays.nth(0)).not.toHaveAttribute("data-exception");
       const oneDay = stays.nth(3);
-      await expect(oneDay.locator(".visit-period-point")).toHaveCount(1);
-      await expect(oneDay.locator(".visit-period-point")).toHaveCSS(
-        "background-color",
-        "rgb(38, 120, 79)",
+      await expect(oneDay.locator(".visit-period-point--hollow")).toHaveCount(
+        2,
       );
-      await expect(oneDay.locator(".visit-period-line")).toHaveCount(0);
-      await expect(oneDay.locator(".visit-period-dates")).toHaveText("11–12");
+      await expect(oneDay.locator(".visit-period-line")).toHaveCount(2);
+      await expect(oneDay.locator(".visit-period-dates time")).toHaveText([
+        "11",
+        "12",
+      ]);
     }
   }
   await page.goto("/?city=shanghai-china");
@@ -962,6 +963,101 @@ test("country and city duration exceptions are explicit while normal stays remai
   await expect(
     page.locator('.country-last-visit[data-year="2025"]').first(),
   ).toHaveCSS("color", "rgb(223, 191, 0)");
+});
+
+test("visit endpoint markers show inclusive days and country-specific half days without changing the timeline style", async ({
+  page,
+}) => {
+  await withoutGlobe(page);
+  for (const width of [320, 1440]) {
+    await page.setViewportSize({ width, height: 1100 });
+    for (const [query, start, end] of [
+      ["panel=countries&country=BA", "hollow", "filled"],
+      ["panel=countries&country=DO", "hollow", "filled"],
+      ["panel=countries&country=CZ", "hollow", "hollow"],
+      ["panel=countries&country=SG", "hollow", "hollow"],
+      ["panel=countries&country=ID", "hollow", "hollow"],
+      ["panel=countries&country=GB", "filled", "hollow"],
+      ["city=shanghai-china", "filled", "hollow"],
+      ["city=london-uk", "filled", "hollow"],
+    ]) {
+      await page.goto(`/?${query}`);
+      const exceptional = page
+        .locator('.visit-period[data-exception="true"]')
+        .first();
+      await expect(exceptional).toBeVisible();
+      expect(
+        await exceptional
+          .locator(".visit-period-point")
+          .evaluateAll((points) =>
+            points.map((point) => point.getAttribute("data-marker")),
+          ),
+      ).toEqual([start, end]);
+      for (const point of await exceptional
+        .locator(".visit-period-point")
+        .all()) {
+        expect(
+          await point.evaluate((element) => {
+            const style = getComputedStyle(element);
+            return (
+              style.backgroundColor ===
+              (element.getAttribute("data-marker") === "filled"
+                ? style.color
+                : "rgb(255, 255, 255)")
+            );
+          }),
+        ).toBe(true);
+      }
+      for (const ordinary of await page
+        .locator('.visit-period:not([data-exception="true"])')
+        .all()) {
+        await expect(
+          ordinary.locator('.visit-period-point:not([data-marker="filled"])'),
+        ).toHaveCount(0);
+        if ((await ordinary.getAttribute("data-duration")) === "1") {
+          await expect(
+            ordinary.locator(".visit-period-point-label"),
+          ).toHaveText("1");
+          await expect(ordinary.locator(".visit-period-point-label")).toHaveCSS(
+            "color",
+            "rgb(255, 255, 255)",
+          );
+        }
+      }
+      await expect(page.locator(".visit-timeline-entry").first()).toHaveCSS(
+        "padding",
+        "9px 8px",
+      );
+      expect(
+        await page
+          .locator(".visit-timeline")
+          .evaluate((element) => element.scrollWidth <= element.clientWidth),
+      ).toBe(true);
+    }
+    await page.goto("/?city=singapore-singapore");
+    const diamond = page.locator('.visit-period[data-exception="true"]');
+    await expect(
+      diamond.locator('.visit-period-point[data-marker="diamond"]'),
+    ).toHaveCount(1);
+    await expect(diamond.locator(".visit-period-point-label")).toHaveText("1*");
+    await expect(diamond.locator(".visit-period-point-label sup")).toHaveCSS(
+      "font-weight",
+      "900",
+    );
+    await expect(
+      diamond.locator(".visit-period-line, .visit-period-duration"),
+    ).toHaveCount(0);
+    await expect(diamond.locator(".visit-period-date-point")).toHaveText(
+      "11–12",
+    );
+    expect(
+      await diamond
+        .locator(".visit-period-point")
+        .evaluate(
+          (element) => getComputedStyle(element, "::before").backgroundColor,
+        ),
+    ).toBe("rgb(255, 255, 255)");
+  }
 });
 function city(name: string) {
   const found = data.cities.find((record) => record.name === name);

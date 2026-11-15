@@ -150,6 +150,7 @@ export default function CountryDetail({
             <VisitTimeline
               visits={visits}
               kind="country"
+              countryCode={country.code}
               cities={historyCities}
             />
           ) : (

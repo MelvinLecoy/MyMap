@@ -5,6 +5,7 @@ import {
   visitTimelineYears,
   type HistoryVisit,
 } from "../src/lib/visit-timeline";
+import { stayMarkers } from "../src/lib/visit-markers";
 const countryData = JSON.parse(
   readFileSync("src/generated/countries.json", "utf8"),
 );
@@ -12,6 +13,110 @@ const cityData = JSON.parse(readFileSync("src/generated/atlas.json", "utf8"));
 const country = (code: string): HistoryVisit[] =>
   countryData.countries.find((item: { code: string }) => item.code === code)
     .visits;
+
+test("ordinary stays include both endpoints, including disconnected one-day periods", () => {
+  const stays = visitTimelineYears(country("GB"))[2].visits[0].months[0]
+    .periods;
+  for (const kind of ["country", "city"] as const) {
+    assert.deepEqual(stayMarkers(stays[1], { kind, countryCode: "GB" }), [
+      "filled",
+      "filled",
+    ]);
+    const disconnected = visitTimelineYears([
+      {
+        number: 1,
+        arrival: "2026-05-01",
+        departure: "2026-05-04",
+        daysSpent: 2,
+        periods: [
+          {
+            number: 1,
+            arrival: "2026-05-01",
+            departure: "2026-05-01",
+            daysSpent: 1,
+          },
+          {
+            number: 2,
+            arrival: "2026-05-04",
+            departure: "2026-05-04",
+            daysSpent: 1,
+          },
+        ],
+      },
+    ])[0].visits[0].months[0].periods;
+    for (const stay of disconnected)
+      assert.deepEqual(stayMarkers(stay, { kind, countryCode: "SG" }), [
+        "filled",
+      ]);
+    assert.equal(disconnected[1].precedingGap, true);
+  }
+});
+
+test("all twelve recorded country exceptions follow the owner-selected endpoint rules", () => {
+  const expected: Record<string, string[]> = {
+    "BA/2026-05-03": ["hollow", "filled"],
+    "CR/2025-04-06": ["filled", "hollow"],
+    "CZ/2024-05-12": ["hollow", "hollow"],
+    "DO/2026-07-14": ["hollow", "filled"],
+    "FJ/2025-08-04": ["filled", "hollow"],
+    "ID/2026-09-03": ["hollow", "hollow"],
+    "NZ/2025-08-05": ["filled", "hollow"],
+    "SG/2026-09-11": ["hollow", "hollow"],
+    "KR/2025-07-15": ["filled", "hollow"],
+    "GB/2023-12-14": ["filled", "hollow"],
+    "GB/2026-05-01": ["filled", "hollow"],
+    "VN/2025-07-22": ["filled", "hollow"],
+  };
+  const actual: Record<string, string[]> = {};
+  for (const item of countryData.countries)
+    for (const year of visitTimelineYears(item.visits ?? []))
+      for (const visit of year.visits)
+        for (const month of visit.months)
+          for (const stay of month.periods)
+            if (stay.exact && stay.exceptional)
+              actual[`${item.code}/${stay.arrival}`] = stayMarkers(stay, {
+                kind: "country",
+                countryCode: item.code,
+              });
+  assert.deepEqual(actual, expected);
+});
+
+test("all eleven recorded city exceptions use half-day endpoints except Singapore's diamond", () => {
+  const expected: Record<string, string[]> = Object.fromEntries(
+    [
+      "auckland-new-zealand/2025-08-05",
+      "boston-usa/2022-06-26",
+      "ho-chi-minh-city-vietnam/2025-07-22",
+      "london-uk/2026-05-01",
+      "los-angeles-usa/2022-01-30",
+      "nadi-fiji/2025-08-04",
+      "orlando-usa/2022-03-01",
+      "san-jose-costa-rica/2025-04-06",
+      "seoul-south-korea/2025-07-17",
+      "shanghai-china/2026-08-30",
+    ].map((key) => [key, ["filled", "hollow"]]),
+  );
+  expected["singapore-singapore/2026-09-11"] = ["diamond"];
+  const actual: Record<string, string[]> = {};
+  for (const city of cityData.cities)
+    for (const year of visitTimelineYears(city.visits ?? []))
+      for (const visit of year.visits)
+        for (const month of visit.months)
+          for (const stay of month.periods)
+            if (stay.exact && stay.exceptional)
+              actual[`${city.id}/${stay.arrival}`] = stayMarkers(stay, {
+                kind: "city",
+                countryCode: city.countryCode,
+              });
+  assert.deepEqual(actual, expected);
+  // Country-only overrides must not leak into a city's exceptional stay.
+  const exception = { single: false, exceptional: true, days: 2.5 };
+  for (const countryCode of ["BA", "DO", "CZ", "ID"])
+    assert.deepEqual(stayMarkers(exception, { kind: "city", countryCode }), [
+      "filled",
+      "hollow",
+    ]);
+});
 
 test("timeline sorts years and visits newest first, preserves grouping and places exceptional durations on actual stays", () => {
   const visits = country("GB");

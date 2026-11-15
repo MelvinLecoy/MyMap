@@ -12,8 +12,34 @@ import {
   type HistoryCity,
   type TimelineMonth,
 } from "../lib/visit-timeline";
+import {
+  stayMarkers,
+  type StayMarker,
+  type VisitMarkerContext,
+} from "../lib/visit-markers";
 
-function StaySegment({ stay }: { stay: TimelineStay }) {
+function Endpoint({ marker, oneDay }: { marker: StayMarker; oneDay: boolean }) {
+  return (
+    <span
+      className={`visit-period-point visit-period-point--${marker}`}
+      data-marker={marker}
+    >
+      {(oneDay || marker === "diamond") && (
+        <span className="visit-period-point-label">
+          1{marker === "diamond" && <sup>*</sup>}
+        </span>
+      )}
+    </span>
+  );
+}
+
+function StaySegment({
+  stay,
+  context,
+}: {
+  stay: TimelineStay;
+  context: VisitMarkerContext;
+}) {
   if (!stay.exact)
     return (
       <div className="visit-period-fallback" role="listitem">
@@ -21,12 +47,15 @@ function StaySegment({ stay }: { stay: TimelineStay }) {
       </div>
     );
   const units = stay.days === 1 ? "day" : "days";
-  const pointStay = stay.single || stay.days === 1;
+  const markers = stayMarkers(stay, context);
+  const pointStay = markers.length === 1;
+  const diamond = markers[0] === "diamond";
+  const oneDay = pointStay && !stay.exceptional && stay.days === 1;
   const monthDates = stay.arrival?.slice(0, 7) !== stay.departure?.slice(0, 7);
   return (
     <div
       role="listitem"
-      className={`visit-period${pointStay ? " visit-period--single" : ""}${stay.days === 1 ? " visit-period--one-day" : ""}${stay.exceptional && pointStay ? " visit-period--single-exception" : ""}${stay.cities.length ? " visit-period--with-cities" : ""}${monthDates ? " visit-period--month-dates" : ""}`}
+      className={`visit-period${pointStay ? " visit-period--single" : ""}${diamond ? " visit-period--diamond" : ""}${stay.exceptional && pointStay && !diamond ? " visit-period--single-exception" : ""}${stay.cities.length ? " visit-period--with-cities" : ""}${monthDates ? " visit-period--month-dates" : ""}`}
       data-duration={stay.days ?? undefined}
       data-exception={stay.exceptional || undefined}
     >
@@ -46,18 +75,19 @@ function StaySegment({ stay }: { stay: TimelineStay }) {
             : `, ${stay.days} ${units}${stay.exceptional ? ", recorded duration" : ""}`}
         </span>
         <div className="visit-period-axis" aria-hidden="true">
-          <span className="visit-period-point" />
+          <Endpoint marker={markers[0]} oneDay={oneDay} />
           {!pointStay && <span className="visit-period-line" />}
-          {(!pointStay || stay.exceptional) && stay.days != null && (
-            <span className="visit-period-duration">
-              {stay.days}
-              {stay.exceptional && <sup>*</sup>}
-            </span>
-          )}
+          {(!pointStay || (stay.exceptional && !diamond)) &&
+            stay.days != null && (
+              <span className="visit-period-duration">
+                {stay.days}
+                {stay.exceptional && <sup>*</sup>}
+              </span>
+            )}
           {!pointStay && (
             <>
               <span className="visit-period-line" />
-              <span className="visit-period-point" />
+              <Endpoint marker={markers[1]} oneDay={false} />
             </>
           )}
         </div>
@@ -93,7 +123,13 @@ function StaySegment({ stay }: { stay: TimelineStay }) {
   );
 }
 
-function StayRow({ row }: { row: TimelineMonth }) {
+function StayRow({
+  row,
+  context,
+}: {
+  row: TimelineMonth;
+  context: VisitMarkerContext;
+}) {
   const container = useRef<HTMLDivElement>(null);
   const connections = useRef<SVGSVGElement>(null);
   useLayoutEffect(() => {
@@ -146,7 +182,7 @@ function StayRow({ row }: { row: TimelineMonth }) {
       active = false;
       observer.disconnect();
     };
-  }, [row.periods]);
+  }, [row.periods, context.kind, context.countryCode]);
   return (
     <div className="visit-month-periods" ref={container}>
       <svg
@@ -156,7 +192,7 @@ function StayRow({ row }: { row: TimelineMonth }) {
         focusable="false"
       />
       {row.periods.map((stay) => (
-        <StaySegment key={stay.number} stay={stay} />
+        <StaySegment key={stay.number} stay={stay} context={context} />
       ))}
     </div>
   );
@@ -166,10 +202,12 @@ export default memo(function VisitTimeline({
   visits,
   kind,
   cities,
+  countryCode,
 }: {
   visits: readonly HistoryVisit[];
   kind: "country" | "city";
   cities?: readonly HistoryCity[];
+  countryCode?: string | null;
 }) {
   const years = useMemo(
     () => visitTimelineYears(visits, kind === "country" ? cities : undefined),
@@ -245,7 +283,7 @@ export default memo(function VisitTimeline({
                             </span>
                           ))}
                         </div>
-                        <StayRow row={row} />
+                        <StayRow row={row} context={{ kind, countryCode }} />
                       </div>
                     ))}
                   </div>

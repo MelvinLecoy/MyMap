@@ -14,3 +14,7 @@
 - Keep the explicit policy in `COUNTRIES_WITHOUT_CITY_LABELS` in `src/components/CountryDetail.tsx` and its README description consistent. Check this case for new countries and record any new country-specific display decisions there.
 - Do not suppress labels solely because only one city is currently in the catalog. Other countries can still benefit from naming that city.
 - This policy hides only the city-name captions above country timeline segments. It does not delete city records, city-list navigation, maps, visit dates or statistics.
+
+# Visit history markers
+
+- Preserve the owner-approved inclusive circles, half-day endpoints and Singapore city diamond in [docs/VISIT_HISTORY_MARKERS.md](docs/VISIT_HISTORY_MARKERS.md). Country exception overrides apply only to country timelines and exceptional durations. Keep other timeline styles and stored history unchanged when adjusting markers.

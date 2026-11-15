@@ -3000,6 +3000,7 @@ h2 {
   min-width: 0;
 }
 .visit-period {
+  --visit-marker-size: 9px;
   position: relative;
   z-index: 1;
   display: flex;
@@ -3010,8 +3011,11 @@ h2 {
   max-width: var(--visit-range-width);
 }
 .visit-period--single {
-  flex: 0 0 9px;
-  min-width: 9px;
+  flex: 0 0 var(--visit-marker-size);
+  min-width: var(--visit-marker-size);
+}
+.visit-period--diamond {
+  --visit-marker-size: 18px;
 }
 .visit-period--single-exception {
   flex-basis: 36px;
@@ -3061,15 +3065,47 @@ h2 {
   color: var(--visit-year);
 }
 .visit-period-point {
-  flex: 0 0 9px;
-  width: 9px;
-  height: 9px;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 var(--visit-marker-size);
+  width: var(--visit-marker-size);
+  height: var(--visit-marker-size);
   border: 1.5px solid currentColor;
   border-radius: 50%;
   background: var(--surface);
 }
-.visit-period--one-day .visit-period-point {
+.visit-period-point--filled {
   background: currentColor;
+}
+.visit-period-point-label {
+  position: relative;
+  color: white;
+  font-size: 7px;
+  line-height: 1;
+  font-weight: 800;
+}
+.visit-period-point--diamond {
+  border: 0;
+  border-radius: 0;
+  background: currentColor;
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+}
+.visit-period-point--diamond::before {
+  content: "";
+  position: absolute;
+  inset: 1.5px;
+  background: var(--surface);
+  clip-path: inherit;
+}
+.visit-period-point--diamond .visit-period-point-label {
+  color: var(--visit-year);
+}
+.visit-period-point-label sup {
+  font-size: 0.8em;
+  line-height: 0;
+  font-weight: 900;
 }
 .visit-period-line {
   flex: 1;
@@ -3107,11 +3143,11 @@ h2 {
 }
 .visit-period-date-start,
 .visit-period-date-point {
-  left: 4.5px;
+  left: calc(var(--visit-marker-size) / 2);
   transform: translateX(-50%);
 }
 .visit-period-date-end {
-  right: 4.5px;
+  right: calc(var(--visit-marker-size) / 2);
   transform: translateX(50%);
 }
 .visit-period-fallback {

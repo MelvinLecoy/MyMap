@@ -3,7 +3,13 @@ import { cityVisitSummary } from "../lib/city-visits";
 import type { CityVisit } from "../lib/types";
 import VisitTimeline from "./VisitTimeline";
 
-export default function CityVisitHistory({ visits }: { visits?: CityVisit[] }) {
+export default function CityVisitHistory({
+  visits,
+  countryCode,
+}: {
+  visits?: CityVisit[];
+  countryCode?: string | null;
+}) {
   if (!visits?.length) return null;
   const summary = cityVisitSummary(visits);
   return (
@@ -22,7 +28,7 @@ export default function CityVisitHistory({ visits }: { visits?: CityVisit[] }) {
         <CalendarDays size={15} aria-hidden="true" />
         Visit history
       </h2>
-      <VisitTimeline visits={visits} kind="city" />
+      <VisitTimeline visits={visits} kind="city" countryCode={countryCode} />
     </section>
   );
 }
