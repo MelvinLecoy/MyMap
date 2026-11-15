@@ -3026,8 +3026,8 @@ h2 {
   height: 1px;
   background: repeating-linear-gradient(
     to right,
-    var(--visit-year) 0 5px,
-    transparent 5px 8px
+    var(--visit-year) 0 4px,
+    transparent 4px 8px
   );
   opacity: 0.9;
 }
