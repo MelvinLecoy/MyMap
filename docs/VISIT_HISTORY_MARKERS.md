@@ -37,13 +37,14 @@ Singapore's ordinary stays still follow the ordinary rules above.
 | Indonesia (ID)                              | Hollow circle                         | Hollow circle                                         |
 | All other countries                         | Filled circle                         | Hollow circle                                         |
 
-The country overrides apply only to exceptional durations. Singapore's exceptional **11–12 September 2026** stay uses the same hollow **1\*** diamond in both country and city timelines, with **11–12** centered below it. Czechia's exceptional country stay on **12–13 May 2024** uses the same diamond, with **12–13** centered below it. Other exceptional Czechia country durations retain hollow endpoints.
+The country overrides apply only to exceptional durations. Singapore's exceptional **11–12 September 2026** stay uses the same hollow **1\*** diamond in both country and city timelines, with **11–12** centered below it. In the country visit spanning August–September, the earlier **3 Sep** label already identifies September. Czechia's exceptional country stay on **12–13 May 2024** uses the same diamond, with **12–13** centered below it. Other exceptional Czechia country durations retain hollow endpoints.
 
 ## Preserve the existing presentation
 
 - Keep other styles unchanged: typography, spacing, row padding and default heights, card borders, dividers, month headings, visit counts and clock totals.
 - Keep the existing panel date colors: 2026 green, 2025 yellow, 2024 orange, and 2023 or earlier brown.
 - Stacked multi-month headings always show the newer month above the older month in both country and city histories: **JUL** above **JUN**, **JAN** above **DEC**, and the same rule for every other pair. Endpoint dates and segments still run from arrival to departure.
+- Every counted visit has one shared month-range heading, including visits with disconnected stays in different months. For example, Singapore's August–September visit uses **SEP – AUG** as one stacked heading. In a multi-month visit, include the month name only on the first displayed date of each month: **18 Aug**, **20**, **25**, **3 Sep**, **11–12**. Keep each stay, its duration and the dashed gaps intact; do not display separate August and September headings within that visit. Same-month visits keep one month name and day-only dates. Cross-year visits include the actual year alongside each first month label.
 - Keep ordinary range lengths and the current four-dash connector style. Connect the actual marker edges and center each date label under its marker; wrapped stays start a new visual line.
 - Center markers on the same visual line together, including a circle followed by a diamond. Rows grow only as needed for their own content.
 - Keep counted visits, recorded dates, explicit durations, city captions and statistics unchanged. Marker choices are presentation rules only.

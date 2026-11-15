@@ -51,7 +51,17 @@ function StaySegment({
   const pointStay = markers.length === 1;
   const diamond = markers[0] === "diamond";
   const oneDay = pointStay && !stay.exceptional && stay.days === 1;
-  const monthDates = stay.arrival?.slice(0, 7) !== stay.departure?.slice(0, 7);
+  const monthDates = stay.monthDates;
+  const sharedPointMonth =
+    pointStay &&
+    !stay.single &&
+    stay.arrival!.slice(0, 7) === stay.departure!.slice(0, 7);
+  const pointStartLabel = sharedPointMonth
+    ? String(Number(stay.arrival!.slice(8)))
+    : stay.startLabel;
+  const pointEndLabel = sharedPointMonth
+    ? stay.endLabel + stay.startLabel.replace(/^\d+/, "")
+    : stay.endLabel;
   return (
     <div
       role="listitem"
@@ -94,10 +104,10 @@ function StaySegment({
         <div className="visit-period-dates" aria-hidden="true">
           {pointStay ? (
             <span className="visit-period-date-point">
-              <time dateTime={stay.arrival!}>{stay.startLabel}</time>
+              <time dateTime={stay.arrival!}>{pointStartLabel}</time>
               {!stay.single && (
                 <>
-                  –<time dateTime={stay.departure!}>{stay.endLabel}</time>
+                  –<time dateTime={stay.departure!}>{pointEndLabel}</time>
                 </>
               )}
             </span>
@@ -184,7 +194,10 @@ function StayRow({
     };
   }, [row.periods, context.kind, context.countryCode]);
   return (
-    <div className="visit-month-periods" ref={container}>
+    <div
+      className={`visit-month-periods${row.periods.length > 1 && row.periods.some((stay) => stay.monthDates) ? " visit-month-periods--shared-months" : ""}`}
+      ref={container}
+    >
       <svg
         ref={connections}
         className="visit-period-connections"

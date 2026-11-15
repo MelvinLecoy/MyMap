@@ -2860,7 +2860,7 @@ test("visit history rows keep their default height and only grow for extra conte
       if (query === "city=dubai-uae")
         expect(layout.map((row) => row.height)).toEqual([56, 56, 56]);
       if (query === "panel=countries&country=SG")
-        expect(layout.map((row) => row.height)).toEqual([91, 48]);
+        expect(layout.at(-1)!.height).toBe(48);
       expect(
         layout.every(
           (row) =>
@@ -2977,6 +2977,48 @@ test("visit history rows keep their default height and only grow for extra conte
         connections: true,
         borders: true,
       });
+    }
+  }
+});
+
+test("multi-month visits share one stacked heading and retain each actual stay", async ({
+  page,
+}) => {
+  await withoutGlobe(page);
+  for (const width of [320, 1440]) {
+    await page.setViewportSize({ width, height: 1100 });
+    for (const [query, visitNumber, labels, periods, total] of [
+      ["panel=countries&country=SG", 2, ["SEP", "–AUG"], 4, "6"],
+      ["panel=countries&country=AU", 1, ["AUG", "–JUL"], 2, "10"],
+      ["city=shanghai-china", 1, ["SEP", "–AUG"], 2, "2.5"],
+    ] as const) {
+      await page.goto(`/?${query}`);
+      const visit = page.locator(
+        `.visit-timeline-entry[data-visit-number="${visitNumber}"]`,
+      );
+      await expect(visit.locator(".visit-month-row")).toHaveCount(1);
+      await expect(visit.locator(".visit-month-label > span")).toHaveText([
+        ...labels,
+      ]);
+      await expect(visit.locator(".visit-period")).toHaveCount(periods);
+      await expect(visit.locator(".visit-total strong")).toHaveText(total);
+      if (query.endsWith("SG")) {
+        await expect(visit.locator(".visit-period-dates")).toHaveText([
+          "18 Aug20",
+          "25",
+          "3 Sep",
+          "11–12",
+        ]);
+        await expect(visit.locator(".visit-period-duration")).toHaveText(["3"]);
+        await expect(visit.locator(".visit-period-point--diamond")).toHaveText(
+          "1*",
+        );
+      }
+      expect(
+        await page
+          .locator(".visit-timeline")
+          .evaluate((element) => element.scrollWidth <= element.clientWidth),
+      ).toBe(true);
     }
   }
 });

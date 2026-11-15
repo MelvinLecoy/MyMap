@@ -3030,6 +3030,12 @@ h2 {
   box-sizing: content-box;
   padding-inline: 20px;
 }
+.visit-month-periods--shared-months {
+  padding-inline: 20px;
+}
+.visit-month-periods--shared-months .visit-period--month-dates {
+  padding-inline: 0;
+}
 .visit-period-cities {
   margin-bottom: 4px;
   color: var(--muted);

@@ -24,6 +24,7 @@ export interface TimelineStay extends HistoryStay {
   exceptional: boolean;
   exact: boolean;
   single: boolean;
+  monthDates: boolean;
   range: string;
   startLabel: string;
   endLabel: string;
@@ -149,7 +150,27 @@ export function visitTimelineYears(
           b.arrival ?? b.departure ?? "",
         ) || a.number - b.number,
     );
-    const rows: TimelineMonth[] = [];
+    const dated = stays
+      .flatMap((stay) => [stay.arrival, stay.departure])
+      .filter((date): date is string => Boolean(date && month(date)))
+      .sort();
+    const firstDate = dated[0] ?? null;
+    const lastDate = dated.at(-1) ?? null;
+    const crossMonth = firstDate?.slice(0, 7) !== lastDate?.slice(0, 7);
+    const crossYear = firstDate?.slice(0, 4) !== lastDate?.slice(0, 4);
+    const labels = [
+      ...new Set(
+        [month(lastDate), month(firstDate)].filter((value): value is string =>
+          Boolean(value),
+        ),
+      ),
+    ].map((value) => value.toUpperCase());
+    const row: TimelineMonth = {
+      key: `${firstDate?.slice(0, 7) ?? ""}/${lastDate?.slice(0, 7) ?? ""}`,
+      labels: labels.length ? labels : ["DATE"],
+      periods: [],
+    };
+    const labeledMonths = new Set<string>();
     stays.forEach((stay, i) => {
       const supplied =
         stay.daysSpent ?? (stays.length === 1 ? visit.daysSpent : null);
@@ -173,39 +194,29 @@ export function visitTimelineYears(
       const exceptional = Boolean(
         visitDurationAnnotation(stay.arrival, stay.departure, supplied),
       );
-      const crossMonth =
-        stay.arrival?.slice(0, 7) !== stay.departure?.slice(0, 7);
-      const crossYear =
-        stay.arrival?.slice(0, 4) !== stay.departure?.slice(0, 4);
-      const endpoint = (date: string | null) =>
-        exact && date
-          ? `${Number(date.slice(8))}${crossMonth ? ` ${month(date)}` : ""}${crossYear ? ` ’${date.slice(2, 4)}` : ""}`
-          : "";
-      const rowKey = `${stay.arrival?.slice(0, 7) ?? ""}/${stay.departure?.slice(0, 7) ?? ""}`;
-      const labels = [
-        ...new Set(
-          [month(stay.arrival), month(stay.departure)].filter(
-            (value): value is string => Boolean(value),
-          ),
-        ),
-      ].map((value) => value.toUpperCase());
-      // Month headings run newest first; endpoint dates remain chronological.
-      labels.reverse();
-      if (rows.at(-1)?.key !== rowKey)
-        rows.push({
-          key: rowKey,
-          labels: labels.length ? labels : ["DATE"],
-          periods: [],
-        });
-      rows.at(-1)!.periods.push({
+      const endpoint = (date: string | null) => {
+        if (!exact || !date) return { label: "", monthDates: false };
+        const key = date.slice(0, 7);
+        const monthDates = crossMonth && !labeledMonths.has(key);
+        labeledMonths.add(key);
+        return {
+          label: `${Number(date.slice(8))}${monthDates ? ` ${month(date)}` : ""}${monthDates && crossYear ? ` ’${date.slice(2, 4)}` : ""}`,
+          monthDates,
+        };
+      };
+      const start = endpoint(stay.arrival);
+      const end =
+        stay.arrival === stay.departure ? start : endpoint(stay.departure);
+      row.periods.push({
         ...stay,
         days,
         exceptional,
         exact,
         single: stay.arrival === stay.departure,
+        monthDates: start.monthDates || end.monthDates,
         range: historyDateRange(stay),
-        startLabel: endpoint(stay.arrival),
-        endLabel: endpoint(stay.departure),
+        startLabel: start.label,
+        endLabel: end.label,
         precedingGap: i > 0,
         cities: [...matchingCities.values()],
       });
@@ -213,7 +224,7 @@ export function visitTimelineYears(
     grouped.get(key)!.visits.push({
       number: visit.number,
       days: visit.daysSpent ?? null,
-      months: rows,
+      months: [row],
     });
   }
   return [...grouped.values()];
