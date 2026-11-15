@@ -2954,7 +2954,7 @@ h2 {
   content: "";
   position: absolute;
   inset: 0 0 auto;
-  border-top: 1px solid var(--line);
+  border-top: 1px solid var(--visit-year);
 }
 .visit-months {
   min-width: 0;

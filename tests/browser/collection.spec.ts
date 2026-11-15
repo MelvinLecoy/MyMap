@@ -2796,6 +2796,14 @@ test("visit history rows keep their default height and only grow for extra conte
             getComputedStyle(group.querySelector(".visit-year-card")!)
               .outlineColor ===
             getComputedStyle(group.querySelector(".visit-year-circle")!).color;
+          for (const entry of [
+            ...group.querySelectorAll(".visit-timeline-entry"),
+          ].slice(1)) {
+            borders &&=
+              getComputedStyle(entry, "::before").borderTopColor ===
+              getComputedStyle(group.querySelector(".visit-year-circle")!)
+                .color;
+          }
         }
         for (const row of root.querySelectorAll(".visit-month-periods")) {
           const origin = row.getBoundingClientRect();
