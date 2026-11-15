@@ -892,9 +892,13 @@ test("country and city duration exceptions are explicit while normal stays remai
     ]);
     await expect(page.locator(".country-visit-list")).toContainText(text);
     await expect(
-      page.locator(".visit-period-duration").filter({
-        hasText: new RegExp(`^${marker.replace(/[.*]/g, "\\$&")}$`),
-      }),
+      page
+        .locator(
+          ".visit-period-duration, .visit-period-point--diamond .visit-period-point-label",
+        )
+        .filter({
+          hasText: new RegExp(`^${marker.replace(/[.*]/g, "\\$&")}$`),
+        }),
     ).toHaveCount(1);
     await expect(page.locator(".visit-total")).not.toContainText(["days"]);
     if (code === "GB") {
@@ -932,14 +936,16 @@ test("country and city duration exceptions are explicit while normal stays remai
       await expect(stays.nth(2)).toContainText("3 September 2026");
       await expect(stays.nth(0)).not.toHaveAttribute("data-exception");
       const oneDay = stays.nth(3);
-      await expect(oneDay.locator(".visit-period-point--hollow")).toHaveCount(
-        2,
+      await expect(oneDay.locator(".visit-period-point--diamond")).toHaveCount(
+        1,
       );
-      await expect(oneDay.locator(".visit-period-line")).toHaveCount(2);
-      await expect(oneDay.locator(".visit-period-dates time")).toHaveText([
-        "11",
-        "12",
-      ]);
+      await expect(oneDay.locator(".visit-period-point-label")).toHaveText(
+        "1*",
+      );
+      await expect(oneDay.locator(".visit-period-line")).toHaveCount(0);
+      await expect(oneDay.locator(".visit-period-date-point")).toHaveText(
+        "11–12",
+      );
     }
   }
   await page.goto("/?city=shanghai-china");
@@ -974,8 +980,6 @@ test("visit endpoint markers show inclusive days and country-specific half days 
     for (const [query, start, end] of [
       ["panel=countries&country=BA", "hollow", "filled"],
       ["panel=countries&country=DO", "hollow", "filled"],
-      ["panel=countries&country=CZ", "hollow", "hollow"],
-      ["panel=countries&country=SG", "hollow", "hollow"],
       ["panel=countries&country=ID", "hollow", "hollow"],
       ["panel=countries&country=GB", "filled", "hollow"],
       ["city=shanghai-china", "filled", "hollow"],
@@ -1034,29 +1038,37 @@ test("visit endpoint markers show inclusive days and country-specific half days 
           .evaluate((element) => element.scrollWidth <= element.clientWidth),
       ).toBe(true);
     }
-    await page.goto("/?city=singapore-singapore");
-    const diamond = page.locator('.visit-period[data-exception="true"]');
-    await expect(
-      diamond.locator('.visit-period-point[data-marker="diamond"]'),
-    ).toHaveCount(1);
-    await expect(diamond.locator(".visit-period-point-label")).toHaveText("1*");
-    await expect(diamond.locator(".visit-period-point-label sup")).toHaveCSS(
-      "font-weight",
-      "900",
-    );
-    await expect(
-      diamond.locator(".visit-period-line, .visit-period-duration"),
-    ).toHaveCount(0);
-    await expect(diamond.locator(".visit-period-date-point")).toHaveText(
-      "11–12",
-    );
-    expect(
-      await diamond
-        .locator(".visit-period-point")
-        .evaluate(
-          (element) => getComputedStyle(element, "::before").backgroundColor,
-        ),
-    ).toBe("rgb(255, 255, 255)");
+    for (const [query, dates] of [
+      ["city=singapore-singapore", "11–12"],
+      ["panel=countries&country=SG", "11–12"],
+      ["panel=countries&country=CZ", "12–13"],
+    ]) {
+      await page.goto(`/?${query}`);
+      const diamond = page.locator('.visit-period[data-exception="true"]');
+      await expect(
+        diamond.locator('.visit-period-point[data-marker="diamond"]'),
+      ).toHaveCount(1);
+      await expect(diamond.locator(".visit-period-point-label")).toHaveText(
+        "1*",
+      );
+      await expect(diamond.locator(".visit-period-point-label sup")).toHaveCSS(
+        "font-weight",
+        "900",
+      );
+      await expect(
+        diamond.locator(".visit-period-line, .visit-period-duration"),
+      ).toHaveCount(0);
+      await expect(diamond.locator(".visit-period-date-point")).toHaveText(
+        dates,
+      );
+      expect(
+        await diamond
+          .locator(".visit-period-point")
+          .evaluate(
+            (element) => getComputedStyle(element, "::before").backgroundColor,
+          ),
+      ).toBe("rgb(255, 255, 255)");
+    }
   }
 });
 function city(name: string) {
@@ -2804,6 +2816,7 @@ test("visit history rows keep their default height and only grow for extra conte
       "panel=countries&country=CA",
       "panel=countries&country=CH",
       "panel=countries&country=SG",
+      "panel=countries&country=CZ",
       "panel=countries&country=DK",
     ]) {
       await page.goto(`/?${query}`);
@@ -2847,7 +2860,7 @@ test("visit history rows keep their default height and only grow for extra conte
       if (query === "city=dubai-uae")
         expect(layout.map((row) => row.height)).toEqual([56, 56, 56]);
       if (query === "panel=countries&country=SG")
-        expect(layout.map((row) => row.height)).toEqual([88, 48]);
+        expect(layout.map((row) => row.height)).toEqual([91, 48]);
       expect(
         layout.every(
           (row) =>

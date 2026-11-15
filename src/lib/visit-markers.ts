@@ -12,7 +12,10 @@ export function stayMarkers(
   { kind, countryCode }: VisitMarkerContext,
 ): StayMarker[] {
   if (!stay.exceptional) return stay.single ? ["filled"] : ["filled", "filled"];
-  if (kind === "city" && countryCode === "SG" && stay.days === 1)
+  if (
+    stay.days === 1 &&
+    (countryCode === "SG" || (kind === "country" && countryCode === "CZ"))
+  )
     return ["diamond"];
   if (stay.single) return ["hollow"];
   if (kind === "country") {

@@ -1,0 +1,13 @@
+CountryCode,Country,VisitNumber,PeriodNumber,ArrivalDate,DepartureDate,RecordedDays,CalendarDays,ArrivalMarker,DepartureMarker,SingleMarker,DurationLabel
+BA,Bosnia & Herzegovina,1,1,2026-05-03,2026-05-05,2.5,3,hollow-circle,filled-circle,,2.5*
+CR,Costa Rica,1,1,2025-04-06,2025-04-07,1.5,2,filled-circle,hollow-circle,,1.5*
+CZ,Czechia,1,2,2024-05-12,2024-05-13,1,2,,,hollow-diamond,1*
+DO,Dominican Republic,1,1,2026-07-14,2026-07-15,1.5,2,hollow-circle,filled-circle,,1.5*
+FJ,Fiji,1,1,2025-08-04,2025-08-05,1.5,2,filled-circle,hollow-circle,,1.5*
+ID,Indonesia,1,1,2026-09-03,2026-09-07,4,5,hollow-circle,hollow-circle,,4*
+NZ,New Zealand,1,2,2025-08-05,2025-08-08,3.5,4,filled-circle,hollow-circle,,3.5*
+SG,Singapore,2,4,2026-09-11,2026-09-12,1,2,,,hollow-diamond,1*
+KR,South Korea,1,1,2025-07-15,2025-07-21,6.5,7,filled-circle,hollow-circle,,6.5*
+GB,United Kingdom,1,1,2023-12-14,2023-12-17,3.5,4,filled-circle,hollow-circle,,3.5*
+GB,United Kingdom,3,1,2026-05-01,2026-05-03,2.5,3,filled-circle,hollow-circle,,2.5*
+VN,Vietnam,1,1,2025-07-22,2025-07-23,1.5,2,filled-circle,hollow-circle,,1.5*

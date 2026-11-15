@@ -17,4 +17,4 @@
 
 # Visit history markers
 
-- Preserve the owner-approved inclusive circles, half-day endpoints and Singapore city diamond in [docs/VISIT_HISTORY_MARKERS.md](docs/VISIT_HISTORY_MARKERS.md). Country exception overrides apply only to country timelines and exceptional durations. Keep other timeline styles and stored history unchanged when adjusting markers.
+- Preserve the owner-approved inclusive circles, half-day endpoints and one-day exceptional diamonds in [docs/VISIT_HISTORY_MARKERS.md](docs/VISIT_HISTORY_MARKERS.md). Singapore uses the diamond in both country and city timelines; Czechia uses it in the country timeline. Country endpoint overrides apply only to country timelines and exceptional durations. Keep other timeline styles and stored history unchanged when adjusting markers.

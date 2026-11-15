@@ -1,0 +1,12 @@
+CityId,City,CountryCode,Country,VisitNumber,PeriodNumber,ArrivalDate,DepartureDate,RecordedDays,CalendarDays,ArrivalMarker,DepartureMarker,SingleMarker,DurationLabel
+auckland-new-zealand,Auckland,NZ,New Zealand,2,1,2025-08-05,2025-08-08,3.5,4,filled-circle,hollow-circle,,3.5*
+boston-usa,Boston,US,USA,2,1,2022-06-26,2022-06-28,2.5,3,filled-circle,hollow-circle,,2.5*
+ho-chi-minh-city-vietnam,Ho Chi Minh City,VN,Vietnam,1,1,2025-07-22,2025-07-23,1.5,2,filled-circle,hollow-circle,,1.5*
+london-uk,London,GB,UK,4,1,2026-05-01,2026-05-03,2.5,3,filled-circle,hollow-circle,,2.5*
+los-angeles-usa,Los Angeles,US,USA,1,1,2022-01-30,2022-02-02,3.5,4,filled-circle,hollow-circle,,3.5*
+nadi-fiji,Nadi,FJ,Fiji,1,1,2025-08-04,2025-08-05,1.5,2,filled-circle,hollow-circle,,1.5*
+orlando-usa,Orlando,US,USA,1,1,2022-03-01,2022-03-06,5.5,6,filled-circle,hollow-circle,,5.5*
+san-jose-costa-rica,San Jose,CR,Costa Rica,1,1,2025-04-06,2025-04-07,1.5,2,filled-circle,hollow-circle,,1.5*
+seoul-south-korea,Seoul,KR,South Korea,1,1,2025-07-17,2025-07-21,4.5,5,filled-circle,hollow-circle,,4.5*
+shanghai-china,Shanghai,CN,China,1,1,2026-08-30,2026-08-31,1.5,2,filled-circle,hollow-circle,,1.5*
+singapore-singapore,Singapore,SG,Singapore,4,1,2026-09-11,2026-09-12,1,2,,,hollow-diamond,1*

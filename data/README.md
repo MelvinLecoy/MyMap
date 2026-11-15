@@ -76,3 +76,18 @@ and Indonesia, Vietnam, Fiji, UK and Bosnia corrections are tracked in
 `sources/country-visit-updates-2026-11-14.json`. City data is unchanged. Country
 lifetime order and incomplete-history flags are preserved; see the current
 [country update workflow](../docs/country-history.md).
+
+## Visit marker table exports
+
+The owner-requested CSV snapshots in `exports/` contain the current visit-history
+marker rules and the exceptional stays listed in the country and city tables:
+
+- [visit-history-marker-rules.csv](exports/visit-history-marker-rules.csv)
+- [starred-country-visits.csv](exports/starred-country-visits.csv): 12 stay periods
+- [starred-city-visits.csv](exports/starred-city-visits.csv): 11 stay periods
+
+These are reference exports from 15 November 2026. Both Singapore timelines and
+Czechia's country timeline use the hollow `1*` diamond for their exceptional
+one-day stay. Keep the canonical
+history files above as the import sources. See the complete
+[marker rules](../docs/VISIT_HISTORY_MARKERS.md).

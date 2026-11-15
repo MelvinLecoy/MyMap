@@ -3064,6 +3064,9 @@ h2 {
   min-height: 15px;
   color: var(--visit-year);
 }
+.visit-month-periods:has(.visit-period--diamond) .visit-period-axis {
+  min-height: 18px;
+}
 .visit-period-point {
   position: relative;
   display: inline-flex;
