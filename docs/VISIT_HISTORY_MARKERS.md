@@ -55,11 +55,24 @@ The country overrides apply only to exceptional durations. Singapore's exception
 ## Adaptive country city captions
 
 - When every stay in one counted visit has the same single known city, show its name above the month heading on the left, once for the whole visit. Reserve enough width for the name and wrap long names within that column; align the month with the timeline markers.
+- All visits within a country share the same city/month column width and leading date space. Center every month heading in that column and align the first timeline markers across visits, including those with month-qualified dates. A wrapped left-city label uses the same compact 11px line height and 2px gap above the month as a one-line label. Align a single-track visit's clock badge with the markers.
 - Otherwise, center each stay's city caption above the middle of its segment or circle. Measure the actual loaded caption font and available width. Prefer keeping the entire visit on one timeline track; use one caption line and extend the segment to support it whenever space permits.
 - When one caption line cannot fit, balance complete city names over the fewest necessary lines before splitting the timeline. The UK 2023 visit fits `London · Bristol` on one line and `Bath · Cardiff · Southampton` / `London · Portsmouth` on two lines at a 390px viewport. Switzerland's 2024 visit uses three, three and two city-caption lines above its three stays at that width; its 2023 cities fit one caption line.
-- Narrower layouts may require more caption lines or another timeline track. Preserve each actual stay, chronological order, date alignment, year colors, marker shapes and the four-dash connections. Resizing and font loading recalculate only the local caption layout and connectors.
-- Use **GC** for Gold Coast in visit-history captions only. The canonical city name, city lists, profiles, stored data and full-name caption tooltips retain **Gold Coast**.
+- Before wrapping a narrow multi-month visit, try stacked captions with shorter readable segments. This includes Australia and New Zealand: stack their city names rather than retaining a long one-line caption that forces a second timeline track. Narrower layouts may still need another track when the markers, durations and dates cannot fit safely. Preserve each actual stay, chronological order, date alignment, year colors, marker shapes and the four-dash connections. Resizing and font loading recalculate only the local caption layout and connectors.
+- Keep short forms in the exported `VISIT_CAPTION_SHORT_NAMES` dictionary in `src/lib/visit-caption-layout.ts`. Use them only in this country visit-history caption layout and solver. Canonical names, city lists, profiles, stored data and full-name caption tooltips remain unchanged.
 - Preserve the existing seven country caption exclusions. City-profile histories keep their current layout.
+
+| Canonical city      | Caption short form |
+| ------------------- | ------------------ |
+| Gold Coast          | GC                 |
+| Rio de Janeiro      | Rio                |
+| Buenos Aires        | BA                 |
+| Andorra la Vella    | Andorra lV         |
+| Kuala Lumpur        | KL                 |
+| Johor Bahru         | JB                 |
+| Ho Chi Minh City    | HCMC               |
+| Bandar Seri Begawan | BSB                |
+| San Pedro Sula      | SPS                |
 
 The endpoint policy is implemented in [`src/lib/visit-markers.ts`](../src/lib/visit-markers.ts). The timeline is rendered by [`src/components/VisitTimeline.tsx`](../src/components/VisitTimeline.tsx).
 

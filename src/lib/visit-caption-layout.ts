@@ -1,7 +1,19 @@
 import type { TimelineCity, TimelineStay } from "./visit-timeline";
 
+/** Presentation-only aliases for the country visit-caption solver. */
+export const VISIT_CAPTION_SHORT_NAMES: Readonly<Record<string, string>> = {
+  "gold-coast-australia": "GC",
+  "rio-de-janeiro-brazil": "Rio",
+  "buenos-aires-argentina": "BA",
+  "andorra-la-vella-andorra": "Andorra lV",
+  "kuala-lumpur-malaysia": "KL",
+  "johor-bahru-malaysia": "JB",
+  "ho-chi-minh-city-vietnam": "HCMC",
+  "bandar-seri-begawan-brunei": "BSB",
+  "san-pedro-sula-honduras": "SPS",
+};
 export function historyCityName(city: TimelineCity): string {
-  return city.id === "gold-coast-australia" ? "GC" : city.name;
+  return VISIT_CAPTION_SHORT_NAMES[city.id] ?? city.name;
 }
 
 export function visitSingleCity(
@@ -20,6 +32,7 @@ export function visitSingleCity(
 export interface CaptionPeriod {
   cities: string[];
   minimumWidth: number;
+  compactWidth?: number;
   markerSize: number;
   point: boolean;
   startDateWidth: number;
@@ -123,12 +136,31 @@ export function layoutVisitCaptions(
   const options = periods.map((period) =>
     cityCaptionOptions(period.cities, measure, period.minimumWidth),
   );
+  const compactOptions = periods.map((period) =>
+    cityCaptionOptions(
+      period.cities,
+      measure,
+      period.point
+        ? period.minimumWidth
+        : Math.min(
+            period.minimumWidth,
+            period.compactWidth ??
+              Math.max(
+                64,
+                period.markerSize +
+                  (period.startDateWidth + period.endDateWidth) / 2 +
+                  4,
+              ),
+          ),
+    ),
+  );
   const solveTrack = (
     start: number,
     end: number,
+    optionSet = options,
   ): { blocks: CaptionBlock[]; gap: number } | undefined => {
     const source = periods.slice(start, end),
-      choices = options.slice(start, end);
+      choices = optionSet.slice(start, end);
     const maxLines = Math.max(
       1,
       ...source.map((period) => period.cities.length),
@@ -190,6 +222,28 @@ export function layoutVisitCaptions(
       blocks: whole.blocks,
       tracks: [{ indices: periods.map((_, index) => index), gap: whole.gap }],
     };
+  const compact = solveTrack(0, periods.length, compactOptions);
+  if (compact) {
+    let spare = Math.max(
+      0,
+      available -
+        compact.blocks.reduce((sum, block) => sum + block.width, 0) -
+        compact.gap * (periods.length - 1),
+    );
+    compact.blocks.forEach((block, index) => {
+      if (periods[index].point) return;
+      const restore = Math.min(
+        spare,
+        Math.max(0, periods[index].minimumWidth - block.width),
+      );
+      block.width += restore;
+      spare -= restore;
+    });
+    return {
+      blocks: compact.blocks,
+      tracks: [{ indices: periods.map((_, index) => index), gap: compact.gap }],
+    };
+  }
 
   type Plan = {
     blocks: CaptionBlock[];

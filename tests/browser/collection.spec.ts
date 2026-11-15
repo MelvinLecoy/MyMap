@@ -3205,6 +3205,64 @@ test("country visit captions use the left month column or measured centered segm
   ).toBe(true);
 });
 
+test("country histories share aligned columns and compact multi-month visits before wrapping", async ({
+  page,
+}) => {
+  await withoutGlobe(page);
+  for (const width of [320, 375, 390, 601, 1440, 1920]) {
+    await page.setViewportSize({ width, height: 1100 });
+    for (const code of ["CN", "GB", "AU", "NZ", "DO", "LA"]) {
+      await page.goto(`/?panel=countries&country=${code}`);
+      await page.evaluate(() => document.fonts.ready);
+      await expect
+        .poll(() =>
+          page.locator(".country-visit-list").evaluate((root) => {
+            const center = (box: DOMRect) => box.left + box.width / 2;
+            const points = [...root.querySelectorAll(".visit-month-row")]
+              .map((row) =>
+                row
+                  .querySelector(".visit-period-point")
+                  ?.getBoundingClientRect(),
+              )
+              .filter((box): box is DOMRect => Boolean(box));
+            const months = [...root.querySelectorAll(".visit-month-label")].map(
+              (month) => month.getBoundingClientRect(),
+            );
+            return (
+              points.every(
+                (point) => Math.abs(center(point) - center(points[0])) < 0.15,
+              ) &&
+              months.every(
+                (month) => Math.abs(center(month) - center(months[0])) < 0.15,
+              ) &&
+              root.scrollWidth <= root.clientWidth + 1
+            );
+          }),
+        )
+        .toBe(true);
+      if (
+        ["AU", "NZ"].includes(code) &&
+        ((width >= 375 && width <= 600) || width >= 1440)
+      ) {
+        const visit = page.locator(
+          '.visit-timeline-entry[data-visit-number="1"]',
+        );
+        await expect(visit.locator(".visit-period-track")).toHaveCount(1);
+      }
+      if (["DO", "LA"].includes(code)) {
+        await expect(page.locator(".visit-month-city")).toHaveCSS(
+          "line-height",
+          "11px",
+        );
+        await expect(page.locator(".visit-month-city")).toHaveCSS(
+          "margin-bottom",
+          "2px",
+        );
+      }
+    }
+  }
+});
+
 test("selected country histories omit city labels while other countries keep them", async ({
   page,
 }) => {
@@ -3229,7 +3287,7 @@ test("selected country histories omit city labels while other countries keep the
       data.cities.filter((city) => city.countryCode === code).length,
     );
   }
-  for (const [code, city] of [["AD", "Andorra la Vella"]]) {
+  for (const [code, city] of [["AD", "Andorra lV"]]) {
     await page.goto(`/?panel=countries&country=${code}`);
     await expect(page.locator(".visit-month-city")).toContainText([city]);
   }

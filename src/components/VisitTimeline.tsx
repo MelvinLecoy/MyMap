@@ -238,11 +238,11 @@ function StayRow({
           : stay.endLabel;
         const label = stay.single ? first : `${first}–${last}`;
         const duration =
-          point && stay.exceptional && markers[0] !== "diamond"
-            ? (rendered[index]
-                ?.querySelector(".visit-period-duration")
-                ?.getBoundingClientRect().width ?? 0)
-            : 0;
+          rendered[index]
+            ?.querySelector(".visit-period-duration")
+            ?.getBoundingClientRect().width ?? 0;
+        const startDateWidth = dateWidth(point ? label : stay.startLabel);
+        const endDateWidth = dateWidth(point ? label : stay.endLabel);
         return {
           cities: hideCities ? [] : stay.cities.map(historyCityName),
           minimumWidth: point
@@ -255,9 +255,16 @@ function StayRow({
               ? 84
               : 76,
           markerSize: markers[0] === "diamond" ? 18 : 9,
+          compactWidth: point
+            ? undefined
+            : Math.max(
+                64,
+                36 + duration,
+                13 + (startDateWidth + endDateWidth) / 2,
+              ),
           point,
-          startDateWidth: dateWidth(point ? label : stay.startLabel),
-          endDateWidth: dateWidth(point ? label : stay.endLabel),
+          startDateWidth,
+          endDateWidth,
         };
       });
       canvas.font = font;
@@ -295,11 +302,11 @@ function StayRow({
     const element = container.current!;
     const svg = connections.current!;
     svg.replaceChildren();
-    if (row.periods.length < 2 && !adaptive) return;
+    if (row.periods.length < 2 && context.kind !== "country") return;
     let active = true;
     const draw = () => {
       if (!active) return;
-      if (adaptive) {
+      if (context.kind === "country") {
         const monthRow = element.parentElement!;
         const heading = monthRow.querySelector<HTMLElement>(
           ".visit-month-heading",
@@ -329,6 +336,26 @@ function StayRow({
             const next = `${value}px`;
             if (monthRow.style.getPropertyValue(name) !== next)
               monthRow.style.setProperty(name, next);
+          }
+          const entry = monthRow.closest<HTMLElement>(".visit-timeline-entry")!;
+          const total = entry.querySelector<HTMLElement>(".visit-total")!;
+          const points = [
+            ...element.querySelectorAll(".visit-period-point"),
+          ].map((point) => point.getBoundingClientRect());
+          const axisY = points[0].top + points[0].height / 2;
+          const oneTrack = points.every(
+            (point) => Math.abs(point.top + point.height / 2 - axisY) < 0.5,
+          );
+          entry.dataset.timelineAxis = oneTrack ? "single" : "multiple";
+          if (oneTrack) {
+            const top =
+              axisY -
+              entry.getBoundingClientRect().top -
+              (parseFloat(getComputedStyle(entry).paddingTop) || 0) -
+              total.getBoundingClientRect().height / 2;
+            const next = `${top}px`;
+            if (entry.style.getPropertyValue("--visit-total-top") !== next)
+              entry.style.setProperty("--visit-total-top", next);
           }
         }
       }
@@ -468,16 +495,60 @@ export default memo(function VisitTimeline({
     () => visitTimelineYears(visits, kind === "country" ? cities : undefined),
     [visits, kind, cities],
   );
+  const timeline = useRef<HTMLOListElement>(null);
+  useLayoutEffect(() => {
+    if (kind !== "country") return;
+    const element = timeline.current!;
+    const canvas = document.createElement("canvas").getContext("2d");
+    if (!canvas) return;
+    let active = true;
+    const align = () => {
+      if (!active) return;
+      let width = 32;
+      for (const city of element.querySelectorAll<HTMLElement>(
+        ".visit-month-city",
+      )) {
+        canvas.font = getComputedStyle(city).font;
+        width = Math.max(
+          width,
+          Math.min(
+            64,
+            Math.ceil(canvas.measureText(city.textContent ?? "").width) + 1,
+          ),
+        );
+      }
+      element.style.setProperty("--visit-city-column", `${width}px`);
+    };
+    align();
+    void document.fonts.ready.then(align);
+    return () => {
+      active = false;
+    };
+  }, [years, kind]);
   let nextRow = 1;
   return (
     <ol
       className={`visit-timeline ${kind}-visit-list`}
+      ref={timeline}
       aria-label="Visits by year, newest first"
-      style={{
-        gridTemplateRows: years
-          .map((group) => `repeat(${group.visits.length}, auto)`)
-          .join(" 12px "),
-      }}
+      style={
+        {
+          "--visit-country-gutter":
+            kind === "country" &&
+            years.some((year) =>
+              year.visits.some((visit) =>
+                visit.months.some((row) =>
+                  row.periods.some((stay) => stay.monthDates),
+                ),
+              ),
+            )
+              ? "20px"
+              : "0px",
+          gridTemplateRows: years
+            .map((group) => `repeat(${group.visits.length}, auto)`)
+            .join(" 12px "),
+        } as CSSProperties
+      }
     >
       {years.map((group) => {
         const firstRow = nextRow;

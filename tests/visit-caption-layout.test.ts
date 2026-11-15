@@ -48,10 +48,22 @@ test("a whole visit moves its one known city only when every stay agrees", () =>
   assert.equal(visitSingleCity([]), undefined);
 });
 
-test("Gold Coast is abbreviated only for history captions", () => {
-  const city = { id: "gold-coast-australia", name: "Gold Coast" };
-  assert.equal(historyCityName(city), "GC");
-  assert.equal(city.name, "Gold Coast");
+test("owner-approved aliases apply only to history labels", () => {
+  for (const [id, name, alias] of [
+    ["gold-coast-australia", "Gold Coast", "GC"],
+    ["rio-de-janeiro-brazil", "Rio de Janeiro", "Rio"],
+    ["buenos-aires-argentina", "Buenos Aires", "BA"],
+    ["andorra-la-vella-andorra", "Andorra la Vella", "Andorra lV"],
+    ["kuala-lumpur-malaysia", "Kuala Lumpur", "KL"],
+    ["johor-bahru-malaysia", "Johor Bahru", "JB"],
+    ["ho-chi-minh-city-vietnam", "Ho Chi Minh City", "HCMC"],
+    ["bandar-seri-begawan-brunei", "Bandar Seri Begawan", "BSB"],
+    ["san-pedro-sula-honduras", "San Pedro Sula", "SPS"],
+  ]) {
+    const city = { id, name };
+    assert.equal(historyCityName(city), alias);
+    assert.equal(city.name, name);
+  }
   assert.equal(
     historyCityName({ id: "other", name: "Gold Coast" }),
     "Gold Coast",
@@ -132,6 +144,37 @@ test("three Swiss stays stack captions to preserve one entire timeline track", (
         track.gap * (track.indices.length - 1) <=
         150.01,
     );
+});
+
+test("Australia and New Zealand stack captions and compact ranges before wrapping a visit", () => {
+  for (const periods of [
+    [
+      {
+        ...range(["Brisbane", "GC", "Sunshine Coast"]),
+        minimumWidth: 84,
+        compactWidth: 64,
+      },
+      { ...range(["Sydney", "Melbourne"]), minimumWidth: 84, compactWidth: 64 },
+    ],
+    [
+      {
+        ...range(["Auckland", "Wellington"]),
+        minimumWidth: 84,
+        compactWidth: 64,
+      },
+      { ...range(["Auckland"]), minimumWidth: 84, compactWidth: 64 },
+    ],
+  ]) {
+    const layout = layoutVisitCaptions(periods, 160, measure);
+    assert.equal(layout.tracks.length, 1);
+    assert.equal(layout.blocks[0].lines.length, 2);
+    assert.ok(
+      layout.blocks.reduce((sum, block) => sum + block.width, 0) +
+        layout.tracks[0].gap <=
+        160.01,
+    );
+    assert.deepEqual(layout.tracks[0].indices, [0, 1]);
+  }
 });
 
 test("year-bearing dates retain space and long labels cannot overflow the track", () => {
