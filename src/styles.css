@@ -2861,7 +2861,7 @@ h2 {
 }
 .visit-timeline {
   --visit-range-width: 84px;
-  --visit-gap-width: 15px;
+  --visit-gap-width: 19px;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   margin: 12px 0 0;
