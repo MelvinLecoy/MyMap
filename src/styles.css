@@ -2980,7 +2980,7 @@ h2 {
 .visit-period:has(.visit-period-gap) {
   flex-basis: 75px;
   max-width: 107px;
-  padding-left: 11px;
+  padding-left: 17px;
 }
 .visit-period--single {
   flex: 0 0 24px;
@@ -3018,8 +3018,10 @@ h2 {
   position: absolute;
   top: 8px;
   right: calc(100% + 4px);
-  width: 7px;
-  border-top: 2px dotted var(--visit-year);
+  width: 13px;
+  height: 2px;
+  background: radial-gradient(circle, var(--visit-year) 0.8px, transparent 1px)
+    left center / 2.5px 2px repeat-x;
   opacity: 0.65;
 }
 .visit-period-axis {
