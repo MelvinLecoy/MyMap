@@ -3086,6 +3086,9 @@ h2 {
   line-height: 1;
   font-weight: 800;
 }
+.visit-period-point--filled .visit-period-point-label {
+  font-size: 8px;
+}
 .visit-period-point--diamond {
   border: 0;
   border-radius: 0;

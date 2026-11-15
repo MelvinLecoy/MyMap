@@ -6,7 +6,7 @@ Owner-approved rules for both country and city profile timelines.
 
 - A filled circle means the endpoint date is inclusive.
 - Ordinary date ranges use filled circles at both ends.
-- An ordinary one-day stay uses one filled circle with a white **1** centered inside it.
+- An ordinary one-day stay uses one filled circle with a white **1** centered inside it. The numeral is **8px**; keep the existing circle size.
 - These same rules apply to individual stays joined by dashed links. Dashed links indicate a gap between stays; they add no days.
 
 ## Exceptional durations
