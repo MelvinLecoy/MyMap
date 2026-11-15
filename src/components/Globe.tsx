@@ -487,7 +487,10 @@ export default function Globe({
       setCursor("");
     };
     map.on("dragstart", () => setHint(false));
-    const pickCityFeature = (point: { x: number; y: number }) => {
+    const pickCityFeature = (
+      point: { x: number; y: number },
+      cityRadius = 14,
+    ) => {
       if (!map.getSource("atlas-cities") || !map.getLayer("city-pins"))
         return undefined;
       const rendered = map.queryRenderedFeatures([point.x, point.y], {
@@ -521,7 +524,8 @@ export default function Globe({
           projected.x - point.x,
           projected.y - point.y,
         );
-        if (distance <= 14 && distance < closestDistance) {
+        const radius = feature.properties.kind === "place" ? 14 : cityRadius;
+        if (distance <= radius && distance < closestDistance) {
           closest = feature;
           closestDistance = distance;
         }
@@ -567,12 +571,9 @@ export default function Globe({
           clearHover();
           return;
         }
-        const city = pickCityFeature(hoverPoint);
-        const code =
-          city || !current.current.hoverEnabled
-            ? null
-            : pickCountry(hoverPoint);
-        hoverCountry(code);
+        const city = pickCityFeature(hoverPoint, 11);
+        const code = city ? null : pickCountry(hoverPoint);
+        hoverCountry(current.current.hoverEnabled ? code : null);
         setCursor(city || code ? "pointer" : "");
       });
     };
