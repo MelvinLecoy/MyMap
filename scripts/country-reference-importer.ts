@@ -12,6 +12,7 @@ export function importCountryReference(
   highlightsCsv: string,
   countries: CountrySeed[],
   sources: Record<string, ReferenceSource>,
+  comparisonRegionsCsv = "",
 ): CountryReferenceData {
   const figures = (
     row: Record<string, string>,
@@ -113,6 +114,23 @@ export function importCountryReference(
   if (regions.some((region) => !medians[region]))
     throw new Error("Supplied median coverage is incomplete.");
 
+  const comparisonRegions = new Map<string, string>();
+  if (comparisonRegionsCsv) {
+    for (const { values: row } of readCSV(comparisonRegionsCsv, [
+      "CountryCode",
+      "MedianRegion",
+    ])) {
+      if (
+        !metricRows.has(row.countrycode) ||
+        comparisonRegions.has(row.countrycode) ||
+        !countries.some((country) => country.code === row.countrycode) ||
+        !regions.slice(1).includes(row.medianregion)
+      )
+        throw new Error("Invalid or duplicate country comparison region.");
+      comparisonRegions.set(row.countrycode, row.medianregion);
+    }
+  }
+
   const highlights = new Map<string, Record<string, string>>();
   for (const { values: row } of readCSV(highlightsCsv, [
     "CountryCode",
@@ -168,6 +186,7 @@ export function importCountryReference(
         code: country.code,
         name: country.name,
         continent: excluded ? country.continent : supplied.continent,
+        medianRegion: comparisonRegions.get(country.code),
         category: excluded ? null : supplied.category,
         metrics: excluded
           ? {

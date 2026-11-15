@@ -3,10 +3,7 @@
   "metrics": "The three original raw figures and indices are copied from the owner's workbook. GDP per capita and its index are calculated offline from the supplied raw GDP/population using model V1. All values are stored at full precision in CSV; missing values and numeric zero remain distinct.",
   "comparisons": "Original metric medians are copied from Medians 197. GDP-per-capita raw/index medians are calculated offline over the 197-country reference set, excluding missing data. Median regions follow the workbook's UN M49 grouping; existing travel categories are unchanged.",
   "citySelection": "Editorially reviewed city and town highlights, starting from GeoNames populated-place names. Neighbourhoods and duplicate boroughs have been removed. These are destination highlights, not a uniform city-proper or metropolitan population ranking. Single-city states and Tuvalu list their main urban centre once.",
-  "missingGdp": [
-    "ER",
-    "VA"
-  ],
+  "missingGdp": ["ER", "VA"],
   "sources": {
     "country-info": {
       "label": "Country information · mledoze/countries",
@@ -38,7 +35,8 @@
   "csvSha256": {
     "data/country-metrics.csv": "d0e304acf153515b9da100a16b74ea8d48f3718cc1f86157d24b8f8e93214763",
     "data/country-metric-medians.csv": "c6281ddf8b09a45881889fe2d91b5f7d258446e29d36f22e69135fb3e78785e0",
-    "data/country-highlights.csv": "9247da622acade96830bcadfe7df66fbf36e7ff8cda84bb5f1e0dd2eea984d22"
+    "data/country-highlights.csv": "9247da622acade96830bcadfe7df66fbf36e7ff8cda84bb5f1e0dd2eea984d22",
+    "data/country-comparison-regions.csv": "40e10696207cc4a2cfb11975506d54acac5e98653e6dfba939d68e637f67ec88"
   },
   "profileExclusions": {
     "SJ": "Owner requested Svalbard remain untouched. The workbook row combines Svalbard and Jan Mayen, so its figures are retained only in the source CSV, not applied to the Svalbard profile."
@@ -46,11 +44,7 @@
   "workbook": {
     "path": "data/sources/country-reference/ciudad_mundo_three_indices_global_continental_medians.xlsx",
     "sha256": "99d36b009cc65896553787be22e0dc99507bdb1d9b199f3b36a8b9b3b802b9f4",
-    "sheets": [
-      "Raw Data",
-      "Index Scores",
-      "Medians 197"
-    ],
+    "sheets": ["Raw Data", "Index Scores", "Medians 197"],
     "countries": 197,
     "territories": 53
   },
@@ -74,5 +68,8 @@
     "countryMaximum": 292115.15740278835,
     "territoryMaximum": 142641.05865744117,
     "sourceWorkbookSha256": "99d36b009cc65896553787be22e0dc99507bdb1d9b199f3b36a8b9b3b802b9f4"
+  },
+  "comparisonOverrides": {
+    "TR": "Owner requested European median comparisons. Original workbook figures, continent classifications and baseline pools are preserved; the override selects European raw/index medians for all four metrics."
   }
 }

@@ -68,6 +68,7 @@ try {
         readFileSync("data/country-highlights.csv", "utf8"),
         countryHistory,
         countryReferenceSources.sources,
+        readFileSync("data/country-comparison-regions.csv", "utf8"),
       ),
     ) + "\n",
   );

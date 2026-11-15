@@ -706,6 +706,45 @@ test("country badge shapes, compact menus and H styling keep controls aligned", 
   await page.keyboard.press("Escape");
 });
 
+test("every tenth country uses the same crown in rows and profiles, following the displayed country scope", async ({
+  page,
+}) => {
+  await withoutGlobe(page);
+  await page.goto("/?panel=countries");
+  const row = (name: string) =>
+    page
+      .locator(".country-row")
+      .filter({ has: page.getByText(name, { exact: true }) });
+  await expect(row("Portugal").locator(".country-order-crown")).toHaveCount(1);
+  await expect(row("Spain").locator(".country-order-crown")).toHaveCount(0);
+  await expect(row("Estonia").locator(".country-order-crown")).toHaveCount(0);
+  await expect(row("Latvia").locator(".country-order-crown")).toHaveCount(1);
+  const crownPath = await row("Portugal")
+    .locator(".country-order-crown path")
+    .first()
+    .getAttribute("d");
+  await row("Portugal").click();
+  await expect(
+    page.locator(".country-detail-heading .country-order-badge--milestone"),
+  ).toHaveText("#10");
+  expect(
+    await page
+      .locator(".country-detail-heading .country-order-crown path")
+      .first()
+      .getAttribute("d"),
+  ).toBe(crownPath);
+  await page
+    .getByRole("button", { name: "Back to countries", exact: true })
+    .click();
+  await chooseFilter(page, "Country scoreboard scope", "197 (🇽🇰🇹🇼)");
+  await expect(row("Estonia").locator(".country-order-crown")).toHaveCount(1);
+  await expect(row("Latvia").locator(".country-order-crown")).toHaveCount(0);
+  await row("Estonia").click();
+  await expect(
+    page.locator(".country-detail-heading .country-order-badge--milestone"),
+  ).toHaveText("#80");
+});
+
 test("phone country controls keep A and scoped visited filtering while omitting H", async ({
   browser,
 }) => {
@@ -2161,19 +2200,23 @@ test("country scoreboard scope updates row and profile ranks without inventing m
   await expect(page.locator(".country-row")).toHaveCount(198);
 });
 
-test("country profile titles keep whole words and the shared shield at the top right on every panel width", async ({
+test("country profile titles keep whole words and center the inset shield beside short and wrapped names", async ({
   page,
 }) => {
   await withoutGlobe(page);
   await page.emulateMedia({ reducedMotion: "reduce" });
-  for (const width of [320, 390, 760, 1440]) {
+  for (const width of [320, 390, 1440]) {
     await page.setViewportSize({ width, height: 1100 });
-    for (const code of ["CA", "CH", "LI", "BA", "MK"]) {
+    for (const code of ["EG", "AE", "CH", "LI", "BA", "MK"]) {
       await page.goto(`/?panel=countries&country=${code}`);
       await page.evaluate(() => document.fonts.ready);
       const heading = page.locator(".country-detail-heading");
       const title = heading.locator("h1");
       await expect(title).toHaveCSS("font-family", /Fraunces/);
+      await expect(page.locator(".country-place-card")).toHaveCSS(
+        "font-family",
+        /Alegreya Sans/,
+      );
       const card = (await page.locator(".country-place-card").boundingBox())!;
       const badge = (await heading
         .locator(".country-order-badge")
@@ -2182,8 +2225,12 @@ test("country profile titles keep whole words and the shared shield at the top r
       const identity = (await heading
         .locator(".country-detail-identity")
         .boundingBox())!;
-      expect(badge.x + badge.width).toBeCloseTo(card.x + card.width - 16, 0);
-      expect(badge.y).toBeCloseTo(identity.y - 5, 0);
+      expect(badge.x + badge.width).toBeCloseTo(card.x + card.width - 19, 0);
+      expect(badge.y + badge.height / 2).toBeCloseTo(
+        identity.y + identity.height / 2 + 4,
+        0,
+      );
+      expect(badge.y).toBeGreaterThan(identity.y);
       expect(badge.x).toBeGreaterThan(titleBox.x + titleBox.width);
       const ending = title.locator(".country-name-ending");
       const lastWord = (await ending
@@ -2242,6 +2289,10 @@ test("supplied workbook metrics and median rows render offline without changing 
     route.abort(),
   );
   await page.goto("/?panel=countries&country=CH");
+  await expect(page.locator('[data-metric="gdpPerCapita"]')).toHaveCount(1);
+  await page
+    .getByRole("button", { name: "Show total GDP", exact: true })
+    .click();
   await expect(page.locator(".country-reference-value")).toHaveText([
     "9M",
     "41.3K",
@@ -2344,6 +2395,33 @@ test("supplied workbook metrics and median rows render offline without changing 
     "N/A",
   ]);
   await expect(page.getByRole("meter")).toHaveCount(0);
+  await page.goto("/?panel=countries&country=RU");
+  await expect(page.locator(".country-place-card")).toHaveClass(
+    /country-place-card--unvisited/,
+  );
+  await expect(page.locator(".country-place-card")).toHaveCSS(
+    "background-color",
+    "rgb(208, 214, 216)",
+  );
+  await page.goto("/?panel=countries&country=TR");
+  await expect(page.getByText("EU median", { exact: true })).toHaveCount(6);
+  await expect(page.getByText("AS median", { exact: true })).toHaveCount(0);
+  await expect(
+    page.locator('[data-metric="gdp"] .country-reference-medians--raw strong'),
+  ).toHaveText(["53.16B", "198B"]);
+  await page
+    .getByRole("button", { name: "Show GDP per capita", exact: true })
+    .click();
+  await expect(
+    page.locator(
+      '[data-metric="gdpPerCapita"] .country-reference-medians--raw strong',
+    ),
+  ).toHaveText(["8.53K", "41.34K"]);
+  await expect(
+    page.locator(
+      '[data-metric="gdpPerCapita"] .country-reference-medians--index strong',
+    ),
+  ).toHaveText(["35.6", "65.0"]);
 });
 
 test("GDP toggles to saved per-capita figures in the same third column and remembers the choice", async ({
@@ -2351,16 +2429,31 @@ test("GDP toggles to saved per-capita figures in the same third column and remem
 }) => {
   await withoutGlobe(page);
   await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.addInitScript(() =>
+    localStorage.setItem("ciudad-mundo-country-gdp-display-v1", "gdp"),
+  );
   await page.route("https://gbgkxgdreftzhxeprryc.supabase.co/**", (route) =>
     route.abort(),
   );
   await page.goto("/?panel=countries&country=CH");
   const columns = page.locator(".country-reference-metric");
   await expect(columns).toHaveCount(3);
-  await page
-    .getByRole("button", { name: "Show GDP per capita", exact: true })
-    .click();
   const perCapita = page.locator('[data-metric="gdpPerCapita"]');
+  await expect(page.getByText("In perspective", { exact: true })).toHaveCount(
+    0,
+  );
+  await expect(page.locator(".country-reference-section")).toHaveCSS(
+    "border-top-style",
+    "solid",
+  );
+  await expect(page.locator(".country-reference-section")).toHaveCSS(
+    "border-radius",
+    "0px",
+  );
+  await expect(page.locator(".country-index-label").first()).toHaveCSS(
+    "border-top-style",
+    "dashed",
+  );
   await expect(columns).toHaveCount(3);
   await expect(page.locator('[data-metric="gdp"]')).toHaveCount(0);
   await expect(page.locator(".country-reference-value")).toHaveText([

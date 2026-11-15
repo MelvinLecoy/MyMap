@@ -88,7 +88,7 @@ export default function CountryDetail({
       </div>
       <div className="country-detail" key={country.code}>
         <section
-          className="detail-place-card country-place-card"
+          className={`detail-place-card country-place-card${country.visit === "visited" ? "" : " country-place-card--unvisited"}`}
           aria-label={`${country.name} information`}
         >
           <div className="country-detail-heading" ref={headingRef}>

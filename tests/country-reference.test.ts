@@ -31,13 +31,22 @@ const countries = importCountryHistory(
 const metrics = readFileSync("data/country-metrics.csv", "utf8"),
   medians = readFileSync("data/country-metric-medians.csv", "utf8"),
   highlights = readFileSync("data/country-highlights.csv", "utf8");
-const load = (figures = metrics, comparisons = medians) =>
+const comparisonRegions = readFileSync(
+  "data/country-comparison-regions.csv",
+  "utf8",
+);
+const load = (
+  figures = metrics,
+  comparisons = medians,
+  regions = comparisonRegions,
+) =>
   importCountryReference(
     figures,
     comparisons,
     highlights,
     countries,
     provenance.sources,
+    regions,
   );
 const data = load(),
   lookup = createCountryReferenceLookup(data);
@@ -108,7 +117,20 @@ test("country values, indices and both median sets are direct workbook lookups w
     countryMetricContext(changed, "CH", "gdp").worldMedianIndex,
     23.413777972507063,
   );
-  assert.equal(countryMetricContext(lookup, "TR", "area").continent, "Asia");
+  assert.equal(lookup.byCode.get("TR")!.continent, "Asia");
+  assert.equal(countryMetricContext(lookup, "TR", "area").continent, "Europe");
+  assert.equal(
+    countryMetricContext(lookup, "TR", "gdp").continentalMedian,
+    198.235,
+  );
+  assert.equal(
+    countryMetricContext(lookup, "TR", "gdpPerCapita").continentalMedian,
+    41338.486629811196,
+  );
+  assert.equal(
+    countryMetricContext(lookup, "TR", "gdpPerCapita").continentalMedianIndex,
+    65.02643289864008,
+  );
   assert.equal(countries.find((c) => c.code === "TR")!.continent, "Europe");
 });
 
@@ -290,6 +312,14 @@ test("GDP per capita is stored at full precision with independent country median
 });
 
 test("reference imports reject incomplete joins, invalid supplied numbers and incomplete median tables", () => {
+  assert.throws(
+    () => load(metrics, medians, "CountryCode,MedianRegion\nTR,Global\n"),
+    /comparison region/,
+  );
+  assert.throws(
+    () => load(metrics, medians, comparisonRegions + "TR,Asia\n"),
+    /comparison region/,
+  );
   assert.throws(
     () => load(metrics + metrics.split("\n")[1] + "\n"),
     /duplicate/,

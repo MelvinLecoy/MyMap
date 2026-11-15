@@ -21,7 +21,7 @@ const labels = {
   gdp: "GDP",
   gdpPerCapita: "GDP per capita",
 };
-const GDP_DISPLAY_KEY = "ciudad-mundo-country-gdp-display-v1";
+const GDP_DISPLAY_KEY = "ciudad-mundo-country-gdp-display-v2";
 
 function CompactValue({
   metric,
@@ -188,11 +188,11 @@ export default memo(function CountryReferenceOverview({
   const [gdpDisplay, setGdpDisplay] = useState<"gdp" | "gdpPerCapita">(() => {
     try {
       return typeof window !== "undefined" &&
-        localStorage.getItem(GDP_DISPLAY_KEY) === "gdpPerCapita"
-        ? "gdpPerCapita"
-        : "gdp";
+        localStorage.getItem(GDP_DISPLAY_KEY) === "gdp"
+        ? "gdp"
+        : "gdpPerCapita";
     } catch {
-      return "gdp";
+      return "gdpPerCapita";
     }
   });
   const toggleGdp = () => {
@@ -213,9 +213,6 @@ export default memo(function CountryReferenceOverview({
         className="country-reference-section"
         aria-label="Country reference statistics"
       >
-        <div className="country-reference-section-heading">
-          <span>In perspective</span>
-        </div>
         <dl className="country-reference-metrics">
           {visibleMetrics.map((metric) => (
             <CountryMetricColumn

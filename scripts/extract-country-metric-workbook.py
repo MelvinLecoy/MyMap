@@ -98,6 +98,6 @@ metadata["methodReference"] = {"path": "docs/COUNTRY_METRIC_INDEX.md", "sha256":
 metadata["missingGdp"] = [row[0] for row in output if row[2] != "Territory" and row[8] == ""]
 metadata["sources"].pop("world-bank-population", None)
 metadata["sources"].pop("world-bank-gdp", None)
-metadata["csvSha256"] = {path: hashlib.sha256((ROOT / path).read_bytes()).hexdigest() for path in ["data/country-metrics.csv", "data/country-metric-medians.csv", "data/country-highlights.csv"]}
+metadata["csvSha256"] = {path: hashlib.sha256((ROOT / path).read_bytes()).hexdigest() for path in ["data/country-metrics.csv", "data/country-metric-medians.csv", "data/country-highlights.csv", "data/country-comparison-regions.csv"]}
 meta_path.write_text(json.dumps(metadata, ensure_ascii=False, indent=2) + "\n")
 print("Copied 250 entity rows and 7 median rows; both workbook score sheets agree. Svalbard profile remains excluded.")

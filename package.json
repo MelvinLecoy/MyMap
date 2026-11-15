@@ -7,6 +7,7 @@
     "node": ">=22.12.0"
   },
   "scripts": {
+    "country:preview-fonts": "tsx scripts/preview-country-fonts.ts",
     "country:prepare-reference": "python3 scripts/extract-country-metric-workbook.py && tsx scripts/prepare-country-gdp-per-capita.ts",
     "country:prepare-gdp-per-capita": "tsx scripts/prepare-country-gdp-per-capita.ts",
     "country:verify-gdp-per-capita": "tsx scripts/prepare-country-gdp-per-capita.ts --check",
@@ -56,6 +57,7 @@
     "@fontsource-variable/dm-sans": "5.3.0",
     "@fontsource-variable/fraunces": "5.3.0",
     "@fontsource-variable/manrope": "5.3.0",
+    "@fontsource/alegreya-sans": "5.3.0",
     "@supabase/supabase-js": "2.119.0",
     "lucide-react": "0.468.0",
     "maplibre-gl": "5.12.0",
@@ -64,6 +66,7 @@
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.16",
+    "@fontsource-variable/nunito": "5.3.0",
     "@maplibre/maplibre-gl-style-spec": "24.10.0",
     "@playwright/test": "1.56.1",
     "@types/geojson": "7946.0.16",

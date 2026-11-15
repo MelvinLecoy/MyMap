@@ -162,28 +162,39 @@ export function CountryVisitOrderBadge({
   order: number | null;
 }) {
   const label = order == null ? null : countryVisitOrderLabel(code, order);
+  const milestone = order !== null && order > 0 && order % 10 === 0;
   return (
     <span className="country-row-order">
       {order != null && (
         <span
-          className="country-order-badge"
+          className={`country-order-badge${milestone ? " country-order-badge--milestone" : ""}`}
           role="note"
           aria-label={`Visit order ${label}`}
           title={
             code === "XK"
               ? `Country visit order: #${label} · Included in the 197-country set`
-              : `Country visit order: #${label}`
+              : `Country visit order: #${label}${milestone ? " · Milestone" : ""}`
           }
         >
           <svg
-            className="country-order-shield"
+            className={`country-order-shield${milestone ? " country-order-crown" : ""}`}
             viewBox="0 0 40 44"
             aria-hidden="true"
           >
-            <path d="M6 3Q20 7 34 3Q35 8 38 11C34 20 38 28 34 34C30 39 24 40 20 43C16 40 10 39 6 34C2 28 6 20 2 11Q5 8 6 3Z" />
+            <path
+              d={
+                milestone
+                  ? "M3 14L11 22L20 4L29 22L37 14L33 39Q20 43 7 39Z"
+                  : "M6 3Q20 7 34 3Q35 8 38 11C34 20 38 28 34 34C30 39 24 40 20 43C16 40 10 39 6 34C2 28 6 20 2 11Q5 8 6 3Z"
+              }
+            />
             <path
               className="country-order-shield-inset"
-              d="M8 6Q20 9 32 6L35 12C32 21 35 28 32 32C29 36 23 38 20 40C17 38 11 36 8 32C5 28 8 21 5 12Z"
+              d={
+                milestone
+                  ? "M7 20L12 26L20 10L28 26L33 20L30 36Q20 39 10 36Z"
+                  : "M8 6Q20 9 32 6L35 12C32 21 35 28 32 32C29 36 23 38 20 40C17 38 11 36 8 32C5 28 8 21 5 12Z"
+              }
             />
           </svg>
           <span className="country-order-number">

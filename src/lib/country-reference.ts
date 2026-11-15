@@ -13,6 +13,7 @@ export interface CountryReference {
   code: string;
   name: string;
   continent: string;
+  medianRegion?: string;
   category: "195" | "197" | "Territory" | null;
   metrics: Record<CountryMetric, ReferenceValue>;
   facts: string[];
@@ -53,9 +54,10 @@ export function countryMetricContext(
   const country = data.byCode.get(code);
   const countryPool =
     country?.category === "195" || country?.category === "197";
+  const medianRegion = country?.medianRegion ?? country?.continent ?? "";
   const global = countryPool ? data.medians.Global?.metrics[metric] : null;
   const continental = countryPool
-    ? data.medians[country!.continent]?.metrics[metric]
+    ? data.medians[medianRegion]?.metrics[metric]
     : null;
   return {
     value: country?.metrics[metric].value ?? null,
@@ -64,7 +66,7 @@ export function countryMetricContext(
     continentalMedian: continental?.value ?? null,
     worldMedianIndex: global?.index ?? null,
     continentalMedianIndex: continental?.index ?? null,
-    continent: country?.continent ?? "",
+    continent: medianRegion,
   };
 }
 
