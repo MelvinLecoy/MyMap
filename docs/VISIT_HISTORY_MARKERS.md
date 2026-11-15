@@ -13,6 +13,8 @@ Owner-approved rules for both country and city profile timelines.
 
 An asterisk marks a recorded duration that differs from the inclusive calendar span. Retain the recorded duration and asterisk; a hollow circle represents a half-day endpoint.
 
+Use **0.8em** for an asterisk beside a duration such as **2.5\***, and **1.2em** when it is inside a diamond. The diamond's asterisk retains font weight **900**.
+
 ### Cities
 
 | Case                                 | Arrival                               | Departure / presentation                                                  |
