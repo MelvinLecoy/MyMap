@@ -443,11 +443,13 @@ test("country collection mirrors the compact scoreboard, filters and visit rows 
   await expect(names).toHaveCount(198);
   await expect(names.filter({ hasText: /^Kosovo$/ })).toHaveCount(1);
   await expect(names.filter({ hasText: /^Svalbard$/ })).toHaveCount(1);
-  await expect(alphabetical).toHaveAttribute("aria-pressed", "false");
-  await alphabetical.click();
+  await expect(alphabetical).toHaveAttribute("aria-pressed", "true");
   await expect(names.first()).toHaveText("Afghanistan");
   await visited.click();
   await expect(names).toHaveCount(97);
+  await expect(alphabetical).toHaveAttribute("aria-pressed", "true");
+  await expect(names.first()).toHaveText("Albania");
+  await alphabetical.click();
   await expect(alphabetical).toHaveAttribute("aria-pressed", "false");
   await expect(names.first()).toHaveText("China");
   await visits.click();
@@ -742,6 +744,17 @@ test("phone country controls keep A and scoped visited filtering while omitting 
     await expect(names).toHaveCount(198);
     await expect(names.filter({ hasText: /^Svalbard$/ })).toHaveCount(1);
     await expect(names.filter({ hasText: /^Kosovo$/ })).toHaveCount(1);
+    await expect(alphabetical).toHaveAttribute("aria-pressed", "true");
+    await expect(names.first()).toHaveText("Afghanistan");
+    await visited.tap();
+    await expect(names).toHaveCount(97);
+    await expect(alphabetical).toHaveAttribute("aria-pressed", "true");
+    await expect(names.first()).toHaveText("Albania");
+    await visited.tap();
+    await expect(names).toHaveCount(198);
+    await alphabetical.tap();
+    await expect(alphabetical).toHaveAttribute("aria-pressed", "false");
+    await expect(names.first()).toHaveText("China");
     const a = (await alphabetical.boundingBox())!;
     const scope = (await scores
       .getByRole("combobox", { name: "Country scoreboard scope", exact: true })

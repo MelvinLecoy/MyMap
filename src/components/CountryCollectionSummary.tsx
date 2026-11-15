@@ -81,8 +81,8 @@ export default function CountryCollectionSummary({
               .length,
             active: visitedOnly,
             title: visitedOnly
-              ? "Show all countries in visit order"
-              : "Show visited countries in visit order",
+              ? "Show all countries"
+              : "Show visited countries",
             onClick: onVisitedOnly,
             cornerControl: (
               <button

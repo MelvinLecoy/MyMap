@@ -609,7 +609,9 @@ export default function App() {
                       setCountryVisit((current) =>
                         current === "visited" ? "all" : "visited",
                       );
-                      setCountrySort("visit-order");
+                      setCountrySort((current) =>
+                        current === "alphabetical" ? current : "visit-order",
+                      );
                     }}
                     onSort={(sort) =>
                       setCountrySort((current) =>
@@ -686,12 +688,14 @@ export default function App() {
                             code={country.code}
                             order={countryOrders.get(country.code) ?? null}
                           />
-                          <CountryCityCount count={country.cityCount} />
-                          <ChevronRight
-                            className="row-chevron"
-                            size={14}
-                            aria-hidden="true"
-                          />
+                          <span className="country-row-tail">
+                            <CountryCityCount count={country.cityCount} />
+                            <ChevronRight
+                              className="row-chevron"
+                              size={14}
+                              aria-hidden="true"
+                            />
+                          </span>
                         </button>
                       ))
                     : filtered.map((city) => (

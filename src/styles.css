@@ -2155,9 +2155,15 @@ h2 {
   border-color: var(--line);
 }
 .country-row {
-  grid-template-columns: 48px minmax(0, 1fr) 32px 48px 14px;
+  grid-template-columns: 48px minmax(0, 1fr) 32px auto;
   column-gap: 8px;
-  padding-right: calc(var(--collection-inset) - 2px);
+  padding-right: calc(var(--collection-inset) - 6px);
+}
+.country-row-tail {
+  display: grid;
+  grid-template-columns: 48px 14px;
+  column-gap: 5px;
+  align-items: center;
 }
 .country-row .city-row-name {
   white-space: normal;
@@ -2256,7 +2262,7 @@ h2 {
   font-weight: 700;
 }
 .country-order-number .country-order-asterisk {
-  font-weight: 750;
+  font-weight: 900;
 }
 .country-city-count {
   position: relative;
