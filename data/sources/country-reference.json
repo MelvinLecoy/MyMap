@@ -1,29 +1,13 @@
 {
   "preparedOn": "2026-11-15",
-  "metrics": "Latest reported positive value in each frozen World Bank series. Population of Vatican City and Taiwan uses undated GeoNames estimates. Missing comparable GDP and Svalbard-only statistics are left empty. GDP is nominal, current US dollars. Area includes inland water; no area vintage is implied.",
-  "comparisons": "Country-based empirical standing: 1 + 99 * (lower-valued countries + (tied countries - 1) / 2) / (available countries - 1). Lowest=1, highest=100; ties share their midrank. The 197-country reference set is fixed, independent of filters. Svalbard is excluded. Arithmetic means use only available values. Years can differ, explicitly shown on each metric.",
+  "metrics": "Raw figures and precomputed indices copied from the owner's Raw Data sheet, verified against Index Scores. GDP is already expressed in USD billions. Missing values remain empty; numeric zero remains zero. No formula is evaluated or implemented.",
+  "comparisons": "World and continental raw/index medians are copied from Medians 197, not calculated. The workbook uses UN M49 continents (Turkey and Cyprus in Asia). These statistical comparison groups do not change existing travel categories.",
   "citySelection": "Editorially reviewed city and town highlights, starting from GeoNames populated-place names. Neighbourhoods and duplicate boroughs have been removed. These are destination highlights, not a uniform city-proper or metropolitan population ranking. Single-city states and Tuvalu list their main urban centre once.",
   "missingGdp": [
-    "KP",
-    "SJ",
-    "TW",
+    "ER",
     "VA"
   ],
   "sources": {
-    "world-bank-population": {
-      "label": "World Bank · Population",
-      "url": "https://data.worldbank.org/indicator/SP.POP.TOTL",
-      "snapshotUrl": "https://raw.githubusercontent.com/datasets/population/d4b1a4a9a17e2123baf0ef119de05bceced1ab1b/data/population.csv",
-      "sha256": "2c697c3e668c8cb06ee467cd0d475b37b52844fdc48cb7725b79b58f18bf0b02",
-      "license": "World Bank CC BY 4.0; DataHub PDDL"
-    },
-    "world-bank-gdp": {
-      "label": "World Bank · GDP, current US$",
-      "url": "https://data.worldbank.org/indicator/NY.GDP.MKTP.CD",
-      "snapshotUrl": "https://raw.githubusercontent.com/datasets/gdp/36d761dc5617982d3e50b213e02b9a1b47c4e958/data/gdp.csv",
-      "sha256": "8d84ef6bcaccf740c01c5ed7566aae8f7b149d0e2c20001e441efd3cb5b2fa86",
-      "license": "CC BY 4.0"
-    },
     "country-info": {
       "label": "Country information · mledoze/countries",
       "url": "https://github.com/mledoze/countries",
@@ -52,7 +36,27 @@
     }
   },
   "csvSha256": {
-    "data/country-metrics.csv": "270f330888edcf84b9fd6930268f5591347688b69ea27e2efc6959b81cc719b8",
+    "data/country-metrics.csv": "d5fa17ef7bc12316633860bec13fdc41b304d28fba07497ea5df28fc01ebf8ab",
+    "data/country-metric-medians.csv": "8bf0a7d4d428946c817765661cc41e028304368ee19231c0640acc7987d99a88",
     "data/country-highlights.csv": "9247da622acade96830bcadfe7df66fbf36e7ff8cda84bb5f1e0dd2eea984d22"
+  },
+  "profileExclusions": {
+    "SJ": "Owner requested Svalbard remain untouched. The workbook row combines Svalbard and Jan Mayen, so its figures are retained only in the source CSV, not applied to the Svalbard profile."
+  },
+  "workbook": {
+    "path": "data/sources/country-reference/ciudad_mundo_three_indices_global_continental_medians.xlsx",
+    "sha256": "99d36b009cc65896553787be22e0dc99507bdb1d9b199f3b36a8b9b3b802b9f4",
+    "sheets": [
+      "Raw Data",
+      "Index Scores",
+      "Medians 197"
+    ],
+    "countries": 197,
+    "territories": 53
+  },
+  "methodReference": {
+    "path": "docs/COUNTRY_METRIC_INDEX.md",
+    "sha256": "354286cfcc302e582601831a97a96cb4d5498d025bac8ae8f850ab5124b1048d",
+    "status": "Archived for future reference only; the application uses the supplied cached values and does not implement this formula."
   }
 }

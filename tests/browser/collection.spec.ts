@@ -2225,7 +2225,7 @@ test("country profile titles keep whole words and the shared shield at the top r
   }
 });
 
-test("country reference metrics are readable offline, explain their standing and preserve travel statistics", async ({
+test("supplied workbook metrics and median rows render offline without changing travel statistics", async ({
   page,
 }) => {
   await withoutGlobe(page);
@@ -2243,18 +2243,28 @@ test("country reference metrics are readable offline, explain their standing and
   );
   await page.goto("/?panel=countries&country=CH");
   await expect(page.locator(".country-reference-value")).toHaveText([
-    "9.09M",
-    "41.28K",
-    "884.94B",
+    "9M",
+    "41.3K km²",
+    "1,140B",
   ]);
-  await expect(page.locator(".country-reference-vintage")).toHaveText([
-    "people · 2025",
-    "km²",
-    "USD · 2023",
+  await expect(
+    page.locator(".country-reference-medians--raw strong"),
+  ).toHaveText(["9.1M", "5.65M", "118K", "65.3K", "53.16B", "198B"]);
+  await expect(page.locator(".country-index-label strong")).toHaveText([
+    "27.7 / 100",
+    "18.2 / 100",
+    "59.3 / 100",
   ]);
+  await expect(
+    page.locator(".country-reference-medians--index strong"),
+  ).toHaveText(["27.9", "21.8", "28.4", "21.6", "23.4", "38.2"]);
+  await expect(page.locator(".country-reference-unit")).toHaveText(["km²"]);
+  await expect(
+    page.locator(
+      ".country-reference-vintage, .country-reference-info, .country-reference-explanation",
+    ),
+  ).toHaveCount(0);
   await expect(page.getByRole("meter")).toHaveCount(3);
-  await expect(page.locator(".country-reference-averages p")).toHaveCount(6);
-  await expect(page.locator(".country-highlights > div")).toHaveCount(3);
   await expect(page.locator(".country-highlights ul li")).toHaveText([
     "Capital: Bern",
     "Swiss franc",
@@ -2265,35 +2275,42 @@ test("country reference metrics are readable offline, explain their standing and
     "11",
     "8",
   ]);
-  await expect(
-    page.locator(".country-detail-heading .country-order-badge"),
-  ).toHaveText("#5");
-  await page
-    .getByRole("button", { name: "About country data and global standing" })
-    .click();
-  const explanation = page.getByRole("dialog");
-  await expect(explanation).toBeVisible();
-  await expect(explanation).toContainText("above roughly 90% of countries");
-  await expect(explanation.locator(".country-reference-leaders dd")).toHaveText(
-    ["India100", "Russia100", "United States100"],
-  );
-  await expect(explanation.locator("a")).toHaveCount(5);
-  await page.keyboard.press("Escape");
-  await expect(explanation).not.toBeVisible();
-  await expect(
-    page.getByRole("button", {
-      name: "About country data and global standing",
-    }),
-  ).toBeFocused();
   const values = await page
-    .locator(".country-standing-label strong")
+    .locator(".country-index-label strong")
     .allTextContents();
   await page.goto("/?panel=countries&country=CH&countrySet=197");
-  await expect(page.locator(".country-standing-label strong")).toHaveText(
-    values,
-  );
+  await expect(page.locator(".country-index-label strong")).toHaveText(values);
   expect(referenceRequests).toEqual([]);
+  for (const width of [320, 390, 1440]) {
+    await page.setViewportSize({ width, height: 1100 });
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    const sections = await page
+      .locator('[data-metric="population"] .country-reference-metric-body')
+      .evaluate((element) =>
+        [...element.children].map((child) => ({
+          className: child.className,
+          top: child.getBoundingClientRect().top,
+        })),
+      );
+    expect(
+      sections.find((s) => s.className.includes("medians--raw"))!.top,
+    ).toBeLessThan(
+      sections.find((s) => s.className.includes("index-label"))!.top,
+    );
+    expect(
+      sections.find((s) => s.className.includes("medians--index"))!.top,
+    ).toBeGreaterThan(
+      sections.find((s) => s.className.includes("index-track"))!.top,
+    );
+  }
   await page.goto("/?panel=countries&country=US");
+  await expect(
+    page.locator('[data-metric="gdp"] .country-reference-value'),
+  ).toHaveText("32,640B");
   await expect(page.locator(".country-statistics dd")).toHaveText([
     "—",
     "—",
@@ -2303,19 +2320,17 @@ test("country reference metrics are readable offline, explain their standing and
       ).length,
     ),
   ]);
-  await expect(
-    page.locator('[data-metric="gdp"] [role="meter"]'),
-  ).toHaveAttribute("aria-valuenow", "100");
-  await page.goto("/?panel=countries&country=VA");
+  await page.goto("/?panel=countries&country=TW");
   await expect(
     page.locator('[data-metric="gdp"] .country-reference-value'),
-  ).toHaveText("—");
-  await expect(
-    page.locator(".country-highlights > div").nth(1).locator("li"),
-  ).toHaveCount(1);
-  await expect(
-    page.locator(".country-highlights > div").nth(2).locator("li"),
-  ).toHaveCount(3);
+  ).toHaveText("1,020B");
+  await page.goto("/?panel=countries&country=SJ");
+  await expect(page.locator(".country-reference-value")).toHaveText([
+    "N/A",
+    "N/A km²",
+    "N/A",
+  ]);
+  await expect(page.getByRole("meter")).toHaveCount(0);
 });
 
 test("country history shows stays and corrected dates without explanatory copy or notes", async ({

@@ -120,19 +120,23 @@ City pins do not cluster. Pin labels start at zoom 4 and the maximum zoom is 10,
 
 ## Country profiles
 
-Country profiles use a bundled Fraunces title and the same visit-order shield as country rows. The first card contains population, total surface area and nominal GDP, their global standing, per-country world and continent averages, and three columns of facts, cities and attractions. The separate travel scoreboard reads existing country visit totals and counts visited city records; places do not increase that city count. Missing visit history remains missing.
+Country profiles use a bundled Fraunces title and a larger version of the shared row shield. The first card contains workbook-supplied population, total area and GDP, followed by their world and continental raw medians. Each metric's supplied index and world/continental index medians appear separately underneath. Facts, city highlights and attractions remain unchanged, as does the travel scoreboard and visit history.
 
-Reference data has a separate, static source of truth:
+The static sources are:
 
-- `data/country-metrics.csv`: one row per country code, raw numeric values, reporting years, source IDs and explicit eligibility for global comparisons.
-- `data/country-highlights.csv`: ordered facts and reviewed city/town and attraction highlights, joined by the same country codes. Duplicate boroughs and neighbourhoods are excluded. Single-city states appear once; small island countries may list settlements.
-- `data/sources/country-reference.json`: definitions, citations, pinned upstream snapshots, checksums and coverage limits.
+- `data/country-metrics.csv`: exact raw values and full-precision cached indices for all 250 workbook entities (197 countries and 53 territories), keyed by country/territory code. GDP is stored in USD billions.
+- `data/country-metric-medians.csv`: the seven rows copied directly from the workbook's **Medians 197** sheet. These are country-only raw and index medians; the two are never derived from one another.
+- `data/country-highlights.csv`: the existing ordered facts, city/town highlights and attractions.
+- `data/sources/country-reference.json`: workbook and CSV checksums, provenance, scope and the Svalbard exclusion.
+- `data/sources/country-reference/ciudad_mundo_three_indices_global_continental_medians.xlsx`: the owner's original workbook, retained unchanged.
 
-`npm run build` validates all 198 records and generates the bundled reference JSON. No reference-data API calls, database tables, polling or per-profile downloads are needed. The existing Supabase history and map-status tables remain independent and unchanged. Country filters and the 195/197 travel counter never change the fixed 197-country reference population; Svalbard is excluded from those comparisons.
+Run `python3 scripts/extract-country-metric-workbook.py` (requires `openpyxl`) to copy the cached sheet values to CSV. Extraction verifies **Raw Data** and **Index Scores** agree; it does not evaluate formulas or calculate medians. `npm run build` validates these CSVs and creates a bundled static lookup. There are no reference database requests, refresh timers, percentile calculations or average calculations. Existing Supabase travel records remain independent and unchanged.
 
-Global standing is an empirical percentile on a 1–100 scale, using the midrank of tied values with the endpoints anchored at 1 and 100. The world's largest country for each metric scores 100; a standing of 90 means above roughly 90% of countries, not 90% of the largest country's output. Arithmetic averages include only available country values, once per country. Dates remain visible because the latest available reporting year can differ. Values use two decimal places and K/M/B/T suffixes; standing rounds to an integer, or one decimal below 1.
+The owner's [index method](docs/COUNTRY_METRIC_INDEX.md) is archived exactly for future reference. **Its formula is not implemented in the application.** The supplied workbook is authoritative for the currently displayed values. Missing values remain N/A and numeric zero remains zero. The 53 territory records are retained for future use; they do not create country rows or visit records. Svalbard remains unfilled because the workbook's SJ record combines Svalbard and Jan Mayen, which the owner explicitly excluded from this update.
 
-Population and GDP come from frozen World Bank series; Taiwan and Vatican City population use undated GeoNames estimates. Comparable GDP is unavailable in the selected World Bank series for Taiwan, North Korea and Vatican City, and Svalbard-only metrics are left empty instead of importing the combined Svalbard and Jan Mayen totals. The information dialog explains comparisons, coverage and sources. Attraction lists are editorial selections; they do not claim visitor-count rankings.
+Median grouping follows the supplied UN M49 convention, including Turkey and Cyprus in Asia. Comparison rows name the actual continent used; existing travel categories are unchanged. Country filters and the 195/197 visit-counter toggle never alter the supplied comparisons.
+
+Raw figures use compact adaptive rounding: numbers at least 100 in their displayed unit round to an integer; smaller values usually use one decimal, retaining two when the hundredths digit is 3–7. Tiny values retain useful significant digits. Population and area use K/M (and B for large populations); GDP always uses B, including trillion-sized economies. Only total area has a km² unit label. Reporting years are omitted from this presentation. Indices and median indices display one decimal, while the CSVs retain full precision.
 
 ## Places
 

@@ -1,31 +1,80 @@
-import { memo, useId, useRef } from "react";
-import { Info, X } from "lucide-react";
+import { memo } from "react";
 import referenceData from "../generated/country-reference.json";
 import {
   COUNTRY_METRICS,
-  compactCountryValue,
+  continentMedianLabel,
   countryMetricContext,
-  createCountryReferenceIndex,
-  formatStanding,
+  createCountryReferenceLookup,
+  formatCountryValue,
+  formatMetricIndex,
   type CountryMetric,
   type CountryReferenceData,
 } from "../lib/country-reference";
 
-// One immutable index for every profile. No network requests or refresh loop.
-const reference = createCountryReferenceIndex(
+// Workbook values are bundled once. No formula, aggregation or database refresh.
+const reference = createCountryReferenceLookup(
   referenceData as CountryReferenceData,
 );
 const labels = { population: "Population", area: "Total area", gdp: "GDP" };
-const units = { population: "people", area: "km²", gdp: "USD" };
 
-function CompactValue({ value }: { value: number | null }) {
-  if (value === null) return <>—</>;
-  const formatted = compactCountryValue(value);
+function CompactValue({
+  metric,
+  value,
+}: {
+  metric: CountryMetric;
+  value: number | null;
+}) {
+  if (value === null) return <span aria-label="Not available">N/A</span>;
+  const formatted = formatCountryValue(metric, value);
   return (
     <>
       {formatted.amount}
       <span className="reference-value-suffix">{formatted.suffix}</span>
     </>
+  );
+}
+
+function MedianRows({
+  metric,
+  context,
+  indices = false,
+}: {
+  metric: CountryMetric;
+  context: ReturnType<typeof countryMetricContext>;
+  indices?: boolean;
+}) {
+  const pairs = [
+    ["World median", indices ? context.worldMedianIndex : context.worldMedian],
+    [
+      continentMedianLabel(context.continent),
+      indices ? context.continentalMedianIndex : context.continentalMedian,
+    ],
+  ] as const;
+  return (
+    <div
+      className={`country-reference-medians ${indices ? "country-reference-medians--index" : "country-reference-medians--raw"}`}
+      aria-label={`${labels[metric]} ${indices ? "index" : "raw"} medians`}
+    >
+      {pairs.map(([label, value], i) => (
+        <p
+          key={label}
+          title={`${i ? context.continent : "World"} median ${indices ? "index" : labels[metric].toLowerCase()} · supplied workbook`}
+        >
+          <span>{label}</span>
+          <strong>
+            {indices ? (
+              value === null ? (
+                "N/A"
+              ) : (
+                formatMetricIndex(value)
+              )
+            ) : (
+              <CompactValue metric={metric} value={value} />
+            )}
+          </strong>
+        </p>
+      ))}
+    </div>
   );
 }
 
@@ -37,11 +86,6 @@ function CountryMetricColumn({
   metric: CountryMetric;
 }) {
   const context = countryMetricContext(reference, code, metric);
-  const country = reference.byCode.get(code)!;
-  const figure = context.reference;
-  const standing = context.standing;
-  const averageTitle = (scope: string, count: number) =>
-    `${scope} arithmetic average · ${count} countries with reported data · ${units[metric]}`;
   return (
     <div className="country-reference-metric" data-metric={metric}>
       <dt>{labels[metric]}</dt>
@@ -49,149 +93,46 @@ function CountryMetricColumn({
         <div
           className="country-reference-value"
           title={
-            figure
-              ? `${figure.value.toLocaleString("en", { maximumFractionDigits: 2 })} ${units[metric]}`
-              : "Comparable figure unavailable in the selected source"
+            context.value === null
+              ? "Not available"
+              : `${context.value.toLocaleString("en", { maximumFractionDigits: 10 })}${metric === "area" ? " km²" : metric === "gdp" ? " billion USD" : ""}`
           }
         >
-          <CompactValue value={figure?.value ?? null} />
+          <CompactValue metric={metric} value={context.value} />
+          {metric === "area" && (
+            <>
+              {" "}
+              <span className="country-reference-unit">km²</span>
+            </>
+          )}
         </div>
-        <p className="country-reference-vintage">
-          {units[metric]}
-          {figure && metric !== "area" && <> · {figure.year ?? "est."}</>}
-        </p>
-        <div className="country-standing-label">
-          <span>Standing</span>
+        <MedianRows metric={metric} context={context} />
+        <div className="country-index-label">
+          <span>Index</span>
           <strong>
-            {standing === null ? "—" : formatStanding(standing)}
+            {context.index === null ? "N/A" : formatMetricIndex(context.index)}
             <small> / 100</small>
           </strong>
         </div>
         <div
-          className="country-standing-track"
-          role={standing === null ? undefined : "meter"}
-          aria-hidden={standing === null ? true : undefined}
-          aria-label={`${labels[metric]} global standing`}
-          aria-valuemin={1}
+          className="country-index-track"
+          role={context.index === null ? undefined : "meter"}
+          aria-hidden={context.index === null ? true : undefined}
+          aria-label={`${labels[metric]} index`}
+          aria-valuemin={0}
           aria-valuemax={100}
-          aria-valuenow={standing ?? undefined}
+          aria-valuenow={context.index ?? undefined}
           aria-valuetext={
-            standing === null
+            context.index === null
               ? "Not available"
-              : `${formatStanding(standing)} out of 100; world leader ${context.leader?.name}`
+              : `${formatMetricIndex(context.index)} out of 100`
           }
         >
-          <span style={{ width: `${standing ?? 0}%` }} />
+          <span style={{ width: `${context.index ?? 0}%` }} />
         </div>
-        <div className="country-reference-averages">
-          <p title={averageTitle("World", context.worldCount)}>
-            <span>World avg</span>
-            <strong>
-              <CompactValue value={context.worldAverage} />
-            </strong>
-          </p>
-          <p title={averageTitle(country.continent, context.continentCount)}>
-            <span>Cont. avg</span>
-            <strong>
-              <CompactValue value={context.continentAverage} />
-            </strong>
-          </p>
-        </div>
+        <MedianRows metric={metric} context={context} indices />
       </dd>
     </div>
-  );
-}
-
-function ReferenceExplanation({ code }: { code: string }) {
-  const dialog = useRef<HTMLDialogElement>(null);
-  const titleId = useId();
-  const country = reference.byCode.get(code)!;
-  const sourceIds = [
-    ...new Set([
-      ...COUNTRY_METRICS.flatMap((key) => country.metrics[key]?.source ?? []),
-      ...Object.values(country.sources),
-    ]),
-  ];
-  return (
-    <>
-      <button
-        type="button"
-        className="country-reference-info"
-        aria-label="About country data and global standing"
-        onClick={() => dialog.current?.showModal()}
-      >
-        <Info size={13} aria-hidden="true" />
-      </button>
-      <dialog
-        ref={dialog}
-        className="country-reference-explanation"
-        aria-labelledby={titleId}
-        onClick={(event) => {
-          if (event.target === event.currentTarget) dialog.current?.close();
-        }}
-      >
-        <div>
-          <div className="country-reference-explanation-heading">
-            <h2 id={titleId}>The numbers, in perspective</h2>
-            <button
-              type="button"
-              aria-label="Close country data explanation"
-              onClick={() => dialog.current?.close()}
-            >
-              <X size={16} aria-hidden="true" />
-            </button>
-          </div>
-          <p>
-            <strong>Global standing</strong> places each country on a 1–100
-            scale. The largest scores 100; 90 means above roughly 90% of
-            countries. Equal values share their standing.
-          </p>
-          <dl className="country-reference-leaders">
-            {COUNTRY_METRICS.map((metric) => {
-              const leader = reference.benchmarks[metric].leader;
-              return (
-                <div key={metric}>
-                  <dt>{labels[metric]} leader</dt>
-                  <dd>
-                    {leader?.name ?? "—"}
-                    <span>100</span>
-                  </dd>
-                </div>
-              );
-            })}
-          </dl>
-          <p>
-            <strong>Averages</strong> are arithmetic averages per country, using
-            available figures in the fixed 197-country reference set. Cont. avg
-            refers to {country.continent}. Filters and the 195/197 toggle do not
-            change these comparisons.
-          </p>
-          <p>
-            Each dated figure shows its reporting year. GDP is nominal, in
-            current US dollars; total area includes inland water. Years can
-            differ. A dash means a comparable figure is unavailable.
-          </p>
-          <p>
-            Cities and attractions are selected highlights. Small island
-            countries may list towns or settlements; single-city states appear
-            once. These lists are editorial selections.
-          </p>
-          <div className="country-reference-source-links">
-            <span>Sources</span>
-            {sourceIds.map((id) => (
-              <a
-                key={id}
-                href={reference.sources[id].url}
-                target="_blank"
-                rel="noreferrer"
-              >
-                {reference.sources[id].label}
-              </a>
-            ))}
-          </div>
-        </div>
-      </dialog>
-    </>
   );
 }
 
@@ -210,7 +151,6 @@ export default memo(function CountryReferenceOverview({
       >
         <div className="country-reference-section-heading">
           <span>In perspective</span>
-          <ReferenceExplanation code={code} />
         </div>
         <dl className="country-reference-metrics">
           {COUNTRY_METRICS.map((metric) => (

@@ -64,6 +64,7 @@ try {
     JSON.stringify(
       importCountryReference(
         readFileSync("data/country-metrics.csv", "utf8"),
+        readFileSync("data/country-metric-medians.csv", "utf8"),
         readFileSync("data/country-highlights.csv", "utf8"),
         countryHistory,
         countryReferenceSources.sources,
