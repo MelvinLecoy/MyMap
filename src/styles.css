@@ -2861,6 +2861,7 @@ h2 {
 }
 .visit-timeline {
   margin: 12px 0 0;
+  margin-inline: calc(8px - var(--collection-inset));
   padding: 0 0 4px;
   list-style: none;
   font-family: "DM Sans Variable", sans-serif;
@@ -2912,7 +2913,7 @@ h2 {
   color: var(--visit-year);
   font-size: 8px;
   line-height: 11px;
-  font-weight: 600;
+  font-weight: 650;
   white-space: nowrap;
 }
 .visit-year-card {
@@ -2941,16 +2942,16 @@ h2 {
 }
 .visit-month-row {
   display: grid;
-  grid-template-columns: 26px minmax(0, 1fr);
+  grid-template-columns: 32px minmax(0, 1fr);
   align-items: center;
   gap: 6px;
 }
 .visit-month-label {
   display: grid;
   color: var(--visit-year);
-  font-size: 9px;
-  font-weight: 750;
-  line-height: 12px;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 15px;
 }
 .visit-month-label span,
 .visit-month-label small {
@@ -2974,9 +2975,11 @@ h2 {
   gap: 4px;
   flex: 1 1 64px;
   min-width: 56px;
+  max-width: 96px;
 }
 .visit-period:has(.visit-period-gap) {
   flex-basis: 75px;
+  max-width: 107px;
 }
 .visit-period--single {
   flex: 0 0 24px;
