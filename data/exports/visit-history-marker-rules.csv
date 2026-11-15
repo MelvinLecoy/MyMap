@@ -1,6 +1,6 @@
 Profile,CountryCode,Condition,ArrivalMarker,DepartureMarker,SingleMarker,Label,Notes
 all,*,ordinary-date-range,filled-circle,filled-circle,,{days},Inclusive endpoints; also applies between dashed links
-all,*,ordinary-single-day,,,filled-circle,1,White 8px numeral; existing circle size; also applies between dashed links
+all,*,ordinary-single-day,,,filled-circle,1,White 10px numeral; existing circle size; also applies between dashed links
 city,*,exceptional-range-default,filled-circle,hollow-circle,,{days}*,Use Singapore override for its exceptional one-day stay
 city,SG,exceptional-one-day,,,hollow-diamond,1*,Both dates centered below; asterisk font weight 900
 country,BA,exceptional-range,hollow-circle,filled-circle,,{days}*,Bosnia & Herzegovina

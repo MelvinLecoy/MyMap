@@ -200,6 +200,45 @@ test("cross-month groups retain one visit total and gaps contribute no days", ()
     [stay.startLabel, stay.endLabel, stay.days, stay.exceptional],
     ["30 Dec ’23", "1 Jan ’24", 3, false],
   );
+  const canada = visitTimelineYears(country("CA"))[1].visits[0].months[0];
+  assert.deepEqual(canada.labels, ["JUL", "JUN"]);
+  assert.deepEqual(
+    [
+      canada.periods[0].startLabel,
+      canada.periods[0].endLabel,
+      canada.periods[0].days,
+    ],
+    ["29 Jun", "16 Jul", 18],
+  );
+});
+
+test("every country and city month heading puts the newer month above the older month", () => {
+  const month = (date: string) =>
+    new Intl.DateTimeFormat("en", {
+      month: "short",
+      timeZone: "UTC",
+    })
+      .format(new Date(`${date}T00:00:00Z`))
+      .toUpperCase();
+  for (const entries of [countryData.countries, cityData.cities]) {
+    let multiMonthStays = 0;
+    const before = JSON.stringify(entries);
+    for (const entry of entries)
+      for (const year of visitTimelineYears(entry.visits ?? []))
+        for (const visit of year.visits)
+          for (const row of visit.months)
+            for (const stay of row.periods) {
+              if (!stay.exact) continue;
+              assert.deepEqual(
+                row.labels,
+                [...new Set([month(stay.departure!), month(stay.arrival!)])],
+                `${entry.code ?? entry.id}: ${stay.arrival} to ${stay.departure}`,
+              );
+              if (row.labels.length > 1) multiMonthStays++;
+            }
+    assert.ok(multiMonthStays > 0);
+    assert.equal(JSON.stringify(entries), before);
+  }
 });
 
 test("unknown and partial dates remain honest and single half days receive a marker", () => {

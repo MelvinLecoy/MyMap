@@ -189,7 +189,8 @@ export function visitTimelineYears(
           ),
         ),
       ].map((value) => value.toUpperCase());
-      if (labels[0] === "DEC" && labels[1] === "JAN") labels.reverse();
+      // Month headings run newest first; endpoint dates remain chronological.
+      labels.reverse();
       if (rows.at(-1)?.key !== rowKey)
         rows.push({
           key: rowKey,

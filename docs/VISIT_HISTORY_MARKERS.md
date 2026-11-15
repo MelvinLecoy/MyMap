@@ -6,7 +6,7 @@ Owner-approved rules for both country and city profile timelines.
 
 - A filled circle means the endpoint date is inclusive.
 - Ordinary date ranges use filled circles at both ends.
-- An ordinary one-day stay uses one filled circle with a white **1** centered inside it. The numeral is **8px**; keep the existing circle size.
+- An ordinary one-day stay uses one filled circle with a white **1** centered inside it. The numeral is **10px**; keep the existing circle size.
 - These same rules apply to individual stays joined by dashed links. Dashed links indicate a gap between stays; they add no days.
 
 ## Exceptional durations
@@ -41,6 +41,7 @@ The country overrides apply only to exceptional durations. Singapore's exception
 
 - Keep other styles unchanged: typography, spacing, row padding and default heights, card borders, dividers, month headings, visit counts and clock totals.
 - Keep the existing panel date colors: 2026 green, 2025 yellow, 2024 orange, and 2023 or earlier brown.
+- Stacked multi-month headings always show the newer month above the older month in both country and city histories: **JUL** above **JUN**, **JAN** above **DEC**, and the same rule for every other pair. Endpoint dates and segments still run from arrival to departure.
 - Keep ordinary range lengths and the current four-dash connector style. Connect the actual marker edges and center each date label under its marker; wrapped stays start a new visual line.
 - Center markers on the same visual line together, including a circle followed by a diamond. Rows grow only as needed for their own content.
 - Keep counted visits, recorded dates, explicit durations, city captions and statistics unchanged. Marker choices are presentation rules only.
