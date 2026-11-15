@@ -2213,7 +2213,7 @@ test("country profile titles keep whole words and center the inset shield beside
       const heading = page.locator(".country-detail-heading");
       const title = heading.locator("h1");
       await expect(title).toHaveCSS("font-family", /Fraunces/);
-      await expect(page.locator(".country-place-card")).toHaveCSS(
+      await expect(page.locator(".country-reference-section")).toHaveCSS(
         "font-family",
         /Alegreya Sans/,
       );

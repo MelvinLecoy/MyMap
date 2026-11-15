@@ -2479,8 +2479,6 @@ h2 {
   padding: 17px 15px 15px;
   background: linear-gradient(145deg, #dfecdf, #cfe3d7 75%);
   border-color: #b8d0be;
-  font-family: var(--country-profile-font);
-  color: var(--country-card-muted);
 }
 .country-place-card--unvisited {
   --country-card-heading: #34464b;
@@ -2507,7 +2505,7 @@ h2 {
   display: flex;
   align-items: center;
   margin: 0 0 6px;
-  color: var(--country-card-muted);
+  color: #4f6c59;
   font-size: 15px;
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -2516,7 +2514,7 @@ h2 {
 .country-detail h1 {
   min-width: 0;
   margin: 0;
-  color: var(--country-card-heading);
+  color: #233f37;
   font-family: "Fraunces Variable", Georgia, serif;
   font-size: clamp(28px, 8.7cqi, 36px);
   font-weight: 520;
@@ -2557,6 +2555,7 @@ h2 {
   font-size: 12px;
 }
 .country-reference-section {
+  font-family: var(--country-profile-font);
   margin: 12px -7px 0;
   padding: 10px 6px;
   border: 1px solid var(--country-card-line);
@@ -2587,9 +2586,9 @@ h2 {
 .country-reference-metric dt {
   margin-bottom: 4px;
   color: var(--country-card-muted);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 450;
-  line-height: 14px;
+  line-height: 15px;
 }
 .country-reference-metric-body {
   display: contents;
@@ -2613,10 +2612,10 @@ h2 {
 }
 .country-reference-value {
   color: var(--country-card-ink);
-  font-family: var(--country-profile-font);
-  font-size: clamp(16px, 5cqi, 21px);
-  font-weight: 650;
-  letter-spacing: -0.025em;
+  font-family: "Manrope Variable", sans-serif;
+  font-size: clamp(18px, calc(5cqi + 2px), 23px);
+  font-weight: 750;
+  letter-spacing: -0.05em;
   line-height: 1.2;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
@@ -2640,19 +2639,20 @@ h2 {
   justify-content: space-between;
   gap: 2px;
   color: var(--country-card-muted);
-  font-size: 8.5px;
-  line-height: 12px;
+  font-size: 9.5px;
+  line-height: 14px;
 }
 .country-index-label strong {
   color: var(--country-card-ink);
-  font-size: 10px;
-  font-weight: 650;
+  font-family: "DM Sans Variable", sans-serif;
+  font-size: 11px;
+  font-weight: 700;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
 .country-index-label small {
   color: var(--country-card-muted);
-  font-size: 7px;
+  font-size: 8px;
   font-weight: 400;
 }
 .country-index-track {
@@ -2687,14 +2687,15 @@ h2 {
   gap: 2px;
   margin: 0;
   color: var(--country-card-muted);
-  font-size: 9.5px;
-  line-height: 13px;
+  font-size: 10.5px;
+  line-height: 15px;
   white-space: nowrap;
 }
 .country-reference-medians strong {
   color: var(--country-card-baseline);
-  font-size: 9.5px;
-  font-weight: 650;
+  font-family: "DM Sans Variable", sans-serif;
+  font-size: 10.5px;
+  font-weight: 700;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
@@ -2704,7 +2705,7 @@ h2 {
   gap: 12px;
   margin-top: 10px;
   padding-top: 9px;
-  border-top: 1px solid var(--country-card-soft-line);
+  border-top: 1px solid #bcd3c3;
 }
 .country-highlights > div {
   min-width: 0;
@@ -2712,9 +2713,9 @@ h2 {
 .country-detail .country-highlights h2 {
   display: block;
   margin: 0 0 7px;
-  color: var(--country-card-muted);
+  color: #5b7565;
   font-size: 9.5px;
-  font-weight: 600;
+  font-weight: 650;
   letter-spacing: 0;
   line-height: 12px;
   text-transform: none;
@@ -2724,13 +2725,13 @@ h2 {
   gap: 6px;
   margin: 0;
   padding-left: 12px;
-  color: var(--country-card-muted);
+  color: #4a6254;
   font-size: 10px;
   line-height: 1.4;
   overflow-wrap: anywhere;
 }
 .country-highlights li::marker {
-  color: var(--country-card-muted);
+  color: #8b9d8d;
   font-size: 8px;
 }
 .country-value-missing {
@@ -2931,7 +2932,7 @@ h2 {
 }
 @container (max-width: 330px) {
   .country-reference-medians strong {
-    font-size: 10px;
+    font-size: 11px;
   }
   .collection-controls .status-filter,
   .collection-controls .continent-filter {
