@@ -13,10 +13,11 @@ function StaySegment({ stay }: { stay: TimelineStay }) {
       </div>
     );
   const units = stay.days === 1 ? "day" : "days";
+  const pointStay = stay.single || stay.days === 1;
   return (
     <div
       role="listitem"
-      className={`visit-period${stay.single ? " visit-period--single" : ""}${stay.exceptional && stay.single ? " visit-period--single-exception" : ""}`}
+      className={`visit-period${pointStay ? " visit-period--single" : ""}${stay.days === 1 ? " visit-period--one-day" : ""}${stay.exceptional && pointStay ? " visit-period--single-exception" : ""}`}
       data-duration={stay.days ?? undefined}
       data-exception={stay.exceptional || undefined}
     >
@@ -39,24 +40,30 @@ function StaySegment({ stay }: { stay: TimelineStay }) {
         </span>
         <div className="visit-period-axis" aria-hidden="true">
           <span className="visit-period-point" />
-          {!stay.single && <span className="visit-period-line" />}
-          {(!stay.single || stay.exceptional) && stay.days != null && (
+          {!pointStay && <span className="visit-period-line" />}
+          {(!pointStay || stay.exceptional) && stay.days != null && (
             <span className="visit-period-duration">
               {stay.days}
               {stay.exceptional && <sup>*</sup>}
             </span>
           )}
-          {!stay.single && (
+          {!pointStay && (
             <>
               <span className="visit-period-line" />
               <span className="visit-period-point" />
             </>
           )}
         </div>
-        <div className="visit-period-dates" aria-hidden="true">
+        <div
+          className={`visit-period-dates${pointStay && !stay.single ? " visit-period-dates--point" : ""}`}
+          aria-hidden="true"
+        >
           <time dateTime={stay.arrival!}>{stay.startLabel}</time>
           {!stay.single && (
-            <time dateTime={stay.departure!}>{stay.endLabel}</time>
+            <>
+              {pointStay && <span>–</span>}
+              <time dateTime={stay.departure!}>{stay.endLabel}</time>
+            </>
           )}
         </div>
       </div>

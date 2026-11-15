@@ -892,11 +892,9 @@ test("country and city duration exceptions are explicit while normal stays remai
     ]);
     await expect(page.locator(".country-visit-list")).toContainText(text);
     await expect(
-      page
-        .locator(".visit-period-duration")
-        .filter({
-          hasText: new RegExp(`^${marker.replace(/[.*]/g, "\\$&")}$`),
-        }),
+      page.locator(".visit-period-duration").filter({
+        hasText: new RegExp(`^${marker.replace(/[.*]/g, "\\$&")}$`),
+      }),
     ).toHaveCount(1);
     await expect(page.locator(".visit-total")).not.toContainText(["days"]);
     if (code === "GB") {
@@ -933,6 +931,14 @@ test("country and city duration exceptions are explicit while normal stays remai
       await expect(stays).toHaveCount(4);
       await expect(stays.nth(2)).toContainText("3 September 2026");
       await expect(stays.nth(0)).not.toHaveAttribute("data-exception");
+      const oneDay = stays.nth(3);
+      await expect(oneDay.locator(".visit-period-point")).toHaveCount(1);
+      await expect(oneDay.locator(".visit-period-point")).toHaveCSS(
+        "background-color",
+        "rgb(38, 120, 79)",
+      );
+      await expect(oneDay.locator(".visit-period-line")).toHaveCount(0);
+      await expect(oneDay.locator(".visit-period-dates")).toHaveText("11–12");
     }
   }
   await page.goto("/?city=shanghai-china");

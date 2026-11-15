@@ -3018,6 +3018,9 @@ h2 {
   border-radius: 50%;
   background: var(--surface);
 }
+.visit-period--one-day .visit-period-point {
+  background: currentColor;
+}
 .visit-period-line {
   flex: 1;
   min-width: 3px;
@@ -3046,6 +3049,10 @@ h2 {
   font-weight: 550;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+}
+.visit-period-dates--point {
+  justify-content: flex-start;
+  gap: 2px;
 }
 .visit-period-fallback {
   color: var(--muted);
