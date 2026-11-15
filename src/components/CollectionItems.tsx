@@ -1,3 +1,4 @@
+import { useId } from "react";
 import {
   CalendarDays,
   ChevronRight,
@@ -154,6 +155,47 @@ function CountryVisitedSummary({ country }: { country: CountryRecord }) {
   );
 }
 
+function MilestoneCrown() {
+  const id = useId();
+  return (
+    <svg
+      className="country-order-shield country-order-crown"
+      viewBox="0 0 40 44"
+      aria-hidden="true"
+    >
+      <defs>
+        <linearGradient id={`${id}-gold`} x1="0" y1="0" x2="0.8" y2="1">
+          <stop offset="0" stopColor="#fff4cc" />
+          <stop offset="0.48" stopColor="#efd384" />
+          <stop offset="1" stopColor="#dcb34d" />
+        </linearGradient>
+        <linearGradient id={`${id}-band`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#fff8e2" />
+          <stop offset="1" stopColor="#f2dda1" />
+        </linearGradient>
+      </defs>
+      <path
+        fill={`url(#${id}-gold)`}
+        d="M4.1 13.2L11.7 20.1L18.7 6.4Q20 4.3 21.3 6.4L28.3 20.1L35.9 13.2L33.1 27.5L32.7 39.4Q20 42.6 7.3 39.4L6.9 27.5Z"
+      />
+      <path
+        className="country-order-crown-band"
+        fill={`url(#${id}-band)`}
+        d="M6.5 24.7Q20 27.2 33.5 24.7L32.8 39.4Q20 42.7 7.2 39.4Z"
+      />
+      <path
+        className="country-order-crown-highlight"
+        d="M6.5 15.9L12.4 21.4L20 8.2L27.6 21.4L33.5 15.9"
+      />
+      <g className="country-order-crown-pearls">
+        <circle cx="3.8" cy="12" r="1.65" />
+        <circle cx="20" cy="4.6" r="1.9" />
+        <circle cx="36.2" cy="12" r="1.65" />
+      </g>
+    </svg>
+  );
+}
+
 export function CountryVisitOrderBadge({
   code,
   order,
@@ -176,27 +218,21 @@ export function CountryVisitOrderBadge({
               : `Country visit order: #${label}${milestone ? " · Milestone" : ""}`
           }
         >
-          <svg
-            className={`country-order-shield${milestone ? " country-order-crown" : ""}`}
-            viewBox="0 0 40 44"
-            aria-hidden="true"
-          >
-            <path
-              d={
-                milestone
-                  ? "M3 14L11 22L20 4L29 22L37 14L33 39Q20 43 7 39Z"
-                  : "M6 3Q20 7 34 3Q35 8 38 11C34 20 38 28 34 34C30 39 24 40 20 43C16 40 10 39 6 34C2 28 6 20 2 11Q5 8 6 3Z"
-              }
-            />
-            <path
-              className="country-order-shield-inset"
-              d={
-                milestone
-                  ? "M7 20L12 26L20 10L28 26L33 20L30 36Q20 39 10 36Z"
-                  : "M8 6Q20 9 32 6L35 12C32 21 35 28 32 32C29 36 23 38 20 40C17 38 11 36 8 32C5 28 8 21 5 12Z"
-              }
-            />
-          </svg>
+          {milestone ? (
+            <MilestoneCrown />
+          ) : (
+            <svg
+              className="country-order-shield"
+              viewBox="0 0 40 44"
+              aria-hidden="true"
+            >
+              <path d="M6 3Q20 7 34 3Q35 8 38 11C34 20 38 28 34 34C30 39 24 40 20 43C16 40 10 39 6 34C2 28 6 20 2 11Q5 8 6 3Z" />
+              <path
+                className="country-order-shield-inset"
+                d="M8 6Q20 9 32 6L35 12C32 21 35 28 32 32C29 36 23 38 20 40C17 38 11 36 8 32C5 28 8 21 5 12Z"
+              />
+            </svg>
+          )}
           <span className="country-order-number">
             <span className="country-row-order-hash">#</span>
             {order}

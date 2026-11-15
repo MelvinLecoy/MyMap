@@ -2291,16 +2291,26 @@ h2 {
   font-variant-numeric: tabular-nums;
 }
 .country-order-crown {
-  fill: #f6e1a7;
-  stroke: #b18c35;
+  stroke: #b39343;
   stroke-linejoin: round;
 }
-.country-order-crown .country-order-shield-inset {
-  stroke: #d7b75f;
+.country-order-crown-band {
+  stroke: #bd9e51;
+  stroke-width: 0.85;
+}
+.country-order-crown-highlight {
+  fill: none;
+  stroke: #fff7dc;
+  stroke-width: 0.85;
+  stroke-linecap: round;
+}
+.country-order-crown-pearls {
+  fill: #fff3cc;
+  stroke-width: 0.85;
 }
 .country-order-badge--milestone .country-order-number {
   align-self: end;
-  margin-bottom: 12%;
+  margin-bottom: 9%;
   transform: none;
 }
 .country-row-order-hash {
@@ -2489,7 +2499,7 @@ h2 {
   --country-card-soft-line: #bdc7cb;
   --country-card-meter: #7d9097;
   --country-card-track: #b8c3c7;
-  background: #d0d6d8;
+  background: #e1e5e6;
   border-color: #b5c0c4;
 }
 .country-detail-heading {

@@ -2401,7 +2401,7 @@ test("supplied workbook metrics and median rows render offline without changing 
   );
   await expect(page.locator(".country-place-card")).toHaveCSS(
     "background-color",
-    "rgb(208, 214, 216)",
+    "rgb(225, 229, 230)",
   );
   await page.goto("/?panel=countries&country=TR");
   await expect(page.getByText("EU median", { exact: true })).toHaveCount(6);
