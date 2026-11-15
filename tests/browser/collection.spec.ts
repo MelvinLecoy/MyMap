@@ -2922,6 +2922,35 @@ test("country stay segments name matching cities above the plot and fit narrow p
   }
 });
 
+test("selected country histories omit city labels while other countries keep them", async ({
+  page,
+}) => {
+  await withoutGlobe(page);
+  for (const [code, name] of [
+    ["SG", "Singapore"],
+    ["MC", "Monaco"],
+    ["VA", "Vatican City"],
+    ["SM", "San Marino"],
+    ["LU", "Luxembourg"],
+    ["LI", "Liechtenstein"],
+    ["MT", "Malta"],
+  ]) {
+    await page.goto(`/?panel=countries&country=${code}`);
+    await expect(
+      page.getByRole("heading", { name, exact: true }),
+    ).toBeVisible();
+    await expect(page.locator(".visit-timeline-entry").first()).toBeVisible();
+    await expect(page.locator(".visit-period-cities")).toHaveCount(0);
+    await expect(page.locator(".country-city-list .city-row")).toHaveCount(
+      data.cities.filter((city) => city.countryCode === code).length,
+    );
+  }
+  for (const [code, city] of [["AD", "Andorra la Vella"]]) {
+    await page.goto(`/?panel=countries&country=${code}`);
+    await expect(page.locator(".visit-period-cities")).toContainText([city]);
+  }
+});
+
 test("grouped city visits show only actual periods, preserve partial days and fit mobile", async ({
   page,
 }) => {

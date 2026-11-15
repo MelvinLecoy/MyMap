@@ -8,6 +8,18 @@ import VisitTimeline from "./VisitTimeline";
 import { isPlace } from "../lib/places";
 import CountryReferenceOverview from "./CountryReferenceOverview";
 
+// Review this case for future country/city imports; see AGENTS.md.
+// These display preferences are independent of the number of stored cities.
+const COUNTRIES_WITHOUT_CITY_LABELS = new Set([
+  "SG",
+  "MC",
+  "VA",
+  "SM",
+  "LU",
+  "LI",
+  "MT",
+]);
+
 export default function CountryDetail({
   country,
   cities,
@@ -29,8 +41,11 @@ export default function CountryDetail({
   ).length;
   const visits = country.visits ?? [];
   const historyCities = useMemo(
-    () => cities.filter((city) => !isPlace(city)),
-    [cities],
+    () =>
+      COUNTRIES_WITHOUT_CITY_LABELS.has(country.code)
+        ? []
+        : cities.filter((city) => !isPlace(city)),
+    [cities, country.code],
   );
   const nameParts = country.name.split(/(\s+)/);
   return (
@@ -135,7 +150,7 @@ export default function CountryDetail({
             <VisitTimeline
               visits={visits}
               kind="country"
-              cities={country.code === "SG" ? undefined : historyCities}
+              cities={historyCities}
             />
           ) : (
             <p className="country-history-empty">
