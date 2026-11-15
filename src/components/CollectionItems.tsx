@@ -1,4 +1,3 @@
-import { useId } from "react";
 import {
   CalendarDays,
   ChevronRight,
@@ -156,42 +155,23 @@ function CountryVisitedSummary({ country }: { country: CountryRecord }) {
 }
 
 function MilestoneCrown() {
-  const id = useId();
   return (
     <svg
       className="country-order-shield country-order-crown"
       viewBox="0 0 40 44"
       aria-hidden="true"
     >
-      <defs>
-        <linearGradient id={`${id}-gold`} x1="0" y1="0" x2="0.8" y2="1">
-          <stop offset="0" stopColor="#fff4cc" />
-          <stop offset="0.48" stopColor="#efd384" />
-          <stop offset="1" stopColor="#dcb34d" />
-        </linearGradient>
-        <linearGradient id={`${id}-band`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#fff8e2" />
-          <stop offset="1" stopColor="#f2dda1" />
-        </linearGradient>
-      </defs>
-      <path
-        fill={`url(#${id}-gold)`}
-        d="M4.1 13.2L11.7 20.1L18.7 6.4Q20 4.3 21.3 6.4L28.3 20.1L35.9 13.2L33.1 27.5L32.7 39.4Q20 42.6 7.3 39.4L6.9 27.5Z"
+      <circle className="country-order-medallion" cx="20" cy="26.5" r="16.5" />
+      <circle
+        className="country-order-medallion-inset"
+        cx="20"
+        cy="26.5"
+        r="14.3"
       />
       <path
-        className="country-order-crown-band"
-        fill={`url(#${id}-band)`}
-        d="M6.5 24.7Q20 27.2 33.5 24.7L32.8 39.4Q20 42.7 7.2 39.4Z"
+        className="country-order-crown-crest"
+        d="M12.6 12.4L9.7 4.9L15.8 8.6L20 1.8L24.2 8.6L30.3 4.9L27.4 12.4Z"
       />
-      <path
-        className="country-order-crown-highlight"
-        d="M6.5 15.9L12.4 21.4L20 8.2L27.6 21.4L33.5 15.9"
-      />
-      <g className="country-order-crown-pearls">
-        <circle cx="3.8" cy="12" r="1.65" />
-        <circle cx="20" cy="4.6" r="1.9" />
-        <circle cx="36.2" cy="12" r="1.65" />
-      </g>
     </svg>
   );
 }
@@ -209,7 +189,7 @@ export function CountryVisitOrderBadge({
     <span className="country-row-order">
       {order != null && (
         <span
-          className={`country-order-badge${milestone ? " country-order-badge--milestone" : ""}`}
+          className={`country-order-badge${milestone ? " country-order-badge--milestone" : ""}${milestone && order >= 100 ? " country-order-badge--milestone-wide" : ""}`}
           role="note"
           aria-label={`Visit order ${label}`}
           title={

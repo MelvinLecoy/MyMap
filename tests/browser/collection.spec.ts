@@ -719,6 +719,20 @@ test("every tenth country uses the same crown in rows and profiles, following th
   await expect(row("Spain").locator(".country-order-crown")).toHaveCount(0);
   await expect(row("Estonia").locator(".country-order-crown")).toHaveCount(0);
   await expect(row("Latvia").locator(".country-order-crown")).toHaveCount(1);
+  await page.evaluate(() => document.fonts.ready);
+  const milestoneBadge = row("Portugal").locator(".country-order-badge");
+  const ordinaryBadge = row("Spain").locator(".country-order-badge");
+  const milestoneBounds = (await milestoneBadge.boundingBox())!;
+  const ordinaryBounds = (await ordinaryBadge.boundingBox())!;
+  expect(milestoneBounds.width).toBe(ordinaryBounds.width);
+  expect(milestoneBounds.height).toBe(ordinaryBounds.height);
+  const rowRing = (await milestoneBadge
+    .locator(".country-order-medallion-inset")
+    .boundingBox())!;
+  const rowNumber = (await milestoneBadge
+    .locator(".country-order-number")
+    .boundingBox())!;
+  expect(rowRing.width - rowNumber.width).toBeGreaterThanOrEqual(4);
   const crownPath = await row("Portugal")
     .locator(".country-order-crown path")
     .first()
@@ -727,6 +741,19 @@ test("every tenth country uses the same crown in rows and profiles, following th
   await expect(
     page.locator(".country-detail-heading .country-order-badge--milestone"),
   ).toHaveText("#10");
+  const profileBadge = page.locator(
+    ".country-detail-heading .country-order-badge",
+  );
+  const profileBounds = (await profileBadge.boundingBox())!;
+  expect(profileBounds.width).toBe(50);
+  expect(profileBounds.height).toBe(56.25);
+  const profileRing = (await profileBadge
+    .locator(".country-order-medallion-inset")
+    .boundingBox())!;
+  const profileNumber = (await profileBadge
+    .locator(".country-order-number")
+    .boundingBox())!;
+  expect(profileRing.width - profileNumber.width).toBeGreaterThanOrEqual(6);
   expect(
     await page
       .locator(".country-detail-heading .country-order-crown path")

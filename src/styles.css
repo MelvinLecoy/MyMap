@@ -2285,37 +2285,45 @@ h2 {
   display: inline-flex;
   align-items: baseline;
   gap: 1px;
-  font-size: 12px;
+  font-size: var(--country-order-number-size, 12px);
   line-height: 12px;
   font-weight: 900;
   font-variant-numeric: tabular-nums;
 }
 .country-order-crown {
-  stroke: #b39343;
+  stroke: #b99b50;
   stroke-linejoin: round;
 }
-.country-order-crown-band {
-  stroke: #bd9e51;
-  stroke-width: 0.85;
+.country-order-medallion {
+  fill: #f8edcf;
 }
-.country-order-crown-highlight {
+.country-order-medallion-inset {
   fill: none;
-  stroke: #fff7dc;
-  stroke-width: 0.85;
-  stroke-linecap: round;
+  stroke: #e3cf94;
+  stroke-width: 0.7;
 }
-.country-order-crown-pearls {
-  fill: #fff3cc;
-  stroke-width: 0.85;
+.country-order-crown-crest {
+  fill: #ead08b;
+  stroke-width: 1;
+}
+.country-order-badge--milestone {
+  --country-order-number-size: 10.5px;
+  --country-order-hash-size: 7px;
+}
+.country-order-badge--milestone-wide {
+  --country-order-number-size: 9px;
+  --country-order-hash-size: 6px;
 }
 .country-order-badge--milestone .country-order-number {
-  align-self: end;
-  margin-bottom: 9%;
-  transform: none;
+  position: absolute;
+  left: 50%;
+  top: 62%;
+  margin: 0;
+  transform: translate(-50%, -50%);
 }
 .country-row-order-hash {
   color: #9a7d45;
-  font-size: 8px;
+  font-size: var(--country-order-hash-size, 8px);
   font-weight: 700;
 }
 .country-order-asterisk {
@@ -2559,11 +2567,19 @@ h2 {
   height: 56.25px;
 }
 .country-detail-heading .country-order-number {
-  font-size: 19px;
+  font-size: var(--country-order-number-size, 19px);
   line-height: 19px;
 }
 .country-detail-heading .country-row-order-hash {
-  font-size: 12px;
+  font-size: var(--country-order-hash-size, 12px);
+}
+.country-detail-heading .country-order-badge--milestone {
+  --country-order-number-size: 16.5px;
+  --country-order-hash-size: 10.5px;
+}
+.country-detail-heading .country-order-badge--milestone-wide {
+  --country-order-number-size: 14px;
+  --country-order-hash-size: 9px;
 }
 .country-reference-section {
   font-family: var(--country-profile-font);
