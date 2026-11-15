@@ -72,6 +72,7 @@ export default function CountryDetail({
   const visits = [...(country.visits ?? [])].sort(
     (a, b) => a.number - b.number,
   );
+  const nameParts = country.name.split(/(\s+)/);
   return (
     <>
       <div className="detail-top country-detail-top">
@@ -93,13 +94,17 @@ export default function CountryDetail({
           <div className="country-detail-heading" ref={headingRef}>
             <div className="country-detail-identity">
               <p className="detail-geography">
-                <Flag code={country.code} />
                 {country.continent || "Country"}
               </p>
               <h1>
-                {country.name.split(/(\s+)/).map((part, index) =>
+                {nameParts.map((part, index) =>
                   /^\s+$/.test(part) ? (
                     part
+                  ) : index === nameParts.length - 1 ? (
+                    <span key={index} className="country-name-ending">
+                      <span className="country-name-word">{part}</span>
+                      <Flag code={country.code} />
+                    </span>
                   ) : (
                     <span key={index} className="country-name-word">
                       {part}

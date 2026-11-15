@@ -2453,9 +2453,10 @@ h2 {
 }
 /* Country profile: editorial title, shared row shield, and one quiet data grid. */
 .country-place-card {
+  margin-inline: calc(12px - var(--collection-inset));
   padding: 17px 15px 15px;
-  background: linear-gradient(145deg, #f6f8ef, #edf4ee 75%);
-  border-color: #ccddd1;
+  background: linear-gradient(145deg, #dfecdf, #cfe3d7 75%);
+  border-color: #b8d0be;
 }
 .country-detail-heading {
   display: grid;
@@ -2469,17 +2470,12 @@ h2 {
 .country-place-card .detail-geography {
   display: flex;
   align-items: center;
-  gap: 7px;
-  margin: 0 0 8px;
-  color: #61786c;
-  font-size: 10px;
-  font-weight: 550;
+  margin: 0 0 6px;
+  color: #4f6c59;
+  font-size: 12px;
+  font-weight: 600;
   letter-spacing: 0.04em;
-  line-height: 16px;
-}
-.country-place-card .detail-geography .country-flag {
-  font-size: 17px;
-  line-height: 16px;
+  line-height: 18px;
 }
 .country-detail h1 {
   min-width: 0;
@@ -2497,21 +2493,45 @@ h2 {
 .country-name-word {
   white-space: nowrap;
 }
+.country-name-ending {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  white-space: nowrap;
+}
+.country-name-ending > .country-flag {
+  font-size: 22px;
+  line-height: 1;
+  letter-spacing: 0;
+}
 .country-detail-heading > .country-row-order {
+  width: 56px;
+  margin-block: -6px -4px;
   padding-top: 1px;
 }
+.country-detail-heading .country-order-badge {
+  width: 56px;
+  height: 63px;
+}
+.country-detail-heading .country-order-number {
+  font-size: 21px;
+  line-height: 21px;
+}
+.country-detail-heading .country-row-order-hash {
+  font-size: 13px;
+}
 .country-reference-section {
-  margin-top: 17px;
-  padding-top: 11px;
-  border-top: 1px solid #d5e1d6;
+  margin-top: 6px;
+  padding-top: 7px;
+  border-top: 1px solid #bcd3c3;
 }
 .country-reference-section-heading {
   display: flex;
   align-items: center;
   justify-content: space-between;
   min-height: 20px;
-  margin-bottom: 8px;
-  color: #687f70;
+  margin-bottom: 6px;
+  color: #4e6b58;
   font-size: 8.5px;
   font-weight: 650;
   letter-spacing: 0.1em;
@@ -2524,7 +2544,7 @@ h2 {
   height: 24px;
   margin: -3px -3px -3px 0;
   border-radius: 50%;
-  color: #758a7c;
+  color: #52715d;
 }
 .country-reference-info:hover {
   background: #dce9df;
@@ -2533,14 +2553,14 @@ h2 {
 .country-reference-metrics {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  margin: 0 -7px;
+  margin: 0 -6px;
 }
 .country-reference-metric {
   min-width: 0;
-  padding-inline: 7px;
+  padding-inline: 6px;
 }
 .country-reference-metric + .country-reference-metric {
-  border-left: 1px solid #d6e1d6;
+  border-left: 1px solid #bdd4c5;
 }
 .country-reference-metric dt {
   margin-bottom: 4px;
@@ -2571,7 +2591,7 @@ h2 {
 }
 .country-reference-vintage {
   margin: 3px 0 12px;
-  color: #627969;
+  color: #4f6b59;
   font-size: 8.5px;
   line-height: 12px;
 }
@@ -2580,7 +2600,7 @@ h2 {
   align-items: baseline;
   justify-content: space-between;
   gap: 2px;
-  color: #607968;
+  color: #4e6a57;
   font-size: 8.5px;
   line-height: 12px;
 }
@@ -2592,7 +2612,7 @@ h2 {
   font-variant-numeric: tabular-nums;
 }
 .country-standing-label small {
-  color: #657c6b;
+  color: #516c5b;
   font-size: 7px;
   font-weight: 400;
 }
@@ -2601,7 +2621,7 @@ h2 {
   margin-top: 4px;
   overflow: hidden;
   border-radius: 3px;
-  background: #dbe6db;
+  background: #bad2c2;
 }
 .country-standing-track > span {
   display: block;
@@ -2621,7 +2641,7 @@ h2 {
   justify-content: space-between;
   gap: 1px 2px;
   margin: 0;
-  color: #617769;
+  color: #4f685a;
   font-size: 8.5px;
   line-height: 11px;
 }
@@ -2636,16 +2656,16 @@ h2 {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
-  margin-top: 15px;
-  padding-top: 14px;
-  border-top: 1px solid #d5e1d6;
+  margin-top: 10px;
+  padding-top: 9px;
+  border-top: 1px solid #bcd3c3;
 }
 .country-highlights > div {
   min-width: 0;
 }
 .country-detail .country-highlights h2 {
   display: block;
-  margin: 0 0 9px;
+  margin: 0 0 7px;
   color: #5b7565;
   font-size: 9.5px;
   font-weight: 650;

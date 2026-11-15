@@ -12,19 +12,26 @@ export function useCountryHeading(
     let disposed = false;
     const measure = () => {
       if (disposed) return;
-      // Keep normal title sizing unless a complete word cannot fit beside the rank.
+      // Keep whole words and the trailing flag together beside the rank.
       heading.style.removeProperty("font-size");
       const size = parseFloat(getComputedStyle(heading).fontSize);
-      const longestWord = Math.max(
-        0,
-        ...[...heading.querySelectorAll(".country-name-word")].map(
-          (word) => word.getBoundingClientRect().width,
-        ),
-      );
       const available = heading.getBoundingClientRect().width;
-      if (available > 0 && longestWord > available) {
-        heading.style.fontSize = `${Math.floor(((size * (available - 1)) / longestWord) * 100) / 100}px`;
+      if (available <= 0) return;
+      let scale = 1;
+      for (const word of heading.querySelectorAll(".country-name-word")) {
+        const width = word.getBoundingClientRect().width;
+        const ending = word.parentElement;
+        const reserved = ending?.classList.contains("country-name-ending")
+          ? ending.getBoundingClientRect().width - width
+          : 0;
+        if (width > 0)
+          scale = Math.min(
+            scale,
+            Math.max(1, available - reserved - 1) / width,
+          );
       }
+      if (scale < 1)
+        heading.style.fontSize = `${Math.floor(size * scale * 100) / 100}px`;
     };
     measure();
     const observer = new ResizeObserver(measure);

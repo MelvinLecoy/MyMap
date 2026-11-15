@@ -2168,7 +2168,7 @@ test("country profile titles keep whole words and the shared shield at the top r
   await page.emulateMedia({ reducedMotion: "reduce" });
   for (const width of [320, 390, 760, 1440]) {
     await page.setViewportSize({ width, height: 1100 });
-    for (const code of ["CH", "LI", "BA", "MK"]) {
+    for (const code of ["CA", "CH", "LI", "BA", "MK"]) {
       await page.goto(`/?panel=countries&country=${code}`);
       await page.evaluate(() => document.fonts.ready);
       const heading = page.locator(".country-detail-heading");
@@ -2183,8 +2183,17 @@ test("country profile titles keep whole words and the shared shield at the top r
         .locator(".country-detail-identity")
         .boundingBox())!;
       expect(badge.x + badge.width).toBeCloseTo(card.x + card.width - 16, 0);
-      expect(badge.y).toBeCloseTo(identity.y + 1, 0);
+      expect(badge.y).toBeCloseTo(identity.y - 5, 0);
       expect(badge.x).toBeGreaterThan(titleBox.x + titleBox.width);
+      const ending = title.locator(".country-name-ending");
+      const lastWord = (await ending
+        .locator(".country-name-word")
+        .boundingBox())!;
+      const flag = (await ending.locator(".country-flag").boundingBox())!;
+      expect(flag.x).toBeGreaterThan(lastWord.x + lastWord.width);
+      expect(flag.x + flag.width).toBeLessThanOrEqual(
+        titleBox.x + titleBox.width + 1,
+      );
       for (const word of await title.locator(".country-name-word").all()) {
         const box = (await word.boundingBox())!;
         expect(box.x + box.width).toBeLessThanOrEqual(
