@@ -61,6 +61,21 @@ test("static country references cover every country code, preserve provenance an
     "Basel",
   ]);
   assert.deepEqual(index.byCode.get("SG")!.cities, ["Singapore"]);
+  assert.deepEqual(index.byCode.get("US")!.cities, [
+    "New York City",
+    "Los Angeles",
+    "Chicago",
+  ]);
+  assert.deepEqual(index.byCode.get("AM")!.cities, [
+    "Yerevan",
+    "Gyumri",
+    "Vanadzor",
+  ]);
+  assert.deepEqual(index.byCode.get("HU")!.cities, [
+    "Budapest",
+    "Debrecen",
+    "Szeged",
+  ]);
   assert.deepEqual(index.byCode.get("VA")!.cities, ["Vatican City"]);
   assert.deepEqual(index.byCode.get("SJ")!.metrics, {
     population: null,

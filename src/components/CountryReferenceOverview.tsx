@@ -172,9 +172,9 @@ function ReferenceExplanation({ code }: { code: string }) {
             differ. A dash means a comparable figure is unavailable.
           </p>
           <p>
-            Top cities follow GeoNames population figures; city and metropolitan
-            boundaries vary. City-states appear once. Attractions are editorial
-            highlights.
+            Cities and attractions are selected highlights. Small island
+            countries may list towns or settlements; single-city states appear
+            once. These lists are editorial selections.
           </p>
           <div className="country-reference-source-links">
             <span>Sources</span>

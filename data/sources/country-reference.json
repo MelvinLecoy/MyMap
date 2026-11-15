@@ -2,7 +2,7 @@
   "preparedOn": "2026-11-15",
   "metrics": "Latest reported positive value in each frozen World Bank series. Population of Vatican City and Taiwan uses undated GeoNames estimates. Missing comparable GDP and Svalbard-only statistics are left empty. GDP is nominal, current US dollars. Area includes inland water; no area vintage is implied.",
   "comparisons": "Country-based empirical standing: 1 + 99 * (lower-valued countries + (tied countries - 1) / 2) / (available countries - 1). Lowest=1, highest=100; ties share their midrank. The 197-country reference set is fixed, independent of filters. Svalbard is excluded. Arithmetic means use only available values. Years can differ, explicitly shown on each metric.",
-  "citySelection": "Largest GeoNames populated places by stored population, unique names; these are not uniform metropolitan-area definitions. One city for Monaco, Singapore and Vatican City.",
+  "citySelection": "Editorially reviewed city and town highlights, starting from GeoNames populated-place names. Neighbourhoods and duplicate boroughs have been removed. These are destination highlights, not a uniform city-proper or metropolitan population ranking. Single-city states and Tuvalu list their main urban centre once.",
   "missingGdp": [
     "KP",
     "SJ",
@@ -48,11 +48,11 @@
     "editorial": {
       "label": "Editorial highlights · destination guides",
       "url": "https://en.wikivoyage.org/",
-      "note": "Curated highlights, not a visitor-count ranking. City-states list the city once. Svalbard facts refer to the archipelago, not the joint Svalbard and Jan Mayen statistical unit."
+      "note": "Reviewed city/town and attraction highlights, not visitor-count or population rankings. Small island countries can list settlements. Svalbard facts refer to the archipelago, not the joint Svalbard and Jan Mayen statistical unit."
     }
   },
   "csvSha256": {
-    "data/country-metrics.csv": "ce179876207e4997e4ed5e4211a66a04bf16cd421eb6371ba88a7044608ee87a",
-    "data/country-highlights.csv": "9f7ff509383271f60049f2f2ce6bb7651d6cf2062f49a1b79ea761fa98b6a4be"
+    "data/country-metrics.csv": "270f330888edcf84b9fd6930268f5591347688b69ea27e2efc6959b81cc719b8",
+    "data/country-highlights.csv": "9247da622acade96830bcadfe7df66fbf36e7ff8cda84bb5f1e0dd2eea984d22"
   }
 }

@@ -125,7 +125,7 @@ Country profiles use a bundled Fraunces title and the same visit-order shield as
 Reference data has a separate, static source of truth:
 
 - `data/country-metrics.csv`: one row per country code, raw numeric values, reporting years, source IDs and explicit eligibility for global comparisons.
-- `data/country-highlights.csv`: ordered facts, leading populated places and editorial attraction selections, joined by the same country codes. City-states appear once rather than being filled with invented extra cities.
+- `data/country-highlights.csv`: ordered facts and reviewed city/town and attraction highlights, joined by the same country codes. Duplicate boroughs and neighbourhoods are excluded. Single-city states appear once; small island countries may list settlements.
 - `data/sources/country-reference.json`: definitions, citations, pinned upstream snapshots, checksums and coverage limits.
 
 `npm run build` validates all 198 records and generates the bundled reference JSON. No reference-data API calls, database tables, polling or per-profile downloads are needed. The existing Supabase history and map-status tables remain independent and unchanged. Country filters and the 195/197 travel counter never change the fixed 197-country reference population; Svalbard is excluded from those comparisons.
