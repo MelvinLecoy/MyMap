@@ -2505,7 +2505,8 @@ h2 {
   display: flex;
   align-items: center;
   margin: 0 0 6px;
-  color: #4f6c59;
+  color: var(--country-card-muted);
+  font-family: var(--country-profile-font);
   font-size: 15px;
   font-weight: 600;
   letter-spacing: 0.04em;
