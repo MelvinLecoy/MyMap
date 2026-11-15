@@ -3,6 +3,7 @@ import {
   visitTimelineYears,
   type HistoryVisit,
   type TimelineStay,
+  type HistoryCity,
 } from "../lib/visit-timeline";
 
 function StaySegment({ stay }: { stay: TimelineStay }) {
@@ -17,21 +18,19 @@ function StaySegment({ stay }: { stay: TimelineStay }) {
   return (
     <div
       role="listitem"
-      className={`visit-period${pointStay ? " visit-period--single" : ""}${stay.days === 1 ? " visit-period--one-day" : ""}${stay.exceptional && pointStay ? " visit-period--single-exception" : ""}`}
+      className={`visit-period${pointStay ? " visit-period--single" : ""}${stay.days === 1 ? " visit-period--one-day" : ""}${stay.exceptional && pointStay ? " visit-period--single-exception" : ""}${stay.cities.length ? " visit-period--with-cities" : ""}`}
       data-duration={stay.days ?? undefined}
       data-exception={stay.exceptional || undefined}
     >
-      {stay.precedingGap && (
-        <span
-          className="visit-period-gap"
-          title="Separate stays; no connecting days added"
-          aria-hidden="true"
-        />
-      )}
       <div
         className="visit-period-plot"
         title={`${stay.range}${stay.days == null ? "" : ` · ${stay.days} ${units}`}${stay.exceptional ? " · Recorded duration differs from the calendar span" : ""}`}
       >
+        {stay.cities.length > 0 && (
+          <div className="visit-period-cities">
+            {stay.cities.map((city) => city.name).join(" · ")}
+          </div>
+        )}
         <span className="visually-hidden">
           {stay.range}
           {stay.days == null
@@ -39,6 +38,13 @@ function StaySegment({ stay }: { stay: TimelineStay }) {
             : `, ${stay.days} ${units}${stay.exceptional ? ", recorded duration" : ""}`}
         </span>
         <div className="visit-period-axis" aria-hidden="true">
+          {stay.precedingGap && (
+            <span
+              className="visit-period-gap"
+              title="Separate stays; no connecting days added"
+              aria-hidden="true"
+            />
+          )}
           <span className="visit-period-point" />
           {!pointStay && <span className="visit-period-line" />}
           {(!pointStay || stay.exceptional) && stay.days != null && (
@@ -74,11 +80,16 @@ function StaySegment({ stay }: { stay: TimelineStay }) {
 export default memo(function VisitTimeline({
   visits,
   kind,
+  cities,
 }: {
   visits: readonly HistoryVisit[];
   kind: "country" | "city";
+  cities?: readonly HistoryCity[];
 }) {
-  const years = useMemo(() => visitTimelineYears(visits), [visits]);
+  const years = useMemo(
+    () => visitTimelineYears(visits, kind === "country" ? cities : undefined),
+    [visits, kind, cities],
+  );
   return (
     <ol
       className={`visit-timeline ${kind}-visit-list`}

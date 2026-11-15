@@ -118,3 +118,93 @@ test("unknown and partial dates remain honest and single half days receive a mar
   assert.equal(half.single, true);
   assert.equal(half.exceptional, true);
 });
+
+test("country segments show the cities recorded on their own dates", () => {
+  const cities = cityData.cities.filter(
+    (city: { countryCode: string }) => city.countryCode === "CA",
+  );
+  const before = JSON.stringify(cities);
+  const years = visitTimelineYears(country("CA"), cities);
+  assert.deepEqual(
+    years.flatMap((year) =>
+      year.visits.flatMap((visit) =>
+        visit.months.flatMap((month) =>
+          month.periods.map((stay) => stay.cities.map((city) => city.name)),
+        ),
+      ),
+    ),
+    [["Ottawa"], ["Toronto"], ["Vancouver"]],
+  );
+  assert.equal(JSON.stringify(cities), before);
+});
+
+test("city matching uses actual periods, deduplicates cities, and leaves unknown dates unmatched", () => {
+  const period = (arrival: string, departure = arrival) => ({
+    number: 1,
+    arrival,
+    departure,
+    daysSpent: 1,
+  });
+  const visits = [
+    {
+      number: 1,
+      arrival: "2026-05-02",
+      departure: "2026-05-07",
+      daysSpent: 3,
+      periods: [
+        period("2026-05-02", "2026-05-03"),
+        { ...period("2026-05-07"), number: 2 },
+      ],
+    },
+  ];
+  const cities = [
+    {
+      id: "gap",
+      name: "Gap city",
+      visits: [
+        {
+          ...period("2026-05-01", "2026-05-08"),
+          periods: [period("2026-05-01"), period("2026-05-08")],
+        },
+      ],
+    },
+    {
+      id: "alpha",
+      name: "Alpha",
+      visits: [
+        {
+          ...period("2026-05-02", "2026-05-07"),
+          periods: [
+            period("2026-05-02"),
+            period("2026-05-03"),
+            period("2026-05-07"),
+          ],
+        },
+      ],
+    },
+    {
+      id: "bravo",
+      name: "Bravo",
+      visits: [period("2026-05-01", "2026-05-03")],
+    },
+    { id: "partial", name: "Partial", visits: [period("2026-05")] },
+  ];
+  const before = JSON.stringify({ visits, cities });
+  const stays = visitTimelineYears(visits, cities)[0].visits[0].months[0]
+    .periods;
+  assert.deepEqual(
+    stays.map((stay) => stay.cities.map((city) => city.name)),
+    [["Bravo", "Alpha"], ["Alpha"]],
+  );
+  assert.equal(JSON.stringify({ visits, cities }), before);
+  assert.equal(
+    visitTimelineYears(country("US"), cities)[0].visits[0].months[0].periods[0]
+      .cities.length,
+    0,
+  );
+  assert.ok(
+    visitTimelineYears(visits)[0].visits[0].months[0].periods.every(
+      (stay) => stay.cities.length === 0,
+    ),
+  );
+});

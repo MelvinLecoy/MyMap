@@ -12,6 +12,13 @@ export interface HistoryStay {
 export interface HistoryVisit extends HistoryStay {
   periods?: HistoryStay[];
 }
+export interface TimelineCity {
+  id: string;
+  name: string;
+}
+export interface HistoryCity extends TimelineCity {
+  visits?: readonly HistoryVisit[];
+}
 export interface TimelineStay extends HistoryStay {
   days: number | null;
   exceptional: boolean;
@@ -21,6 +28,7 @@ export interface TimelineStay extends HistoryStay {
   startLabel: string;
   endLabel: string;
   precedingGap: boolean;
+  cities: TimelineCity[];
 }
 export interface TimelineMonth {
   key: string;
@@ -79,7 +87,29 @@ export function historyDateRange(stay: HistoryStay) {
 /** Presentation only: preserve counted visits and periods; never regroup or add gap days. */
 export function visitTimelineYears(
   visits: readonly HistoryVisit[],
+  cities: readonly HistoryCity[] = [],
 ): TimelineYear[] {
+  const cityStays = cities
+    .flatMap((city) =>
+      (city.visits ?? []).flatMap((visit) =>
+        (visit.periods?.length ? visit.periods : [visit]).flatMap((stay) =>
+          exactVisitDate(stay.arrival) && exactVisitDate(stay.departure)
+            ? [
+                {
+                  id: city.id,
+                  name: city.name,
+                  arrival: stay.arrival,
+                  departure: stay.departure,
+                },
+              ]
+            : [],
+        ),
+      ),
+    )
+    .sort(
+      (a, b) =>
+        a.arrival.localeCompare(b.arrival) || a.name.localeCompare(b.name),
+    );
   const grouped = new Map<string, TimelineYear>();
   const ordered = visits
     .map((visit) => ({
@@ -125,6 +155,14 @@ export function visitTimelineYears(
         stay.daysSpent ?? (stays.length === 1 ? visit.daysSpent : null);
       const exact =
         exactVisitDate(stay.arrival) && exactVisitDate(stay.departure);
+      const matchingCities = new Map<string, TimelineCity>();
+      if (exact)
+        for (const city of cityStays)
+          if (
+            city.arrival <= stay.departure! &&
+            city.departure >= stay.arrival!
+          )
+            matchingCities.set(city.id, { id: city.id, name: city.name });
       const days =
         supplied ??
         (exact
@@ -167,6 +205,7 @@ export function visitTimelineYears(
         startLabel: endpoint(stay.arrival),
         endLabel: endpoint(stay.departure),
         precedingGap: i > 0,
+        cities: [...matchingCities.values()],
       });
     });
     grouped.get(key)!.visits.push({

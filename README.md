@@ -126,6 +126,8 @@ With a production build served on port 4173, `npm run country:preview-fonts` cap
 
 Country and city visit histories share a light timeline. Years and visits run newest first, with a visit count beside years containing multiple visits and a separate total for each visit. Actual stays within a visit remain chronological; dots mark dates, solid segments show stay durations, and dotted links separate stays without adding gap days. A duration that differs from the inclusive calendar span is marked with an asterisk on its segment. The rightmost total displays only a clock emoji and number. Timeline colors use the panel date palette, including the panel's yellow rather than the globe's brighter yellow. Cross-year visits sit under their latest recorded year and retain the actual endpoint years; incomplete dates remain explicitly unrecorded. This presentation never regroups counted visits or changes stored history.
 
+Country timelines list the cities whose actual dated stays overlap each segment, deduplicated and ordered by arrival. Captions wrap above compact segments. Matching uses individual stay periods and leaves unknown dates unmatched; place records are excluded. City profile timelines keep their existing presentation.
+
 The static sources are:
 
 - `data/country-metrics.csv`: exact raw values and full-precision cached indices for all 250 workbook entities (197 countries and 53 territories), keyed by country/territory code. GDP is stored in USD billions. The additional `GdpPerCapitaUsd` and `GdpPerCapitaIndex` columns store the calculated USD-per-person figures and indices.

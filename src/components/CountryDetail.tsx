@@ -1,4 +1,5 @@
 import { ArrowLeft, CalendarDays } from "lucide-react";
+import { useMemo } from "react";
 import { type CountryRecord } from "../lib/countries";
 import { type City } from "../lib/types";
 import { useCountryHeading } from "../lib/use-country-heading";
@@ -27,6 +28,10 @@ export default function CountryDetail({
     (city) => !isPlace(city) && city.visit === "visited",
   ).length;
   const visits = country.visits ?? [];
+  const historyCities = useMemo(
+    () => cities.filter((city) => !isPlace(city)),
+    [cities],
+  );
   const nameParts = country.name.split(/(\s+)/);
   return (
     <>
@@ -127,7 +132,11 @@ export default function CountryDetail({
             Visit history
           </h2>
           {visits.length ? (
-            <VisitTimeline visits={visits} kind="country" />
+            <VisitTimeline
+              visits={visits}
+              kind="country"
+              cities={historyCities}
+            />
           ) : (
             <p className="country-history-empty">
               Visit dates and durations haven’t been added yet.

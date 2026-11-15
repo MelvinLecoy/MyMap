@@ -2911,7 +2911,7 @@ h2 {
   padding: 1px 0;
   background: var(--surface);
   color: var(--visit-year);
-  font-size: 8px;
+  font-size: 9px;
   line-height: 11px;
   font-weight: 650;
   white-space: nowrap;
@@ -2965,7 +2965,7 @@ h2 {
 .visit-month-periods {
   display: flex;
   flex-wrap: wrap;
-  align-items: start;
+  align-items: flex-end;
   gap: 9px 0;
   min-width: 0;
 }
@@ -2980,6 +2980,7 @@ h2 {
 .visit-period:has(.visit-period-gap) {
   flex-basis: 75px;
   max-width: 107px;
+  padding-left: 11px;
 }
 .visit-period--single {
   flex: 0 0 24px;
@@ -2993,17 +2994,36 @@ h2 {
   flex-basis: 58px;
   min-width: 48px;
 }
+.visit-period--with-cities {
+  flex-basis: 72px;
+  min-width: 72px;
+}
+.visit-period--with-cities:has(.visit-period-gap) {
+  flex-basis: 83px;
+  min-width: 83px;
+}
+.visit-period-cities {
+  margin-bottom: 4px;
+  color: var(--muted);
+  font-size: 9px;
+  line-height: 12px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
 .visit-period-plot {
   min-width: 0;
   flex: 1;
 }
 .visit-period-gap {
-  flex: 0 0 7px;
-  margin-top: 8px;
+  position: absolute;
+  top: 8px;
+  right: calc(100% + 4px);
+  width: 7px;
   border-top: 2px dotted var(--visit-year);
   opacity: 0.65;
 }
 .visit-period-axis {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 3px;

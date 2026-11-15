@@ -2693,6 +2693,56 @@ test("country history shows stays and corrected dates without explanatory copy o
   ).toBe(true);
 });
 
+test("country stay segments name matching cities above the plot and fit narrow panels", async ({
+  page,
+}) => {
+  await withoutGlobe(page);
+  for (const width of [320, 1440]) {
+    await page.setViewportSize({ width, height: 1100 });
+    await page.goto("/?panel=countries&country=CA");
+    await expect(page.locator(".visit-period-cities")).toHaveText([
+      "Ottawa",
+      "Toronto",
+      "Vancouver",
+    ]);
+    await expect(page.locator(".visit-year-count")).toHaveCSS(
+      "font-size",
+      "9px",
+    );
+    await expect(page.locator(".country-statistics dd")).toHaveText([
+      "3",
+      "22",
+      "3",
+    ]);
+    await page.goto("/?panel=countries&country=CH");
+    await expect(page.locator(".visit-period-cities")).toHaveCount(4);
+    expect(
+      await page
+        .locator(".country-detail")
+        .evaluate((element) => element.scrollWidth <= element.clientWidth),
+    ).toBe(true);
+    expect(
+      await page.locator(".visit-period--with-cities").evaluateAll((elements) =>
+        elements.every((element) => {
+          const cities = element
+            .querySelector(".visit-period-cities")!
+            .getBoundingClientRect();
+          const axis = element
+            .querySelector(".visit-period-axis")!
+            .getBoundingClientRect();
+          return (
+            cities.bottom < axis.top &&
+            cities.right <= element.getBoundingClientRect().right + 1
+          );
+        }),
+      ),
+    ).toBe(true);
+    await page.goto("/?city=london-uk");
+    await expect(page.locator(".visit-period-cities")).toHaveCount(0);
+    await expect(page.locator(".visit-timeline-entry")).toHaveCount(4);
+  }
+});
+
 test("grouped city visits show only actual periods, preserve partial days and fit mobile", async ({
   page,
 }) => {
