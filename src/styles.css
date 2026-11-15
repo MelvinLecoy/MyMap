@@ -2932,6 +2932,9 @@ h2 {
   gap: 7px;
   padding: 10px 8px;
 }
+.city-visit-list .visit-timeline-entry {
+  padding-block: 8px;
+}
 .visit-timeline-entry + .visit-timeline-entry {
   border-top: 1px solid var(--line);
 }
