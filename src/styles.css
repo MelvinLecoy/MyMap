@@ -2862,6 +2862,7 @@ h2 {
 .visit-timeline {
   --visit-range-width: 84px;
   --visit-gap-width: 19px;
+  --visit-marker-offset: 7px;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   margin: 12px 0 0;
@@ -2869,6 +2870,9 @@ h2 {
   padding: 0 0 4px;
   list-style: none;
   font-family: "DM Sans Variable", sans-serif;
+}
+.city-visit-list {
+  --visit-marker-offset: 11px;
 }
 .visit-timeline-year {
   position: relative;
@@ -2881,8 +2885,8 @@ h2 {
 .visit-timeline-year::before {
   content: "";
   position: absolute;
-  top: 23px;
-  bottom: -35px;
+  top: calc(var(--visit-marker-offset) + 17px);
+  bottom: calc(-12px - var(--visit-marker-offset) - 17px);
   left: 16px;
   border-left: 1px solid var(--line);
 }
@@ -2898,7 +2902,7 @@ h2 {
   display: grid;
   justify-items: center;
   gap: 4px;
-  padding-top: 6px;
+  padding-top: var(--visit-marker-offset);
 }
 .visit-year-circle {
   display: grid;
@@ -2945,15 +2949,15 @@ h2 {
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 7px;
-  padding: 10px 8px;
+  padding: 9px 8px;
 }
 .city-visit-list .visit-timeline-entry {
-  padding-block: 8px;
+  min-height: 56px;
 }
 .visit-timeline-entry + .visit-timeline-entry::before {
   content: "";
   position: absolute;
-  inset: 0 0 auto;
+  inset: 0 8px auto;
   border-top: 1px solid var(--visit-year);
 }
 .visit-months {

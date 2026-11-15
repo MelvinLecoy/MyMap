@@ -2727,10 +2727,12 @@ test("visit history rows keep their default height and only grow for extra conte
               .getBoundingClientRect();
             return {
               height: bounds.height,
-              expectedHeight:
+              expectedHeight: Math.max(
+                parseFloat(style.minHeight) || 0,
                 Math.max(content.height, total.height) +
-                parseFloat(style.paddingTop) +
-                parseFloat(style.paddingBottom),
+                  parseFloat(style.paddingTop) +
+                  parseFloat(style.paddingBottom),
+              ),
               top: style.paddingTop,
               bottom: style.paddingBottom,
               balance: Math.abs(
@@ -2747,9 +2749,9 @@ test("visit history rows keep their default height and only grow for extra conte
         `${width}px ${query} content only determines its own row height`,
       ).toBe(true);
       if (query === "city=dubai-uae")
-        expect(layout.map((row) => row.height)).toEqual([46, 46, 46]);
+        expect(layout.map((row) => row.height)).toEqual([56, 56, 56]);
       if (query === "panel=countries&country=SG")
-        expect(layout.map((row) => row.height)).toEqual([90, 50]);
+        expect(layout.map((row) => row.height)).toEqual([88, 48]);
       expect(
         layout.every(
           (row) =>
