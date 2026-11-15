@@ -135,7 +135,7 @@ export default function CountryDetail({
             <VisitTimeline
               visits={visits}
               kind="country"
-              cities={historyCities}
+              cities={country.code === "SG" ? undefined : historyCities}
             />
           ) : (
             <p className="country-history-empty">
