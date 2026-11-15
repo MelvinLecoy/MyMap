@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { importCities } from "./importer.js";
 import { importCountryHistory } from "./country-importer.js";
 import countryStarter from "../data/countries.sample.json";
+import { importPlaces } from "./place-importer";
 const demo =
   process.argv.includes("--demo") ||
   (process.argv.includes("--demo-fallback") && !existsSync("data/cities.csv"));
@@ -39,6 +40,19 @@ try {
         countryStarter.countries,
         readFileSync("data/country-visit-periods.csv", "utf8"),
       );
+  if (!demo) {
+    data.places = importPlaces(
+      readFileSync("data/places.csv", "utf8"),
+      readFileSync("data/place-countries.csv", "utf8"),
+      countryHistory,
+    );
+    if (
+      data.places.some((place) =>
+        data.cities.some((city) => city.id === place.id),
+      )
+    )
+      throw new Error("City and place IDs must be distinct.");
+  }
   writeFileSync(
     "src/generated/countries.json",
     JSON.stringify({ sample: demo, countries: countryHistory }, null, 2) + "\n",

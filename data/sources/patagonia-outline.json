@@ -1,0 +1,27 @@
+{
+  "url": "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson/ne_10m_admin_1_states_provinces.geojson",
+  "sha256": "22d0e3ad85eb3e27f17cabf8ba2d50e554fbc27a87796ff891d958185da62fb5",
+  "codes": [
+    "AR-Q",
+    "AR-R",
+    "AR-U",
+    "AR-Z",
+    "AR-V",
+    "CL-LL",
+    "CL-AI",
+    "CL-MA"
+  ],
+  "license": "Natural Earth, public domain",
+  "outline": "public/places/patagonia.geojson",
+  "definition": "Union of Neuquen, Rio Negro, Chubut, Santa Cruz and Tierra del Fuego in Argentina, and Los Lagos, Aysen and Magallanes in Chile. Antarctic claims are excluded.",
+  "clipBounds": [
+    -80,
+    -57,
+    -60,
+    -35
+  ],
+  "simplification": "2% keep-shapes, precision 0.0001 degrees",
+  "geometrySha256": "453a22f13c7a342b0aa6d591db3d8561ad54bb3847821c6c9bab5992c544cfa8",
+  "placeId": "patagonia",
+  "name": "Patagonia"
+}

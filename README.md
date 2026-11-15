@@ -118,6 +118,16 @@ Atlas assets in `public/atlas/` are generated from **Natural Earth 5.1.2** Admin
 
 City pins do not cluster. Pin labels start at zoom 4 and the maximum zoom is 10, configured in `src/lib/map-style.ts`. The single MapLibre instance updates its existing GeoJSON source on filtering, resizes with its container, and cleans up on unmount. The viewer overlays it rather than destroying it, preserving the current camera.
 
+## Places
+
+Places such as Patagonia are separate from city records. They use a diamond pin labeled only with their name, list every associated country, and reuse the city profile. Selecting the pin raises its preloaded outline by two pixels; the outline stays selected in the profile and fits narrow screens. Country and city visit histories and city statistics remain independent. Map progress includes both city and place maps, while the result counter shows their counts separately.
+
+The canonical sources are `data/places.csv`, `data/place-countries.csv`, and the GeoJSON files in `public/places/`. `data/sources/patagonia-outline.json` records the pinned Natural Earth source, checksums and broad scope: five Argentine provinces and three Chilean regions, excluding Antarctic claims. `npm run places:prepare-outline` reproduces that outline from the verified source.
+
+`npm run build` imports the place CSVs into the bundled fallback. Use `npm run places:verify-migration` to check the additive database migration in a rolled-back transaction, `npm run places:apply` to save an approved batch to the separate `places` and `place_countries` tables, and `npm run places:verify-live` to compare saved records and geometry with the sources. The public snapshot reads both countries atomically; editor permissions govern map-status changes. Ship the CSVs, outline, database batch and site together.
+
+Patagonia initially has no attached map and no inferred visit history. Its representative pin is inside the broad outline. Additional places can have one or several countries and their own Polygon or MultiPolygon boundary.
+
 ## Map label typography
 
 Geographic levels use separate bundled font families with compact, zoom-dependent sizes:

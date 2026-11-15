@@ -1,0 +1,142 @@
+import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { isDeepStrictEqual } from "node:util";
+import { importPlaces } from "./place-importer";
+import { importCountryHistory } from "./country-importer";
+import starter from "../data/countries.sample.json";
+import { fromPlaceRow, type PlaceRow } from "../src/lib/places";
+
+const countries = importCountryHistory(
+  readFileSync("data/countries.csv", "utf8"),
+  readFileSync("data/country-visit-history.csv", "utf8"),
+  starter.countries,
+  readFileSync("data/country-visit-periods.csv", "utf8"),
+);
+export const approvedPlaces = importPlaces(
+  readFileSync("data/places.csv", "utf8"),
+  readFileSync("data/place-countries.csv", "utf8"),
+  countries,
+);
+const quote = (value: unknown) =>
+  value == null ? "null" : `'${String(value).replaceAll("'", "''")}'`;
+export function placeSeedSql() {
+  return approvedPlaces
+    .map((place) => {
+      const columns = [
+        "id",
+        "name",
+        "continent",
+        "region",
+        "subregion",
+        "longitude",
+        "latitude",
+        "map_embed_url",
+        "map_viewer_url",
+        "map_status",
+        "visit_status",
+        "last_visited",
+        "notes",
+        "pin_color",
+        "outline",
+        "outline_source",
+      ];
+      const values = [
+        place.id,
+        place.name,
+        place.continent,
+        place.region,
+        place.subregion,
+        place.coordinates![0],
+        place.coordinates![1],
+        place.map?.embedUrl,
+        place.map?.viewerUrl,
+        place.status,
+        place.visit,
+        place.lastVisited,
+        place.notes,
+        place.pinColor,
+        JSON.stringify(place.outline),
+        place.outlineSource,
+      ];
+      return (
+        `insert into public.places (${columns.join(",")}) values (${values.map(quote).join(",")}) on conflict(id) do update set ${columns
+          .slice(1)
+          .map((column) => `${column}=excluded.${column}`)
+          .join(
+            ",",
+          )};\ndelete from public.place_countries where place_id=${quote(place.id)};\n` +
+        place.countries
+          .map(
+            (country, i) =>
+              `insert into public.place_countries(place_id,country_code,position) values (${quote(place.id)},${quote(country.code)},${i + 1});`,
+          )
+          .join("\n")
+      );
+    })
+    .join("\n");
+}
+
+if (
+  process.argv[1] &&
+  import.meta.url === new URL(process.argv[1], "file:").href
+) {
+  const migration = readFileSync(
+    "supabase/migrations/202611150001_places.sql",
+    "utf8",
+  );
+  const sql = migration.replace(/commit;\s*$/i, placeSeedSql() + "\ncommit;\n");
+  mkdirSync(".cache", { recursive: true });
+  writeFileSync(".cache/places-ready.sql", sql);
+  const apply = process.argv.includes("--apply"),
+    verify = process.argv.includes("--verify"),
+    dryRun = process.argv.includes("--dry-run");
+  if ([apply, verify, dryRun].filter(Boolean).length > 1)
+    throw new Error("Choose apply, verify or dry-run.");
+  if (apply || verify || dryRun) {
+    const { projectRef } = JSON.parse(
+      readFileSync(".cache/cloud-setup.json", "utf8"),
+    );
+    if (
+      !/^[a-z0-9]{20}$/.test(projectRef) ||
+      !process.env.SUPABASE_ACCESS_TOKEN
+    )
+      throw new Error(
+        "Configured Supabase project and management credential are required.",
+      );
+    async function query(query: string) {
+      const response = await fetch(
+        `https://api.supabase.com/v1/projects/${projectRef}/database/query`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${process.env.SUPABASE_ACCESS_TOKEN}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ query }),
+        },
+      );
+      if (!response.ok)
+        throw new Error(
+          `Place persistence failed (${response.status}): ${await response.text()}`,
+        );
+      return response.json();
+    }
+    if (apply || dryRun)
+      await query(dryRun ? sql.replace(/commit;\s*$/i, "rollback;") : sql);
+    if (!dryRun) {
+      const result = await query(
+        "select public.atlas_places_snapshot() as places;",
+      );
+      const actual = (result[0].places as PlaceRow[]).map(fromPlaceRow);
+      if (!isDeepStrictEqual(actual, approvedPlaces))
+        throw new Error("Place CSVs, boundaries and database do not match.");
+    }
+    console.log(
+      dryRun
+        ? "Place migration and approved batch verified and rolled back."
+        : `${approvedPlaces.length} place: CSVs, outline and database match.`,
+    );
+  } else
+    console.log(
+      `Prepared ${approvedPlaces.length} place in .cache/places-ready.sql; no live changes.`,
+    );
+}

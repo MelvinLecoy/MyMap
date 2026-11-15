@@ -29,6 +29,7 @@ import {
   CountryCityCount,
   Flag,
   VisitMarker,
+  EntryCountries,
 } from "./components/CollectionItems";
 import CollectionFooter from "./components/CollectionFooter";
 import {
@@ -62,6 +63,8 @@ import { useCoordinateLayout } from "./lib/use-coordinate-layout";
 import { useRemoteAtlas } from "./lib/use-remote-atlas";
 import { useRemoteCountries } from "./lib/use-remote-countries";
 import { supabase } from "./lib/supabase";
+import { useRemotePlaces } from "./lib/use-remote-places";
+import { entryInCountry, isPlace } from "./lib/places";
 import { deriveCountries } from "./lib/cloud-data";
 import { cityVisitSummary } from "./lib/city-visits";
 import {
@@ -78,7 +81,8 @@ import {
   type AtlasData,
   type MapStatus,
 } from "./lib/types";
-const data = atlas as AtlasData;
+const data = atlas as unknown as AtlasData;
+const initialPlaces = data.places ?? [];
 const COUNTRY_HOVER_QUERY =
   "(min-width: 761px) and (hover: hover) and (pointer: fine)";
 const statusStorageKey = data.demo
@@ -93,7 +97,7 @@ function readRoute(): {
 } {
   const p = new URLSearchParams(window.location.search);
   return {
-    city: p.get("city"),
+    city: p.get("place") ?? p.get("city"),
     view: p.get("view") === "map",
     panel:
       p.get("panel") === "countries" || p.has("country")
@@ -108,6 +112,11 @@ export default function App() {
   const countryCloud = useRemoteCountries(
     countrySeed.countries,
     data.demo ? null : supabase,
+  );
+  const placesCloud = useRemotePlaces(
+    initialPlaces,
+    data.demo ? null : supabase,
+    cloud.canEdit,
   );
   const [route, setRoute] = useState(readRoute);
   const [search, setSearch] = useState("");
@@ -156,14 +165,29 @@ export default function App() {
   const searchRef = useRef<HTMLInputElement>(null);
   const viewerButton = useRef<HTMLButtonElement>(null);
   const editorControls = useRef<EditorControlsHandle>(null);
-  const selected = cities.find((c) => c.id === route.city) || null;
+  const places = useMemo(
+    () =>
+      cloud.enabled
+        ? placesCloud.places
+        : placesCloud.places.map((place) =>
+            Object.hasOwn(statusOverrides, place.id)
+              ? { ...place, status: statusOverrides[place.id] }
+              : place,
+          ),
+    [cloud.enabled, placesCloud.places, statusOverrides],
+  );
+  const entries = useMemo(() => [...cities, ...places], [cities, places]);
+  const selected = entries.find((entry) => entry.id === route.city) || null;
+  const profileCloud = selected && isPlace(selected) ? placesCloud : cloud;
   const { ref: identityRef, layout: coordinateLayout } = useCoordinateLayout(
     selected?.id,
   );
   const viewer = Boolean(route.view && selected?.map);
   const updateMapStatus = (id: string, value: MapStatus) => {
     if (cloud.enabled) {
-      void cloud.saveStatus(id, value);
+      if (places.some((place) => place.id === id))
+        void placesCloud.saveStatus(id, value);
+      else void cloud.saveStatus(id, value);
       return;
     }
     const next = { ...statusOverrides, [id]: value };
@@ -184,24 +208,27 @@ export default function App() {
     (id: string | null, view = false, replace = false) => {
       const url = new URL(window.location.href);
       if (id) {
-        url.searchParams.set("city", id);
+        const entry = entries.find((entry) => entry.id === id);
+        const key = entry && isPlace(entry) ? "place" : "city";
+        url.searchParams.set(key, id);
+        url.searchParams.delete(key === "place" ? "city" : "place");
         const country = url.searchParams.get("country");
-        if (
-          country &&
-          cities.some((city) => city.id === id && countryKey(city) === country)
-        ) {
+        if (country && entry && entryInCountry(entry, country)) {
           url.searchParams.set("panel", "countries");
         } else {
           url.searchParams.delete("panel");
           url.searchParams.delete("country");
         }
-      } else url.searchParams.delete("city");
+      } else {
+        url.searchParams.delete("city");
+        url.searchParams.delete("place");
+      }
       if (view) url.searchParams.set("view", "map");
       else url.searchParams.delete("view");
       window.history[replace ? "replaceState" : "pushState"]({}, "", url);
       setRoute(readRoute());
     },
-    [cities],
+    [entries],
   );
   useEffect(() => {
     const listener = () => setRoute(readRoute());
@@ -221,12 +248,12 @@ export default function App() {
   const cityLastVisits = useMemo(
     () =>
       new globalThis.Map(
-        cities.map((city) => [
+        entries.map((city) => [
           city.id,
           cityVisitSummary(city.visits ?? []).lastVisited ?? city.lastVisited,
         ]),
       ),
-    [cities],
+    [entries],
   );
   const lastVisitYears = useMemo(
     () =>
@@ -257,11 +284,11 @@ export default function App() {
   const countryCities = useMemo(
     () =>
       scopedCountry
-        ? cities
-            .filter((city) => countryKey(city) === scopedCountry.code)
+        ? entries
+            .filter((city) => entryInCountry(city, scopedCountry.code))
             .sort((a, b) => a.name.localeCompare(b.name))
         : [],
-    [cities, scopedCountry],
+    [entries, scopedCountry],
   );
   const countryContinents = useMemo(
     () =>
@@ -379,7 +406,7 @@ export default function App() {
   );
   const cityScope = useMemo(() => {
     const query = searchText(search);
-    return cities
+    return entries
       .filter((city) => {
         const year = cityLastVisits.get(city.id)?.slice(0, 4);
         return (
@@ -390,13 +417,23 @@ export default function App() {
               (lastVisitYear === "2023"
                 ? Number(year) <= 2023
                 : year === lastVisitYear))) &&
-          (!scopedCountry || countryKey(city) === scopedCountry.code)
+          (!scopedCountry || entryInCountry(city, scopedCountry.code))
         );
       })
       .sort((a, b) => a.name.localeCompare(b.name));
-  }, [search, continent, lastVisitYear, cityLastVisits, cities, scopedCountry]);
+  }, [
+    search,
+    continent,
+    lastVisitYear,
+    cityLastVisits,
+    entries,
+    scopedCountry,
+  ]);
   const cityProgressScope = useMemo(
-    () => cityScope.filter((city) => !visitedOnly || city.visit === "visited"),
+    () =>
+      cityScope.filter(
+        (city) => !visitedOnly || (!isPlace(city) && city.visit === "visited"),
+      ),
     [cityScope, visitedOnly],
   );
   const filtered = useMemo(() => {
@@ -413,25 +450,46 @@ export default function App() {
         a.name.localeCompare(b.name),
     );
   }, [cityProgressScope, status, citySort]);
-  const mapCities = useMemo(() => {
+  const filteredCities = useMemo(
+    () => filtered.filter((entry) => !isPlace(entry)),
+    [filtered],
+  );
+  const mapEntries = useMemo(() => {
     if (countryView && scopedCountry) return countryCities;
     if (!countryView) return filtered;
     const codes = new Set(countryScope.map((country) => country.code));
-    return cities.filter((city) => codes.has(countryKey(city)));
+    return entries.filter((entry) =>
+      isPlace(entry)
+        ? entry.countries.some((country) => codes.has(country.code))
+        : codes.has(countryKey(entry)),
+    );
   }, [
     countryView,
     scopedCountry,
     countryCities,
     filtered,
     countryScope,
-    cities,
+    entries,
   ]);
+  const globeCities = useMemo(
+    () => mapEntries.filter((entry) => !isPlace(entry)),
+    [mapEntries],
+  );
+  const globePlaces = useMemo(() => {
+    const visible = mapEntries.filter(isPlace);
+    return selected &&
+      isPlace(selected) &&
+      !visible.some((place) => place.id === selected.id)
+      ? [...visible, selected]
+      : visible;
+  }, [mapEntries, selected]);
   const changePanel = useCallback((panel: CollectionView) => {
     const current = readRoute();
     if (current.panel === panel && !current.city && !current.country) return;
     const url = new URL(window.location.href);
     if (current.countrySet === 197) url.searchParams.set("countrySet", "197");
-    for (const key of ["city", "view", "country"]) url.searchParams.delete(key);
+    for (const key of ["city", "place", "view", "country"])
+      url.searchParams.delete(key);
     if (panel === "countries") url.searchParams.set("panel", panel);
     else url.searchParams.delete("panel");
     window.history.pushState({}, "", url);
@@ -440,7 +498,7 @@ export default function App() {
   }, []);
   const openCountry = (code: string) => {
     const url = new URL(window.location.href);
-    for (const key of ["city", "view"]) url.searchParams.delete(key);
+    for (const key of ["city", "place", "view"]) url.searchParams.delete(key);
     url.searchParams.set("panel", "countries");
     url.searchParams.set("country", code);
     window.history.pushState({}, "", url);
@@ -451,7 +509,8 @@ export default function App() {
     const url = new URL(window.location.href);
     if (readRoute().countrySet === 197)
       url.searchParams.set("countrySet", "197");
-    for (const key of ["country", "city", "view"]) url.searchParams.delete(key);
+    for (const key of ["country", "city", "place", "view"])
+      url.searchParams.delete(key);
     url.searchParams.set("panel", "countries");
     window.history.pushState({}, "", url);
     setCountryPreview(null);
@@ -519,7 +578,8 @@ export default function App() {
       <main className={`atlas-layout ${viewer ? "viewer-is-open" : ""}`}>
         <div className="map-stage">
           <Globe
-            cities={mapCities}
+            cities={globeCities}
+            places={globePlaces}
             countries={countryData}
             selected={selected}
             selectedCountry={scopedCountry?.code ?? null}
@@ -625,7 +685,7 @@ export default function App() {
                   />
                 ) : (
                   <CityCollectionSummary
-                    cities={filtered}
+                    cities={filteredCities}
                     scope={cityProgressScope}
                     status={status}
                     onStatus={setStatus}
@@ -656,7 +716,12 @@ export default function App() {
                     countryView ? countryLastVisitYears : lastVisitYears
                   }
                   count={
-                    countryView ? filteredCountries.length : filtered.length
+                    countryView
+                      ? filteredCountries.length
+                      : filteredCities.length
+                  }
+                  placeCount={
+                    countryView ? 0 : filtered.length - filteredCities.length
                   }
                   searchRef={searchRef}
                 />
@@ -770,17 +835,27 @@ export default function App() {
                           <CityName name={selected.name} />
                         </h1>
                         <p className="detail-country">
-                          <Flag code={selected.countryCode} />
-                          {countryDisplayName(
-                            selected.country,
-                            selected.countryCode,
+                          {isPlace(selected) ? (
+                            <EntryCountries entry={selected} />
+                          ) : (
+                            <>
+                              <Flag code={selected.countryCode} />
+                              {countryDisplayName(
+                                selected.country,
+                                selected.countryCode,
+                              )}
+                            </>
                           )}
                         </p>
                       </div>
                       {selected.coordinates && (
                         <div
                           className="detail-coordinates"
-                          aria-label="City coordinates"
+                          aria-label={
+                            isPlace(selected)
+                              ? "Place coordinates"
+                              : "City coordinates"
+                          }
                         >
                           <span>
                             <span className="visually-hidden">Latitude </span>
@@ -813,7 +888,7 @@ export default function App() {
                         <strong>A map in the making</strong>
                         <p>
                           {selected.status === "Not Started"
-                            ? "This city is waiting for its first pins."
+                            ? `This ${isPlace(selected) ? "place" : "city"} is waiting for its first pins.`
                             : "No annotated map has been added yet."}
                         </p>
                       </div>
@@ -823,7 +898,7 @@ export default function App() {
                     <div className="detail-fact-row">
                       <span className="map-status-label">
                         <label htmlFor="city-map-status">Map status</label>
-                        {cloud.pending[selected.id] && (
+                        {profileCloud.pending[selected.id] && (
                           <span className="map-status-saving" role="status">
                             <LoaderCircle
                               size={14}
@@ -841,14 +916,14 @@ export default function App() {
                       >
                         <select
                           id="city-map-status"
-                          aria-busy={Boolean(cloud.pending[selected.id])}
+                          aria-busy={Boolean(profileCloud.pending[selected.id])}
                           value={selected.status}
                           disabled={
                             cloud.enabled &&
                             (!cloud.canEdit ||
-                              !cloud.ready ||
-                              Boolean(cloud.loadError) ||
-                              Boolean(cloud.pending[selected.id]))
+                              !profileCloud.ready ||
+                              Boolean(profileCloud.loadError) ||
+                              Boolean(profileCloud.pending[selected.id]))
                           }
                           title={
                             cloud.enabled && !cloud.canEdit
@@ -889,11 +964,12 @@ export default function App() {
                     )}
                   </div>
                   <CityVisitHistory visits={selected.visits} />
-                  {cloud.enabled && cloud.saveError?.id === selected.id && (
-                    <p className="status-save-error" role="alert">
-                      {cloud.saveError.message}
-                    </p>
-                  )}
+                  {cloud.enabled &&
+                    profileCloud.saveError?.id === selected.id && (
+                      <p className="status-save-error" role="alert">
+                        {profileCloud.saveError.message}
+                      </p>
+                    )}
                   {!cloud.enabled && saveErrorCity === selected.id && (
                     <p className="status-save-error" role="status">
                       Status changed for this session. Your browser couldn’t

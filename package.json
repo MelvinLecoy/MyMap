@@ -7,6 +7,11 @@
     "node": ">=22.12.0"
   },
   "scripts": {
+    "places:prepare": "tsx scripts/sync-places.ts",
+    "places:prepare-outline": "NODE_USE_ENV_PROXY=1 tsx scripts/prepare-place-outline.ts",
+    "places:verify-live": "NODE_USE_ENV_PROXY=1 tsx scripts/sync-places.ts --verify",
+    "places:verify-migration": "NODE_USE_ENV_PROXY=1 tsx scripts/sync-places.ts --dry-run",
+    "places:apply": "NODE_USE_ENV_PROXY=1 tsx scripts/sync-places.ts --apply",
     "dev": "tsx scripts/import-data.ts && vite --host 0.0.0.0",
     "data:import": "tsx scripts/import-data.ts",
     "data:verify-live": "NODE_USE_ENV_PROXY=1 tsx scripts/verify-persistent-data.ts",

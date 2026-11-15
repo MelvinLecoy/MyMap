@@ -15,6 +15,7 @@ import { formatVisitDate, VISIT_LABELS, type City } from "../lib/types";
 import { useCountryHeading } from "../lib/use-country-heading";
 import { CityRow, Flag } from "./CollectionItems";
 import { visitDurationAnnotation } from "../lib/visit-duration";
+import { isPlace } from "../lib/places";
 
 function VisitDates({
   visit,
@@ -80,6 +81,8 @@ export default function CountryDetail({
       ? null
       : countryVisitOrderLabel(country.code, visitOrder);
   const headingRef = useCountryHeading(country.name, visitOrder);
+  const placeCount = cities.filter(isPlace).length;
+  const cityCount = cities.length - placeCount;
   const visits = [...(country.visits ?? [])].sort(
     (a, b) => a.number - b.number,
   );
@@ -289,9 +292,17 @@ export default function CountryDetail({
           aria-labelledby="country-cities-heading"
         >
           <div className="country-cities-heading">
-            <h2 id="country-cities-heading">Cities</h2>
+            <h2 id="country-cities-heading">
+              {placeCount ? "Cities & places" : "Cities"}
+            </h2>
             <span>
-              {cities.length} {cities.length === 1 ? "city" : "cities"}
+              {cityCount} {cityCount === 1 ? "city" : "cities"}
+              {placeCount > 0 && (
+                <>
+                  {" "}
+                  · {placeCount} {placeCount === 1 ? "place" : "places"}
+                </>
+              )}
             </span>
           </div>
           <div

@@ -1,5 +1,5 @@
 import type { MouseEvent } from "react";
-import { countryKey } from "./countries";
+import { entryInCountry, isPlace } from "./places";
 import type { City } from "./types";
 
 function currentParams() {
@@ -15,19 +15,18 @@ function profileHref(params: URLSearchParams) {
 
 export function countryProfileHref(code: string) {
   const params = currentParams();
-  for (const key of ["city", "view"]) params.delete(key);
+  for (const key of ["city", "place", "view"]) params.delete(key);
   params.set("panel", "countries");
   params.set("country", code);
   return profileHref(params);
 }
 
-export function cityProfileHref(
-  city: Pick<City, "id" | "countryCode" | "country">,
-) {
+export function cityProfileHref(city: City) {
   const params = currentParams();
-  params.set("city", city.id);
+  params.set(isPlace(city) ? "place" : "city", city.id);
+  params.delete(isPlace(city) ? "city" : "place");
   params.delete("view");
-  if (params.get("country") === countryKey(city)) {
+  if (params.get("country") && entryInCountry(city, params.get("country")!)) {
     params.set("panel", "countries");
   } else {
     params.delete("country");

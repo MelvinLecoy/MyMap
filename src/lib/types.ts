@@ -1,3 +1,5 @@
+import type { MultiPolygon, Polygon } from "geojson";
+
 export const MAP_STATUSES = [
   "Complete",
   "Update",
@@ -45,11 +47,22 @@ export interface CountryVisit {
   color: string | null;
   lastVisited?: string | null;
 }
+export interface PlaceCountry {
+  code: string;
+  name: string;
+}
+export interface Place extends City {
+  kind: "place";
+  countries: PlaceCountry[];
+  outline: Polygon | MultiPolygon;
+  outlineSource: string;
+}
 export interface AtlasData {
   demo: boolean;
   cities: City[];
   countries: CountryVisit[];
   geonames: boolean;
+  places?: Place[];
 }
 export const VISIT_LABELS: Record<VisitStatus, string> = {
   visited: "Visited",

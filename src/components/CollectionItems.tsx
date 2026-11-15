@@ -22,6 +22,7 @@ import { VISIT_YEAR_COLORS } from "../lib/palette";
 import { cityVisitSummary } from "../lib/city-visits";
 import { formatShortVisitDate } from "../lib/types";
 import { cityProfileHref, followProfileLink } from "../lib/profile-navigation";
+import { isPlace } from "../lib/places";
 
 export function Flag({ code }: { code: string | null }) {
   return (
@@ -32,6 +33,26 @@ export function Flag({ code }: { code: string | null }) {
             .join("")
         : "◌"}
     </span>
+  );
+}
+
+export function EntryCountries({ entry }: { entry: City }) {
+  if (!isPlace(entry))
+    return (
+      <>
+        <Flag code={entry.countryCode} />
+        <span>{countryDisplayName(entry.country, entry.countryCode)}</span>
+      </>
+    );
+  return (
+    <>
+      {entry.countries.map((country) => (
+        <span key={country.code} className="entry-country">
+          <Flag code={country.code} />
+          <span>{country.name}</span>
+        </span>
+      ))}
+    </>
   );
 }
 
@@ -241,8 +262,7 @@ export function CityRow({
       <span className="city-row-body">
         <span className="city-row-name">{city.name}</span>
         <span className="city-row-country">
-          <Flag code={city.countryCode} />
-          <span>{countryDisplayName(city.country, city.countryCode)}</span>
+          <EntryCountries entry={city} />
         </span>
         {!city.coordinates && (
           <span className="location-missing">Location missing</span>

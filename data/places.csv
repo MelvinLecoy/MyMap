@@ -1,0 +1,2 @@
+PlaceId,Place,Continent,Region,Subregion,Longitude,Latitude,MapStatus,VisitStatus,LastVisited,MapEmbedUrl,MapViewerUrl,OutlineFile,OutlineSource,Notes
+patagonia,Patagonia,South America,,,-70.8,-46.5,Not Started,unknown,,,,places/patagonia.geojson,Natural Earth 5.1.2 administrative provinces; broad Patagonia across Argentina and Chile,

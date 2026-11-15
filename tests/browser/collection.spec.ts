@@ -15,6 +15,9 @@ import {
 const data = JSON.parse(
   readFileSync("src/generated/atlas.json", "utf8"),
 ) as AtlasData;
+const entries = [...data.cities, ...(data.places ?? [])];
+const mapCount = (status: string) =>
+  entries.filter((entry) => entry.status === status).length;
 const backName = `All cities (${data.cities.length})`;
 
 test("city overview, compact visit rows, map progress filters and city details use the same history", async ({
@@ -39,15 +42,20 @@ test("city overview, compact visit rows, map progress filters and city details u
     "401",
   ]);
   await expect(page.locator(".city-map-progress-heading")).toContainText(
-    "253 / 343 complete",
+    `${mapCount("Complete")} / ${entries.length} complete`,
   );
   const filters = page.getByRole("group", { name: "Map progress filters" });
-  await filters.getByRole("button", { name: "Update 7", exact: true }).click();
+  await filters
+    .getByRole("button", {
+      name: `Update ${mapCount("Unfinished")}`,
+      exact: true,
+    })
+    .click();
   await expect(mapFilterButton(page, "Unfinished")).toHaveAttribute(
     "aria-pressed",
     "true",
   );
-  await expect(page.locator(".city-row")).toHaveCount(7);
+  await expect(page.locator(".city-row")).toHaveCount(mapCount("Unfinished"));
   await page.getByLabel("Search cities and countries").fill("Shanghai");
   await expect(page.locator(".city-overview-totals dd")).toHaveText([
     "1",
@@ -112,7 +120,7 @@ test("scoreboard toggles compose with filters and sort visits and half-days with
   ]);
   await expect(page.locator(".city-map-progress-bar")).toHaveAttribute(
     "aria-label",
-    "253 Complete, 0 Usable, 7 Update, 83 Not Started",
+    `${mapCount("Complete")} Complete, ${mapCount("Update")} Usable, ${mapCount("Unfinished")} Update, ${mapCount("Not Started")} Not Started`,
   );
   await expect(
     page.locator(".city-map-progress-bar .status-complete"),
@@ -126,7 +134,7 @@ test("scoreboard toggles compose with filters and sort visits and half-days with
         .evaluate((el) => getComputedStyle(el).color),
     );
   }
-  const alphabetical = data.cities
+  const alphabetical = entries
     .map((city) => city.name)
     .sort((a, b) => a.localeCompare(b));
   await expect(names).toHaveText(alphabetical);
@@ -197,10 +205,8 @@ test("scoreboard toggles compose with filters and sort visits and half-days with
     "aria-pressed",
     "true",
   );
-  await expect(names).toHaveCount(0);
-  await page
-    .getByRole("button", { name: "Clear filters", exact: true })
-    .click();
+  await expect(names).toHaveCount(mapCount("Update"));
+  await filters.getByRole("button", { name: /^Usable / }).click();
   await expect(names).toHaveText(alphabetical);
   for (const width of [320, 650, 1440]) {
     await page.setViewportSize({ width, height: 1000 });
@@ -317,7 +323,7 @@ test("compact year and continent menus filter latest visits, retain year colors 
   await page
     .getByRole("button", { name: "Clear filters", exact: true })
     .click();
-  await expect(page.locator(".city-row")).toHaveCount(343);
+  await expect(page.locator(".city-row")).toHaveCount(entries.length);
   await expect(year).toContainText("Year last visited");
   await expect(continent).toContainText("Continent");
   await year.focus();
@@ -969,22 +975,31 @@ test.beforeEach(async ({ context, page, baseURL }) => {
   );
 });
 
-test("the default globe loads all 343 entries with approved city visits and no saved demo statuses", async ({
+test("the default globe loads cities and places with approved city visits and no saved demo statuses", async ({
   page,
 }) => {
   await page.goto("/");
-  await expect(page.locator(".city-row")).toHaveCount(343);
+  await expect(page.locator(".city-row")).toHaveCount(entries.length);
   await expect(page.locator(".city-total")).toHaveText("343");
-  await expect(page.locator(".visit-marker-not-yet")).toHaveCount(256);
+  await expect(page.locator(".visit-marker-not-yet")).toHaveCount(
+    entries.filter((entry) => !["visited", "planned"].includes(entry.visit))
+      .length,
+  );
   await expect(
     page.locator(".visit-marker-visited, .visit-marker-planned"),
   ).toHaveCount(174);
   await expect(page.locator(".collection-bottom")).toHaveText(
     /Visited\s*98\s*countries\s*174\s*cities/,
   );
-  await expect(page.locator(".city-row .status-complete")).toHaveCount(253);
-  await expect(page.locator(".city-row .status-unfinished")).toHaveCount(7);
-  await expect(page.locator(".city-row .status-not-started")).toHaveCount(65);
+  await expect(page.locator(".city-row .status-complete")).toHaveCount(
+    mapCount("Complete"),
+  );
+  await expect(page.locator(".city-row .status-unfinished")).toHaveCount(
+    mapCount("Unfinished"),
+  );
+  await expect(page.locator(".city-row .status-not-started")).toHaveCount(
+    entries.filter((entry) => entry.status === "Not Started").length,
+  );
   await expect(page.locator('[data-testid="map-canvas"]')).toHaveAttribute(
     "data-ready",
     "true",
@@ -997,10 +1012,13 @@ test("every status and continent filter and country search work on the full coll
 }) => {
   await page.goto("/");
   for (const [status, count] of [
-    ["Complete", 253],
-    ["Unfinished", 7],
-    ["Not Started", 83],
-    ["Update", 0],
+    ["Complete", mapCount("Complete")],
+    ["Unfinished", mapCount("Unfinished")],
+    [
+      "Not Started",
+      entries.filter((entry) => entry.status === "Not Started").length,
+    ],
+    ["Update", mapCount("Update")],
   ] as const) {
     await setMapFilter(page, status);
     await expect(page.locator(".city-row")).toHaveCount(count);
@@ -1011,7 +1029,7 @@ test("every status and continent filter and country search work on the full coll
   ]) {
     await chooseFilter(page, "Filter by continent", continent);
     await expect(page.locator(".city-row")).toHaveCount(
-      data.cities.filter((record) => record.continent === continent).length,
+      entries.filter((record) => record.continent === continent).length,
     );
   }
   await chooseFilter(page, "Filter by continent", "All continents");
@@ -1348,8 +1366,13 @@ test("real status edits persist and sync separately from demo edits without chan
   await other.close();
   await back(page);
   await page.getByRole("textbox").fill("");
-  await expect(page.locator(".city-row .status-complete")).toHaveCount(253);
-  await expect(page.locator(".visit-marker-not-yet")).toHaveCount(256);
+  await expect(page.locator(".city-row .status-complete")).toHaveCount(
+    mapCount("Complete"),
+  );
+  await expect(page.locator(".visit-marker-not-yet")).toHaveCount(
+    entries.filter((entry) => !["visited", "planned"].includes(entry.visit))
+      .length,
+  );
 });
 
 test("the full collection and corrected map links remain usable without WebGL", async ({
@@ -1370,7 +1393,7 @@ test("the full collection and corrected map links remain usable without WebGL", 
   await expect(
     page.getByText("The interactive globe needs WebGL.", { exact: false }),
   ).toBeVisible();
-  await expect(page.locator(".city-row")).toHaveCount(343);
+  await expect(page.locator(".city-row")).toHaveCount(entries.length);
   await openCity(page, "Nice");
   await expect(
     page.getByRole("button", { name: "View My Map", exact: true }),
@@ -1383,7 +1406,8 @@ test("the Countries tab has labelled counts, independent filters, and reloadable
   await withoutGlobe(page);
   await page.goto("/");
   const tabs = page.getByRole("tablist", { name: "Collection view" });
-  await expect(page.locator(".collection-count")).toHaveText("343 cities");
+  await expect(page.locator(".collection-count-main")).toHaveText("343 cities");
+  await expect(page.locator(".collection-count small")).toHaveText("1 place");
   await page.getByLabel("Search cities and countries").fill("Adelaide");
   await expect(page.locator(".collection-count")).toHaveText("1 city");
   await tabs.getByRole("tab", { name: "Countries", exact: true }).click();
@@ -1512,6 +1536,95 @@ test("countries open their own details and keep their tab through city details a
       exact: true,
     }),
   ).toBeVisible();
+});
+
+test("Patagonia reuses the city row and profile with both countries and preserves city statistics", async ({
+  page,
+  context,
+  baseURL,
+}) => {
+  await withoutGlobe(page);
+  await page.goto("/");
+  await expect(
+    page.locator(".city-overview-totals .scoreboard-stat-value"),
+  ).toHaveText(["174", "222", "401"]);
+  await expect(page.locator(".collection-count-main")).toHaveText("343 cities");
+  await expect(page.locator(".collection-count small")).toHaveText("1 place");
+  const patagonia = page.locator(".city-row").filter({
+    has: page.locator(".city-row-name", { hasText: /^Patagonia$/ }),
+  });
+  await expect(patagonia.locator(".city-row-name")).toHaveText("Patagonia");
+  await expect(
+    patagonia.locator(".entry-country > span:last-child"),
+  ).toHaveText(["Argentina", "Chile"]);
+  await expect(patagonia.locator(".status")).toHaveText("Not Started");
+  await expect(patagonia).toHaveAttribute("href", /place=patagonia/);
+  await patagonia.click();
+  await expect(page).toHaveURL(/place=patagonia/);
+  await expect(
+    page.getByRole("heading", { name: "Patagonia", exact: true }),
+  ).toBeVisible();
+  await expect(page.locator(".detail-country")).toContainText("Argentina");
+  await expect(page.locator(".detail-country")).toContainText("Chile");
+  await expect(
+    page.getByRole("button", { name: "View My Map", exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByText("A map in the making", { exact: true }),
+  ).toBeVisible();
+  await page.reload();
+  await expect(
+    page.getByRole("heading", { name: "Patagonia", exact: true }),
+  ).toBeVisible();
+  for (const width of [320, 390, 1440]) {
+    await page.setViewportSize({ width, height: 1000 });
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+  }
+  for (const [code, name] of [
+    ["AR", "Argentina"],
+    ["CL", "Chile"],
+  ]) {
+    await page.goto(`/?panel=countries&country=${code}&countrySet=197`);
+    await expect(
+      page.getByRole("heading", { name, exact: true }),
+    ).toBeVisible();
+    await expect(page.locator(".country-cities-heading")).toContainText(
+      "1 place",
+    );
+    const row = page
+      .locator(".city-row")
+      .filter({ has: page.getByText("Patagonia", { exact: true }) });
+    const href = (await row.getAttribute("href"))!;
+    expect(new URL(href, baseURL).searchParams.get("country")).toBe(code);
+    expect(new URL(href, baseURL).searchParams.get("place")).toBe("patagonia");
+    const tab = await context.newPage();
+    await withoutGlobe(tab);
+    await tab.goto(new URL(href, baseURL).href);
+    await expect(
+      tab.getByRole("heading", { name: "Patagonia", exact: true }),
+    ).toBeVisible();
+    await expect(
+      tab.getByRole("tab", { name: "Countries", exact: true }),
+    ).toHaveAttribute("aria-selected", "true");
+    await tab.close();
+  }
+  await page.goto("/?panel=countries");
+  for (const code of ["AR", "CL"]) {
+    const country = data.cities.find((city) => city.countryCode === code)!;
+    const row = page
+      .locator(".country-row")
+      .filter({ has: page.getByText(country.country, { exact: true }) });
+    await expect(row.locator(".country-city-count strong")).toHaveText(
+      String(data.cities.filter((city) => city.countryCode === code).length),
+    );
+  }
+  await expect(page.locator(".collection-bottom")).toHaveText(
+    /Visited\s*98\s*countries\s*174\s*cities/,
+  );
 });
 
 test("country and city rows support native new tabs while ordinary clicks preserve panel state", async ({

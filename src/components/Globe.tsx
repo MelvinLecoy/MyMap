@@ -38,10 +38,17 @@ import { countryBounds, positionBounds } from "../lib/country-camera";
 import { countryKey } from "../lib/countries";
 import { createCountryHover, restoreCountryPaint } from "../lib/country-hover";
 import type { FeatureCollection } from "geojson";
-import type { City, CountryVisit } from "../lib/types";
+import type { City, CountryVisit, Place } from "../lib/types";
+import { isPlace, placeOutlineFeatures, placePinFeatures } from "../lib/places";
+import {
+  createPlaceSelection,
+  focusPlace,
+  placePinImage,
+} from "../lib/place-selection";
 import "maplibre-gl/dist/maplibre-gl.css";
 interface Props {
   cities: City[];
+  places: Place[];
   countries: CountryVisit[];
   selected: City | null;
   selectedCountry?: string | null;
@@ -56,6 +63,7 @@ interface Props {
 }
 export default function Globe({
   cities,
+  places,
   countries,
   selected,
   selectedCountry = null,
@@ -74,9 +82,14 @@ export default function Globe({
   const countryHover = useRef<ReturnType<typeof createCountryHover> | null>(
     null,
   );
+  const placeSelection = useRef<ReturnType<typeof createPlaceSelection> | null>(
+    null,
+  );
+  const previousPlaces = useRef<Place[]>([]);
   const configureHoverRef = useRef<(() => void) | null>(null);
   const current = useRef({
     cities,
+    places,
     countries,
     selected,
     selectedCountry,
@@ -89,6 +102,7 @@ export default function Globe({
   });
   current.current = {
     cities,
+    places,
     countries,
     selected,
     selectedCountry,
@@ -342,6 +356,24 @@ export default function Globe({
         data: cityFeatures(current.current.cities),
         cluster: false,
       });
+      map.addSource("atlas-places", {
+        type: "geojson",
+        data: placePinFeatures(current.current.places),
+        cluster: false,
+      });
+      map.addSource("atlas-place-outlines", {
+        type: "geojson",
+        promoteId: "id",
+        data: placeOutlineFeatures(current.current.places),
+      });
+      previousPlaces.current = current.current.places;
+      placeSelection.current?.destroy();
+      placeSelection.current = createPlaceSelection(map, motionDuration);
+      placeSelection.current.setPlace(
+        current.current.selected && isPlace(current.current.selected)
+          ? current.current.selected.id
+          : null,
+      );
       map.addLayer({
         id: "city-selection-halo",
         type: "circle",
@@ -399,6 +431,30 @@ export default function Globe({
           "text-halo-width": 1.4,
         },
       });
+      if (!map.hasImage("place-pin"))
+        map.addImage("place-pin", placePinImage(), { pixelRatio: 2 });
+      map.addLayer({
+        id: "place-pins",
+        type: "symbol",
+        source: "atlas-places",
+        layout: {
+          "icon-image": "place-pin",
+          "icon-allow-overlap": true,
+          "icon-ignore-placement": true,
+          "text-field": ["get", "name"],
+          "text-font": [LABEL_FONTS.city],
+          "text-size": 11,
+          "text-anchor": "left",
+          "text-offset": [0.8, 0],
+          "text-padding": 4,
+          "text-optional": true,
+        },
+        paint: {
+          "text-color": MAP_COLORS.cityLabel,
+          "text-halo-color": MAP_COLORS.cityLabelHalo,
+          "text-halo-width": 1.4,
+        },
+      });
       map.once("idle", () => setReady(true));
     };
     map.on("style.load", decorate);
@@ -435,7 +491,7 @@ export default function Globe({
       if (!map.getSource("atlas-cities") || !map.getLayer("city-pins"))
         return undefined;
       const rendered = map.queryRenderedFeatures([point.x, point.y], {
-        layers: ["city-pins"],
+        layers: ["place-pins", "city-pins"],
       });
       if (rendered[0]) return rendered[0];
       // MapLibre 5's globe hit testing can miss rendered circles at orbit scale.
@@ -448,7 +504,10 @@ export default function Globe({
         | ReturnType<MapInstance["querySourceFeatures"]>[number]
         | undefined;
       let closestDistance = Infinity;
-      for (const feature of map.querySourceFeatures("atlas-cities")) {
+      for (const feature of [
+        ...map.querySourceFeatures("atlas-places"),
+        ...map.querySourceFeatures("atlas-cities"),
+      ]) {
         if (feature.geometry.type !== "Point") continue;
         const [lng, lat] = feature.geometry.coordinates;
         const facing =
@@ -551,7 +610,11 @@ export default function Globe({
       map.on("mousemove", handleHover);
     }
     configureHoverRef.current = configureHover;
-    const resize = new ResizeObserver(() => map.resize());
+    const resize = new ResizeObserver(() => {
+      map.resize();
+      const entry = current.current.selected;
+      if (entry && isPlace(entry)) focusPlace(map, entry, 0);
+    });
     resize.observe(container.current);
     // Start with the bundled atlas immediately. A compatible provider adds closer-scale labels.
     const abort = new AbortController();
@@ -594,6 +657,8 @@ export default function Globe({
       configureHoverRef.current = null;
       countryHover.current?.destroy();
       countryHover.current = null;
+      placeSelection.current?.destroy();
+      placeSelection.current = null;
       map.getCanvas().removeEventListener("mouseleave", clearHover);
       map.getCanvas().removeEventListener("touchstart", clearHover);
       map.off("mousemove", handleHover);
@@ -617,6 +682,28 @@ export default function Globe({
   }, [cities]);
   useEffect(() => {
     const map = mapRef.current;
+    if (!map?.getSource("atlas-places")) return;
+    if (
+      places.length === previousPlaces.current.length &&
+      places.every((place, index) => place === previousPlaces.current[index])
+    )
+      return;
+    previousPlaces.current = places;
+    (map?.getSource("atlas-places") as GeoJSONSource | undefined)?.setData(
+      placePinFeatures(places),
+    );
+    (
+      map?.getSource("atlas-place-outlines") as GeoJSONSource | undefined
+    )?.setData(placeOutlineFeatures(places));
+  }, [places]);
+  useEffect(() => {
+    if (ready)
+      placeSelection.current?.setPlace(
+        selected && isPlace(selected) ? selected.id : null,
+      );
+  }, [selected, ready]);
+  useEffect(() => {
+    const map = mapRef.current;
     if (!ready || !map?.getLayer("atlas-land")) return;
     if (countryHover.current) countryHover.current.updateCountries(countries);
     else restoreCountryPaint(map, countries);
@@ -633,7 +720,7 @@ export default function Globe({
   useEffect(() => {
     const map = mapRef.current;
     if (!ready || !map?.getLayer("city-pins")) return;
-    const id = selected?.id ?? "";
+    const id = selected && !isPlace(selected) ? selected.id : "";
     map.setFilter("city-selection-halo", ["==", ["get", "id"], id]);
     map.setPaintProperty("city-pins", "circle-stroke-color", [
       "case",
@@ -705,6 +792,11 @@ export default function Globe({
     )
       return;
     previousCity.current = selected.id;
+    if (isPlace(selected)) {
+      focusPlace(map, selected, motionDuration(1400));
+      setHint(false);
+      return;
+    }
     map.flyTo({
       center: selected.coordinates,
       zoom: window.innerWidth < 650 ? 4.2 : 4.1,
@@ -743,6 +835,7 @@ export default function Globe({
         data-hover-country=""
         data-hover-available={hoverAvailable}
         data-selected-country={selected ? "" : (selectedCountry ?? "")}
+        data-selected-place={selected && isPlace(selected) ? selected.id : ""}
       />
       <div className="map-topline">
         {viewControl ?? (
@@ -824,6 +917,12 @@ export default function Globe({
               />
               Visited city
             </span>
+            {places.length > 0 && (
+              <span>
+                <i className="legend-place" />
+                Place
+              </span>
+            )}
             <div
               className="map-year-legend"
               aria-label="Country last visit year"

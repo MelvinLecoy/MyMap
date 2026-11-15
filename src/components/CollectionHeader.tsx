@@ -74,6 +74,7 @@ export default function CollectionHeader({
   onLastVisitYear,
   lastVisitYears,
   count,
+  placeCount = 0,
   searchRef,
 }: {
   view: CollectionView;
@@ -86,6 +87,7 @@ export default function CollectionHeader({
   onLastVisitYear: (value: string) => void;
   lastVisitYears: string[];
   count: number;
+  placeCount?: number;
   searchRef: RefObject<HTMLInputElement | null>;
 }) {
   const countries = view === "countries";
@@ -98,15 +100,22 @@ export default function CollectionHeader({
       : "cities";
   const resultCount = (
     <span
-      className="collection-count"
+      className={`collection-count${placeCount ? " collection-count--with-places" : ""}`}
       role="status"
       aria-live="polite"
-      aria-label={`${count} ${noun}`}
+      aria-label={`${count} ${noun}${placeCount ? `, ${placeCount} ${placeCount === 1 ? "place" : "places"}` : ""}`}
     >
-      <strong className={countries ? "country-total" : "city-total"}>
-        {count}
-      </strong>{" "}
-      <span>{noun}</span>
+      <span className="collection-count-main">
+        <strong className={countries ? "country-total" : "city-total"}>
+          {count}
+        </strong>{" "}
+        <span>{noun}</span>
+      </span>
+      {placeCount > 0 && (
+        <small>
+          {placeCount} {placeCount === 1 ? "place" : "places"}
+        </small>
+      )}
     </span>
   );
   return (

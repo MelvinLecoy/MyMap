@@ -32,6 +32,12 @@ test("the published collection preserves all rows and links from the updated CSV
     Longyearbyen: "Svalbard",
     Sevastopol: "Ukraine",
   };
+  const savedStatuses = JSON.parse(
+    readFileSync("data/sources/map-status-updates-2026-11-15.json", "utf8"),
+  ).changes as { id: string; previous: string; status: string }[];
+  const statusOverrides = new Map(
+    savedStatuses.map((change) => [change.id, change]),
+  );
   for (let i = 0; i < raw.length; i++) {
     const original = raw[i].values;
     const prepared = normalized[i].values;
@@ -40,9 +46,12 @@ test("the published collection preserves all rows and links from the updated CSV
       prepared.country,
       countryOverrides[original.cities] ?? original.country,
     );
-    for (const field of ["continent", "region", "subregion", "status"]) {
+    for (const field of ["continent", "region", "subregion"]) {
       assert.equal(prepared[field], original[field]);
     }
+    const savedStatus = statusOverrides.get(prepared.cityid);
+    if (savedStatus) assert.equal(savedStatus.previous, original.status);
+    assert.equal(prepared.status, savedStatus?.status ?? original.status);
     const sourceUrl = /^src="([^"]+)"$/.exec(original.link)?.[1];
     assert.ok(sourceUrl, original.cities);
     assert.deepEqual(parseMapLink(prepared.link), parseMapLink(sourceUrl));
