@@ -25,6 +25,7 @@ export interface TimelineStay extends HistoryStay {
   exact: boolean;
   single: boolean;
   monthDates: boolean;
+  yearDates: boolean;
   range: string;
   startLabel: string;
   endLabel: string;
@@ -214,6 +215,7 @@ export function visitTimelineYears(
         exact,
         single: stay.arrival === stay.departure,
         monthDates: start.monthDates || end.monthDates,
+        yearDates: crossYear && (start.monthDates || end.monthDates),
         range: historyDateRange(stay),
         startLabel: start.label,
         endLabel: end.label,

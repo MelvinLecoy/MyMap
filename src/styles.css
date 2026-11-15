@@ -3036,6 +3036,9 @@ h2 {
 .visit-month-periods--shared-months .visit-period--month-dates {
   padding-inline: 0;
 }
+.visit-month-periods--year-dates {
+  --visit-gap-width: 36px;
+}
 .visit-period-cities {
   margin-bottom: 4px;
   color: var(--muted);
@@ -3113,6 +3116,10 @@ h2 {
 }
 .visit-period-point--diamond .visit-period-point-label {
   color: var(--visit-year);
+}
+.visit-period-point--diamond .visit-period-point-number {
+  font-size: 8px;
+  font-weight: 900;
 }
 .visit-period-point-label sup {
   font-size: 1.2em;
@@ -3257,6 +3264,9 @@ h2 {
   }
   .country-detail {
     overflow: visible;
+  }
+  .visit-period-point--filled .visit-period-point-label {
+    top: 1px;
   }
 }
 .country-history-scope {

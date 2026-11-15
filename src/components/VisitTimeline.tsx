@@ -26,7 +26,14 @@ function Endpoint({ marker, oneDay }: { marker: StayMarker; oneDay: boolean }) {
     >
       {(oneDay || marker === "diamond") && (
         <span className="visit-period-point-label">
-          1{marker === "diamond" && <sup>*</sup>}
+          {marker === "diamond" ? (
+            <>
+              <span className="visit-period-point-number">1</span>
+              <sup>*</sup>
+            </>
+          ) : (
+            "1"
+          )}
         </span>
       )}
     </span>
@@ -195,7 +202,7 @@ function StayRow({
   }, [row.periods, context.kind, context.countryCode]);
   return (
     <div
-      className={`visit-month-periods${row.periods.length > 1 && row.periods.some((stay) => stay.monthDates) ? " visit-month-periods--shared-months" : ""}`}
+      className={`visit-month-periods${row.periods.length > 1 && row.periods.some((stay) => stay.monthDates) ? " visit-month-periods--shared-months" : ""}${row.periods.length > 1 && row.periods.some((stay) => stay.yearDates) ? " visit-month-periods--year-dates" : ""}`}
       ref={container}
     >
       <svg

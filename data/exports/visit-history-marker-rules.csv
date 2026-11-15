@@ -1,13 +1,13 @@
 Profile,CountryCode,Condition,ArrivalMarker,DepartureMarker,SingleMarker,Label,Notes,AsteriskSizeEm
 all,*,ordinary-date-range,filled-circle,filled-circle,,{days},Inclusive endpoints; also applies between dashed links,
-all,*,ordinary-single-day,,,filled-circle,1,White 10px numeral; existing circle size; also applies between dashed links,
+all,*,ordinary-single-day,,,filled-circle,1,White 10px numeral; 1px lower at phone widths up to 600px; existing circle size; also applies between dashed links,
 city,*,exceptional-range-default,filled-circle,hollow-circle,,{days}*,Use Singapore override for its exceptional one-day stay,0.8
-city,SG,exceptional-one-day,,,hollow-diamond,1*,Both dates centered below; asterisk font weight 900,1.2
+city,SG,exceptional-one-day,,,hollow-diamond,1*,Both dates centered below; asterisk font weight 900; numeral 1 only: 8px and weight 900; asterisk unchanged,1.2
 country,BA,exceptional-range,hollow-circle,filled-circle,,{days}*,Bosnia & Herzegovina,0.8
 country,DO,exceptional-range,hollow-circle,filled-circle,,{days}*,Dominican Republic,0.8
-country,CZ,exceptional-one-day,,,hollow-diamond,1*,Same diamond as Singapore; both dates below; asterisk font weight 900,1.2
+country,CZ,exceptional-one-day,,,hollow-diamond,1*,Same diamond as Singapore; both dates below; asterisk font weight 900; numeral 1 only: 8px and weight 900; asterisk unchanged,1.2
 country,CZ,other-exceptional-range,hollow-circle,hollow-circle,,{days}*,Retain original country endpoint rule for other exceptional durations,0.8
-country,SG,exceptional-one-day,,,hollow-diamond,1*,Same diamond as Singapore city; both dates below; asterisk font weight 900,1.2
+country,SG,exceptional-one-day,,,hollow-diamond,1*,Same diamond as Singapore city; both dates below; asterisk font weight 900; numeral 1 only: 8px and weight 900; asterisk unchanged,1.2
 country,SG,other-exceptional-range,hollow-circle,hollow-circle,,{days}*,Retain original country endpoint rule for other exceptional durations,0.8
 country,ID,exceptional-range,hollow-circle,hollow-circle,,{days}*,Indonesia,0.8
 country,*,exceptional-range-default,filled-circle,hollow-circle,,{days}*,Use named country overrides when applicable,0.8

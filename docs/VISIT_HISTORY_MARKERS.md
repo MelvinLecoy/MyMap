@@ -6,7 +6,7 @@ Owner-approved rules for both country and city profile timelines.
 
 - A filled circle means the endpoint date is inclusive.
 - Ordinary date ranges use filled circles at both ends.
-- An ordinary one-day stay uses one filled circle with a white **1** centered inside it. The numeral is **10px**; keep the existing circle size.
+- An ordinary one-day stay uses one filled circle with a white **1** inside it. The numeral is **10px**; keep the existing circle size. At phone widths of **600px or less**, lower only the white numeral by **1px**. Keep its desktop position and all diamond labels unchanged.
 - These same rules apply to individual stays joined by dashed links. Dashed links indicate a gap between stays; they add no days.
 
 ## Exceptional durations
@@ -14,6 +14,8 @@ Owner-approved rules for both country and city profile timelines.
 An asterisk marks a recorded duration that differs from the inclusive calendar span. Retain the recorded duration and asterisk; a hollow circle represents a half-day endpoint.
 
 Use **0.8em** for an asterisk beside a duration such as **2.5\***, and **1.2em** when it is inside a diamond. The diamond's asterisk retains font weight **900**.
+
+Only the numeral **1** inside a diamond uses **8px** text at **font weight 900**. Its asterisk keeps its existing styling: **1.2em** relative to the unchanged **7px** label container, at weight **900**. Ordinary white **1** labels remain **10px** at their existing weight.
 
 ### Cities
 
@@ -46,6 +48,7 @@ The country overrides apply only to exceptional durations. Singapore's exception
 - Stacked multi-month headings always show the newer month above the older month in both country and city histories: **JUL** above **JUN**, **JAN** above **DEC**, and the same rule for every other pair. Endpoint dates and segments still run from arrival to departure.
 - Every counted visit has one shared month-range heading, including visits with disconnected stays in different months. For example, Singapore's August–September visit uses **SEP – AUG** as one stacked heading. In a multi-month visit, include the month name only on the first displayed date of each month: **18 Aug**, **20**, **25**, **3 Sep**, **11–12**. Keep each stay, its duration and the dashed gaps intact; do not display separate August and September headings within that visit. Same-month visits keep one month name and day-only dates. Cross-year visits include the actual year alongside each first month label.
 - Keep ordinary range lengths and the current four-dash connector style. Connect the actual marker edges and center each date label under its marker; wrapped stays start a new visual line.
+- Allow extra space between year-bearing date labels so they do not overlap, including Antigua's December–January visit. Keep the four-dash connection style.
 - Center markers on the same visual line together, including a circle followed by a diamond. Rows grow only as needed for their own content.
 - Keep counted visits, recorded dates, explicit durations, city captions and statistics unchanged. Marker choices are presentation rules only.
 
@@ -60,3 +63,10 @@ The tables are also stored as UTF-8 CSVs:
 - [Starred city visits](../data/exports/starred-city-visits.csv): **11** exceptional stay periods across **11** cities.
 
 The visit tables are a snapshot of the current canonical history exported on **15 November 2026**, with visit/period numbers, exact dates, recorded days, inclusive calendar days and the selected marker presentation. Both Singapore entries and Czechia's exceptional country stay use `hollow-diamond` with `1*`. These reference exports do not replace the canonical history CSVs or change database records.
+
+## Multi-month profile audit: 15 November 2026
+
+The shared month-range presentation was checked in **18 profiles**:
+
+- **Countries (10):** Australia, Canada, China, Denmark, France, Guatemala, Japan, New Zealand, Singapore and United Arab Emirates.
+- **Cities (8):** Antigua (Guatemala), Copenhagen, Los Angeles, Miami, New York City, Shanghai, Tokyo and Vancouver.

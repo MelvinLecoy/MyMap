@@ -2991,6 +2991,19 @@ test("multi-month visits share one stacked heading and retain each actual stay",
       ["panel=countries&country=SG", 2, ["SEP", "–AUG"], 4, "6"],
       ["panel=countries&country=AU", 1, ["AUG", "–JUL"], 2, "10"],
       ["city=shanghai-china", 1, ["SEP", "–AUG"], 2, "2.5"],
+      [
+        "city=antigua-guatemala",
+        data.cities
+          .find((city) => city.id === "antigua-guatemala")!
+          .visits!.find((visit) =>
+            (visit.periods ?? [visit]).some(
+              (stay) => stay.arrival === "2025-12-30",
+            ),
+          )!.number,
+        ["JAN", "–DEC"],
+        2,
+        "2",
+      ],
     ] as const) {
       await page.goto(`/?${query}`);
       const visit = page.locator(
@@ -3018,6 +3031,23 @@ test("multi-month visits share one stacked heading and retain each actual stay",
         await page
           .locator(".visit-timeline")
           .evaluate((element) => element.scrollWidth <= element.clientWidth),
+      ).toBe(true);
+      expect(
+        await visit.locator(".visit-month-periods").evaluateAll((rows) =>
+          rows.every((row) => {
+            const dates = [
+              ...row.querySelectorAll(
+                ".visit-period-date-point, .visit-period-date-start, .visit-period-date-end",
+              ),
+            ].map((date) => date.getBoundingClientRect());
+            return dates.every(
+              (date, index) =>
+                index === 0 ||
+                Math.abs(date.top - dates[index - 1].top) > 0.5 ||
+                date.left - dates[index - 1].right >= 2,
+            );
+          }),
+        ),
       ).toBe(true);
     }
   }
