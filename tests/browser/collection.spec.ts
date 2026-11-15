@@ -2262,7 +2262,7 @@ test("supplied workbook metrics and median rows render offline without changing 
     "Total area (km²)",
   );
   await expect(page.locator(".country-reference-unit")).toHaveCount(0);
-  await expect(page.getByText("🌍 med.", { exact: true })).toHaveCount(6);
+  await expect(page.getByText("🌍 median", { exact: true })).toHaveCount(6);
   await expect(
     page.locator(
       ".country-reference-vintage, .country-reference-info, .country-reference-explanation",

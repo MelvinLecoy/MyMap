@@ -124,5 +124,5 @@ export function continentMedianLabel(continent: string) {
     Oceania: "OC",
     Antarctica: "AN",
   };
-  return `${shortNames[continent] ?? "Cont."} med.`;
+  return `${shortNames[continent] ?? "Cont."} median`;
 }

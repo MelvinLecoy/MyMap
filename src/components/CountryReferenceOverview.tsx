@@ -71,7 +71,7 @@ function MedianRows({
           <span>
             {i === 0 ? (
               <>
-                <span className="country-median-globe">🌍</span> med.
+                <span className="country-median-globe">🌍</span> median
               </>
             ) : (
               label

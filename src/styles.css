@@ -1240,6 +1240,14 @@ h2 {
   background: var(--surface);
   border-color: #8bb3a3;
 }
+@container (max-width: 360px) {
+  .country-reference-metrics {
+    margin-inline: -1px;
+  }
+  .country-reference-metric {
+    padding-inline: 1px;
+  }
+}
 @container (max-width: 330px) {
   .map-status-label {
     gap: 5px;

@@ -147,7 +147,7 @@ test("smart formatting follows the requested examples, retains middle hundredths
     ["South America", "SA"],
     ["Oceania", "OC"],
   ])
-    assert.equal(continentMedianLabel(continent), `${short} med.`);
+    assert.equal(continentMedianLabel(continent), `${short} median`);
   assert.deepEqual(formatCountryValue("population", 1412914089, 2), {
     amount: "1.41",
     suffix: "B",
