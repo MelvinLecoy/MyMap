@@ -47,10 +47,19 @@ The country overrides apply only to exceptional durations. Singapore's exception
 - Keep the existing panel date colors: 2026 green, 2025 yellow, 2024 orange, and 2023 or earlier brown.
 - Stacked multi-month headings always show the newer month above the older month in both country and city histories: **JUL** above **JUN**, **JAN** above **DEC**, and the same rule for every other pair. Endpoint dates and segments still run from arrival to departure.
 - Every counted visit has one shared month-range heading, including visits with disconnected stays in different months. For example, Singapore's August–September visit uses **SEP – AUG** as one stacked heading. In a multi-month visit, include the month name only on the first displayed date of each month: **18 Aug**, **20**, **25**, **3 Sep**, **11–12**. Keep each stay, its duration and the dashed gaps intact; do not display separate August and September headings within that visit. Same-month visits keep one month name and day-only dates. Cross-year visits include the actual year alongside each first month label.
-- Keep ordinary range lengths and the current four-dash connector style. Connect the actual marker edges and center each date label under its marker; wrapped stays start a new visual line.
+- Keep ordinary baseline range lengths and the current four-dash connector style; adaptive country captions may extend their segments to support the text. Connect the actual marker edges and center each date label under its marker; wrapped stays start a new visual line.
 - Allow extra space between year-bearing date labels so they do not overlap, including Antigua's December–January visit. Keep the four-dash connection style.
 - Center markers on the same visual line together, including a circle followed by a diamond. Rows grow only as needed for their own content.
-- Keep counted visits, recorded dates, explicit durations, city captions and statistics unchanged. Marker choices are presentation rules only.
+- Keep counted visits, recorded dates, explicit durations, city membership and statistics unchanged. Marker and caption choices are presentation rules only.
+
+## Adaptive country city captions
+
+- When every stay in one counted visit has the same single known city, show its name above the month heading on the left, once for the whole visit. Reserve enough width for the name and wrap long names within that column; align the month with the timeline markers.
+- Otherwise, center each stay's city caption above the middle of its segment or circle. Measure the actual loaded caption font and available width. Prefer keeping the entire visit on one timeline track; use one caption line and extend the segment to support it whenever space permits.
+- When one caption line cannot fit, balance complete city names over the fewest necessary lines before splitting the timeline. The UK 2023 visit fits `London · Bristol` on one line and `Bath · Cardiff · Southampton` / `London · Portsmouth` on two lines at a 390px viewport. Switzerland's 2024 visit uses three, three and two city-caption lines above its three stays at that width; its 2023 cities fit one caption line.
+- Narrower layouts may require more caption lines or another timeline track. Preserve each actual stay, chronological order, date alignment, year colors, marker shapes and the four-dash connections. Resizing and font loading recalculate only the local caption layout and connectors.
+- Use **GC** for Gold Coast in visit-history captions only. The canonical city name, city lists, profiles, stored data and full-name caption tooltips retain **Gold Coast**.
+- Preserve the existing seven country caption exclusions. City-profile histories keep their current layout.
 
 The endpoint policy is implemented in [`src/lib/visit-markers.ts`](../src/lib/visit-markers.ts). The timeline is rendered by [`src/components/VisitTimeline.tsx`](../src/components/VisitTimeline.tsx).
 

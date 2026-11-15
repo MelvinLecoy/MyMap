@@ -14,6 +14,7 @@
 - Keep the explicit policy in `COUNTRIES_WITHOUT_CITY_LABELS` in `src/components/CountryDetail.tsx` and its README description consistent. Check this case for new countries and record any new country-specific display decisions there.
 - Do not suppress labels solely because only one city is currently in the catalog. Other countries can still benefit from naming that city.
 - This policy hides only the city-name captions above country timeline segments. It does not delete city records, city-list navigation, maps, visit dates or statistics.
+- Country visit captions adapt to the actual available width and loaded font. A visit known to contain the same single city in every stay shows that city above the month on the left. Other captions stay centered above their segment or point; prefer one timeline track, expand segments for one-line captions when space permits, and stack city names before wrapping the timeline. Do not hard-code country-specific line counts. Gold Coast uses the owner-approved `GC` caption alias; keep its canonical name unchanged.
 
 # Visit history markers
 

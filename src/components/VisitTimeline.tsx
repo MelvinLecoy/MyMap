@@ -3,6 +3,7 @@ import {
   useLayoutEffect,
   useMemo,
   useRef,
+  useState,
   type CSSProperties,
 } from "react";
 import {
@@ -17,6 +18,13 @@ import {
   type StayMarker,
   type VisitMarkerContext,
 } from "../lib/visit-markers";
+import {
+  historyCityName,
+  layoutVisitCaptions,
+  visitSingleCity,
+  type CaptionBlock,
+  type VisitCaptionLayout,
+} from "../lib/visit-caption-layout";
 
 function Endpoint({ marker, oneDay }: { marker: StayMarker; oneDay: boolean }) {
   return (
@@ -43,9 +51,15 @@ function Endpoint({ marker, oneDay }: { marker: StayMarker; oneDay: boolean }) {
 function StaySegment({
   stay,
   context,
+  hideCities = false,
+  adaptive = false,
+  caption,
 }: {
   stay: TimelineStay;
   context: VisitMarkerContext;
+  hideCities?: boolean;
+  adaptive?: boolean;
+  caption?: CaptionBlock;
 }) {
   if (!stay.exact)
     return (
@@ -69,10 +83,18 @@ function StaySegment({
   const pointEndLabel = sharedPointMonth
     ? stay.endLabel + stay.startLabel.replace(/^\d+/, "")
     : stay.endLabel;
+  const showCities = !hideCities && stay.cities.length > 0;
+  const width =
+    caption?.width ?? (pointStay ? (diamond ? 18 : 9) : monthDates ? 84 : 76);
   return (
     <div
       role="listitem"
-      className={`visit-period${pointStay ? " visit-period--single" : ""}${diamond ? " visit-period--diamond" : ""}${stay.exceptional && pointStay && !diamond ? " visit-period--single-exception" : ""}${stay.cities.length ? " visit-period--with-cities" : ""}${monthDates ? " visit-period--month-dates" : ""}`}
+      className={`visit-period${pointStay ? " visit-period--single" : ""}${diamond ? " visit-period--diamond" : ""}${stay.exceptional && pointStay && !diamond ? " visit-period--single-exception" : ""}${showCities ? " visit-period--with-cities" : ""}${monthDates ? " visit-period--month-dates" : ""}`}
+      style={
+        adaptive
+          ? ({ "--visit-caption-width": `${width}px` } as CSSProperties)
+          : undefined
+      }
       data-duration={stay.days ?? undefined}
       data-exception={stay.exceptional || undefined}
     >
@@ -80,9 +102,18 @@ function StaySegment({
         className="visit-period-plot"
         title={`${stay.range}${stay.days == null ? "" : ` · ${stay.days} ${units}`}${stay.exceptional ? " · Recorded duration differs from the calendar span" : ""}`}
       >
-        {stay.cities.length > 0 && (
-          <div className="visit-period-cities">
-            {stay.cities.map((city) => city.name).join(" · ")}
+        {showCities && (
+          <div
+            className="visit-period-cities"
+            title={stay.cities.map((city) => city.name).join(" · ")}
+          >
+            {caption
+              ? caption.lines.map((line, index) => (
+                  <span className="visit-period-city-line" key={index}>
+                    {line}
+                  </span>
+                ))
+              : stay.cities.map(historyCityName).join(" · ")}
           </div>
         )}
         <span className="visually-hidden">
@@ -143,20 +174,164 @@ function StaySegment({
 function StayRow({
   row,
   context,
+  hideCities = false,
 }: {
   row: TimelineMonth;
   context: VisitMarkerContext;
+  hideCities?: boolean;
 }) {
   const container = useRef<HTMLDivElement>(null);
   const connections = useRef<SVGSVGElement>(null);
+  const adaptive =
+    context.kind === "country" &&
+    row.periods.every((stay) => stay.exact) &&
+    row.periods.some((stay) => stay.cities.length);
+  const version = `${context.kind}/${context.countryCode}/${hideCities}`;
+  const [sizing, setSizing] = useState<{
+    source: TimelineStay[];
+    version: string;
+    value: VisitCaptionLayout;
+  }>();
+  const layout =
+    adaptive && sizing?.source === row.periods && sizing.version === version
+      ? sizing.value
+      : undefined;
+  useLayoutEffect(() => {
+    if (!adaptive) return;
+    const element = container.current!;
+    const canvas = document.createElement("canvas").getContext("2d");
+    if (!canvas) return;
+    let active = true;
+    let previousKey = "";
+    const measure = (force = false) => {
+      if (!active) return;
+      const caption =
+        element.querySelector(".visit-period-cities") ??
+        element.parentElement!.querySelector(".visit-month-city");
+      if (!caption) return;
+      const style = getComputedStyle(element);
+      const font = getComputedStyle(caption).font;
+      const width =
+        element.getBoundingClientRect().width -
+        parseFloat(style.paddingLeft) -
+        parseFloat(style.paddingRight);
+      const key = `${width}/${font}`;
+      if (!force && key === previousKey) return;
+      previousKey = key;
+      const dateElement = element.querySelector(".visit-period-dates")!;
+      const dateFont = getComputedStyle(dateElement).font;
+      canvas.font = dateFont;
+      const dateWidth = (text: string) => canvas.measureText(text).width;
+      const rendered = [...element.querySelectorAll(".visit-period")];
+      const periods = row.periods.map((stay, index) => {
+        const markers = stayMarkers(stay, context);
+        const point = markers.length === 1;
+        const sameMonth =
+          point &&
+          !stay.single &&
+          stay.arrival!.slice(0, 7) === stay.departure!.slice(0, 7);
+        const first = sameMonth
+          ? String(Number(stay.arrival!.slice(8)))
+          : stay.startLabel;
+        const last = sameMonth
+          ? stay.endLabel + stay.startLabel.replace(/^\d+/, "")
+          : stay.endLabel;
+        const label = stay.single ? first : `${first}–${last}`;
+        const duration =
+          point && stay.exceptional && markers[0] !== "diamond"
+            ? (rendered[index]
+                ?.querySelector(".visit-period-duration")
+                ?.getBoundingClientRect().width ?? 0)
+            : 0;
+        return {
+          cities: hideCities ? [] : stay.cities.map(historyCityName),
+          minimumWidth: point
+            ? markers[0] === "diamond"
+              ? 18
+              : duration
+                ? 9 + 2 * (3 + duration)
+                : 9
+            : stay.monthDates
+              ? 84
+              : 76,
+          markerSize: markers[0] === "diamond" ? 18 : 9,
+          point,
+          startDateWidth: dateWidth(point ? label : stay.startLabel),
+          endDateWidth: dateWidth(point ? label : stay.endLabel),
+        };
+      });
+      canvas.font = font;
+      const next = layoutVisitCaptions(
+        periods,
+        width,
+        (text) => canvas.measureText(text).width,
+        parseFloat(style.getPropertyValue("--visit-gap-width")) || 23,
+      );
+      setSizing((previous) =>
+        previous?.source === row.periods &&
+        previous.version === version &&
+        JSON.stringify(previous.value) === JSON.stringify(next)
+          ? previous
+          : { source: row.periods, version, value: next },
+      );
+    };
+    const observer = new ResizeObserver(() => measure());
+    observer.observe(element);
+    measure();
+    void document.fonts.ready.then(() => measure(true));
+    return () => {
+      active = false;
+      observer.disconnect();
+    };
+  }, [
+    adaptive,
+    row.periods,
+    context.kind,
+    context.countryCode,
+    hideCities,
+    version,
+  ]);
   useLayoutEffect(() => {
     const element = container.current!;
     const svg = connections.current!;
     svg.replaceChildren();
-    if (row.periods.length < 2) return;
+    if (row.periods.length < 2 && !adaptive) return;
     let active = true;
     const draw = () => {
       if (!active) return;
+      if (adaptive) {
+        const monthRow = element.parentElement!;
+        const heading = monthRow.querySelector<HTMLElement>(
+          ".visit-month-heading",
+        )!;
+        const month = heading.querySelector<HTMLElement>(".visit-month-label")!;
+        const city = heading.querySelector<HTMLElement>(".visit-month-city");
+        const first = element
+          .querySelector(".visit-period-point")
+          ?.getBoundingClientRect();
+        if (first) {
+          const padding = parseFloat(getComputedStyle(element).paddingTop) || 0;
+          const axis =
+            first.top +
+            first.height / 2 -
+            element.getBoundingClientRect().top -
+            padding;
+          const prefix = city
+            ? city.getBoundingClientRect().height +
+              (parseFloat(getComputedStyle(city).marginBottom) || 0)
+            : 0;
+          const offset =
+            axis - prefix - month.getBoundingClientRect().height / 2;
+          for (const [name, value] of [
+            ["--visit-heading-top", Math.max(0, offset)],
+            ["--visit-caption-top", Math.max(0, -offset)],
+          ] as const) {
+            const next = `${value}px`;
+            if (monthRow.style.getPropertyValue(name) !== next)
+              monthRow.style.setProperty(name, next);
+          }
+        }
+      }
       const origin = element.getBoundingClientRect();
       const periods = [
         ...element.querySelectorAll<HTMLElement>(".visit-period"),
@@ -199,10 +374,10 @@ function StayRow({
       active = false;
       observer.disconnect();
     };
-  }, [row.periods, context.kind, context.countryCode]);
+  }, [row.periods, context.kind, context.countryCode, layout, adaptive]);
   return (
     <div
-      className={`visit-month-periods${row.periods.length > 1 && row.periods.some((stay) => stay.monthDates) ? " visit-month-periods--shared-months" : ""}${row.periods.length > 1 && row.periods.some((stay) => stay.yearDates) ? " visit-month-periods--year-dates" : ""}`}
+      className={`visit-month-periods${row.periods.length > 1 && row.periods.some((stay) => stay.monthDates) ? " visit-month-periods--shared-months" : ""}${row.periods.length > 1 && row.periods.some((stay) => stay.yearDates) ? " visit-month-periods--year-dates" : ""}${adaptive ? " visit-month-periods--adaptive" : ""}${adaptive && row.periods.some((stay) => stay.monthDates) ? " visit-month-periods--adaptive-months" : ""}`}
       ref={container}
     >
       <svg
@@ -211,9 +386,69 @@ function StayRow({
         aria-hidden="true"
         focusable="false"
       />
-      {row.periods.map((stay) => (
-        <StaySegment key={stay.number} stay={stay} context={context} />
-      ))}
+      {adaptive
+        ? (
+            layout?.tracks ?? [
+              { indices: row.periods.map((_, index) => index), gap: 23 },
+            ]
+          ).map((track, index) => (
+            <div
+              className="visit-period-track"
+              key={index}
+              style={
+                { "--visit-caption-gap": `${track.gap}px` } as CSSProperties
+              }
+            >
+              {track.indices.map((index) => (
+                <StaySegment
+                  key={row.periods[index].number}
+                  stay={row.periods[index]}
+                  context={context}
+                  hideCities={hideCities}
+                  adaptive
+                  caption={layout?.blocks[index]}
+                />
+              ))}
+            </div>
+          ))
+        : row.periods.map((stay) => (
+            <StaySegment key={stay.number} stay={stay} context={context} />
+          ))}
+    </div>
+  );
+}
+
+function VisitMonthRow({
+  row,
+  context,
+}: {
+  row: TimelineMonth;
+  context: VisitMarkerContext;
+}) {
+  const city =
+    context.kind === "country" ? visitSingleCity(row.periods) : undefined;
+  return (
+    <div
+      className={`visit-month-row${city ? " visit-month-row--visit-city" : ""}`}
+    >
+      <div
+        className={`visit-month-heading${city ? " visit-month-heading--city" : ""}`}
+      >
+        {city && (
+          <div className="visit-month-city" title={city.name}>
+            {historyCityName(city)}
+          </div>
+        )}
+        <div className="visit-month-label" aria-hidden="true">
+          {row.labels.map((label, index) => (
+            <span key={label}>
+              {index > 0 && <small>–</small>}
+              {label}
+            </span>
+          ))}
+        </div>
+      </div>
+      <StayRow row={row} context={context} hideCities={Boolean(city)} />
     </div>
   );
 }
@@ -291,20 +526,11 @@ export default memo(function VisitTimeline({
                     aria-label={`${kind === "country" ? "Actual stays" : "Stays"} for visit ${visit.number}`}
                   >
                     {visit.months.map((row, index) => (
-                      <div
-                        className="visit-month-row"
+                      <VisitMonthRow
                         key={`${row.key}-${index}`}
-                      >
-                        <div className="visit-month-label" aria-hidden="true">
-                          {row.labels.map((label, i) => (
-                            <span key={label}>
-                              {i > 0 && <small>–</small>}
-                              {label}
-                            </span>
-                          ))}
-                        </div>
-                        <StayRow row={row} context={{ kind, countryCode }} />
-                      </div>
+                        row={row}
+                        context={{ kind, countryCode }}
+                      />
                     ))}
                   </div>
                   <span

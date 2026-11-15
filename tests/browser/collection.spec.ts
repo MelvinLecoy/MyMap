@@ -2894,7 +2894,10 @@ test("visit history rows keep their default height and only grow for extra conte
               (point, index) =>
                 Math.abs(center(point) - center(labels[index])) <= 0.1,
             );
-          if (points.length === 2)
+          if (
+            points.length === 2 &&
+            !period.closest(".visit-month-periods--adaptive")
+          )
             ranges &&=
               Math.abs(
                 period
@@ -3060,7 +3063,7 @@ test("country stay segments name matching cities above the plot and fit narrow p
   for (const width of [320, 1440]) {
     await page.setViewportSize({ width, height: 1100 });
     await page.goto("/?panel=countries&country=CA");
-    await expect(page.locator(".visit-period-cities")).toHaveText([
+    await expect(page.locator(".visit-month-city")).toHaveText([
       "Ottawa",
       "Toronto",
       "Vancouver",
@@ -3103,6 +3106,105 @@ test("country stay segments name matching cities above the plot and fit narrow p
   }
 });
 
+test("country visit captions use the left month column or measured centered segment layouts", async ({
+  page,
+}) => {
+  await withoutGlobe(page);
+  await page.setViewportSize({ width: 390, height: 1100 });
+  await page.goto("/?panel=countries&country=CN");
+  await page.evaluate(() => document.fonts.ready);
+  await expect(page.locator(".visit-month-city")).toHaveText([
+    "Shanghai",
+    "Kunming",
+    "Huizhou",
+  ]);
+  await expect(page.locator(".visit-period-cities")).toHaveCount(0);
+  expect(
+    await page.locator(".visit-month-row").evaluateAll((rows) =>
+      rows.every((row) => {
+        const city = row
+          .querySelector(".visit-month-city")!
+          .getBoundingClientRect();
+        const month = row
+          .querySelector(".visit-month-label")!
+          .getBoundingClientRect();
+        const point = row
+          .querySelector(".visit-period-point")!
+          .getBoundingClientRect();
+        return (
+          city.bottom < month.top &&
+          Math.abs(
+            month.top + month.height / 2 - point.top - point.height / 2,
+          ) < 0.1
+        );
+      }),
+    ),
+  ).toBe(true);
+  await page.goto("/?panel=countries&country=GB");
+  const uk = page.locator('[data-year="2023"]');
+  await expect(uk.locator(".visit-period-track")).toHaveCount(1);
+  await expect(uk.locator(".visit-period-city-line")).toHaveText([
+    "London · Bristol",
+    "Bath · Cardiff · Southampton",
+    "London · Portsmouth",
+  ]);
+  const lengths = await uk
+    .locator(".visit-period-axis")
+    .evaluateAll((axes) =>
+      axes.map((axis) => axis.getBoundingClientRect().width),
+    );
+  expect(lengths[0]).toBe(76);
+  expect(lengths[1]).toBeGreaterThan(120);
+  await page.goto("/?panel=countries&country=CH");
+  const latest = page.locator('[data-year="2024"]');
+  await expect(latest.locator(".visit-period-track")).toHaveCount(1);
+  await expect(latest.locator(".visit-period-city-line")).toHaveCount(8);
+  expect(
+    await latest
+      .locator(".visit-period-cities")
+      .evaluateAll((captions) =>
+        captions.map((caption) => caption.children.length),
+      ),
+  ).toEqual([3, 3, 2]);
+  await expect(
+    page.locator('[data-year="2023"] .visit-period-city-line'),
+  ).toHaveText(["Geneva · Interlaken · Bern · Lausanne · Luzern"]);
+  expect(
+    await latest.locator(".visit-period").evaluateAll((periods) =>
+      periods.every((period) => {
+        const axis = period
+          .querySelector(".visit-period-axis")!
+          .getBoundingClientRect();
+        const point = period
+          .querySelector(".visit-period-point")!
+          .getBoundingClientRect();
+        const caption = period
+          .querySelector(".visit-period-cities")!
+          .getBoundingClientRect();
+        const center = period.classList.contains("visit-period--single")
+          ? point.left + point.width / 2
+          : axis.left + axis.width / 2;
+        return (
+          Math.abs(center - caption.left - caption.width / 2) < 0.1 &&
+          caption.bottom < axis.top
+        );
+      }),
+    ),
+  ).toBe(true);
+  await page.goto("/?panel=countries&country=AU");
+  await expect(page.locator(".visit-period-cities")).toContainText(["GC"]);
+  await expect(
+    page.locator('.visit-period-cities[title*="Gold Coast"]'),
+  ).toHaveCount(1);
+  await page.setViewportSize({ width: 320, height: 1100 });
+  await page.goto("/?panel=countries&country=CH");
+  expect(
+    await page
+      .locator(".visit-timeline")
+      .evaluate((element) => element.scrollWidth <= element.clientWidth),
+  ).toBe(true);
+});
+
 test("selected country histories omit city labels while other countries keep them", async ({
   page,
 }) => {
@@ -3122,13 +3224,14 @@ test("selected country histories omit city labels while other countries keep the
     ).toBeVisible();
     await expect(page.locator(".visit-timeline-entry").first()).toBeVisible();
     await expect(page.locator(".visit-period-cities")).toHaveCount(0);
+    await expect(page.locator(".visit-month-city")).toHaveCount(0);
     await expect(page.locator(".country-city-list .city-row")).toHaveCount(
       data.cities.filter((city) => city.countryCode === code).length,
     );
   }
   for (const [code, city] of [["AD", "Andorra la Vella"]]) {
     await page.goto(`/?panel=countries&country=${code}`);
-    await expect(page.locator(".visit-period-cities")).toContainText([city]);
+    await expect(page.locator(".visit-month-city")).toContainText([city]);
   }
 });
 
