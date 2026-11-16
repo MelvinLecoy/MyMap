@@ -506,7 +506,7 @@ test("country collection mirrors the compact scoreboard, filters and visit rows 
   await expect(usa.locator(".country-row-duration")).toHaveCount(0);
   await expect(
     page.getByLabel("Search countries", { exact: true }),
-  ).toHaveCount(0);
+  ).toHaveCount(1);
   await expect(
     scores.getByRole("combobox", { name: "Country scoreboard scope" }),
   ).toBeVisible();
@@ -524,9 +524,23 @@ test("country collection mirrors the compact scoreboard, filters and visit rows 
     const labels = await page
       .locator(".country-filter-row .collection-filter-value")
       .evaluateAll((els) =>
-        els.map((el) => ({ client: el.clientWidth, scroll: el.scrollWidth })),
+        els.map((el) => {
+          const label = el.getBoundingClientRect();
+          const trigger = el.closest("button")!.getBoundingClientRect();
+          const style = getComputedStyle(el);
+          return {
+            fits: label.left >= trigger.left && label.right <= trigger.right,
+            readable: el.clientWidth > 30,
+            contained:
+              el.scrollWidth <= el.clientWidth ||
+              (style.overflow === "hidden" &&
+                style.textOverflow === "ellipsis"),
+          };
+        }),
       );
-    expect(labels.every((el) => el.scroll <= el.client)).toBe(true);
+    expect(labels.every((el) => el.fits && el.readable && el.contained)).toBe(
+      true,
+    );
     const scoreLabels = await scores.locator("dt").evaluateAll((els) =>
       els.map((el) => ({
         label: el.getBoundingClientRect(),
@@ -657,24 +671,89 @@ test("country row visit-order badges align beside city counts and leave room for
   ).toHaveText("#98");
 });
 
-test("country badge shapes, compact menus and H styling keep controls aligned", async ({
+test("country search preserves independent city queries, supports aliases and composes with filters", async ({
+  page,
+}) => {
+  await withoutGlobe(page);
+  await page.goto("/");
+  const citySearch = page.getByRole("textbox", {
+    name: "Search cities and countries",
+    exact: true,
+  });
+  await citySearch.fill("London");
+  await expect(page.locator(".city-row")).toHaveCount(1);
+  await page.getByRole("tab", { name: "Countries", exact: true }).click();
+  const countrySearch = page.getByRole("textbox", {
+    name: "Search countries",
+    exact: true,
+  });
+  await expect(countrySearch).toHaveValue("");
+  await expect(page.locator(".collection-count")).toHaveText("198 total");
+  await countrySearch.fill("democratic republic of the congo");
+  await expect(page.locator(".country-row .city-row-name")).toHaveText([
+    "DR Congo",
+  ]);
+  await countrySearch.fill("cote");
+  await expect(page.locator(".country-row")).toHaveCount(1);
+  await expect(page.locator(".country-row")).toHaveAttribute(
+    "href",
+    /country=CI/,
+  );
+  await countrySearch.fill("GB");
+  await expect(page.locator(".country-row .city-row-name")).toHaveText([
+    "United Kingdom",
+  ]);
+  await expect(page.locator(".collection-count")).toHaveText("1 total");
+  await page.getByRole("tab", { name: "Cities", exact: true }).click();
+  await expect(citySearch).toHaveValue("London");
+  await expect(page.locator(".city-row")).toHaveCount(1);
+  await page.getByRole("tab", { name: "Countries", exact: true }).click();
+  await expect(countrySearch).toHaveValue("GB");
+  await page.locator(".country-row").click();
+  await page.keyboard.press("Control+k");
+  await expect(countrySearch).toBeFocused();
+  await expect(countrySearch).toHaveValue("GB");
+  await expect(page).not.toHaveURL(/country=/);
+  await expect(
+    page.getByRole("tab", { name: "Countries", exact: true }),
+  ).toHaveAttribute("aria-selected", "true");
+  await chooseFilter(page, "Filter by continent", "Asia");
+  await expect(
+    page.getByRole("heading", { name: "No countries found", exact: true }),
+  ).toBeVisible();
+  await expect(page.locator(".collection-count")).toHaveText("0 total");
+  await page
+    .getByRole("button", { name: "Clear filters", exact: true })
+    .click();
+  await expect(countrySearch).toHaveValue("");
+  await expect(page.locator(".country-row")).toHaveCount(198);
+  for (const width of [320, 601, 1440]) {
+    await page.setViewportSize({ width, height: 1000 });
+    await expect(page.locator(".search-field")).toHaveCSS("height", "32px");
+    await page.getByRole("tab", { name: "Cities", exact: true }).click();
+    await expect(page.locator(".search-field")).toHaveCSS("height", "32px");
+    await expect(citySearch).toHaveValue("London");
+    await page.getByRole("tab", { name: "Countries", exact: true }).click();
+    await expect(page.locator(".collection-count-main > span")).toBeVisible();
+    await expect(page.locator(".collection-count-main > span")).toHaveText(
+      "total",
+    );
+  }
+});
+
+test("country badge shapes, compact menus and search keep controls aligned", async ({
   page,
 }) => {
   await withoutGlobe(page);
   await page.goto("/?panel=countries");
-  const hover = page.getByRole("button", {
-    name: "Enable country hover",
-    exact: true,
-  });
-  await expect(hover).toHaveAttribute("aria-pressed", "false");
-  await expect(hover).toHaveCSS("left", "-18px");
-  await expect(hover).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
-  await hover.click();
-  await hover.evaluate((element) => element.blur());
-  await page.mouse.move(1, 1);
-  await expect(hover).toHaveAttribute("aria-pressed", "true");
-  await expect(hover).not.toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
-  await hover.click();
+  await expect(
+    page.getByRole("button", { name: "Enable country hover", exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("textbox", { name: "Search countries", exact: true }),
+  ).toBeVisible();
+  await expect(page.locator(".search-field")).toHaveCSS("height", "32px");
+  await expect(page.locator(".collection-count")).toHaveText("198 total");
   await expect(page.locator(".country-order-badge .lucide-crown")).toHaveCount(
     0,
   );
@@ -1221,6 +1300,7 @@ test("the default globe loads cities and places with approved city visits and no
 test("every status and continent filter and country search work on the full collection", async ({
   page,
 }) => {
+  await withoutGlobe(page);
   await page.goto("/");
   for (const [status, count] of [
     ["Complete", mapCount("Complete")],
@@ -1559,7 +1639,9 @@ test("real status edits persist and sync separately from demo edits without chan
   expect(saved.collection["moscow-russia"]).toBe("Unfinished");
   await back(page);
   await setMapFilter(page, "Unfinished");
-  await expect(page.locator(".city-row")).toHaveCount(8);
+  await expect(page.locator(".city-row")).toHaveCount(
+    mapCount("Unfinished") + 1,
+  );
   await expect(page.locator(".collection-bottom")).toHaveText(
     /Visited\s*98\s*countries\s*174\s*cities/,
   );
@@ -1624,18 +1706,18 @@ test("the Countries tab has labelled counts, independent filters, and reloadable
   await tabs.getByRole("tab", { name: "Countries", exact: true }).click();
   await expect(page).toHaveURL(/panel=countries/);
   await expect(page.locator(".country-row")).toHaveCount(198);
-  await expect(page.locator(".collection-count")).toHaveText("198 countries");
+  await expect(page.locator(".collection-count")).toHaveText("198 total");
   await expect(
     page.getByText("Sample country data", { exact: true }),
   ).toHaveCount(0);
   await expect(
     page.getByLabel("Search countries", { exact: true }),
-  ).toHaveCount(0);
+  ).toHaveCount(1);
   await chooseFilter(page, "Filter by continent", "Oceania");
   const oceanianCount = await page.locator(".country-row").count();
   expect(oceanianCount).toBeGreaterThan(0);
   await expect(page.locator(".collection-count")).toHaveText(
-    `${oceanianCount} countries`,
+    `${oceanianCount} total`,
   );
   await tabs.getByRole("tab", { name: "Cities", exact: true }).click();
   await expect(page.getByLabel("Search cities and countries")).toHaveValue(
@@ -1651,13 +1733,13 @@ test("the Countries tab has labelled counts, independent filters, and reloadable
     .getByRole("button", { name: /^Countries visited / })
     .click();
   await expect(page.locator(".country-row")).toHaveCount(97);
-  await expect(page.locator(".collection-count")).toHaveText("97 countries");
+  await expect(page.locator(".collection-count")).toHaveText("97 total");
   await chooseFilter(page, "Filter by last visited year", "2024");
   await chooseFilter(page, "Filter by continent", "Oceania");
   await expect(
     page.getByRole("heading", { name: "No countries found" }),
   ).toBeVisible();
-  await expect(page.locator(".collection-count")).toHaveText("0 countries");
+  await expect(page.locator(".collection-count")).toHaveText("0 total");
   await page
     .getByRole("button", { name: "Clear filters", exact: true })
     .click();
@@ -1691,7 +1773,7 @@ test("countries open their own details and keep their tab through city details a
     "Visits",
   );
   await expect(page.getByLabel("Country visit statistics")).toContainText(
-    "Days spent",
+    "Days",
   );
   await expect(
     page.getByRole("heading", { name: "Visit history", exact: true }),
@@ -1733,7 +1815,7 @@ test("countries open their own details and keep their tab through city details a
     .click();
   await expect(
     page.getByLabel("Search countries", { exact: true }),
-  ).toHaveCount(0);
+  ).toHaveCount(1);
   await expect(page.locator(".country-row")).toHaveCount(198);
   await expect(page).not.toHaveURL(/country=/);
   await page.goBack();
@@ -1921,25 +2003,9 @@ test("country and city rows support native new tabs while ordinary clicks preser
   await globalTab.close();
 });
 
-test("whole-country hover stays stable over lifted land, opens its panel and clears during globe dragging", async ({
+test("country pointers never filter the collection while country clicks and profile selection remain intact", async ({
   page,
 }) => {
-  await page.addInitScript(() => {
-    const stats = { loads: 0, reloads: 0 };
-    Object.assign(window, { countryHoverWorkerStats: stats });
-    const post = Worker.prototype.postMessage;
-    Worker.prototype.postMessage = function (
-      this: Worker,
-      ...args: Parameters<Worker["postMessage"]>
-    ) {
-      const message = args[0];
-      if (message?.data?.source === "atlas-countries") {
-        if (message.type === "LT") stats.loads++;
-        if (message.type === "RT") stats.reloads++;
-      }
-      return post.apply(this, args);
-    } as Worker["postMessage"];
-  });
   await page.route("https://tiles.openfreemap.org/**", (route) =>
     route.abort(),
   );
@@ -1954,99 +2020,27 @@ test("whole-country hover stays stable over lifted land, opens its panel and cle
     .click();
   const box = (await globe.boundingBox())!;
   const point = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
-  const before = await globe.screenshot();
-  const hoverToggle = page.getByRole("button", {
-    name: "Enable country hover",
-    exact: true,
-  });
-  await expect(hoverToggle).toHaveAttribute("aria-pressed", "false");
-  await page.mouse.move(point.x, point.y);
-  await expect(globe).toHaveAttribute("data-hover-country", "");
-  await expect(page.locator(".country-row")).toHaveCount(198);
-  await hoverToggle.click();
-  await page.evaluate(() => {
-    const stats = (
-      window as unknown as Window & {
-        countryHoverWorkerStats: { loads: number; reloads: number };
-      }
-    ).countryHoverWorkerStats;
-    if (!stats.loads) throw new Error("Country tile tracking is inactive");
-    stats.reloads = 0;
-  });
-  await page.mouse.move(point.x, point.y);
-  await expect(globe).toHaveAttribute("data-hover-country", "LY");
-  await expect(page.locator(".country-row .city-row-name")).toHaveText([
-    "Libya",
-  ]);
-  await expect(page.locator(".country-globe-preview")).toHaveCount(0);
-  await hoverToggle.hover();
-  await expect(globe).toHaveAttribute("data-hover-country", "");
-  await expect(page.locator(".country-row .city-row-name")).toHaveText([
-    "Libya",
-  ]);
-  await hoverToggle.click();
-  await expect(page.locator(".country-row")).toHaveCount(198);
-  await page.mouse.move(point.x, point.y);
-  await expect(globe).toHaveAttribute("data-hover-country", "");
-  await expect(page.locator(".country-row")).toHaveCount(198);
-  await hoverToggle.click();
-  await page.mouse.move(point.x, point.y);
-  await expect(globe).toHaveAttribute("data-hover-country", "LY");
+  await expect(
+    page.getByRole("button", { name: "Enable country hover", exact: true }),
+  ).toHaveCount(0);
+  await expect(globe).not.toHaveAttribute("data-hover-country");
+  await expect(globe).not.toHaveAttribute("data-hover-available");
+  for (const offset of [0, 12, -12]) {
+    await page.mouse.move(point.x + offset, point.y);
+    await expect(page.locator(".country-row")).toHaveCount(198);
+    await expect(globe).toHaveAttribute("data-selected-country", "");
+  }
   await expect(page.locator(".maplibregl-canvas")).toHaveCSS(
     "cursor",
     "pointer",
   );
-  await expect
-    .poll(async () => Buffer.compare(await globe.screenshot(), before))
-    .not.toBe(0);
-  // The full 160 ms lift must not rebuild country tiles and drop their outlines.
-  await page.waitForTimeout(200);
-  expect(
-    await page.evaluate(
-      () =>
-        (
-          window as unknown as Window & {
-            countryHoverWorkerStats: { reloads: number };
-          }
-        ).countryHoverWorkerStats.reloads,
-    ),
-  ).toBe(0);
-  // A queued hit test must not restore a hover after the pointer has left.
-  await page.evaluate(({ x, y }) => {
-    const canvas = document.querySelector(".maplibregl-canvas")!;
-    canvas.dispatchEvent(
-      new MouseEvent("mousemove", { bubbles: true, clientX: x, clientY: y }),
-    );
-    canvas.dispatchEvent(new MouseEvent("mouseleave"));
-  }, point);
-  await page.evaluate(
-    () =>
-      new Promise<void>((resolve) =>
-        requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
-      ),
-  );
-  await expect(globe).toHaveAttribute("data-hover-country", "");
-  await page.mouse.move(point.x + 18, point.y + 12);
-  await expect(globe).toHaveAttribute("data-hover-country", "LY");
-  await page.mouse.click(point.x + 18, point.y + 12);
+  await page.mouse.click(point.x, point.y);
   await expect(page).toHaveURL(/panel=countries.*country=LY/);
   await expect(
     page.getByRole("heading", { name: "Libya", exact: true }),
   ).toBeVisible();
-  await page.getByRole("heading", { name: "Libya", exact: true }).hover();
-  await expect(globe).toHaveAttribute("data-hover-country", "");
   await expect(globe).toHaveAttribute("data-selected-country", "LY");
-  let hoverOffset = 0;
-  await expect
-    .poll(async () => {
-      // Country hit testing resumes when the profile's camera animation ends.
-      await page.mouse.move(
-        box.x + box.width * 0.96 + (hoverOffset++ % 2),
-        point.y,
-      );
-      return globe.getAttribute("data-hover-country");
-    })
-    .toBe("EG");
+  await page.mouse.move(box.x + box.width * 0.96, point.y);
   await expect(globe).toHaveAttribute("data-selected-country", "LY");
   await expect(
     page.getByRole("heading", { name: "Libya", exact: true }),
@@ -2059,13 +2053,81 @@ test("whole-country hover stays stable over lifted land, opens its panel and cle
   await page.mouse.move(point.x + 85, point.y + 20, { steps: 8 });
   await page.mouse.up();
   await expect(page).not.toHaveURL(/country=LY/);
-  await expect(globe).toHaveAttribute("data-hover-country", "");
-  await page.locator(".country-overview").hover();
-  await expect(globe).toHaveAttribute("data-hover-country", "");
+  await expect(page.locator(".country-row")).toHaveCount(198);
   expect(errors).toEqual([]);
 });
 
-test("striped-country hover clears over the sea and city pins retain click priority", async ({
+test("area labels follow city visibility and city pin hover and click targets are 9px", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.addInitScript(() => {
+    const layers: Record<string, unknown> = {};
+    Object.assign(window, { collectionStyleLayers: layers });
+    const post = Worker.prototype.postMessage;
+    Worker.prototype.postMessage = function (
+      this: Worker,
+      ...args: Parameters<Worker["postMessage"]>
+    ) {
+      for (const layer of args[0]?.data?.layers ?? [])
+        if (layer?.id) layers[layer.id] = layer;
+      return post.apply(this, args);
+    } as Worker["postMessage"];
+  });
+  await page.route("https://tiles.openfreemap.org/**", (route) =>
+    route.abort(),
+  );
+  await page.goto("/?city=nassau-bahamas");
+  const globe = page.getByTestId("map-canvas");
+  await expect(globe).toHaveAttribute("data-ready", "true", { timeout: 30000 });
+  await expect(page.locator(".coordinates")).toContainText("25.1° N");
+  const styles = await page.evaluate(() => {
+    const layers = (
+      window as unknown as {
+        collectionStyleLayers: Record<
+          string,
+          {
+            minzoom?: number;
+            layout: Record<string, unknown>;
+            paint: Record<string, unknown>;
+          }
+        >;
+      }
+    ).collectionStyleLayers;
+    return {
+      city: layers["city-labels"],
+      area: layers["place-labels"],
+      pins: layers["place-pins"],
+      hover: Object.keys(layers).filter((id) => id.startsWith("atlas-hover-")),
+    };
+  });
+  expect(styles.area.minzoom).toBe(styles.city.minzoom);
+  expect(styles.area.layout).toEqual(styles.city.layout);
+  expect(styles.area.paint).toEqual(styles.city.paint);
+  expect(styles.pins.minzoom ?? 0).toBe(0);
+  expect(styles.pins.layout["text-field"]).toBeUndefined();
+  expect(styles.hover).toEqual([]);
+  await page
+    .getByRole("button", { name: "All cities (343)", exact: true })
+    .click();
+  const box = (await globe.boundingBox())!;
+  const near = { x: box.x + box.width / 2, y: box.y + box.height / 2 - 8 };
+  const far = { x: near.x, y: box.y + box.height / 2 - 10 };
+  const canvas = page.locator(".maplibregl-canvas");
+  await page.mouse.move(near.x, near.y);
+  await expect(canvas).toHaveCSS("cursor", "pointer");
+  await page.mouse.move(far.x, far.y);
+  await expect(canvas).not.toHaveCSS("cursor", "pointer");
+  await page.mouse.click(near.x, near.y);
+  await expect(page).toHaveURL(/city=nassau-bahamas/);
+  await page
+    .getByRole("button", { name: "All cities (343)", exact: true })
+    .click();
+  await page.mouse.click(far.x, far.y);
+  await expect(page).not.toHaveURL(/city=nassau-bahamas/);
+});
+
+test("striped-country selection and city pins retain click priority without country hover", async ({
   page,
 }) => {
   await page.route("https://tiles.openfreemap.org/**", (route) =>
@@ -2080,14 +2142,12 @@ test("striped-country hover clears over the sea and city pins retain click prior
   await page
     .getByRole("button", { name: "Back to countries", exact: true })
     .click();
-  await page
-    .getByRole("button", { name: "Enable country hover", exact: true })
-    .click();
   let box = (await globe.boundingBox())!;
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-  await expect(globe).toHaveAttribute("data-hover-country", "IE");
+  await expect(globe).not.toHaveAttribute("data-hover-country");
+  await expect(page.locator(".country-row")).toHaveCount(198);
   await page.mouse.move(box.x + 20, box.y + box.height * 0.45);
-  await expect(globe).toHaveAttribute("data-hover-country", "");
+  await expect(globe).not.toHaveAttribute("data-hover-country");
   await page.goto("/?city=reykjavik-iceland");
   await expect(globe).toHaveAttribute("data-ready", "true", { timeout: 30000 });
   await expect(page.locator(".coordinates")).toContainText("64.1° N");
@@ -2096,7 +2156,7 @@ test("striped-country hover clears over the sea and city pins retain click prior
     .click();
   box = (await globe.boundingBox())!;
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-  await expect(globe).toHaveAttribute("data-hover-country", "");
+  await expect(globe).not.toHaveAttribute("data-hover-country");
   await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
   await expect(page).toHaveURL(/city=reykjavik-iceland/);
   await expect(
@@ -2107,7 +2167,7 @@ test("striped-country hover clears over the sea and city pins retain click prior
   ).toHaveAttribute("aria-selected", "true");
 });
 
-test("touch taps open country panels with reduced motion and do not leave a hover state", async ({
+test("touch taps open country panels with reduced motion without country-hover controls", async ({
   browser,
 }) => {
   const context = await browser.newContext({
@@ -2133,13 +2193,13 @@ test("touch taps open country panels with reduced motion and do not leave a hove
     await expect(
       page.getByRole("button", { name: "Enable country hover", exact: true }),
     ).toHaveCount(0);
-    await expect(globe).toHaveAttribute("data-hover-available", "false");
+    await expect(globe).not.toHaveAttribute("data-hover-available");
     const box = (await globe.boundingBox())!;
     await page.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2);
     await expect(
       page.getByRole("heading", { name: "Libya", exact: true }),
     ).toBeVisible();
-    await expect(globe).toHaveAttribute("data-hover-country", "");
+    await expect(globe).not.toHaveAttribute("data-hover-country");
   } finally {
     await context.close();
   }
@@ -2237,7 +2297,7 @@ test("country pages preserve city filters and fit narrow panels without overflow
   await openCountry(page, "Albania");
   await page.keyboard.press("Control+k");
   await expect(
-    page.getByLabel("Search cities and countries", { exact: true }),
+    page.getByLabel("Search countries", { exact: true }),
   ).toBeFocused();
   await expect(page).not.toHaveURL(/country=/);
 });
@@ -2277,7 +2337,7 @@ test("collection tabs work with a keyboard and the compact header fits narrow pa
       expect(sizes.scroll).toBeLessThanOrEqual(sizes.width);
       expect(sizes.height).toBeLessThanOrEqual(80);
       await expect(page.locator(".collection-count")).toContainText(
-        view === "Countries" ? "countries" : "cities",
+        view === "Countries" ? "total" : "cities",
       );
     }
   }

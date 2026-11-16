@@ -2,7 +2,7 @@
 
 This is the starting point for understanding the country and city visit-history sections in a new development context. It covers the data contract, presentation rules, caption solver, browser measurements, styles and verification.
 
-**Approved UI baseline:** 16 November 2026, implementation commit [`a61343f`](https://github.com/MelvinLecoy/MyMap/commit/a61343ffcd107f8cf3e38972c1c67974d349b832). The owner accepted the resulting presentation. Stored visits will receive further corrections and additions; the current records and audit counts are snapshots, not a frozen or complete travel history.
+**Approved timeline/caption baseline:** 16 November 2026, implementation commit [`a61343f`](https://github.com/MelvinLecoy/MyMap/commit/a61343ffcd107f8cf3e38972c1c67974d349b832). The owner accepted the resulting timeline presentation. The country history header was subsequently restyled as described below. Stored visits will receive further corrections and additions; the current records and audit counts are snapshots, not a frozen or complete travel history.
 
 Read [AGENTS.md](../AGENTS.md) alongside this guide. [VISIT_HISTORY_MARKERS.md](VISIT_HISTORY_MARKERS.md) is the focused marker-policy reference. The older [city history](city-history.md), [country history](country-history.md) and [duration updates](duration-updates.md) documents contain source, database and migration details, including historical counts and rollout notes.
 
@@ -111,13 +111,15 @@ When configured, [useRemoteAtlas](../src/lib/use-remote-atlas.ts) and [useRemote
 ### Statistics are separate from drawing
 
 - A city summary counts its stored visits, sums their explicit durations and takes the latest actual departure.
-- A country summary prefers supplied lifetime `timesVisited` / `totalDaysSpent`; otherwise it uses `recordedVisits` / `recordedDaysSpent`. The profile calls the fallback values “Recorded visits” / “Recorded days”. Missing values display `—`.
+- A country summary prefers supplied lifetime `timesVisited` / `totalDaysSpent`; otherwise it uses `recordedVisits` / `recordedDaysSpent`. The compact header's visible labels are “Visits”, “Days” and “Cities”, below their numbers. Fuller labels such as “Recorded visits” / “Recorded days” are retained in accessible labels and tooltips. Missing values display `—`.
 - Country recorded totals are calculated from visits with actual periods. An undated placeholder does not establish a known recorded duration or justify inventing lifetime totals.
 - The country “Cities visited” statistic counts visited non-place city records, not the number of caption capsules.
 - The per-row clock total comes from the validated counted visit's `daysSpent`, or displays `—` if unknown. The renderer does not substitute the enclosing calendar span for a missing total.
 - `firstVisitOrder` and its country badge are separate from a trip's `visit.number`.
 
 The city history wrapper renders nothing when its visit array is empty. A country with no visits shows the history heading and “Visit dates and durations haven’t been added yet.” An existing undated country visit instead renders its unknown-year/date fallback; an empty history and a recorded visit with unknown dates are different states.
+
+The country scoreboard sits beside “Visit history” in one vertically centered header row. It is smaller than the previous full-width scorecard, with prominent numbers above compact labels. This change applies to country profiles; city profiles keep their existing separate two-value scorecard and history heading.
 
 ## 4. Timeline transformation and date labels
 
@@ -272,6 +274,8 @@ Capsules are presentational labels, not buttons. They use the existing caption f
 ## 8. Layout dimensions and typography
 
 All values are CSS pixels. A **range width** means the whole axis/block, including endpoints and duration; it is not the length of an individual solid stroke or a dash.
+
+The country header uses a 17px/22px heading at weight 650 with an 18px calendar icon. Its scoreboard uses 20px/24px numbers at weight 750 above 10px/14px labels, with a 2px gap between numbers and labels. The box has 5px vertical and 2px horizontal padding, a 1px border and 7px corner radius. Header items are centered vertically with at least 8px between them; the history section starts 18px below the country information card. In sidebars narrower than 300px, the heading uses 16px text and the score cells reduce their side padding slightly; the numbers and labels retain their normal sizes. These styles do not change the city scorecard or the timeline geometry below.
 
 | Geometry                                     | Value / behavior                                                                                                                  |
 | -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |

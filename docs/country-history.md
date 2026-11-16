@@ -141,14 +141,16 @@ the visited filter. Visits and Days spent toggle highest-first sorting with
 alphabetical ties; toggling an active sort off restores visit-number order.
 Unranked countries follow in alphabetical order. Sorting changes only the list
 order and does not replace the globe's city data. A uses 10px text and a 16px button
-on desktop and phone layouts. Globe hover, continent and last-visited
-year filters combine independently from city filters. A small H button on the
-scoreboard's left edge opts into desktop country hover. It starts off; switching
-it off clears the hover filter. The separate hovered-country strip is removed.
-Phones and touch-only layouts create no hover layers and register no hover handlers;
-country tapping and profile navigation remain available. Hover does not change the
-camera, open a profile, filter globe pins or replace an already-open profile. Year colors are shared;
-2023 and earlier form one brown option. Country map progress is not shown.
+on desktop and phone layouts. Country search, continent and last-visited
+year filters combine independently from city filters. Both collections have a 32px
+search bar, with separate queries. Country search matches names, aliases and country
+codes with case/accent normalization; the result count uses “total”. The H button,
+country hover highlighting and pointer-driven country filtering have been removed.
+Country clicking/tapping and profile navigation remain available, as does the
+persistent raised selection outline on desktop profiles. Moving the pointer does
+not filter the country panel. The search shortcut focuses the active collection
+instead of switching countries to city search. Year colors are shared; 2023 and
+earlier form one brown option. Country map progress is not shown.
 
 The scoreboard embeds a compact denominator menu beside Countries visited, offering
 195 and 197 (🇽🇰 & 🇹🇼). Scoreboard totals use that set. When Countries visited is

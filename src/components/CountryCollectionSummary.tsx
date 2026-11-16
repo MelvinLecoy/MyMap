@@ -18,9 +18,6 @@ export default function CountryCollectionSummary({
   onSort,
   countrySet,
   onCountrySet,
-  hoverAvailable,
-  hoverEnabled,
-  onHoverToggle,
 }: {
   countries: CountryRecord[];
   visitedOnly: boolean;
@@ -29,9 +26,6 @@ export default function CountryCollectionSummary({
   onSort: (sort: CountryScoreSort) => void;
   countrySet?: CountrySet;
   onCountrySet?: (set: CountrySet) => void;
-  hoverAvailable: boolean;
-  hoverEnabled: boolean;
-  onHoverToggle: () => void;
 }) {
   const totals = countries.reduce(
     (sum, country) => {
@@ -57,20 +51,6 @@ export default function CountryCollectionSummary({
       className="city-overview country-overview"
       aria-label="Country collection statistics"
     >
-      {hoverAvailable && (
-        <button
-          type="button"
-          className="country-hover-toggle"
-          aria-label="Enable country hover"
-          aria-pressed={hoverEnabled}
-          title={
-            hoverEnabled ? "Turn country hover off" : "Turn country hover on"
-          }
-          onClick={onHoverToggle}
-        >
-          H
-        </button>
-      )}
       <CollectionScoreboard
         className="country-overview-totals"
         stats={[

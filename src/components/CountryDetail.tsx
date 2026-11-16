@@ -96,56 +96,60 @@ export default function CountryDetail({
           <CountryReferenceOverview code={country.code} />
         </section>
 
-        <dl
-          className="country-statistics country-travel-scoreboard"
-          aria-label="Country visit statistics"
-        >
-          {(
-            [
-              [
-                country.timesVisited == null && country.recordedVisits != null
-                  ? "Recorded visits"
-                  : "Visits",
-                country.timesVisited ?? country.recordedVisits,
-                "visits",
-              ],
-              [
-                country.totalDaysSpent == null &&
-                country.recordedDaysSpent != null
-                  ? "Recorded days"
-                  : "Days spent",
-                country.totalDaysSpent ?? country.recordedDaysSpent,
-                "days",
-              ],
-              ["Cities visited", visitedCityCount, "cities"],
-            ] as const
-          ).map(([label, value, kind]) => (
-            <div key={kind}>
-              <dt>{label}</dt>
-              <dd>
-                {value == null ? (
-                  <span
-                    className="country-value-missing"
-                    aria-label="Not recorded"
-                  >
-                    —
-                  </span>
-                ) : (
-                  value
-                )}
-              </dd>
-            </div>
-          ))}
-        </dl>
-
         <section
           className="country-history"
           aria-labelledby="country-history-heading"
         >
-          <h2 id="country-history-heading">
-            <CalendarDays size={15} aria-hidden="true" />
-            Visit history
-          </h2>
+          <div className="country-history-header">
+            <h2 id="country-history-heading">
+              <CalendarDays size={18} aria-hidden="true" />
+              Visit history
+            </h2>
+            <dl
+              className="country-statistics country-travel-scoreboard"
+              aria-label="Country visit statistics"
+            >
+              {(
+                [
+                  [
+                    country.timesVisited == null &&
+                    country.recordedVisits != null
+                      ? "Recorded visits"
+                      : "Visits",
+                    country.timesVisited ?? country.recordedVisits,
+                    "visits",
+                  ],
+                  [
+                    country.totalDaysSpent == null &&
+                    country.recordedDaysSpent != null
+                      ? "Recorded days"
+                      : "Days spent",
+                    country.totalDaysSpent ?? country.recordedDaysSpent,
+                    "days",
+                  ],
+                  ["Cities visited", visitedCityCount, "cities"],
+                ] as const
+              ).map(([label, value, kind]) => (
+                <div key={kind} title={label}>
+                  <dt aria-label={label}>
+                    {{ visits: "Visits", days: "Days", cities: "Cities" }[kind]}
+                  </dt>
+                  <dd>
+                    {value == null ? (
+                      <span
+                        className="country-value-missing"
+                        aria-label="Not recorded"
+                      >
+                        —
+                      </span>
+                    ) : (
+                      value
+                    )}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </div>
           {visits.length ? (
             <VisitTimeline
               visits={visits}

@@ -91,13 +91,7 @@ export default function CollectionHeader({
   searchRef: RefObject<HTMLInputElement | null>;
 }) {
   const countries = view === "countries";
-  const noun = countries
-    ? count === 1
-      ? "country"
-      : "countries"
-    : count === 1
-      ? "city"
-      : "cities";
+  const noun = countries ? "total" : count === 1 ? "city" : "cities";
   const resultCount = (
     <span
       className={`collection-count${placeCount ? " collection-count--with-places" : ""}`}
@@ -123,29 +117,29 @@ export default function CollectionHeader({
       className={`collection-controls${countries ? " country-controls" : ""}`}
     >
       <h1 className="visually-hidden">{countries ? "Countries" : "Cities"}</h1>
-      {!countries && (
-        <label className="search-field">
-          <Search size={16} aria-hidden="true" />
-          <input
-            ref={searchRef}
-            value={search}
-            onChange={(event) => onSearch(event.target.value)}
-            placeholder="Find a city or country"
-            aria-label="Search cities and countries"
-          />
-          {search ? (
-            <button
-              type="button"
-              aria-label="Clear search"
-              onClick={() => onSearch("")}
-            >
-              <X size={14} />
-            </button>
-          ) : (
-            <kbd>⌘ K</kbd>
-          )}
-        </label>
-      )}
+      <label className="search-field">
+        <Search size={16} aria-hidden="true" />
+        <input
+          ref={searchRef}
+          value={search}
+          onChange={(event) => onSearch(event.target.value)}
+          placeholder={countries ? "Find a country" : "Find a city or country"}
+          aria-label={
+            countries ? "Search countries" : "Search cities and countries"
+          }
+        />
+        {search ? (
+          <button
+            type="button"
+            aria-label="Clear search"
+            onClick={() => onSearch("")}
+          >
+            <X size={14} />
+          </button>
+        ) : (
+          <kbd>⌘ K</kbd>
+        )}
+      </label>
       <div
         className={`filter-row city-filter-row${countries ? " country-filter-row" : ""}`}
       >

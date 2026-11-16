@@ -451,7 +451,7 @@ h2 {
   flex-shrink: 0;
 }
 .search-field {
-  height: 43px;
+  height: 32px;
   border: 1px solid var(--line);
   background: var(--surface);
   display: flex;
@@ -1894,9 +1894,6 @@ h2 {
     border-top: 1px solid var(--line);
     min-height: 470px;
   }
-  .search-field {
-    height: 44px;
-  }
   .search-field kbd {
     display: block;
   }
@@ -2058,7 +2055,7 @@ h2 {
   padding: 0 16px 10px;
 }
 .collection-controls .search-field {
-  height: 36px;
+  height: 32px;
   padding: 0 10px;
   gap: 8px;
 }
@@ -2386,31 +2383,6 @@ h2 {
 .country-overview {
   position: relative;
 }
-.country-hover-toggle {
-  position: absolute;
-  z-index: 2;
-  top: 50%;
-  left: -18px;
-  transform: translateY(-50%);
-  display: grid;
-  place-items: center;
-  width: 16px;
-  height: 18px;
-  padding: 0;
-  border: 1px solid transparent;
-  border-radius: 3px;
-  color: var(--muted);
-  background: transparent;
-  font-size: 10px;
-  line-height: 14px;
-  font-weight: 750;
-}
-.country-hover-toggle:hover,
-.country-hover-toggle[aria-pressed="true"] {
-  color: var(--accent);
-  border-color: var(--line);
-  background: var(--surface);
-}
 .country-alphabetical-toggle {
   position: absolute;
   z-index: 2;
@@ -2435,21 +2407,21 @@ h2 {
   background: var(--surface);
   border-color: var(--line);
 }
-.country-alphabetical-toggle:focus-visible,
-.country-hover-toggle:focus-visible {
+.country-alphabetical-toggle:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 1px;
 }
 .collection-controls .country-filter-row {
   gap: 4px;
-  margin-top: 0;
+}
+.country-filter-row > .collection-filter:first-child,
+.country-filter-row > .collection-filter:nth-child(2) {
+  flex: 1 1 0;
+  min-width: 0;
 }
 @container (max-width: 330px) {
   .country-overview-totals dt {
     font-size: 9px;
-  }
-  .country-filter-row > .collection-count .collection-count-main > span {
-    display: none;
   }
 }
 .country-sample-note {
@@ -2768,11 +2740,12 @@ h2 {
 }
 .country-statistics {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  margin: 12px 0 22px;
-  padding-block: 10px;
+  grid-template-columns: repeat(3, minmax(34px, max-content));
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 5px 2px;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 7px;
   background: var(--surface);
 }
 .city-statistics {
@@ -2825,13 +2798,14 @@ h2 {
 .country-statistics dt {
   color: var(--muted);
   font-size: 10px;
-  line-height: 16px;
+  line-height: 14px;
+  white-space: nowrap;
 }
 .country-statistics dd {
   order: -1;
-  margin: 0 0 3px;
+  margin: 0 0 2px;
   color: var(--text);
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 750;
   line-height: 24px;
   font-variant-numeric: tabular-nums;
@@ -2851,7 +2825,21 @@ h2 {
   font-weight: 650;
 }
 .country-history {
+  margin-top: 18px;
   margin-bottom: 22px;
+}
+.country-history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.country-detail .country-history-header h2 {
+  flex-shrink: 0;
+  gap: 6px;
+  font-size: 17px;
+  line-height: 22px;
+  white-space: nowrap;
 }
 .country-history-empty {
   margin: 10px 0 0;
@@ -3364,6 +3352,13 @@ h2 {
   }
 }
 @container (max-width: 300px) {
+  .country-detail .country-history-header h2 {
+    gap: 5px;
+    font-size: 16px;
+  }
+  .country-statistics > div {
+    padding-inline: 5px;
+  }
   .collection-navigation {
     padding-inline: 12px;
   }

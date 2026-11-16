@@ -23,23 +23,28 @@ import { countryStripeImage } from "../src/lib/country-stripes";
 test("approved country and city corrections preserve every other visit and render exceptional durations", () => {
   const countries = countryCollection(),
     plan = durationUpdatePlan();
-  for (const [code, days] of [
-    ["SG", 7],
-    ["KR", 6.5],
-    ["GB", 12.5],
-    ["NZ", 5.5],
-    ["CZ", 4],
+  for (const [code, arrival, days] of [
+    ["SG", "2026-09-11", 1],
+    ["KR", "2025-07-15", 6.5],
+    ["GB", "2026-05-01", 2.5],
+    ["NZ", "2025-08-05", 3.5],
+    ["CZ", "2024-05-12", 1],
   ] as const)
     assert.equal(
-      countries.find((c) => c.code === code)!.recordedDaysSpent,
+      stayDays(
+        countries
+          .find((c) => c.code === code)!
+          .visits!.flatMap((visit) => visit.periods ?? [])
+          .find((period) => period.arrival === arrival)!,
+      ),
       days,
       code,
     );
   assert.equal(
     countries.reduce((n, c) => n + (c.recordedDaysSpent ?? 0), 0),
-    273.5,
+    plan.after.visits.reduce((n, visit) => n + (visit.days_spent ?? 0), 0),
   );
-  assert.equal(plan.after.periods.length, 127);
+  assert.equal(plan.after.periods.length - plan.before.periods.length, 2);
   const sg = countries.find((c) => c.code === "SG")!;
   assert.equal(sg.recordedVisits, 2);
   assert.equal(sg.visits![1].daysSpent, 6);
@@ -119,14 +124,21 @@ test("country half-days work for any country, reject quarters, and retain compat
       ),
     /whole number/,
   );
-  const old = durationUpdatePlan().before;
+  const old = toCountrySnapshot(
+    importCountryHistory(
+      overview.replaceAll("1.5", "2"),
+      visits.replaceAll("1.5", "2"),
+      [],
+      periods.replaceAll("1.5", "2"),
+    ),
+  );
   old.periods.forEach((p) => delete p.days_spent);
   assert.equal(
     fromCountrySnapshot(old).reduce(
       (n, c) => n + (c.recordedDaysSpent ?? 0),
       0,
     ),
-    270,
+    2,
   );
   const invalid = toCountrySnapshot(data);
   invalid.periods[0].days_spent = 1.25;
@@ -194,9 +206,28 @@ test("the live-format upgrade changes only approved rows, supports exact halves,
     ])
       await db.exec(readFileSync(`supabase/migrations/${file}`, "utf8"));
     await db.exec(`insert into atlas_private.editors values('${owner}');`);
-    const old = structuredClone(plan.before);
-    old.periods.forEach((p) => delete p.days_spent);
-    await db.exec(countrySeedSql(old));
+    // Exercise integer data through the old schema before loading today's
+    // snapshot, which already contains unrelated half-day corrections.
+    await db.exec(`begin;
+      insert into countries(code,name,continent,visit_status) values('ZZ','Legacy test country','Europe','visited');
+      insert into country_visits(country_code,visit_number,arrival_date,departure_date,days_spent) values('ZZ',1,'2020-01-01','2020-01-02',2);
+      insert into country_visit_periods(country_code,visit_number,period_number,arrival_date,departure_date) values('ZZ',1,1,'2020-01-01','2020-01-02');
+      commit;`);
+    const legacyVisits = (await load()).countries as { visits: unknown[] };
+    await db.exec(
+      readFileSync(
+        "supabase/migrations/202611130003_country_half_days.sql",
+        "utf8",
+      ),
+    );
+    const upgraded = (await load()).countries as {
+      visits: unknown[];
+      periods: { days_spent: number | null }[];
+    };
+    assert.deepEqual(upgraded.visits, legacyVisits.visits);
+    assert.equal(upgraded.periods[0].days_spent, null);
+    await db.exec("begin;delete from countries where code='ZZ';commit;");
+    await db.exec(countrySeedSql(structuredClone(plan.before)));
     const cities = cityCollection().map((c) => ({
       ...c,
       visits: c.visits
@@ -226,7 +257,7 @@ test("the live-format upgrade changes only approved rows, supports exact halves,
         (n, c) => n + (c.recordedDaysSpent ?? 0),
         0,
       ),
-      273.5,
+      plan.after.visits.reduce((n, visit) => n + (visit.days_spent ?? 0), 0),
     );
     await db.exec(plan.sql);
     assert.deepEqual(await load(), after);

@@ -4,10 +4,10 @@ import { countryStripeLayers } from "./country-stripes";
 import { MAP_COLORS } from "./palette";
 import type { CountryVisit } from "./types";
 
-const hovered: ExpressionSpecification = [
-  "any",
-  ["boolean", ["feature-state", "countryHover"], false],
-  ["boolean", ["feature-state", "countrySelected"], false],
+const selectedState: ExpressionSpecification = [
+  "boolean",
+  ["feature-state", "countrySelected"],
+  false,
 ];
 const transition = { duration: 0, delay: 0 };
 const uniformPaintOptions = { validate: false };
@@ -36,15 +36,15 @@ function createHighlight(
   countries: CountryVisit[],
   beforeId: string | undefined,
   duration: (milliseconds: number) => number,
-  kind: "hover" | "selected",
+  kind: "selected",
 ) {
-  const flag = kind === "hover" ? "countryHover" : "countrySelected";
+  const flag = "countrySelected";
   const ownState: ExpressionSpecification = [
     "boolean",
     ["feature-state", flag],
     false,
   ];
-  const onlyHovered = (
+  const onlySelected = (
     value: number | ExpressionSpecification,
   ): ExpressionSpecification => ["case", ownState, value, 0];
   let active: string | null = null;
@@ -63,7 +63,7 @@ function createHighlight(
       source: "atlas-countries",
       paint: {
         "fill-color": "#173d3c",
-        "fill-opacity": onlyHovered(0.12),
+        "fill-opacity": onlySelected(0.12),
         "fill-translate": [0, 1],
         "fill-translate-anchor": "viewport",
         "fill-opacity-transition": transition,
@@ -80,7 +80,7 @@ function createHighlight(
         "line-color": "#173d3c",
         "line-width": 3,
         "line-blur": 1.2,
-        "line-opacity": onlyHovered(0.18),
+        "line-opacity": onlySelected(0.18),
         "line-translate": [0, 1],
         "line-translate-anchor": "viewport",
         "line-opacity-transition": transition,
@@ -95,7 +95,7 @@ function createHighlight(
       source: "atlas-countries",
       paint: {
         "fill-color": fillColors(countries) as ExpressionSpecification,
-        "fill-opacity": onlyHovered(countryFillOpacity(countries)),
+        "fill-opacity": onlySelected(countryFillOpacity(countries)),
         "fill-translate": [0, 0],
         "fill-translate-anchor": "viewport",
         "fill-translate-transition": transition,
@@ -111,7 +111,7 @@ function createHighlight(
         id: `atlas-${kind}-${layer.id}`,
         paint: {
           ...layer.paint,
-          "fill-opacity": onlyHovered(1),
+          "fill-opacity": onlySelected(1),
           "fill-opacity-transition": transition,
           "fill-translate": [0, 0],
           "fill-translate-anchor": "viewport",
@@ -129,7 +129,7 @@ function createHighlight(
       paint: {
         "line-color": MAP_COLORS.cityLabel,
         "line-width": 1.25,
-        "line-opacity": onlyHovered(0.85),
+        "line-opacity": onlySelected(0.85),
         "line-translate": [0, 0],
         "line-translate-anchor": "viewport",
         "line-translate-transition": transition,
@@ -165,13 +165,13 @@ function createHighlight(
     map.setPaintProperty("atlas-land", "fill-color", fillColors(next));
     map.setPaintProperty("atlas-land", "fill-opacity", [
       "case",
-      hovered,
+      selectedState,
       0,
       countryFillOpacity(next),
     ]);
     map.setPaintProperty("atlas-borders", "line-opacity", [
       "case",
-      hovered,
+      selectedState,
       0,
       0.9,
     ]);
@@ -179,11 +179,16 @@ function createHighlight(
     map.setPaintProperty(
       `atlas-${kind}-land`,
       "fill-opacity",
-      onlyHovered(countryFillOpacity(next)),
+      onlySelected(countryFillOpacity(next)),
     );
     for (const layer of countryStripeLayers(next)) {
       map.setFilter(layer.id, layer.filter ?? null);
-      map.setPaintProperty(layer.id, "fill-opacity", ["case", hovered, 0, 1]);
+      map.setPaintProperty(layer.id, "fill-opacity", [
+        "case",
+        selectedState,
+        0,
+        1,
+      ]);
       map.setFilter(`atlas-${kind}-${layer.id}`, layer.filter ?? null);
     }
   }
@@ -237,7 +242,8 @@ function createHighlight(
   };
 }
 
-export function createCountryHover(
+/** Persistent profile selection only; pointer movement never changes this state. */
+export function createCountrySelection(
   map: MapInstance,
   countries: CountryVisit[],
   beforeId: string | undefined,
@@ -250,24 +256,17 @@ export function createCountryHover(
     duration,
     "selected",
   );
-  const hover = createHighlight(map, countries, beforeId, duration, "hover");
   let selected: string | null = null;
   return {
-    setCountry(code: string | null) {
-      hover.setCountry(code === selected ? null : code);
-    },
     setSelectedCountry(code: string | null) {
       if (code === selected) return;
       selected = code;
-      if (code && hover.getCountry() === code) hover.setCountry(null, true);
       selection.setCountry(code, true);
     },
     updateCountries(next: CountryVisit[]) {
       selection.updateCountries(next);
-      hover.updateCountries(next);
     },
     destroy() {
-      hover.destroy();
       selection.destroy();
     },
   };
