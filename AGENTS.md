@@ -1,5 +1,7 @@
 # Data updates
 
+- Keep canonical storage concise: country identity/geography comes from the reference CSVs, city visit summaries come from actual stay rows, and map viewer URLs come from the canonical map URL. Use `readCollectionCsv` for the established exchange projections; do not reintroduce maintained aggregate CSVs or old conversion exports. Run `data:verify-sources` and require exact API/business-data parity for storage migrations. Independent lifetime totals, partial dates and manual overrides are real facts and must be retained.
+
 - Before changing schemas, CSV ownership or database hydration, read [docs/BACKEND_ARCHITECTURE.md](docs/BACKEND_ARCHITECTURE.md). Country and city Continent/Region/Subregion must follow `data/reference/country-geography.csv`, derived from the owner's final categorization workbook; preserve its blank values and the existing Svalbard fallback. Verify with `country:verify-geography`. Keep metric comparison groups independent. Periodic DB-to-repo writeback and the documented future features remain inactive until requested.
 
 - For each owner-approved data batch, update the tracked source files and GitHub CSVs, Supabase, and the deployed site together.

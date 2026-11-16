@@ -123,14 +123,15 @@ do $guard$ begin if exists (
   where (c.${table.keys[0]} is null and b.${table.keys[0]} is not null)
     or (c.${table.keys[0]} is not null and to_jsonb(c) is distinct from to_jsonb(n) and (b.${table.keys[0]} is null or to_jsonb(c) is distinct from to_jsonb(b)))
 ) then raise exception 'Existing ${table.name} differs from the approved correction; nothing changed.'; end if; end $guard$;
-insert into public.${table.name} (${columns.join(",")}) select ${columns.join(",")} from jsonb_populate_recordset(null::public.${table.name},${json(next)})
-on conflict (${table.keys.join(",")}) do update set ${columns
+insert into public.${table.name} (${columns.join(",")}) select ${columns.map((c) => `n.${c}`).join(",")} from jsonb_populate_recordset(null::public.${table.name},${json(next)}) n
+where not exists(select 1 from public.${table.name} c where ${pair("c", "n")});
+update public.${table.name} c set ${columns
       .filter((c) => !table.keys.includes(c))
-      .map((c) => `${c}=excluded.${c}`)
+      .map((c) => `${c}=n.${c}`)
       .join(",")}
-where to_jsonb(${table.name}) is distinct from to_jsonb(excluded)
-  and exists(select 1 from jsonb_populate_recordset(null::public.${table.name},${json(prior)}) b
-    where ${table.keys.map((k) => `b.${k}=${table.name}.${k}`).join(" and ")} and to_jsonb(b)=to_jsonb(${table.name}));
+from jsonb_populate_recordset(null::public.${table.name},${json(next)}) n,
+  jsonb_populate_recordset(null::public.${table.name},${json(prior)}) b
+where ${pair("c", "n")} and ${pair("c", "b")} and to_jsonb(c) is distinct from to_jsonb(n) and to_jsonb(c)=to_jsonb(b);
 `;
     const keyJson = (r: string) =>
       table.keys.map((k) => `(${r}->>'${k}')`).join("||':'||");

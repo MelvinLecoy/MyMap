@@ -1,8 +1,14 @@
 # Published collection
 
-The collection uses the latest user-provided `MyMap_Converted_Full.csv`, included here unchanged. `cities.csv` is the ready-to-run version: map links have their `src="..."` wrappers removed, explicit country codes and stable IDs are added, and every visit is provisionally **Not Yet** (`Visited=No`). The source's city names, map statuses, continent, region, and subregion are preserved.
+The canonical collection contains **343 cities**, **341 located cities**, and **321 distinct Google My Maps IDs**. The superseded initial conversion export and maintained city-visit aggregate CSV have been removed; earlier versions remain in Git history.
 
-There are **321 entries**, **319 matched locations**, and **321 distinct Google My Maps IDs**. The source includes the corrected Johannesburg, Uganda, Belize City, Frankfurt am Main, Kingstown, and Nice map link.
+- `cities.csv` stores stable city IDs, city names, country references, map status/link, inline coordinates for the 22 additions, and independent visit-status overrides.
+- `coordinates.csv` supplies the other 319 reviewed positions and their GeoNames IDs. No city has the same position maintained in both files.
+- `reference/country-geography.csv` is the owner's final country name/classification authority. `reference/country-labels.csv` holds only explicit display-name overrides and the Svalbard fallback.
+- `city-visit-periods.csv` stores actual stays and exceptional duration overrides. Inclusive ordinary durations, counted-visit bounds/totals and LastVisited are derived from them.
+- `countries.csv` stores country membership and independent collection facts. Country trip rows retain only independent/partial-date overrides and notes; known date/day summaries come from their stay periods.
+
+`readCollectionCsv` reconstructs the established full import/exchange shape in memory. Browser CSV exports, standalone legacy CSV imports and current application behavior remain supported. `data:verify-sources` rejects reintroduced redundant fields; `data:normalize` normalizes reviewed files only after verifying exact business-data parity. Templates contain headers rather than obsolete copies of the owner's records.
 
 ## Reviewed matching decisions
 
@@ -14,7 +20,7 @@ There are **321 entries**, **319 matched locations**, and **321 distinct Google 
 
 ## Coordinates and attribution
 
-`coordinates.csv` records the GeoNames ID beside every coordinate pair. Coordinates come from GeoNames cities500, distributed by geonamescache 3.0.2, under CC BY 4.0. The app displays GeoNames attribution. Source hashes and import totals are recorded in `collection-info.json`.
+`coordinates.csv` records the GeoNames ID beside every coordinate pair. Coordinates come from GeoNames cities500, distributed by geonamescache 3.0.2, under CC BY 4.0. The app displays GeoNames attribution. Current source paths, import totals and GeoNames dataset attribution are recorded in `collection-info.json`.
 
 ## Runtime and verification
 

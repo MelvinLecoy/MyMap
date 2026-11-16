@@ -93,9 +93,16 @@ async function main() {
     : "";
   console.log("Verified the requested Supabase and Vercel projects.");
 
-  await query(
-    readFileSync(resolve("supabase/migrations/202611120001_atlas.sql"), "utf8"),
+  const canonical = await query(
+    "select to_regclass('atlas_data.cities') is not null as installed;",
   );
+  if (!canonical[0]?.installed)
+    await query(
+      readFileSync(
+        resolve("supabase/migrations/202611120001_atlas.sql"),
+        "utf8",
+      ),
+    );
   const rows = collectionRows();
   for (let offset = 0; offset < rows.length; offset += 25)
     await query(seedSql(rows.slice(offset, offset + 25)));

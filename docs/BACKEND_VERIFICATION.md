@@ -1,5 +1,7 @@
 # Backend refinement verification
 
+The subsequent field-deduplication/storage cleanup is documented in [CONCISE_STORAGE.md](CONCISE_STORAGE.md). The results below record the preceding behavior baseline; the cleanup additionally requires exact old/new data/API equality.
+
 Baseline: `f4f7a0abd0242aa098bea8095c3d8b0219b7cdb5`. Scope and ownership decisions are in [BACKEND_ARCHITECTURE.md](BACKEND_ARCHITECTURE.md).
 
 The intended data change is the owner's replacement country/city hierarchy. No future feature or periodic repository writeback has been enabled.

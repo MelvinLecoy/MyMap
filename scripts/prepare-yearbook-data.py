@@ -1,3 +1,4 @@
+import subprocess
 """Regenerate country CSVs from the independently verified yearbook extraction.
 
 Run from the repository root. Existing membership, first-visit order and known
@@ -14,8 +15,12 @@ provenance = json.loads((ROOT / 'data/sources/yearbook-provenance.json').read_te
 
 
 def read(path):
-    with (ROOT / path).open(encoding="utf-8-sig", newline="") as f:
-        return list(csv.DictReader(f))
+    if str(path).startswith("data/") and str(path).endswith(("countries.csv", "country-visit-history.csv", "country-visit-periods.csv")):
+        import io
+        text = subprocess.check_output(["node", "--import", "tsx", "scripts/collection-inputs.ts", "--project", str(path)], cwd=ROOT, text=True)
+        return list(csv.DictReader(io.StringIO(text)))
+    with (ROOT / path).open(encoding="utf-8-sig", newline="") as handle:
+        return list(csv.DictReader(handle))
 
 
 def write(path, rows, headers=None):
@@ -76,3 +81,5 @@ print(f"Prepared {len(overview)} country rows, 114 dated visits + 6 undated know
 # Preserve later owner-approved country additions after the historical rebuild.
 import runpy
 runpy.run_path(str(ROOT / "scripts/prepare-country-visit-updates.py"), run_name="__main__")
+
+subprocess.run(["node", "--import", "tsx", "scripts/normalize-collection.ts", "--write"], cwd=ROOT, check=True)

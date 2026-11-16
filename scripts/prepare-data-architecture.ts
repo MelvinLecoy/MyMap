@@ -1,8 +1,6 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import {
-  backendArchitectureSql,
-  backendAuditSql,
-} from "./backend-architecture";
+import { backendAuditSql } from "./backend-architecture";
+import { conciseStorageSql } from "./concise-storage";
 
 const apply = process.argv.includes("--apply");
 const dryRun = process.argv.includes("--dry-run");
@@ -34,7 +32,7 @@ async function query(sql: string): Promise<Record<string, unknown>[]> {
 }
 
 mkdirSync(".cache", { recursive: true });
-const plan = backendArchitectureSql(dryRun);
+const plan = conciseStorageSql(dryRun);
 if (apply || dryRun) {
   writeFileSync(".cache/backend-architecture-ready.sql", plan.sql);
   await query(plan.sql);

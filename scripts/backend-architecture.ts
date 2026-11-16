@@ -85,30 +85,30 @@ export const backendAuditSql = `select jsonb_build_object(
     'view_options', c.reloptions
   ) order by n.nspname,c.relname)
     from pg_class c join pg_namespace n on n.oid=c.relnamespace
-    where c.relkind in ('r','v') and n.nspname in ('public','atlas_private')),
+    where c.relkind in ('r','v') and n.nspname in ('public','atlas_private','atlas_data')),
   'columns', (select jsonb_agg(jsonb_build_object(
     'schema',table_schema,'table',table_name,'column',column_name,
     'type',data_type,'nullable',is_nullable
   ) order by table_schema,table_name,ordinal_position)
-    from information_schema.columns where table_schema in ('public','atlas_private')),
+    from information_schema.columns where table_schema in ('public','atlas_private','atlas_data')),
   'constraints', (select jsonb_agg(jsonb_build_object(
     'schema',n.nspname,'table',c.relname,'name',con.conname,
     'definition',pg_get_constraintdef(con.oid)
   ) order by n.nspname,c.relname,con.conname)
     from pg_constraint con join pg_class c on c.oid=con.conrelid
     join pg_namespace n on n.oid=c.relnamespace
-    where n.nspname in ('public','atlas_private')),
+    where n.nspname in ('public','atlas_private','atlas_data')),
   'indexes', (select jsonb_agg(to_jsonb(i) order by schemaname,tablename,indexname)
-    from pg_indexes i where schemaname in ('public','atlas_private')),
+    from pg_indexes i where schemaname in ('public','atlas_private','atlas_data')),
   'policies', (select jsonb_agg(to_jsonb(p) order by schemaname,tablename,policyname)
-    from pg_policies p where schemaname in ('public','atlas_private')),
+    from pg_policies p where schemaname in ('public','atlas_private','atlas_data')),
   'public_access', (select jsonb_agg(jsonb_build_object(
     'table',c.relname,'rls',c.relrowsecurity,
     'read',has_table_privilege('anon',c.oid,'SELECT'),
     'write',has_table_privilege('anon',c.oid,'INSERT,UPDATE,DELETE')
       or has_any_column_privilege('anon',c.oid,'UPDATE')
   ) order by c.relname) from pg_class c join pg_namespace n on n.oid=c.relnamespace
-    where n.nspname='public' and c.relkind='r' and c.relname in (
+    where n.nspname=case when to_regclass('atlas_data.cities') is null then 'public' else 'atlas_data' end and c.relkind='r' and c.relname in (
       'cities','city_visits','city_visit_periods','countries','country_visits',
       'country_visit_periods','places','place_countries')),
   'snapshot_counts', jsonb_build_object(

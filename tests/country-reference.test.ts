@@ -1,3 +1,4 @@
+import { readCollectionCsv } from "../scripts/collection-inputs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -23,8 +24,8 @@ import {
 } from "../src/lib/country-reference";
 
 const countries = importCountryHistory(
-  readFileSync("data/countries.csv", "utf8"),
-  readFileSync("data/country-visit-history.csv", "utf8"),
+  readCollectionCsv("data/countries.csv"),
+  readCollectionCsv("data/country-visit-history.csv"),
   starter.countries,
   readFileSync("data/country-visit-periods.csv", "utf8"),
 );

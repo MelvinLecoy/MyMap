@@ -1,3 +1,4 @@
+import { readCollectionCsv } from "./collection-inputs";
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { isDeepStrictEqual } from "node:util";
 import { importPlaces } from "./place-importer";
@@ -7,8 +8,8 @@ import { fromPlaceRow, type PlaceRow } from "../src/lib/places";
 import type { Place } from "../src/lib/types";
 
 const countries = importCountryHistory(
-  readFileSync("data/countries.csv", "utf8"),
-  readFileSync("data/country-visit-history.csv", "utf8"),
+  readCollectionCsv("data/countries.csv"),
+  readCollectionCsv("data/country-visit-history.csv"),
   starter.countries,
   readFileSync("data/country-visit-periods.csv", "utf8"),
 );
@@ -86,11 +87,10 @@ export function placeSeedSql(places: Place[] = approvedPlaces) {
         place.outlineSource,
       ];
       return (
-        `insert into public.places (${columns.join(",")}) values (${values.map(quote).join(",")}) on conflict(id) do update set ${referenceColumns
-          .map((column) => `${column}=excluded.${column}`)
-          .join(
-            ",",
-          )} where row(${referenceColumns.map((column) => `places.${column}`).join(",")}) is distinct from row(${referenceColumns.map((column) => `excluded.${column}`).join(",")});\ndelete from public.place_countries where place_id=${quote(place.id)};\n` +
+        `insert into public.places (${columns.join(",")}) select ${values.map(quote).join(",")} where not exists(select 1 from public.places where id=${quote(place.id)});
+update public.places t set ${referenceColumns.map((column) => `${column}=${quote(values[columns.indexOf(column)])}${column === "outline" ? "::jsonb" : column === "longitude" || column === "latitude" ? "::double precision" : ""}`).join(",")}
+where t.id=${quote(place.id)} and row(${referenceColumns.map((c) => `t.${c}`).join(",")}) is distinct from row(${referenceColumns.map((column) => `${quote(values[columns.indexOf(column)])}${column === "outline" ? "::jsonb" : column === "longitude" || column === "latitude" ? "::double precision" : ""}`).join(",")});
+delete from public.place_countries where place_id=${quote(place.id)};\n` +
         place.countries
           .map(
             (country, i) =>
@@ -110,7 +110,10 @@ if (
     "supabase/migrations/202611150001_places.sql",
     "utf8",
   );
-  const sql = migration.replace(/commit;\s*$/i, placeSeedSql() + "\ncommit;\n");
+  const schema = migration
+    .replace(/^\s*begin;\s*/i, "")
+    .replace(/commit;\s*$/i, "");
+  const sql = `begin;do $schema$ begin if to_regclass('atlas_data.places') is null then execute $legacy$${schema}$legacy$;end if;end $schema$;\n${placeSeedSql()}\ncommit;`;
   mkdirSync(".cache", { recursive: true });
   writeFileSync(".cache/places-ready.sql", sql);
   const apply = process.argv.includes("--apply"),

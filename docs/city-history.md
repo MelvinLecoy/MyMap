@@ -1,5 +1,7 @@
 # City visit history
 
+Canonical source fields and physical storage are documented in [CONCISE_STORAGE.md](CONCISE_STORAGE.md). API and browser export shapes remain unchanged.
+
 The approved city history contains **174 cities, 222 counted visits, 235 actual stays
 and 401 summed city-days**. The collection contains 343 cities, including the later supplied Southampton
 and Reykjavik histories.
@@ -15,7 +17,7 @@ of 14 days or any country history.
 Three tracked CSVs are required to preserve the full city history:
 
 - `data/cities.csv`: metadata, Visited, LastVisited, RecordedVisits and RecordedDaysSpent.
-- `data/city-visit-history.csv`: one counted visit per row, with CityId, Cities,
+- Counted city visits are generated in memory from stay rows; no maintained aggregate CSV is stored. The full exchange projection contains CityId, Cities,
   CountryCode, VisitNumber, ArrivalDate, DepartureDate and DaysSpent. Bounds
   enclose the actual periods; DaysSpent sums only their explicit durations.
 - `data/city-visit-periods.csv`: one actual stay per row, with the same identifiers,

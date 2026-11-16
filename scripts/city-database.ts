@@ -1,3 +1,4 @@
+import { derivedCityVisitsCsv, readCollectionCsv } from "./collection-inputs";
 import { readFileSync } from "node:fs";
 import { importCities } from "./importer.js";
 import { toCityRow } from "../src/lib/cloud-data.js";
@@ -9,10 +10,10 @@ import {
 import type { City } from "../src/lib/types.js";
 
 export function cityCollection(): City[] {
-  return importCities(readFileSync("data/cities.csv", "utf8"), {
+  return importCities(readCollectionCsv("data/cities.csv"), {
     coordinates: readFileSync("data/coordinates.csv", "utf8"),
-    cityVisits: readFileSync("data/city-visit-history.csv", "utf8"),
-    cityPeriods: readFileSync("data/city-visit-periods.csv", "utf8"),
+    cityVisits: derivedCityVisitsCsv(),
+    cityPeriods: readCollectionCsv("data/city-visit-periods.csv"),
   }).data.cities;
 }
 const sqlJson = (value: unknown) =>
@@ -49,7 +50,13 @@ export function citySeedSql(cities: City[], legacy = false): string {
     "city_id,visit_number,arrival_date,departure_date,days_spent";
   const insertHistory = (table: string, rows: object[], columns: string) => `
 insert into public.${table} (${columns})
-  select ${columns} from jsonb_populate_recordset(null::public.${table},${sqlJson(rows)}) on conflict do nothing;
+  select ${columns
+    .split(",")
+    .map((c) => `s.${c}`)
+    .join(
+      ",",
+    )} from jsonb_populate_recordset(null::public.${table},${sqlJson(rows)}) s
+  where not exists(select 1 from public.${table} t where t.city_id=s.city_id and t.visit_number=s.visit_number${table === "city_visit_periods" ? " and t.period_number=s.period_number" : ""});
 do $check$ begin
   if (select count(*) from public.${table} where city_id in (select id from approved_city_targets)) <> ${rows.length} or exists(
     (select ${columns} from jsonb_populate_recordset(null::public.${table},${sqlJson(rows)}))
@@ -67,7 +74,13 @@ create temporary table city_import_before on commit drop as
 create temporary table country_import_before on commit drop as select public.atlas_country_snapshot() as data;
 
 insert into public.cities (${columns})
-  select ${columns} from jsonb_populate_recordset(null::public.cities,${sqlJson(additions)}) on conflict (id) do nothing;
+  select ${columns
+    .split(",")
+    .map((c) => `s.${c}`)
+    .join(
+      ",",
+    )} from jsonb_populate_recordset(null::public.cities,${sqlJson(additions)}) s
+  where not exists(select 1 from public.cities t where t.id=s.id);
 do $check$ begin
   if exists(select 1 from approved_city_targets t left join public.cities c using(id) where c.id is null or c.country_code is distinct from t.country_code)
     then raise exception 'Missing or mismatched target city; nothing imported.'; end if;
@@ -95,7 +108,7 @@ export function cityDatabaseSql() {
   const cities = cityCollection();
   return {
     cities,
-    sql: `begin;\nselect pg_advisory_xact_lock(202611140001);\n${legacyCitySchemaSql()}\n${migrationBody("202611140002_city_visit_periods.sql")}\n${migrationBody("202611140003_seoul_visit_correction.sql")}\n${migrationBody("202611140006_ho_chi_minh_city_duration.sql")}\n${citySeedSql(cities)}\ncommit;\n`,
+    sql: `begin;\nselect pg_advisory_xact_lock(202611140001);\ndo $schema$ begin if to_regclass('atlas_data.cities') is null then execute $legacy$${legacyCitySchemaSql()}\n${migrationBody("202611140002_city_visit_periods.sql")}\n${migrationBody("202611140003_seoul_visit_correction.sql")}\n${migrationBody("202611140006_ho_chi_minh_city_duration.sql")}$legacy$;end if;end $schema$;\n${citySeedSql(cities)}\ncommit;\n`,
   };
 }
 

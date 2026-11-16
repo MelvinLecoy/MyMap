@@ -1,3 +1,4 @@
+import { readCollectionCsv } from "../scripts/collection-inputs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
@@ -125,7 +126,7 @@ test("taxonomy imports reject incomplete, duplicate, unknown and malformed refer
 });
 
 test("all current city classifications match their country and Svalbard remains unspecified by the new source", () => {
-  const rows = readCSV(readFileSync("data/cities.csv", "utf8"));
+  const rows = readCSV(readCollectionCsv("data/cities.csv"));
   assert.equal(rows.length, 343);
   for (const { values: row } of rows) {
     if (row.countrycode === "SJ") {

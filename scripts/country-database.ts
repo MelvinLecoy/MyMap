@@ -1,3 +1,4 @@
+import { readCollectionCsv } from "./collection-inputs";
 import { readFileSync } from "node:fs";
 import { importCountryHistory } from "./country-importer.js";
 import starter from "../data/countries.sample.json";
@@ -8,8 +9,8 @@ import {
 
 export function countryCollection() {
   return importCountryHistory(
-    readFileSync("data/countries.csv", "utf8"),
-    readFileSync("data/country-visit-history.csv", "utf8"),
+    readCollectionCsv("data/countries.csv"),
+    readCollectionCsv("data/country-visit-history.csv"),
     starter.countries,
     readFileSync("data/country-visit-periods.csv", "utf8"),
   );
@@ -27,7 +28,20 @@ export function countrySeedSql(snapshot: CountrySnapshot): string {
       if (!rows.length) return "";
       const columns = Object.keys(rows[0]).join(","),
         json = JSON.stringify(rows).replaceAll("'", "''");
-      return `insert into public.${table} (${columns}) select ${columns} from jsonb_populate_recordset(null::public.${table},'${json}'::jsonb) on conflict do nothing;
+      const keys =
+        table === "countries"
+          ? ["code"]
+          : table === "country_visits"
+            ? ["country_code", "visit_number"]
+            : ["country_code", "visit_number", "period_number"];
+      return `insert into public.${table} (${columns}) select ${Object.keys(
+        rows[0],
+      )
+        .map((c) => `s.${c}`)
+        .join(
+          ",",
+        )} from jsonb_populate_recordset(null::public.${table},'${json}'::jsonb) s
+where not exists(select 1 from public.${table} t where ${keys.map((k) => `t.${k}=s.${k}`).join(" and ")});
 do $check$ begin
 if (select count(*) from public.${table})<>${rows.length} or exists(
   (select ${columns} from jsonb_populate_recordset(null::public.${table},'${json}'::jsonb))
@@ -51,6 +65,6 @@ export function countryDatabaseSql() {
     .join("\n");
   return {
     snapshot,
-    sql: `begin;\nselect pg_advisory_xact_lock(202611130001);\n${migration}\n${countrySeedSql(snapshot)}\nset constraints all immediate;\ncommit;\n`,
+    sql: `begin;\nselect pg_advisory_xact_lock(202611130001);\ndo $schema$ begin if to_regclass('atlas_data.countries') is null then execute $legacy$${migration}$legacy$;end if;end $schema$;\n${countrySeedSql(snapshot)}\nset constraints all immediate;\ncommit;\n`,
   };
 }

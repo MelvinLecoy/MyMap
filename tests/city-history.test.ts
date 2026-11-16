@@ -1,3 +1,7 @@
+import {
+  derivedCityVisitsCsv,
+  readCollectionCsv,
+} from "../scripts/collection-inputs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -370,16 +374,10 @@ test("city CSVs and cloud snapshots round-trip half-days without changing city m
   );
   assert.throws(
     () =>
-      importCities(
-        readFileSync("data/cities.csv", "utf8").replace(
-          "Yes,2026-05-03,4,6.5",
-          "Yes,2026-05-03,4,7",
-        ),
-        {
-          cityVisits: readFileSync("data/city-visit-history.csv", "utf8"),
-          cityPeriods: readFileSync("data/city-visit-periods.csv", "utf8"),
-        },
-      ),
+      importCities(exportCitiesCsv(cities).replace('"6.5"', '"7"'), {
+        cityVisits: derivedCityVisitsCsv(),
+        cityPeriods: readCollectionCsv("data/city-visit-periods.csv"),
+      }),
     /totals differ/,
   );
 });

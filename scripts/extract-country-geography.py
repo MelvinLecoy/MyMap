@@ -76,8 +76,8 @@ def extract():
     for name, code, continent, region, subregion in records:
         if code in seen or code not in expected:
             raise ValueError(f"Duplicate or unknown country code: {code}")
-        if expected[code]["Country"] != name or expected[code]["Continent"] != continent:
-            raise ValueError(f"Country identity/continent differs from the approved overview: {code}")
+        if not name or not continent:
+            raise ValueError(f"Missing country identity/continent in the authoritative workbook: {code}")
         if subregion and not region:
             raise ValueError(f"A subregion needs its supplied parent region: {code}")
         seen.add(code)
@@ -101,30 +101,12 @@ def extract():
         CSV_PATH: csv_bytes,
         PROVENANCE_PATH: (json.dumps(provenance, ensure_ascii=False, indent=2) + "\n").encode("utf-8"),
     }
-    city_text = (ROOT / CITY_PATH).read_text(encoding="utf-8-sig")
-    cities = list(csv.DictReader(io.StringIO(city_text, newline="")))
-    city_headers = list(cities[0])
-    by_code = {row[1]: row for row in records}
-    changed = False
+    # City geography is inherited by CountryCode and is no longer copied into
+    # each city source row. Validate references without recreating those columns.
+    cities = list(csv.DictReader((ROOT / CITY_PATH).open(encoding="utf-8-sig")))
     for city in cities:
-        code = city["CountryCode"]
-        if code == "SJ":
-            continue
-        if not code or code not in by_code:
-            raise ValueError(f"City {city['CityId']} needs an explicit classified CountryCode; no country is inferred.")
-        _, _, continent, region, subregion = by_code[code]
-        for field, value in (("Continent", continent), ("Region", region), ("SubRegion", subregion)):
-            if city[field] != value:
-                city[field] = value
-                changed = True
-    # Preserve source bytes if every classification already matches. Mutable
-    # names/statuses/visits/map URLs/coordinates are never rewritten by --check.
-    if changed:
-        city_buffer = io.StringIO(newline="")
-        writer = csv.DictWriter(city_buffer, fieldnames=city_headers, lineterminator="\n")
-        writer.writeheader()
-        writer.writerows(cities)
-        outputs[CITY_PATH] = city_buffer.getvalue().encode("utf-8")
+        if city["CountryCode"] not in seen and city["CountryCode"] != "SJ":
+            raise ValueError(f"Unclassified country for city {city['CityId']}")
     return outputs
 
 
@@ -132,7 +114,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--check", action="store_true")
-    mode.add_argument("--prepare", action="store_true", help="Write the extracted reference and matching city geography (the default).")
+    mode.add_argument("--prepare", action="store_true", help="Write the extracted reference and authoritative reference CSV (the default).")
     args = parser.parse_args()
     for path, content in extract().items():
         target = ROOT / path

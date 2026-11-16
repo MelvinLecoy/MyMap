@@ -99,10 +99,12 @@ Country history is independently supplied and may be incomplete. Do not rebuild 
 | Layer            | City history                                                  | Country history                                                     |
 | ---------------- | ------------------------------------------------------------- | ------------------------------------------------------------------- |
 | Tracked metadata | [data/cities.csv](../data/cities.csv)                         | [data/countries.csv](../data/countries.csv)                         |
-| Counted visits   | [data/city-visit-history.csv](../data/city-visit-history.csv) | [data/country-visit-history.csv](../data/country-visit-history.csv) |
+| Counted visits   | Derived in memory from actual stays                           | [data/country-visit-history.csv](../data/country-visit-history.csv) |
 | Actual stays     | [data/city-visit-periods.csv](../data/city-visit-periods.csv) | [data/country-visit-periods.csv](../data/country-visit-periods.csv) |
 | Database         | `cities`, `city_visits`, `city_visit_periods`                 | `countries`, `country_visits`, `country_visit_periods`              |
 | Atomic read RPC  | `atlas_city_snapshot()`                                       | `atlas_country_snapshot()`                                          |
+
+The concise storage model derives counted city bounds/durations and LastVisited from stays, retaining explicit overrides only where history cannot reproduce them. Public API projections preserve the exact renderer input. See [CONCISE_STORAGE.md](CONCISE_STORAGE.md).
 
 The build imports the CSVs into `src/generated/atlas.json` and `src/generated/countries.json`. These generated files are ignored by Git; regenerate them rather than editing them. Approved source ledgers and workbooks live under [data/sources](../data/sources).
 

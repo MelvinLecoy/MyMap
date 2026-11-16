@@ -1,3 +1,8 @@
+import {
+  derivedCityVisitsCsv,
+  readCollectionCsv,
+  verifyConciseInputs,
+} from "./collection-inputs";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { importCities, readCSV } from "./importer.js";
 import { importCountryHistory } from "./country-importer.js";
@@ -16,11 +21,12 @@ if (!demo && !existsSync("data/cities.csv")) {
   process.exit(1);
 }
 try {
+  verifyConciseInputs();
   const optional = (path: string) =>
     existsSync(path) ? readFileSync(path, "utf8") : undefined;
   const geography = importCountryGeography(
     readFileSync("data/reference/country-geography.csv", "utf8"),
-    readCSV(readFileSync("data/countries.csv", "utf8"), [
+    readCSV(readCollectionCsv("data/countries.csv"), [
       "CountryCode",
       "Country",
       "Is195",
@@ -31,19 +37,19 @@ try {
     })),
   );
   const { data, issues } = importCities(
-    readFileSync(demo ? "fixtures/cities.demo.csv" : "data/cities.csv", "utf8"),
+    demo
+      ? readFileSync("fixtures/cities.demo.csv", "utf8")
+      : readCollectionCsv("data/cities.csv"),
     {
       demo,
       coordinates: demo ? undefined : optional("data/coordinates.csv"),
       countryVisits: optional(
         demo ? "fixtures/country-visits.demo.csv" : "data/country-visits.csv",
       ),
-      cityVisits: demo
-        ? undefined
-        : readFileSync("data/city-visit-history.csv", "utf8"),
+      cityVisits: demo ? undefined : derivedCityVisitsCsv(),
       cityPeriods: demo
         ? undefined
-        : readFileSync("data/city-visit-periods.csv", "utf8"),
+        : readCollectionCsv("data/city-visit-periods.csv"),
       countryGeography: geography,
     },
   );
@@ -51,8 +57,8 @@ try {
   const countryHistory = demo
     ? countryStarter.countries
     : importCountryHistory(
-        readFileSync("data/countries.csv", "utf8"),
-        readFileSync("data/country-visit-history.csv", "utf8"),
+        readCollectionCsv("data/countries.csv"),
+        readCollectionCsv("data/country-visit-history.csv"),
         countryStarter.countries,
         readFileSync("data/country-visit-periods.csv", "utf8"),
       );

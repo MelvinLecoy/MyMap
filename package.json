@@ -24,6 +24,8 @@
     "places:apply": "NODE_USE_ENV_PROXY=1 tsx scripts/sync-places.ts --apply",
     "dev": "tsx scripts/import-data.ts && vite --host 0.0.0.0",
     "data:import": "tsx scripts/import-data.ts",
+    "data:verify-sources": "tsx scripts/normalize-collection.ts",
+    "data:normalize": "tsx scripts/normalize-collection.ts --write",
     "data:verify-live": "NODE_USE_ENV_PROXY=1 tsx scripts/verify-persistent-data.ts",
     "data:verify-sync": "NODE_USE_ENV_PROXY=1 tsx scripts/verify-persistent-data.ts --dry-run",
     "data:sync-approved": "NODE_USE_ENV_PROXY=1 tsx scripts/verify-persistent-data.ts --apply",

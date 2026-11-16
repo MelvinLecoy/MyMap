@@ -1,5 +1,7 @@
 """Apply approved country stays without changing city data or country metadata."""
 import csv
+import io
+import subprocess
 import json
 from datetime import date
 from decimal import Decimal
@@ -8,6 +10,9 @@ from pathlib import Path
 root=Path(__file__).resolve().parents[1]
 ledger=json.loads((root/'data/sources/country-visit-updates-2026-11-14.json').read_text())
 def read(name):
+    if str(name).startswith("data/") and str(name).endswith(("countries.csv", "country-visit-history.csv", "country-visit-periods.csv")):
+        text=subprocess.check_output(["node","--import","tsx","scripts/collection-inputs.ts","--project",str(name)],cwd=root,text=True)
+        reader=csv.DictReader(io.StringIO(text));return reader.fieldnames,list(reader)
     p=root/name
     with p.open(encoding='utf-8-sig',newline='') as f:
         reader=csv.DictReader(f);return reader.fieldnames,list(reader)
@@ -76,3 +81,5 @@ for name,headers,rows in [('data/countries.csv',ch,countries),('data/country-vis
 for source,target in [('countries.csv','countries-template.csv'),('country-visit-history.csv','country-visits-template.csv'),('country-visit-periods.csv','country-visit-periods-template.csv')]:
     (root/'data/templates'/target).write_bytes((root/'data'/source).read_bytes())
 print(json.dumps({'countryVisits':len(visits),'periods':len(periods),'days':ledger['expected']['days'],'countries':{c['CountryCode']:[int(c['RecordedVisits']),float(c['RecordedDaysSpent'])] for c in countries if c['CountryCode'] in codes}}))
+
+subprocess.run(["node","--import","tsx","scripts/normalize-collection.ts","--write"],cwd=root,check=True)

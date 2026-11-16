@@ -27,8 +27,8 @@ targets for automatic writeback. Historical preparation scripts must not silentl
 recreate older collection state over a newer reviewed checkpoint. A future exporter
 must record which source revision it started from so those conflicts can be detected.
 
-The current legacy CSVs mix these categories. Until a separate snapshot format has
-been introduced, a compatibility export must join repository reference fields with
+Canonical source files now omit derived fields; [CONCISE_STORAGE.md](CONCISE_STORAGE.md) defines the stored facts and overrides. Until a separate snapshot format has
+been introduced, a compatibility download can join repository reference fields with
 database editable fields by stable ID. It must not copy the database's full city,
 country or place row over the repository reference data.
 
@@ -66,7 +66,6 @@ Do not manufacture a fresh database revision merely because a checkpoint ran.
 The following are candidate compatibility snapshot outputs, not an active job:
 
 - `data/cities.csv`
-- `data/city-visit-history.csv`
 - `data/city-visit-periods.csv`
 - `data/countries.csv`
 - `data/country-visit-history.csv`

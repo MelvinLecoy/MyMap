@@ -8,7 +8,7 @@ The complete original is archived at [countries_categorization.xlsx](../data/sou
 
 Svalbard (`SJ`) is absent from the workbook. Its country keeps its existing Europe continent with no inferred Region/Subregion. Its city retains its existing Europe / Nordic geography. No territory classification is borrowed from a metric source or a sovereign country.
 
-Run `npm run country:prepare-geography` to reproduce the CSV and provenance and apply the same three geography fields to the compatibility `data/cities.csv`. The extractor preserves all other city values, IDs and row order. `npm run country:verify-geography` checks the extraction and compatibility city classifications without writing files. These commands use Python's standard library.
+Run `npm run country:prepare-geography` to reproduce the CSV and provenance ; city rows inherit geography by CountryCode and store none of those copied fields. `npm run country:verify-geography` checks the extraction and city CountryCode references without writing files. These commands use Python's standard library.
 
 `scripts/country-geography-importer.ts` validates unique known codes, exact country names, complete country coverage, recognized continents, all five headers and parent regions for subregions. Production data import passes this reference into `importCities`, writes `src/generated/country-geography.json`, and produces city geography from the same authority. A production city must have an explicit classified CountryCode; `SJ` is the explicit unchanged exception. Demo and isolated importer fixtures can retain their independent data contract when they do not opt into the reference.
 

@@ -23,7 +23,9 @@ def key(value):
 
 with (ROOT / "data/countries.csv").open(encoding="utf-8-sig", newline="") as handle:
     countries = list(csv.DictReader(handle))
-names = {key(row["Country"]): row["CountryCode"] for row in countries}
+with (ROOT / "data/reference/country-geography.csv").open(encoding="utf-8", newline="") as handle:
+    geography = list(csv.DictReader(handle))
+names = {key(row["Country"]): row["CountryCode"] for row in geography}
 names.update({key(name): code for name, code in {
     "DR Congo": "CD", "Republic of the Congo": "CG", "Côte d'Ivoire": "CI",
     "Moldova, Republic of": "MD", "Syrian Arab Republic": "SY",

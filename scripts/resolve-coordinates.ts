@@ -1,3 +1,4 @@
+import { readCollectionCsv } from "./collection-inputs";
 import {
   createReadStream,
   existsSync,
@@ -48,7 +49,7 @@ if (existsSync("data/coordinates.csv"))
       );
     existing.set(r.cityid, coords);
   }
-const pending = readCSV(readFileSync("data/cities.csv", "utf8"), [
+const pending = readCSV(readCollectionCsv("data/cities.csv"), [
   "Cities",
   "Country",
 ])

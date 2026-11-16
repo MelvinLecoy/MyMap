@@ -1,3 +1,4 @@
+import { readCollectionCsv } from "../scripts/collection-inputs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -13,8 +14,8 @@ import {
 import type { City } from "../src/lib/types";
 import starter from "../data/countries.sample.json";
 
-const overview = readFileSync("data/countries.csv", "utf8");
-const history = readFileSync("data/country-visit-history.csv", "utf8");
+const overview = readCollectionCsv("data/countries.csv");
+const history = readCollectionCsv("data/country-visit-history.csv");
 const periods = readFileSync("data/country-visit-periods.csv", "utf8");
 const countries = importCountryHistory(
   overview,

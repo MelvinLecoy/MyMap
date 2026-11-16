@@ -118,6 +118,8 @@ create temporary table taxonomy_before(data jsonb) on commit drop;
 insert into taxonomy_before values (${literal(snapshot)});
 create temporary table taxonomy_wanted on commit drop as
 select * from jsonb_to_recordset(${literal(wanted)}) as r(id text,country_code text,continent text,region text,subregion text,updated_at timestamptz);
+create temporary table taxonomy_reference on commit drop as
+select * from jsonb_to_recordset(${literal(reference)}) as r(code text,continent text,region text,subregion text);
 do $taxonomy_guard$ begin
   if ${geographySnapshotExpression} is distinct from (select data from taxonomy_before) then
     raise exception 'Collection changed since geography review; refresh and review again.' using errcode='40001';
@@ -127,11 +129,17 @@ create temporary table taxonomy_changed on commit drop as
 select c.id from public.cities c join taxonomy_wanted w on c.id=w.id
 where row(c.continent,c.region,c.subregion) is distinct from row(w.continent,w.region,w.subregion);
 do $taxonomy_apply$ declare affected integer; begin
+  if to_regclass('atlas_data.countries') is not null then
+    execute 'update atlas_data.countries c set region=r.region,subregion=r.subregion from taxonomy_reference r where c.code=r.code and row(c.region,c.subregion) is distinct from row(r.region,r.subregion)';
+    execute 'update atlas_data.cities set updated_at=clock_timestamp() where id in (select id from taxonomy_changed)';
+    get diagnostics affected=row_count;
+  else
   update public.cities c set continent=w.continent,region=w.region,subregion=w.subregion
   from taxonomy_wanted w where c.id=w.id and c.country_code is not distinct from w.country_code
     and c.updated_at=w.updated_at
     and row(c.continent,c.region,c.subregion) is distinct from row(w.continent,w.region,w.subregion);
   get diagnostics affected=row_count;
+  end if;
   if affected<>(select count(*) from taxonomy_changed) then
     raise exception 'A city revision changed during geography update.' using errcode='40001';
   end if;

@@ -1,4 +1,8 @@
-import { readFileSync, writeFileSync } from "node:fs";
+import {
+  readCollectionCsv,
+  normalizeCollectionInputs,
+} from "./collection-inputs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { readCSV } from "./importer.js";
 import { parse } from "csv-parse/sync";
 import { CITY_VISIT_GAP_DAYS, groupCityStays } from "../src/lib/city-visits.js";
@@ -67,7 +71,7 @@ const normalize = (s: string) =>
     .replace(/\p{M}/gu, "")
     .toLowerCase()
     .replace(/[^a-z0-9]/g, "");
-const sourceCsv = readFileSync("data/cities.csv", "utf8");
+const sourceCsv = readCollectionCsv("data/cities.csv");
 const originalHeaders = (
   parse(sourceCsv, { bom: true, to: 1 }) as string[][]
 )[0];
@@ -261,8 +265,9 @@ writeFileSync(
     ),
   ]),
 );
+mkdirSync(".cache", { recursive: true });
 writeFileSync(
-  "data/city-visit-history.csv",
+  ".cache/city-visit-history.csv",
   csv([
     [
       "CityId",
@@ -309,3 +314,4 @@ console.log(
     collection: metadata.length,
   }),
 );
+await normalizeCollectionInputs();

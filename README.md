@@ -2,7 +2,7 @@
 
 A responsive, static travel globe inspired by the supplied reference: an airy Coastal palette with off-white panels, pale blue water, light neutral land, mint visited countries, and mint actions with dark text, plus city pins, a searchable collection, and focused city details. The map and city panel fill the browser window, with no outer header, navigation, footer, or page margins. Built with React, TypeScript, Vite, and MapLibre GL JS. The static CSV version runs without a backend. Optional Supabase integration adds owner sign-in and persistent status saves across devices; see [docs/supabase.md](docs/supabase.md).
 
-The repository includes the reviewed **321-entry collection**, its latest uploaded source CSV, and **319 matched locations**. All visits start as **Not Yet**. Iguazu and Lofoten are intentionally unplaced. See [data/IMPORT_NOTES.md](data/IMPORT_NOTES.md) for matching decisions and provenance.
+The repository includes the current **343-city collection**, **174 visited cities** and **341 located cities**. Canonical CSVs store each fact once; country labels/geography and visit summaries are derived during import. Iguazu and Lofoten are intentionally unplaced. See [data/IMPORT_NOTES.md](data/IMPORT_NOTES.md) for matching decisions and provenance.
 
 ## Run on a Mac
 
@@ -43,7 +43,7 @@ Five-city fixtures remain in `fixtures/` for explicit demo builds and regression
 
 Without Supabase configured, the city-detail page has an editable **Map status** dropdown. Changes immediately update the list, its status filter, and other open tabs. They are saved in this browser for this site and survive refreshes; they do not sync across devices or change the source CSV or GitHub. Clearing this site's browser storage restores the imported statuses. If the browser cannot save a change, it stays active for the current session and the page reports that it could not be saved.
 
-The ready-to-run **`data/cities.csv`** and **`data/coordinates.csv`** are tracked in Git. The latest uploaded original is preserved in `data/MyMap_Converted_Full.csv`; runtime normalization and approved country-code choices are documented in `data/IMPORT_NOTES.md`. To replace or extend the collection, update the prepared UTF-8 `data/cities.csv`. Keep these headers (case and surrounding whitespace do not matter; `City` is accepted as an alias for `Cities`):
+The ready-to-run **`data/cities.csv`** and **`data/coordinates.csv`** are tracked in Git. The superseded conversion export was removed; Git retains its history. Current source fields and approved country-code choices are documented in `data/IMPORT_NOTES.md`. To replace or extend the collection, update the prepared UTF-8 `data/cities.csv`. The canonical city file uses `CityId,Cities,CountryCode,Status,Link,Latitude,Longitude,VisitStatusOverride`; geography and recorded totals are not maintained in each row. The importer and browser exports still support the full exchange headers below (case and surrounding whitespace do not matter; `City` is accepted as an alias for `Cities`):
 
 ```csv
 Cities,Country,Continent,Region,SubRegion,Status,Link
@@ -190,7 +190,7 @@ Google controls the embedded content and access. Set the original My Map to **An
 
 ## Persistent saving with Supabase
 
-Read [the backend architecture and ownership guide](docs/BACKEND_ARCHITECTURE.md) before changing schemas, source CSVs or hydration. Country and city classification now comes from the owner's authoritative [country geography CSV](data/reference/country-geography.csv), derived reproducibly from the archived categorization workbook. Database reads share a versioned coherent snapshot, with compatible legacy readers and the existing authenticated write paths. Periodic database-to-repository export remains [future work](docs/REPO_CHECKPOINTS.md); it is not activated.
+Read [the concise physical storage contract](docs/CONCISE_STORAGE.md) and [the backend architecture and ownership guide](docs/BACKEND_ARCHITECTURE.md) before changing schemas, source CSVs or hydration. Country and city classification now comes from the owner's authoritative [country geography CSV](data/reference/country-geography.csv), derived reproducibly from the archived categorization workbook. Database reads share a versioned coherent snapshot, with compatible legacy readers and the existing authenticated write paths. Periodic database-to-repository export remains [future work](docs/REPO_CHECKPOINTS.md); it is not activated.
 
 Country history uses three linked CSVs and database tables so a counted visit
 can contain several actual stay periods. The country panel reads database

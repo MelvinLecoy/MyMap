@@ -1,77 +1,53 @@
+import {
+  derivedCityVisitsCsv,
+  readCollectionCsv,
+} from "../scripts/collection-inputs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { createHash } from "node:crypto";
 import { importCities, parseMapLink, readCSV } from "../scripts/importer.js";
 
-const raw = readCSV(readFileSync("data/MyMap_Converted_Full.csv", "utf8"));
-const normalized = readCSV(readFileSync("data/cities.csv", "utf8"));
+const normalized = readCSV(readCollectionCsv("data/cities.csv"));
 const coordinates = readCSV(readFileSync("data/coordinates.csv", "utf8"));
 const geography = new Map(
   readCSV(readFileSync("data/reference/country-geography.csv", "utf8")).map(
     ({ values: row }) => [row.countrycode, row],
   ),
 );
-const { data, issues } = importCities(readFileSync("data/cities.csv", "utf8"), {
+const { data, issues } = importCities(readCollectionCsv("data/cities.csv"), {
   coordinates: readFileSync("data/coordinates.csv", "utf8"),
-  cityVisits: readFileSync("data/city-visit-history.csv", "utf8"),
-  cityPeriods: readFileSync("data/city-visit-periods.csv", "utf8"),
+  cityVisits: derivedCityVisitsCsv(),
+  cityPeriods: readCollectionCsv("data/city-visit-periods.csv"),
 });
 
-test("the published collection preserves all rows and links from the updated CSV", () => {
+test("the canonical collection has stable identities and reproduces every current map link and classification", () => {
   const metadata = JSON.parse(
     readFileSync("data/collection-info.json", "utf8"),
   );
+  assert.equal(metadata.schemaVersion, 2);
+  assert.equal(metadata.records, 343);
+  assert.equal(normalized.length, 343);
   assert.equal(
-    createHash("sha256")
-      .update(readFileSync("data/MyMap_Converted_Full.csv"))
-      .digest("hex"),
-    metadata.sourceSha256,
+    new Set(normalized.map(({ values: row }) => row.cityid)).size,
+    343,
   );
-  assert.equal(raw.length, 321);
-  assert.equal(normalized.length, raw.length + 22);
-  const approved = new Set(
-    data.cities.filter((c) => c.visits?.length).map((c) => c.id),
-  );
-  const countryOverrides: Record<string, string> = {
-    Longyearbyen: "Svalbard",
-    Sevastopol: "Ukraine",
-  };
-  const savedStatuses = JSON.parse(
-    readFileSync("data/sources/map-status-updates-2026-11-15.json", "utf8"),
-  ).changes as { id: string; previous: string; status: string }[];
-  const statusOverrides = new Map(
-    savedStatuses.map((change) => [change.id, change]),
-  );
-  for (let i = 0; i < raw.length; i++) {
-    const original = raw[i].values;
-    const prepared = normalized[i].values;
-    assert.equal(prepared.cities, original.cities);
-    assert.equal(
-      prepared.country,
-      countryOverrides[original.cities] ?? original.country,
-    );
-    const classification = geography.get(prepared.countrycode);
-    assert.ok(classification || prepared.countrycode === "SJ", prepared.cityid);
-    for (const field of ["continent", "region", "subregion"]) {
-      // The final owner workbook replaces only these three geography fields.
-      // Svalbard is absent from that source and retains its original values.
-      assert.equal(
-        prepared[field],
-        classification ? classification[field] : original[field],
-        `${prepared.cityid}: ${field}`,
+  for (const { values: row } of normalized) {
+    const city = data.cities.find((city) => city.id === row.cityid)!;
+    assert.equal(city.name, row.cities);
+    assert.equal(city.countryCode, row.countrycode);
+    assert.deepEqual(city.map, parseMapLink(row.link));
+    const classification = geography.get(row.countrycode);
+    assert.ok(classification || row.countrycode === "SJ", row.cityid);
+    if (classification)
+      assert.deepEqual(
+        [city.continent, city.region, city.subregion],
+        [
+          classification.continent,
+          classification.region,
+          classification.subregion,
+        ],
+        row.cityid,
       );
-    }
-    const savedStatus = statusOverrides.get(prepared.cityid);
-    if (savedStatus) assert.equal(savedStatus.previous, original.status);
-    assert.equal(prepared.status, savedStatus?.status ?? original.status);
-    const sourceUrl = /^src="([^"]+)"$/.exec(original.link)?.[1];
-    assert.ok(sourceUrl, original.cities);
-    assert.deepEqual(parseMapLink(prepared.link), parseMapLink(sourceUrl));
-    assert.equal(
-      prepared.visited,
-      approved.has(prepared.cityid) ? "Yes" : "No",
-    );
   }
   assert.equal(data.demo, false);
   assert.equal(new Set(data.cities.map((city) => city.id)).size, 343);
