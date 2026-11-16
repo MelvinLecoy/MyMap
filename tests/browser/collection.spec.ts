@@ -82,42 +82,33 @@ for (const width of [320, 601, 1440]) {
   });
 }
 
-test("an outlined place and a pending-boundary place keep Patagonia globe selection; pending pins remain clickable", async ({
-  page,
-}) => {
+test("completed outlines select at phone and desktop widths and city pins retain their existing click behavior", async ({ page }) => {
   test.setTimeout(90_000);
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.route("https://tiles.openfreemap.org/**", (route) =>
-    route.abort(),
-  );
+  await page.route("https://tiles.openfreemap.org/**", (route) => route.abort());
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/?place=cappadocia");
   const globe = page.getByTestId("map-canvas");
   await expect(globe).toHaveAttribute("data-ready", "true", { timeout: 30_000 });
-  await expect(globe).toHaveAttribute("data-selected-place", "cappadocia");
-  await page.goto("/?place=komodo");
-  await expect(globe).toHaveAttribute("data-ready", "true", {
-    timeout: 30_000,
-  });
-  await expect(globe).toHaveAttribute("data-selected-place", "komodo");
-  await page.goto("/?place=fuji");
-  await expect(globe).toHaveAttribute("data-ready", "true", {
-    timeout: 30_000,
-  });
-  await expect(globe).toHaveAttribute("data-selected-place", "fuji");
-  await expect(page.locator(".coordinates")).toContainText("35.4° N");
+  for (const width of [320,1440]) {
+    await page.setViewportSize({ width, height: 1000 });
+    for (const id of ["torres-del-paine","fuji","izu","lake-atitlan","atacama"]) {
+      await page.evaluate(id => { history.replaceState({}, "", `/?place=${id}`); dispatchEvent(new PopStateEvent("popstate")); }, id);
+      await expect(globe).toHaveAttribute("data-selected-place", id);
+      await expect(page.getByRole("button", { name: "View My Map", exact: true })).toBeVisible();
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), id).toBe(true);
+    }
+  }
+  await page.evaluate(() => { history.replaceState({}, "", "/?city=piran-slovenia"); dispatchEvent(new PopStateEvent("popstate")); });
+  await expect(page.getByRole("heading", { name: "Piran", exact: true })).toBeVisible();
+  await page.evaluate(async () => { for (let i=0;i<3;i++) await new Promise(requestAnimationFrame); });
   await page.getByRole("button", { name: backName, exact: true }).click();
-  await expect(globe).toHaveAttribute("data-selected-place", "");
   const box = (await globe.boundingBox())!;
   await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
-  await expect(
-    page.getByRole("heading", { name: "Fuji", exact: true }),
-  ).toBeVisible();
-  await expect(globe).toHaveAttribute("data-selected-place", "fuji");
+  await expect(page.getByRole("heading", { name: "Piran", exact: true })).toBeVisible();
   expect(errors).toEqual([]);
 });
-
 
 test("city overview, compact visit rows, map progress filters and city details use the same history", async ({
   page,

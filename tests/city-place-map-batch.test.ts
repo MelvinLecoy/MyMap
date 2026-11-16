@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { PGlite } from "@electric-sql/pglite";
 import type { Map as MapInstance } from "maplibre-gl";
@@ -25,7 +26,7 @@ import {
 } from "../src/lib/places";
 import { focusPlace } from "../src/lib/place-selection";
 
-test("all approved city/place rows have maps and pins; pending outlines remain explicit and selectable", () => {
+test("all approved city/place rows have maps and pins; all eleven places have sourced outlines", () => {
   assert.equal(mapBatch.cities.length, 21);
   assert.equal(
     mapBatch.cityEntries.filter((entry) => !entry.existing).length,
@@ -33,21 +34,29 @@ test("all approved city/place rows have maps and pins; pending outlines remain e
   );
   assert.equal(mapBatch.places.length, 11);
   for (const city of mapBatch.cities) {
-    const existing = mapBatch.cityEntries.find((entry) => entry.id === city.id)!.existing;
-    assert.equal(city.visit_status, existing ? "visited" : "not-visited", city.id);
+    const existing = mapBatch.cityEntries.find(
+      (entry) => entry.id === city.id,
+    )!.existing;
+    assert.equal(
+      city.visit_status,
+      existing ? "visited" : "not-visited",
+      city.id,
+    );
   }
   for (const city of mapBatch.cities) {
     assert.ok(city.latitude !== null && city.longitude !== null, city.id);
     assert.ok(city.map_embed_url?.includes("&ehbc=2E312F"), city.id);
   }
   assert.equal(placePinFeatures(approvedPlaces).features.length, 11);
-  assert.equal(placeOutlineFeatures(approvedPlaces).features.length, 6);
+  assert.equal(placeOutlineFeatures(approvedPlaces).features.length, 11);
   assert.deepEqual(
     approvedPlaces.filter((place) => !place.outline).map((place) => place.name),
-    ["Torres del Paine", "Fuji", "Izu", "Lake Atitlan", "Atacama"],
+    [],
   );
   const fuji = approvedPlaces.find((place) => place.id === "fuji")!;
-  assert.equal(placeBounds(fuji), null);
+  assert.ok(placeBounds(fuji));
+  const withoutOutline = { ...fuji, outline: null };
+  assert.equal(placeBounds(withoutOutline), null);
   let camera: unknown;
   focusPlace(
     {
@@ -55,7 +64,7 @@ test("all approved city/place rows have maps and pins; pending outlines remain e
         camera = options;
       },
     } as MapInstance,
-    fuji,
+    withoutOutline,
     0,
   );
   assert.deepEqual(camera, {
@@ -150,13 +159,17 @@ test("reviewed batch rehearses and repeats atomically while preserving countries
     assert.equal(
       after.places.filter((place) => fromPlaceRow(place).outline === null)
         .length,
-      5,
+      0,
     );
     // Upgrade the original import's unknown flags using the owner's later verdict.
-    await db.exec(`update public.cities set visit_status='unknown' where id in (${[...newIds].map((id) => `'${id}'`).join(",")});`);
+    await db.exec(
+      `update public.cities set visit_status='unknown' where id in (${[...newIds].map((id) => `'${id}'`).join(",")});`,
+    );
     await db.exec(cityPlaceMapBatchSql());
     const corrected = await load();
-    for (const city of corrected.cities.cities.filter((city) => newIds.has(city.id)))
+    for (const city of corrected.cities.cities.filter((city) =>
+      newIds.has(city.id),
+    ))
       assert.equal(city.visit_status, "not-visited", city.id);
     assert.deepEqual(corrected.cities.visits, after.cities.visits);
     assert.deepEqual(corrected.cities.periods, after.cities.periods);
@@ -184,6 +197,106 @@ test("reviewed batch rehearses and repeats atomically while preserving countries
     );
   } finally {
     await db.close();
+  }
+});
+
+test("completed outlines retain the requested landmarks and exclude unrelated regions", () => {
+  const cases = {
+    fuji: {
+      inside: [
+        [138.7274, 35.3606],
+        [138.586, 35.464],
+        [138.609, 35.491],
+        [138.686, 35.498],
+        [138.753, 35.514],
+        [138.873, 35.413],
+        [138.73, 35.29],
+      ],
+      outside: [
+        [139.01, 35.21],
+        [138.67, 35.16],
+      ],
+    },
+    izu: {
+      inside: [
+        [138.95, 34.703],
+        [138.86, 35.12],
+        [138.84, 34.63],
+        [139.07, 35.1],
+        [138.942, 34.918],
+      ],
+      outside: [
+        [138.7274, 35.3606],
+        [139.39, 34.75],
+        [139.76, 35.68],
+      ],
+    },
+    "torres-del-paine": {
+      inside: [
+        [-73.05, -51.05],
+        [-72.991, -50.942],
+        [-73.113, -51.124],
+      ],
+      outside: [
+        [-72.50603, -51.72987],
+        [-72.8, -51.5],
+      ],
+    },
+    "lake-atitlan": {
+      inside: [
+        [-91.189, 14.69],
+        [-91.16, 14.73],
+        [-91.245, 14.703],
+      ],
+      outside: [
+        [-91.287, 14.696],
+        [-91.186, 14.582],
+        [-91.184, 14.773],
+      ],
+    },
+    atacama: {
+      inside: [
+        [-68.20113, -22.9111],
+        [-68.25, -23.5],
+        [-68.004, -23.189],
+        [-67.891, -23.588],
+      ],
+      outside: [
+        [-68.93, -22.45],
+        [-69.2, -27.3],
+      ],
+    },
+  };
+  const sources = JSON.parse(
+    readFileSync(
+      "data/sources/place-outline-completion-2026-11-16.json",
+      "utf8",
+    ),
+  ) as { placeId: string; geometrySha256: string }[];
+  for (const [id, points] of Object.entries(cases)) {
+    const place = approvedPlaces.find((place) => place.id === id)!;
+    assert.ok(place.outline);
+    assert.equal(
+      outlineContains(place.outline, place.coordinates!),
+      true,
+      id + " pin",
+    );
+    for (const point of points.inside)
+      assert.equal(
+        outlineContains(place.outline, point),
+        true,
+        id + " inside " + point.join(","),
+      );
+    for (const point of points.outside)
+      assert.equal(
+        outlineContains(place.outline, point),
+        false,
+        id + " outside " + point.join(","),
+      );
+    assert.equal(
+      createHash("sha256").update(JSON.stringify(place.outline)).digest("hex"),
+      sources.find((source) => source.placeId === id)!.geometrySha256,
+    );
   }
 });
 

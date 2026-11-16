@@ -192,29 +192,29 @@
       "id": "torres-del-paine",
       "name": "Torres del Paine",
       "existing": false,
-      "outlineStatus": "pending",
-      "locationDefinition": "Torres del Paine National Park; boundary pending a verifiable source."
+      "outlineStatus": "verified",
+      "locationDefinition": "Torres del Paine National Park only, as confirmed by the owner. Select the SNASPE protected-area polygon containing the Paine core. Includes the Torres and Lago Grey park sectors; excludes Puerto Natales and the much larger Torres del Paine municipality. Publisher stripped feature names; identify the unique park polygon by fixed source checksum, known landmarks and its extent."
     },
     {
       "id": "fuji",
       "name": "Fuji",
       "existing": false,
-      "outlineStatus": "pending",
-      "locationDefinition": "Mount Fuji and Fuji Five Lakes area, as confirmed by the owner. Representative pin at Mount Fuji summit; combined boundary pending source verification."
+      "outlineStatus": "sourced-regional-approximation",
+      "locationDefinition": "Mount Fuji and all Fuji Five Lakes. Use the connected Fuji mainland sector of the Ministry of Environment Fuji-Hakone-Izu park zoning geometry. Fill interior settlement/water holes to represent the complete geographic region, including Motosu, Shoji, Saiko, Kawaguchi and Yamanaka lakes. Excludes the disconnected Hakone, Izu Peninsula and Izu island sectors. This is a sourced regional display footprint, not a claim that filled interior areas have national-park protection."
     },
     {
       "id": "izu",
       "name": "Izu",
       "existing": false,
-      "outlineStatus": "pending",
-      "locationDefinition": "Izu Peninsula; boundary pending a verifiable source."
+      "outlineStatus": "sourced-regional-approximation",
+      "locationDefinition": "Izu Peninsula regional footprint: dissolve the 15 peninsula municipalities Numazu, Atami, Mishima, Ito, Shimoda, Izu, Izunokuni, Higashiizu, Kawazu, Minamiizu, Matsuzaki, Nishiizu, Kannami, Shimizu and Nagaizumi. Retains their coastal shape and larger coastal islands; omits display islets smaller than 0.01 km2. Excludes the distant Izu Islands, Mount Fuji and Hakone. Municipalities define an administrative approximation of the peninsula region, not a surveyed natural boundary. The published municipal GeoJSON flattened detached coastal parts into polygon ring lists; rebuild those rings as parts before dissolving and filling regional interior holes, so the mainlands of Numazu, Shimoda and Minamiizu are retained."
     },
     {
       "id": "lake-atitlan",
       "name": "Lake Atitlan",
       "existing": false,
-      "outlineStatus": "pending",
-      "locationDefinition": "Lake Atitlan waterbody and surrounding destinations; boundary pending a verifiable source."
+      "outlineStatus": "verified",
+      "locationDefinition": "Lago de Atitlan waterbody shoreline only, as confirmed by the owner. Published LAGO01 polygon (source area 123.508 km2), converted from Guatemala Transverse Mercator ESRI:103598 to WGS84 using the projection definition published with the source viewer. Excludes the surrounding watershed, towns and volcanoes. Shoreline reflects the source observation rather than a claim of a live water level."
     },
     {
       "id": "bali",
@@ -255,8 +255,8 @@
       "id": "atacama",
       "name": "Atacama",
       "existing": false,
-      "outlineStatus": "pending",
-      "locationDefinition": "Desert destinations around San Pedro de Atacama, as confirmed by the owner. Pin at San Pedro de Atacama; excludes the broad Atacama Desert and administrative Atacama Region."
+      "outlineStatus": "sourced-regional-approximation",
+      "locationDefinition": "San Pedro de Atacama desert destination region, as confirmed by the owner. Use the San Pedro de Atacama commune boundary as a sourced regional display approximation, covering the town, surrounding desert, salt-flat and high-altitude destinations. Excludes the broad Atacama Desert, Atacama administrative region, Calama and the coast. This is an administrative footprint for the San Pedro area, not a natural desert boundary."
     }
   ]
 }

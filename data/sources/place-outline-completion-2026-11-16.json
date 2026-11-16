@@ -1,0 +1,192 @@
+[
+  {
+    "placeId": "torres-del-paine",
+    "name": "Torres del Paine",
+    "inputs": [
+      {
+        "url": "https://raw.githubusercontent.com/matigaticadiaz-beep/SNASPE_CHILE2026/9ed65ee8d6d5dfd4d18f1c3d88aca708025ec7b8/snaspe_liviano.geojson",
+        "sha256": "0629382a88f1c91314f782aead96807bff60dd83635b25b9e9d0307cdfcf37c1",
+        "selector": {
+          "featureContaining": [
+            -73.05,
+            -51.05
+          ]
+        }
+      }
+    ],
+    "definition": "Torres del Paine National Park only, as confirmed by the owner. Select the SNASPE protected-area polygon containing the Paine core. Includes the Torres and Lago Grey park sectors; excludes Puerto Natales and the much larger Torres del Paine municipality. Publisher stripped feature names; identify the unique park polygon by fixed source checksum, known landmarks and its extent.",
+    "license": "SNASPE_CHILE2026 public protected-area mirror; no explicit data license is provided in that mirror.",
+    "outline": "public/places/torres-del-paine.geojson",
+    "geometrySha256": "e365c4d546e9400cf7d4b9fdc85c9cb3baf3429dd552f3239a2a0bf179b3f640"
+  },
+  {
+    "placeId": "fuji",
+    "name": "Fuji",
+    "inputs": [
+      {
+        "url": "https://raw.githubusercontent.com/kamataryo/nationalpark-map/449e68d3e29e19c6c6082a90d80feb8491d962b1/topojson/NPS_fujihakoneizu.topojson",
+        "sha256": "471bb3ae4862e4f7c5d86b6366d0245dd5ea7946dc0e6ea8360de132f3ada028",
+        "format": "topojson",
+        "dissolveBeforeSelect": true,
+        "selector": {
+          "componentContaining": [
+            138.7274,
+            35.3606
+          ]
+        }
+      }
+    ],
+    "fillHoles": true,
+    "simplifyInterval": 50,
+    "definition": "Mount Fuji and all Fuji Five Lakes. Use the connected Fuji mainland sector of the Ministry of Environment Fuji-Hakone-Izu park zoning geometry. Fill interior settlement/water holes to represent the complete geographic region, including Motosu, Shoji, Saiko, Kawaguchi and Yamanaka lakes. Excludes the disconnected Hakone, Izu Peninsula and Izu island sectors. This is a sourced regional display footprint, not a claim that filled interior areas have national-park protection.",
+    "license": "Japan Ministry of Environment data, via kamataryo/nationalpark-map; Government Standard Terms of Use v1.0. https://github.com/kamataryo/nationalpark-map/blob/449e68d3e29e19c6c6082a90d80feb8491d962b1/topojson/LICENSE.md",
+    "outline": "public/places/fuji.geojson",
+    "geometrySha256": "e760193de6163b9d13fb4cc62a1fb8e65fd581c68cc11524d63139e7ae0f62de"
+  },
+  {
+    "placeId": "izu",
+    "name": "Izu",
+    "inputs": [
+      {
+        "url": "https://raw.githubusercontent.com/niiyz/JapanCityGeoJson/f163894b3b6acfe31e772da6fce87b13427d3b56/geojson/22/22203.json",
+        "sha256": "2c1642ca4efa06879510b3287310b51cce4cde919f297c402ea2cd60c7c8bbed",
+        "ringsAsParts": true
+      },
+      {
+        "url": "https://raw.githubusercontent.com/niiyz/JapanCityGeoJson/f163894b3b6acfe31e772da6fce87b13427d3b56/geojson/22/22205.json",
+        "sha256": "671d297434ded6d1be13d746bbb487777a26804675852dfb4b1a151a07ccd96e",
+        "ringsAsParts": true
+      },
+      {
+        "url": "https://raw.githubusercontent.com/niiyz/JapanCityGeoJson/f163894b3b6acfe31e772da6fce87b13427d3b56/geojson/22/22206.json",
+        "sha256": "cf5e645a01c2b03426817ddc2c055e7d17584d13d2cd4f7a4ca95cbe9e988131",
+        "ringsAsParts": true
+      },
+      {
+        "url": "https://raw.githubusercontent.com/niiyz/JapanCityGeoJson/f163894b3b6acfe31e772da6fce87b13427d3b56/geojson/22/22208.json",
+        "sha256": "cebbf01d259fae32611a148f425c5829af3b5e1254664f3c25a9ecbdbcc2b9a6",
+        "ringsAsParts": true
+      },
+      {
+        "url": "https://raw.githubusercontent.com/niiyz/JapanCityGeoJson/f163894b3b6acfe31e772da6fce87b13427d3b56/geojson/22/22219.json",
+        "sha256": "fd1091ff2c8d9faf80a0bbd3ee2acb18d7d3d3f6e5d9c59da142fafb192c3811",
+        "ringsAsParts": true
+      },
+      {
+        "url": "https://raw.githubusercontent.com/niiyz/JapanCityGeoJson/f163894b3b6acfe31e772da6fce87b13427d3b56/geojson/22/22222.json",
+        "sha256": "c1cb269d0cc1421e6064df765d6d5dcbcf89158ad1b31c62d7e0fac39a836154",
+        "ringsAsParts": true
+      },
+      {
+        "url": "https://raw.githubusercontent.com/niiyz/JapanCityGeoJson/f163894b3b6acfe31e772da6fce87b13427d3b56/geojson/22/22225.json",
+        "sha256": "7f4446ed066f2f29438aa810a77eca38899bde31f73c61a8331813665f69f03b",
+        "ringsAsParts": true
+      },
+      {
+        "url": "https://raw.githubusercontent.com/niiyz/JapanCityGeoJson/f163894b3b6acfe31e772da6fce87b13427d3b56/geojson/22/22301.json",
+        "sha256": "0e992ebc83c1beec9e63e651561e5cd60ddcd7fc89acd2a8b88f76a8a7d60ec8",
+        "ringsAsParts": true
+      },
+      {
+        "url": "https://raw.githubusercontent.com/niiyz/JapanCityGeoJson/f163894b3b6acfe31e772da6fce87b13427d3b56/geojson/22/22302.json",
+        "sha256": "ec484b9b1da393ffcd07ce55c80038177b9320a5e4ea3d6b822665ca585bd5d8",
+        "ringsAsParts": true
+      },
+      {
+        "url": "https://raw.githubusercontent.com/niiyz/JapanCityGeoJson/f163894b3b6acfe31e772da6fce87b13427d3b56/geojson/22/22304.json",
+        "sha256": "107ec3ce9343be0e57c46b724ade1a0dcc9fa5bc5f321bb383f6d8bc3ba91a63",
+        "ringsAsParts": true
+      },
+      {
+        "url": "https://raw.githubusercontent.com/niiyz/JapanCityGeoJson/f163894b3b6acfe31e772da6fce87b13427d3b56/geojson/22/22305.json",
+        "sha256": "cbb23e55c91f28b39a17471c5d6a07cf89adf8c0b88b66bb9433acb5392c7ac3",
+        "ringsAsParts": true
+      },
+      {
+        "url": "https://raw.githubusercontent.com/niiyz/JapanCityGeoJson/f163894b3b6acfe31e772da6fce87b13427d3b56/geojson/22/22306.json",
+        "sha256": "219cac44ae7032180f0fd1f9a4403e7dd968e45bb19857f72a72e4b578709766",
+        "ringsAsParts": true
+      },
+      {
+        "url": "https://raw.githubusercontent.com/niiyz/JapanCityGeoJson/f163894b3b6acfe31e772da6fce87b13427d3b56/geojson/22/22325.json",
+        "sha256": "56b5a8606acda1b25ab5093882225fdc9c4ade9f54b959c11f4450e7193460b5",
+        "ringsAsParts": true
+      },
+      {
+        "url": "https://raw.githubusercontent.com/niiyz/JapanCityGeoJson/f163894b3b6acfe31e772da6fce87b13427d3b56/geojson/22/22341.json",
+        "sha256": "dfbc3b7c7cee46df7b125249083c30d714326f71ada7aab5c557c68048343c8d",
+        "ringsAsParts": true
+      },
+      {
+        "url": "https://raw.githubusercontent.com/niiyz/JapanCityGeoJson/f163894b3b6acfe31e772da6fce87b13427d3b56/geojson/22/22342.json",
+        "sha256": "c3db615f21e292f4ee8f76161ed2b5e14606edbc859f7c0b46f2caef3aa87761",
+        "ringsAsParts": true
+      }
+    ],
+    "dissolveOverlaps": true,
+    "minIslandArea": "0.01km2",
+    "simplifyInterval": 75,
+    "fillHoles": true,
+    "definition": "Izu Peninsula regional footprint: dissolve the 15 peninsula municipalities Numazu, Atami, Mishima, Ito, Shimoda, Izu, Izunokuni, Higashiizu, Kawazu, Minamiizu, Matsuzaki, Nishiizu, Kannami, Shimizu and Nagaizumi. Retains their coastal shape and larger coastal islands; omits display islets smaller than 0.01 km2. Excludes the distant Izu Islands, Mount Fuji and Hakone. Municipalities define an administrative approximation of the peninsula region, not a surveyed natural boundary. The published municipal GeoJSON flattened detached coastal parts into polygon ring lists; rebuild those rings as parts before dissolving and filling regional interior holes, so the mainlands of Numazu, Shimoda and Minamiizu are retained.",
+    "municipalityCodes": [
+      "22203",
+      "22205",
+      "22206",
+      "22208",
+      "22219",
+      "22222",
+      "22225",
+      "22301",
+      "22302",
+      "22304",
+      "22305",
+      "22306",
+      "22325",
+      "22341",
+      "22342"
+    ],
+    "license": "Japan MLIT National Land Numerical Information N03 (2020), via niiyz/JapanCityGeoJson. Government data terms and source attribution apply. https://github.com/niiyz/JapanCityGeoJson/blob/f163894b3b6acfe31e772da6fce87b13427d3b56/README.md",
+    "outline": "public/places/izu.geojson",
+    "geometrySha256": "0b52d1b5ecdb04c8c9ae03f0677a293d5f84ada6f7774679e950954877f37b11"
+  },
+  {
+    "placeId": "lake-atitlan",
+    "name": "Lake Atitlan",
+    "inputs": [
+      {
+        "url": "https://raw.githubusercontent.com/lisandr3/atitlan-3d/a741f4d1b0e5745c6640ae5871500fc10fda74a8/data/lago2.geojson",
+        "sha256": "8b3edecb98318ed430e538db9852e943df3b7190d62fa075846a1c07a881f275",
+        "selector": {
+          "property": "ID",
+          "value": "LAGO01"
+        },
+        "fromProjection": "+proj=tmerc +lat_0=0 +lon_0=-90.5 +k=0.9998 +x_0=500000 +y_0=0 +datum=WGS84 +units=m +no_defs"
+      }
+    ],
+    "simplifyInterval": 30,
+    "definition": "Lago de Atitlan waterbody shoreline only, as confirmed by the owner. Published LAGO01 polygon (source area 123.508 km2), converted from Guatemala Transverse Mercator ESRI:103598 to WGS84 using the projection definition published with the source viewer. Excludes the surrounding watershed, towns and volcanoes. Shoreline reflects the source observation rather than a claim of a live water level.",
+    "projectionDefinitionSource": "https://github.com/lisandr3/atitlan-3d/blob/a741f4d1b0e5745c6640ae5871500fc10fda74a8/index.html",
+    "license": "Published Lago de Atitlan waterbody geometry via lisandr3/atitlan-3d; the mirror does not declare an explicit data license.",
+    "outline": "public/places/lake-atitlan.geojson",
+    "geometrySha256": "5a10d6395051a698e9d294f19f309a9882762a09d3b69b540174af7f968b3cc2"
+  },
+  {
+    "placeId": "atacama",
+    "name": "Atacama",
+    "inputs": [
+      {
+        "url": "https://raw.githubusercontent.com/caracena/chile-geojson/92332f85d52030e9f549784b7d9c6fdb87b2dd2c/2.geojson",
+        "sha256": "282abb666d2546fb52552dcd572faabfa1499b1dd75b18fdd228dbf686f48da3",
+        "selector": {
+          "property": "Comuna",
+          "value": "San Pedro de Atacama"
+        }
+      }
+    ],
+    "simplifyInterval": 100,
+    "definition": "San Pedro de Atacama desert destination region, as confirmed by the owner. Use the San Pedro de Atacama commune boundary as a sourced regional display approximation, covering the town, surrounding desert, salt-flat and high-altitude destinations. Excludes the broad Atacama Desert, Atacama administrative region, Calama and the coast. This is an administrative footprint for the San Pedro area, not a natural desert boundary.",
+    "license": "Chile commune boundary mirror caracena/chile-geojson; no explicit data license is provided in that mirror.",
+    "outline": "public/places/atacama.geojson",
+    "geometrySha256": "a699cee15cfa6f50f78fcfd767a147fad2bc5aab211c699a07b8f16d4e9a3b78"
+  }
+]
