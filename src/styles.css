@@ -2740,13 +2740,15 @@ h2 {
 }
 .country-statistics {
   display: grid;
-  grid-template-columns: repeat(3, minmax(34px, max-content));
-  flex: 0 0 auto;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 176px;
   margin: 0;
-  padding: 5px 2px;
+  padding: 6px 0;
   border: 1px solid var(--line);
-  border-radius: 7px;
-  background: var(--surface);
+  border-radius: 8px;
+  background: var(--surface-alt);
 }
 .city-statistics {
   display: grid;
@@ -2790,6 +2792,7 @@ h2 {
   display: flex;
   flex-direction: column;
   align-items: center;
+  min-width: 0;
   padding-inline: 6px;
 }
 .country-statistics > div + div {
@@ -2798,16 +2801,16 @@ h2 {
 .country-statistics dt {
   color: var(--muted);
   font-size: 10px;
-  line-height: 14px;
+  line-height: 12px;
   white-space: nowrap;
 }
 .country-statistics dd {
   order: -1;
-  margin: 0 0 2px;
+  margin: 0;
   color: var(--text);
   font-size: 20px;
   font-weight: 750;
-  line-height: 24px;
+  line-height: 20px;
   font-variant-numeric: tabular-nums;
 }
 .country-statistics > div:first-child dd {
@@ -2832,7 +2835,7 @@ h2 {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 16px;
 }
 .country-detail .country-history-header h2 {
   flex-shrink: 0;
@@ -3357,7 +3360,7 @@ h2 {
     font-size: 16px;
   }
   .country-statistics > div {
-    padding-inline: 5px;
+    padding-inline: 3px;
   }
   .collection-navigation {
     padding-inline: 12px;
