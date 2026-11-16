@@ -18,6 +18,8 @@
 
 # Visit history markers
 
+- Before changing visit-history behavior or layout, read the complete implementation reference in [docs/VISIT_HISTORY.md](docs/VISIT_HISTORY.md). It documents the approved styles, solver, data/presentation boundary and verification; keep it current when approved rules change.
+
 - A country timeline caption containing multiple cities uses one capsule outline with fully rounded ends per city, 1px left/right padding, 0px top/bottom padding, and 1px between outlines horizontally and vertically. Do not display dot separators. Single-city labels stay plain. Include outline borders, padding and gaps in the caption solver's width measurements.
 - Disconnected-stay connectors use China's default rhythm: 5px dashes with 1px gaps. Repeat the same pattern for longer gaps; never stretch four strokes to fill the gap. Keep both ends attached to the measured marker edges.
 

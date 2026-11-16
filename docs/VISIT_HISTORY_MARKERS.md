@@ -2,6 +2,8 @@
 
 Owner-approved rules for both country and city profile timelines.
 
+For the complete data flow, layout solver, dimensions, connector implementation and maintenance workflow, start with [Visit history: implementation and maintenance reference](VISIT_HISTORY.md).
+
 ## Ordinary stays
 
 - A filled circle means the endpoint date is inclusive.
