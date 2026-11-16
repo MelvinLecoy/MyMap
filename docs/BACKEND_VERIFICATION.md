@@ -53,6 +53,10 @@ The existing collection suite retains its checks for search, filters, sorting, c
 
 ## Production release checks
 
+Application commit [`aedb2a0`](https://github.com/MelvinLecoy/MyMap/commit/aedb2a053ee6e2bb4c6f539464a69f9053d2a414) was deployed and its production alias verified. The public browser audit then passed all **1,176 checks** against the actual deployed assets and live Supabase database. All 198 country and 343 city profiles were checked at both 320 and 601px, with representative profiles at 390 and 1440px. Country/city statistics and country-header alignment were preserved.
+
+The audit received two valid `atlas_collection_snapshot` responses across its run and made **zero legacy-reader requests**. There were no blocked write/auth requests, transport errors or JavaScript errors. The tested application asset was `/assets/index-mKmcz9AV.js`. Fresh post-deployment city/country and place verifiers both passed with exact CSV agreement and the unchanged record/day totals listed above. No authenticated production writes were performed by this browser audit.
+
 After deploying the committed application, verify the exact production commit/alias and run a public, read-only browser audit against the deployed HTML/assets and real Supabase endpoint. Check authoritative country/city hierarchy, statistics, country-header alignment, narrow-screen overflow, JavaScript errors, use of the unified reader and absence of legacy read requests. Reject write/auth requests during that audit.
 
 Repeat `data:verify-live`, `places:verify-live` and `country:verify-geography-live` if any further data changes occur during release. The application and local browser suites do not claim to validate the contents of externally hosted Google maps; they validate canonical URLs and navigation, with external-provider fixtures where documented.
