@@ -119,6 +119,8 @@ where id=${q(entry.id)} and row(map_embed_url,map_viewer_url,map_status) is dist
   const newPlaces = mapBatch.places.filter(
     (place) => !ledger.places.find((entry) => entry.id === place.id)!.existing,
   );
+  const confirmedNotVisited = newCities.filter((city) => city.visit_status === "not-visited");
+  const confirmedIds = `array[${confirmedNotVisited.map((city) => q(city.id)).join(",")}]::text[]`;
   const expectedPlaces = mapBatch.places.map((place) => {
     const { country: _country, country_code: _code, ...row } = toCityRow(place);
     return {
@@ -164,6 +166,16 @@ ${migration.replace(/^\s*begin;\s*/i, "").replace(/commit;\s*$/i, "")}
 insert into atlas_private.schema_migrations(version,checksum) values(${q(version)},${q(checksum)}) on conflict(version) do nothing;
 ${guardedUpdates}
 ${seedSql(newCities)}
+-- The owner confirmed only the three existing cities in this sheet were visited.
+-- Reconcile the original unknown flags without resetting a recorded/planned visit.
+do $visit_flags$ begin
+ if exists(select 1 from public.cities c where id=any(${confirmedIds}) and
+  (visit_status not in ('unknown','not-visited') or last_visited is not null
+   or exists(select 1 from public.city_visits v where v.city_id=c.id)))
+ then raise exception 'Confirmed unvisited city has a conflicting saved visit; review before importing.';end if;
+end $visit_flags$;
+update public.cities set visit_status='not-visited'
+ where id=any(${confirmedIds}) and visit_status='unknown';
 ${placeSeedSql(newPlaces)}
 do $verify$ begin
  if public.atlas_country_snapshot() is distinct from (select countries from _map_batch_before)

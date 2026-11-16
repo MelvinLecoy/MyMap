@@ -33,6 +33,10 @@ test("all approved city/place rows have maps and pins; pending outlines remain e
   );
   assert.equal(mapBatch.places.length, 11);
   for (const city of mapBatch.cities) {
+    const existing = mapBatch.cityEntries.find((entry) => entry.id === city.id)!.existing;
+    assert.equal(city.visit_status, existing ? "visited" : "not-visited", city.id);
+  }
+  for (const city of mapBatch.cities) {
     assert.ok(city.latitude !== null && city.longitude !== null, city.id);
     assert.ok(city.map_embed_url?.includes("&ehbc=2E312F"), city.id);
   }
@@ -129,7 +133,7 @@ test("reviewed batch rehearses and repeats atomically while preserving countries
       "Live rehearsal rolls back schema, data and revisions",
     );
     await db.exec(cityPlaceMapBatchSql());
-    const after = await load();
+    let after = await load();
     assert.deepEqual(after.countries, before.countries);
     assert.deepEqual(after.cities.visits, before.cities.visits);
     assert.deepEqual(after.cities.periods, before.cities.periods);
@@ -148,6 +152,16 @@ test("reviewed batch rehearses and repeats atomically while preserving countries
         .length,
       5,
     );
+    // Upgrade the original import's unknown flags using the owner's later verdict.
+    await db.exec(`update public.cities set visit_status='unknown' where id in (${[...newIds].map((id) => `'${id}'`).join(",")});`);
+    await db.exec(cityPlaceMapBatchSql());
+    const corrected = await load();
+    for (const city of corrected.cities.cities.filter((city) => newIds.has(city.id)))
+      assert.equal(city.visit_status, "not-visited", city.id);
+    assert.deepEqual(corrected.cities.visits, after.cities.visits);
+    assert.deepEqual(corrected.cities.periods, after.cities.periods);
+    assert.deepEqual(corrected.places, after.places);
+    after = corrected;
     await db.exec(cityPlaceMapBatchSql());
     assert.deepEqual(
       await load(),
