@@ -70,16 +70,17 @@ test("owner-approved aliases apply only to history labels", () => {
   );
 });
 
-test("caption partitions balance whole city names without trailing separators", () => {
+test("caption partitions balance whole outlined cities with 1px gaps", () => {
   const names = ["Bath", "Cardiff", "Southampton", "London", "Portsmouth"];
   const option = cityCaptionOptions(names, measure, 76)[1];
   assert.deepEqual(option.lines, [
-    "Bath · Cardiff · Southampton",
-    "London · Portsmouth",
+    ["Bath", "Cardiff", "Southampton"],
+    ["London", "Portsmouth"],
   ]);
-  assert.deepEqual(
-    option.lines.flatMap((line) => line.split(" · ")),
-    names,
+  assert.deepEqual(option.lines.flat(), names);
+  assert.ok(
+    option.width >=
+      measure("Bath") + measure("Cardiff") + measure("Southampton") + 6 + 2,
   );
 });
 
@@ -87,9 +88,14 @@ test("spare width produces one caption line and a supporting longer segment", ()
   const cities = ["Geneva", "Interlaken", "Bern", "Lausanne", "Luzern"];
   const layout = layoutVisitCaptions([range(cities)], 300, measure);
   assert.equal(layout.tracks.length, 1);
-  assert.deepEqual(layout.blocks[0].lines, [cities.join(" · ")]);
+  assert.deepEqual(layout.blocks[0].lines, [cities]);
   assert.ok(layout.blocks[0].width > 76);
-  assert.ok(layout.blocks[0].width >= measure(cities.join(" · ")));
+  assert.ok(
+    layout.blocks[0].width >=
+      cities.reduce((sum, city) => sum + measure(city) + 2, 0) +
+        cities.length -
+        1,
+  );
 });
 
 test("UK stays fit one track with one and two caption lines", () => {
@@ -126,7 +132,7 @@ test("three Swiss stays stack captions to preserve one entire timeline track", (
   assert.equal(layout.tracks.length, 1);
   assert.deepEqual(
     layout.blocks.map((block) => block.lines.length),
-    [3, 3, 2],
+    [3, 2, 2],
   );
   assert.deepEqual(layout.tracks[0].indices, [0, 1, 2]);
   const narrow = layoutVisitCaptions(periods, 150, measure);

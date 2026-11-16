@@ -84,6 +84,8 @@ function StaySegment({
     ? stay.endLabel + stay.startLabel.replace(/^\d+/, "")
     : stay.endLabel;
   const showCities = !hideCities && stay.cities.length > 0;
+  const multipleCities = stay.cities.length > 1;
+  const cityLines = caption?.lines ?? [stay.cities.map(historyCityName)];
   const width =
     caption?.width ?? (pointStay ? (diamond ? 18 : 9) : monthDates ? 84 : 76);
   return (
@@ -104,16 +106,20 @@ function StaySegment({
       >
         {showCities && (
           <div
-            className="visit-period-cities"
-            title={stay.cities.map((city) => city.name).join(" · ")}
+            className={`visit-period-cities${multipleCities ? " visit-period-cities--multiple" : ""}`}
+            title={stay.cities.map((city) => city.name).join(", ")}
           >
-            {caption
-              ? caption.lines.map((line, index) => (
-                  <span className="visit-period-city-line" key={index}>
-                    {line}
-                  </span>
-                ))
-              : stay.cities.map(historyCityName).join(" · ")}
+            {cityLines.map((line, index) => (
+              <span className="visit-period-city-line" key={index}>
+                {multipleCities
+                  ? line.map((name) => (
+                      <span className="visit-city-chip" key={name}>
+                        {name}
+                      </span>
+                    ))
+                  : line[0]}
+              </span>
+            ))}
           </div>
         )}
         <span className="visually-hidden">
@@ -410,7 +416,13 @@ function StayRow({
         line.setAttribute("x2", String(end.left - origin.left));
         line.setAttribute("y1", String(startY - origin.top));
         line.setAttribute("y2", String(endY - origin.top));
-        line.setAttribute("stroke-dasharray", `${(length - 3) / 4} 1`);
+        const dash = 5,
+          gap = 1;
+        const count = Math.ceil((length + gap) / (dash + gap));
+        // Keep the default dash rhythm and join both marker edges inside a dash.
+        const offset = (count * (dash + gap) - gap - length) / 2;
+        line.setAttribute("stroke-dasharray", `${dash} ${gap}`);
+        line.setAttribute("stroke-dashoffset", String(offset));
         line.dataset.from = String(index - 1);
         line.dataset.to = String(index);
         lines.push(line);

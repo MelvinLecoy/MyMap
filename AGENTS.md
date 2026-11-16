@@ -18,4 +18,7 @@
 
 # Visit history markers
 
+- A country timeline caption containing multiple cities uses one capsule outline with fully rounded ends per city, no inner padding, and 1px between outlines horizontally and vertically. Do not display dot separators. Single-city labels stay plain. Include outline borders and gaps in the caption solver's width measurements.
+- Disconnected-stay connectors use China's default rhythm: 5px dashes with 1px gaps. Repeat the same pattern for longer gaps; never stretch four strokes to fill the gap. Keep both ends attached to the measured marker edges.
+
 - Preserve the owner-approved inclusive circles, half-day endpoints and one-day exceptional diamonds in [docs/VISIT_HISTORY_MARKERS.md](docs/VISIT_HISTORY_MARKERS.md). Singapore uses the diamond in both country and city timelines; Czechia uses it in the country timeline. Country endpoint overrides apply only to country timelines and exceptional durations. Keep other timeline styles and stored history unchanged when adjusting markers.

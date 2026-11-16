@@ -3102,6 +3102,21 @@ h2 {
 .visit-period-city-line {
   display: block;
 }
+.visit-period-cities--multiple {
+  display: grid;
+  gap: 1px;
+}
+.visit-period-cities--multiple .visit-period-city-line {
+  display: flex;
+  justify-content: center;
+  gap: 1px;
+}
+.visit-city-chip {
+  min-width: 0;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  padding: 0;
+}
 .visit-month-periods--adaptive .visit-period--single .visit-period-axis {
   justify-content: center;
 }

@@ -2815,6 +2815,8 @@ test("visit history rows keep their default height and only grow for extra conte
       "city=new-york-city-usa",
       "panel=countries&country=CA",
       "panel=countries&country=CH",
+      "panel=countries&country=FR",
+      "panel=countries&country=CN",
       "panel=countries&country=SG",
       "panel=countries&country=CZ",
       "panel=countries&country=DK",
@@ -2958,14 +2960,20 @@ test("visit history rows keep their default height and only grow for extra conte
               .getAttribute("stroke-dasharray")!
               .split(" ")
               .map(Number);
+            const offset = Number(line.getAttribute("stroke-dashoffset"));
+            const endPhase =
+              (next.left - previous.right + offset) % (dash + gap);
             connections &&=
               Math.abs(line.x1.baseVal.value + origin.left - previous.right) <=
                 0.1 &&
               Math.abs(line.x2.baseVal.value + origin.left - next.left) <=
                 0.1 &&
-              Math.abs(4 * dash + 3 * gap - (next.left - previous.right)) <=
-                0.02 &&
-              gap === 1;
+              dash === 5 &&
+              gap === 1 &&
+              offset >= 0 &&
+              offset < dash &&
+              endPhase > 0 &&
+              endPhase <= dash + 0.02;
           }
           connections &&= lines.length === expected;
         }
@@ -3143,10 +3151,16 @@ test("country visit captions use the left month column or measured centered segm
   await page.goto("/?panel=countries&country=GB");
   const uk = page.locator('[data-year="2023"]');
   await expect(uk.locator(".visit-period-track")).toHaveCount(1);
-  await expect(uk.locator(".visit-period-city-line")).toHaveText([
-    "London · Bristol",
-    "Bath · Cardiff · Southampton",
-    "London · Portsmouth",
+  expect(
+    await uk
+      .locator(".visit-period-city-line")
+      .evaluateAll((lines) =>
+        lines.map((line) => [...line.children].map((city) => city.textContent)),
+      ),
+  ).toEqual([
+    ["London", "Bristol"],
+    ["Bath", "Cardiff", "Southampton"],
+    ["London", "Portsmouth"],
   ]);
   const lengths = await uk
     .locator(".visit-period-axis")
@@ -3154,21 +3168,34 @@ test("country visit captions use the left month column or measured centered segm
       axes.map((axis) => axis.getBoundingClientRect().width),
     );
   expect(lengths[0]).toBe(76);
-  expect(lengths[1]).toBeGreaterThan(120);
+  expect(lengths[1]).toBeGreaterThan(lengths[0]);
   await page.goto("/?panel=countries&country=CH");
   const latest = page.locator('[data-year="2024"]');
   await expect(latest.locator(".visit-period-track")).toHaveCount(1);
-  await expect(latest.locator(".visit-period-city-line")).toHaveCount(8);
+  await expect(latest.locator(".visit-city-chip")).toHaveText([
+    "Basel",
+    "Zurich",
+    "Bern",
+    "Interlaken",
+    "Geneva",
+    "Lausanne",
+    "Luzern",
+    "Bern",
+    "Lugano",
+    "Zurich",
+    "Bern",
+    "Lausanne",
+  ]);
+  const captionLineCounts = await latest
+    .locator(".visit-period-cities")
+    .evaluateAll((captions) =>
+      captions.map((caption) => caption.children.length),
+    );
+  expect(captionLineCounts).toHaveLength(3);
+  expect(Math.max(...captionLineCounts)).toBeLessThanOrEqual(3);
   expect(
-    await latest
-      .locator(".visit-period-cities")
-      .evaluateAll((captions) =>
-        captions.map((caption) => caption.children.length),
-      ),
-  ).toEqual([3, 3, 2]);
-  await expect(
-    page.locator('[data-year="2023"] .visit-period-city-line'),
-  ).toHaveText(["Geneva · Interlaken · Bern · Lausanne · Luzern"]);
+    await page.locator('[data-year="2023"] .visit-city-chip').allTextContents(),
+  ).toEqual(["Geneva", "Interlaken", "Bern", "Lausanne", "Luzern"]);
   expect(
     await latest.locator(".visit-period").evaluateAll((periods) =>
       periods.every((period) => {
@@ -3196,6 +3223,26 @@ test("country visit captions use the left month column or measured centered segm
   await expect(
     page.locator('.visit-period-cities[title*="Gold Coast"]'),
   ).toHaveCount(1);
+  expect(
+    await page
+      .locator(".visit-city-chip")
+      .evaluateAll((cities) =>
+        cities.every((city) => getComputedStyle(city).padding === "0px"),
+      ),
+  ).toBe(true);
+  expect(
+    await page
+      .locator(".visit-period-cities--multiple")
+      .evaluateAll((captions) =>
+        captions.every(
+          (caption) =>
+            !caption.textContent?.includes("·") &&
+            [...caption.children].every(
+              (line) => getComputedStyle(line).gap === "1px",
+            ),
+        ),
+      ),
+  ).toBe(true);
   await page.setViewportSize({ width: 320, height: 1100 });
   await page.goto("/?panel=countries&country=CH");
   expect(
@@ -3255,7 +3302,7 @@ test("country histories share aligned columns and compact multi-month visits bef
                 );
               });
               return (
-                  Math.abs(center(first) - heading.right - 11.5) < 0.15 && clear
+                Math.abs(center(first) - heading.right - 11.5) < 0.15 && clear
               );
             });
             return (

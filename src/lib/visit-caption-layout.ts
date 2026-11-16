@@ -40,7 +40,7 @@ export interface CaptionPeriod {
 }
 export interface CaptionBlock {
   width: number;
-  lines: string[];
+  lines: string[][];
 }
 export interface CaptionTrack {
   indices: number[];
@@ -52,7 +52,7 @@ export interface VisitCaptionLayout {
 }
 type Measure = (text: string) => number;
 
-/** Contiguous city names stay together; choose balanced lines without dangling dots. */
+/** Keep cities whole and measure their zero-padding outlines and 1px gaps. */
 export function cityCaptionOptions(
   names: readonly string[],
   measure: Measure,
@@ -60,34 +60,42 @@ export function cityCaptionOptions(
 ): CaptionBlock[] {
   if (!names.length) return [{ width: minimumWidth, lines: [] }];
   const n = names.length;
+  const outlined = n > 1;
   const widths = Array.from({ length: n }, (_, start) =>
     Array.from({ length: n + 1 }, (_, end) =>
-      end > start ? measure(names.slice(start, end).join(" · ")) : 0,
+      end > start
+        ? names
+            .slice(start, end)
+            .reduce(
+              (sum, name) => sum + measure(name) + (outlined ? 2 : 0),
+              0,
+            ) + (outlined ? end - start - 1 : 0)
+        : 0,
     ),
   );
   const options: CaptionBlock[] = [];
   for (let count = 1; count <= n; count++) {
-    const memo = new Map<string, { width: number; lines: string[] }>();
+    const memo = new Map<string, { width: number; lines: string[][] }>();
     const partition = (
       start: number,
       remaining: number,
-    ): { width: number; lines: string[] } => {
+    ): { width: number; lines: string[][] } => {
       const key = `${start}/${remaining}`;
       const cached = memo.get(key);
       if (cached) return cached;
       if (remaining === 1)
         return {
           width: widths[start][n],
-          lines: [names.slice(start).join(" · ")],
+          lines: [names.slice(start)],
         };
-      let best = { width: Infinity, lines: [] as string[] };
+      let best = { width: Infinity, lines: [] as string[][] };
       for (let end = start + 1; end <= n - remaining + 1; end++) {
         const rest = partition(end, remaining - 1);
         const width = Math.max(widths[start][end], rest.width);
         if (width < best.width)
           best = {
             width,
-            lines: [names.slice(start, end).join(" · "), ...rest.lines],
+            lines: [names.slice(start, end), ...rest.lines],
           };
       }
       memo.set(key, best);
