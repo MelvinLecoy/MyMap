@@ -3,7 +3,11 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { PGlite } from "@electric-sql/pglite";
-import { approvedPlaces, placeSeedSql } from "../scripts/sync-places";
+import {
+  approvedPlaces,
+  placeReferenceData,
+  placeSeedSql,
+} from "../scripts/sync-places";
 import {
   fromPlaceRow,
   outlineContains,
@@ -128,6 +132,46 @@ test("place persistence is separate from city records and enforces public-read o
       /permission denied/,
     );
     await db.exec("reset role");
+    await db.exec(`update public.places set
+      map_embed_url='https://www.google.com/maps/d/embed?mid=owner-map',
+      map_viewer_url='https://www.google.com/maps/d/viewer?mid=owner-map',
+      visit_status='visited',last_visited='2026-08-01',
+      notes='Owner note, with punctuation',pin_color='#123456'
+      where id='patagonia'`);
+    const editableColumns =
+      "map_status,map_embed_url,map_viewer_url,visit_status,last_visited,notes,pin_color";
+    const savedState = (
+      await db.query(`select ${editableColumns} from public.places`)
+    ).rows;
+    const beforeRefresh = (await db.query("select * from public.places")).rows;
+    await db.exec(placeSeedSql());
+    assert.deepEqual(
+      (await db.query("select * from public.places")).rows,
+      beforeRefresh,
+      "Repeated reference imports must preserve owner state and revision timestamps",
+    );
+    const refreshed = {
+      ...patagonia,
+      name: "Patagonia reference update",
+      outlineSource: "Updated reference source",
+    };
+    await db.exec(placeSeedSql([refreshed]));
+    assert.deepEqual(
+      (await db.query(`select ${editableColumns} from public.places`)).rows,
+      savedState,
+      "Changing reference metadata must not reset any editable place field",
+    );
+    const snapshot = await db.query<{ places: PlaceRow[] }>(
+      "select public.atlas_places_snapshot() as places",
+    );
+    assert.deepEqual(
+      snapshot.rows[0].places.map(fromPlaceRow).map(placeReferenceData),
+      [placeReferenceData(refreshed)],
+    );
+    assert.deepEqual(
+      (await db.query("select * from public.cities")).rows,
+      before.rows,
+    );
     assert.equal(
       (await db.query("select * from public.place_countries")).rows.length,
       2,

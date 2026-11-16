@@ -4,6 +4,10 @@ import en from "i18n-iso-countries/langs/en.json";
 import { importCityHistory } from "./city-importer.js";
 import { cityVisitSummary } from "../src/lib/city-visits.js";
 import {
+  applyCityGeography,
+  type CountryGeography,
+} from "../src/lib/country-geography.js";
+import {
   MAP_STATUSES,
   type AtlasData,
   type City,
@@ -176,6 +180,7 @@ export function importCities(
     countryVisits?: string;
     cityVisits?: string;
     cityPeriods?: string;
+    countryGeography?: CountryGeography[];
   } = {},
 ): { data: AtlasData; issues: Issue[] } {
   const issues: Issue[] = [];
@@ -227,6 +232,10 @@ export function importCities(
         `Row ${line}: unrecognized or missing Status "${r.status}". Supported: ${MAP_STATUSES.join(", ")} (legacy Done is accepted).`,
       );
     const code = countryCode(r.country, r.countrycode);
+    if (options.countryGeography && !r.countrycode)
+      throw new Error(
+        `Row ${line}: an explicit CountryCode is required for final city geography.`,
+      );
     if (!code)
       issue(
         line,
@@ -363,7 +372,11 @@ export function importCities(
   return {
     data: {
       demo: options.demo ?? false,
-      cities: preparedCities,
+      cities: options.countryGeography
+        ? applyCityGeography(preparedCities, options.countryGeography, {
+            strict: true,
+          })
+        : preparedCities,
       countries: [...countryMap.values()].sort((a, b) =>
         a.code.localeCompare(b.code),
       ),

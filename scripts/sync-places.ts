@@ -4,6 +4,7 @@ import { importPlaces } from "./place-importer";
 import { importCountryHistory } from "./country-importer";
 import starter from "../data/countries.sample.json";
 import { fromPlaceRow, type PlaceRow } from "../src/lib/places";
+import type { Place } from "../src/lib/types";
 
 const countries = importCountryHistory(
   readFileSync("data/countries.csv", "utf8"),
@@ -18,8 +19,35 @@ export const approvedPlaces = importPlaces(
 );
 const quote = (value: unknown) =>
   value == null ? "null" : `'${String(value).replaceAll("'", "''")}'`;
-export function placeSeedSql() {
-  return approvedPlaces
+const referenceColumns = [
+  "name",
+  "continent",
+  "region",
+  "subregion",
+  "longitude",
+  "latitude",
+  "outline",
+  "outline_source",
+];
+
+/** Compare repository-owned place data separately from saved collection state. */
+export function placeReferenceData(place: Place) {
+  return {
+    id: place.id,
+    name: place.name,
+    continent: place.continent,
+    region: place.region,
+    subregion: place.subregion,
+    coordinates: place.coordinates,
+    countries: place.countries,
+    outline: place.outline,
+    outlineSource: place.outlineSource,
+  };
+}
+
+/** Seed initial state once; subsequent imports only refresh reference metadata. */
+export function placeSeedSql(places: Place[] = approvedPlaces) {
+  return places
     .map((place) => {
       const columns = [
         "id",
@@ -58,12 +86,11 @@ export function placeSeedSql() {
         place.outlineSource,
       ];
       return (
-        `insert into public.places (${columns.join(",")}) values (${values.map(quote).join(",")}) on conflict(id) do update set ${columns
-          .slice(1)
+        `insert into public.places (${columns.join(",")}) values (${values.map(quote).join(",")}) on conflict(id) do update set ${referenceColumns
           .map((column) => `${column}=excluded.${column}`)
           .join(
             ",",
-          )};\ndelete from public.place_countries where place_id=${quote(place.id)};\n` +
+          )} where row(${referenceColumns.map((column) => `places.${column}`).join(",")}) is distinct from row(${referenceColumns.map((column) => `excluded.${column}`).join(",")});\ndelete from public.place_countries where place_id=${quote(place.id)};\n` +
         place.countries
           .map(
             (country, i) =>
@@ -127,13 +154,26 @@ if (
         "select public.atlas_places_snapshot() as places;",
       );
       const actual = (result[0].places as PlaceRow[]).map(fromPlaceRow);
-      if (!isDeepStrictEqual(actual, approvedPlaces))
-        throw new Error("Place CSVs, boundaries and database do not match.");
+      if (
+        !isDeepStrictEqual(
+          actual.map(placeReferenceData),
+          approvedPlaces.map(placeReferenceData),
+        )
+      )
+        throw new Error(
+          "Place reference CSVs, boundaries and database do not match.",
+        );
+      if (verify && !isDeepStrictEqual(actual, approvedPlaces))
+        throw new Error(
+          "Saved place state differs from its repository snapshot. The database edits were preserved; review them before a future repository checkpoint.",
+        );
     }
     console.log(
       dryRun
         ? "Place migration and approved batch verified and rolled back."
-        : `${approvedPlaces.length} place: CSVs, outline and database match.`,
+        : apply
+          ? `${approvedPlaces.length} place: reference data refreshed; saved editable state preserved.`
+          : `${approvedPlaces.length} place: CSVs, outline and database match.`,
     );
   } else
     console.log(

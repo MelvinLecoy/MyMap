@@ -7,6 +7,11 @@ import { importCities, parseMapLink, readCSV } from "../scripts/importer.js";
 const raw = readCSV(readFileSync("data/MyMap_Converted_Full.csv", "utf8"));
 const normalized = readCSV(readFileSync("data/cities.csv", "utf8"));
 const coordinates = readCSV(readFileSync("data/coordinates.csv", "utf8"));
+const geography = new Map(
+  readCSV(readFileSync("data/reference/country-geography.csv", "utf8")).map(
+    ({ values: row }) => [row.countrycode, row],
+  ),
+);
 const { data, issues } = importCities(readFileSync("data/cities.csv", "utf8"), {
   coordinates: readFileSync("data/coordinates.csv", "utf8"),
   cityVisits: readFileSync("data/city-visit-history.csv", "utf8"),
@@ -46,8 +51,16 @@ test("the published collection preserves all rows and links from the updated CSV
       prepared.country,
       countryOverrides[original.cities] ?? original.country,
     );
+    const classification = geography.get(prepared.countrycode);
+    assert.ok(classification || prepared.countrycode === "SJ", prepared.cityid);
     for (const field of ["continent", "region", "subregion"]) {
-      assert.equal(prepared[field], original[field]);
+      // The final owner workbook replaces only these three geography fields.
+      // Svalbard is absent from that source and retains its original values.
+      assert.equal(
+        prepared[field],
+        classification ? classification[field] : original[field],
+        `${prepared.cityid}: ${field}`,
+      );
     }
     const savedStatus = statusOverrides.get(prepared.cityid);
     if (savedStatus) assert.equal(savedStatus.previous, original.status);

@@ -14,6 +14,8 @@ export interface CountrySeed {
   code: string;
   name: string;
   continent: string;
+  region?: string;
+  subregion?: string;
   visit: string;
   is195?: boolean;
   aliases?: string[];

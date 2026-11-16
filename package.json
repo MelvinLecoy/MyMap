@@ -8,6 +8,12 @@
   },
   "scripts": {
     "country:preview-fonts": "tsx scripts/preview-country-fonts.ts",
+    "country:prepare-geography": "python3 scripts/extract-country-geography.py",
+    "country:verify-geography": "python3 scripts/extract-country-geography.py --check",
+    "country:verify-geography-live": "NODE_USE_ENV_PROXY=1 tsx scripts/sync-country-geography.ts",
+    "country:apply-geography": "NODE_USE_ENV_PROXY=1 tsx scripts/sync-country-geography.ts --apply",
+    "architecture:verify": "NODE_USE_ENV_PROXY=1 tsx scripts/prepare-data-architecture.ts",
+    "architecture:apply": "NODE_USE_ENV_PROXY=1 tsx scripts/prepare-data-architecture.ts --apply",
     "country:prepare-reference": "python3 scripts/extract-country-metric-workbook.py && tsx scripts/prepare-country-gdp-per-capita.ts",
     "country:prepare-gdp-per-capita": "tsx scripts/prepare-country-gdp-per-capita.ts",
     "country:verify-gdp-per-capita": "tsx scripts/prepare-country-gdp-per-capita.ts --check",

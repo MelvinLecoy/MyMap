@@ -41,6 +41,11 @@ import CollectionHeader, {
   type CollectionView,
 } from "./components/CollectionHeader";
 import countrySeed from "./generated/countries.json";
+import countryGeography from "./generated/country-geography.json";
+import {
+  applyCityGeography,
+  applyCountryGeography,
+} from "./lib/country-geography";
 import {
   buildCountryRecords,
   countryDisplayName,
@@ -135,13 +140,16 @@ export default function App() {
   const [saveErrorCity, setSaveErrorCity] = useState<string | null>(null);
   const cities = useMemo(
     () =>
-      cloud.enabled
-        ? cloud.cities
-        : data.cities.map((city) =>
-            Object.hasOwn(statusOverrides, city.id)
-              ? { ...city, status: statusOverrides[city.id] }
-              : city,
-          ),
+      applyCityGeography(
+        cloud.enabled
+          ? cloud.cities
+          : data.cities.map((city) =>
+              Object.hasOwn(statusOverrides, city.id)
+                ? { ...city, status: statusOverrides[city.id] }
+                : city,
+            ),
+        countryGeography.countries,
+      ),
     [statusOverrides, cloud.enabled, cloud.cities],
   );
   const searchRef = useRef<HTMLInputElement>(null);
@@ -252,7 +260,14 @@ export default function App() {
   );
   const countryView = route.panel === "countries";
   const countryRecords = useMemo(
-    () => buildCountryRecords(countryCloud.countries, cities),
+    () =>
+      buildCountryRecords(
+        applyCountryGeography(
+          countryCloud.countries,
+          countryGeography.countries,
+        ),
+        cities,
+      ),
     [cities, countryCloud.countries],
   );
   const countriesInView = countryRecords;

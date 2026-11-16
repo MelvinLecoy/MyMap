@@ -1,5 +1,7 @@
 # Data updates
 
+- Before changing schemas, CSV ownership or database hydration, read [docs/BACKEND_ARCHITECTURE.md](docs/BACKEND_ARCHITECTURE.md). Country and city Continent/Region/Subregion must follow `data/reference/country-geography.csv`, derived from the owner's final categorization workbook; preserve its blank values and the existing Svalbard fallback. Verify with `country:verify-geography`. Keep metric comparison groups independent. Periodic DB-to-repo writeback and the documented future features remain inactive until requested.
+
 - For each owner-approved data batch, update the tracked source files and GitHub CSVs, Supabase, and the deployed site together.
 - City stays start a new counted visit when the next arrival is at least six calendar days after the previous departure. Keep actual periods and explicit half-day durations; gaps add no days.
 - Country history remains independent and incomplete unless the owner requests a country update. Its grouping threshold remains 14 days.

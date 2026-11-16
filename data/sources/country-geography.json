@@ -1,0 +1,19 @@
+{
+  "authority": "Owner-supplied final country categorization; preserve labels and blank cells verbatim.",
+  "workbook": {
+    "path": "data/sources/country-geography/countries_categorization.xlsx",
+    "sha256": "962a968a34e7030d0a8cd795841b6d09196d265a7083b092df210dd2e9c12f2a",
+    "sheet": "Countries",
+    "rows": 197
+  },
+  "csv": {
+    "path": "data/reference/country-geography.csv",
+    "sha256": "52e5f6b08fb0c935972e50e60d5a5ea5a7a3c883f17ddcf4ee95d79a49a89a16"
+  },
+  "blankRegions": 12,
+  "blankSubregions": 103,
+  "unlistedCountries": {
+    "SJ": "Svalbard is absent from this workbook. Preserve its existing continent and leave its region/subregion unspecified."
+  },
+  "scope": "Authoritative country and city travel classification. Country identity, metric reference figures and metric median regions remain separate."
+}

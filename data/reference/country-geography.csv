@@ -1,0 +1,198 @@
+CountryCode,Country,Continent,Region,Subregion
+KE,Kenya,Africa,East Africa,Lakeside 5
+RW,Rwanda,Africa,East Africa,Lakeside 5
+UG,Uganda,Africa,East Africa,Lakeside 5
+DZ,Algeria,Africa,North Africa,
+EG,Egypt,Africa,North Africa,
+MR,Mauritania,Africa,Sahel 6,
+MA,Morocco,Africa,North Africa,
+TN,Tunisia,Africa,North Africa,
+AO,Angola,Africa,Southern Africa,Zambezi 5
+BW,Botswana,Africa,Southern Africa,SACU 5
+ZA,South Africa,Africa,Southern Africa,SACU 5
+ZM,Zambia,Africa,Southern Africa,Zambezi 5
+ZW,Zimbabwe,Africa,Southern Africa,Zambezi 5
+BJ,Benin,Africa,West Africa,Gulf 5
+BF,Burkina Faso,Africa,Sahel 6,
+BI,Burundi,Africa,East Africa,Lakeside 5
+CV,Cabo Verde,Africa,Insular 6,
+CM,Cameroon,Africa,Central Africa,
+CF,Central African Republic,Africa,Central Africa,
+TD,Chad,Africa,Sahel 6,
+KM,Comoros,Africa,Insular 6,
+CI,Côte d’Ivoire,Africa,West Africa,Gulf 5
+DJ,Djibouti,Africa,East Africa,Horn of Africa
+CD,DR Congo,Africa,Central Africa,
+GQ,Equatorial Guinea,Africa,Central Africa,
+ER,Eritrea,Africa,East Africa,Horn of Africa
+SZ,Eswatini,Africa,Southern Africa,SACU 5
+ET,Ethiopia,Africa,East Africa,Horn of Africa
+GA,Gabon,Africa,Central Africa,
+GM,Gambia,Africa,West Africa,Upper Coast 6
+GH,Ghana,Africa,West Africa,Gulf 5
+GN,Guinea,Africa,West Africa,Upper Coast 6
+GW,Guinea-Bissau,Africa,West Africa,Upper Coast 6
+LS,Lesotho,Africa,Southern Africa,SACU 5
+LR,Liberia,Africa,West Africa,Upper Coast 6
+LY,Libya,Africa,North Africa,
+MG,Madagascar,Africa,Insular 6,
+MW,Malawi,Africa,Southern Africa,Zambezi 5
+ML,Mali,Africa,Sahel 6,
+MU,Mauritius,Africa,Insular 6,
+MZ,Mozambique,Africa,Southern Africa,Zambezi 5
+NA,Namibia,Africa,Southern Africa,SACU 5
+NE,Niger,Africa,Sahel 6,
+NG,Nigeria,Africa,West Africa,Gulf 5
+CG,Republic of Congo,Africa,Central Africa,
+ST,Sao Tome & Principe,Africa,Insular 6,
+SN,Senegal,Africa,West Africa,Upper Coast 6
+SC,Seychelles,Africa,Insular 6,
+SL,Sierra Leone,Africa,West Africa,Upper Coast 6
+SO,Somalia,Africa,East Africa,Horn of Africa
+SS,South Sudan,Africa,Central Africa,
+SD,Sudan,Africa,Sahel 6,
+TZ,Tanzania,Africa,East Africa,Lakeside 5
+TG,Togo,Africa,West Africa,Gulf 5
+KZ,Kazakhstan,Asia,Central Asia,
+KG,Kyrgyzstan,Asia,Central Asia,
+MN,Mongolia,Asia,Central Asia,
+TJ,Tajikistan,Asia,Central Asia,
+TM,Turkmenistan,Asia,Central Asia,
+UZ,Uzbekistan,Asia,Central Asia,
+CN,China,Asia,East Asia,
+JP,Japan,Asia,East Asia,
+KP,North Korea,Asia,East Asia,
+KR,South Korea,Asia,East Asia,
+TW,Taiwan,Asia,East Asia,
+BH,Bahrain,Asia,Middle East,GCC
+KW,Kuwait,Asia,Middle East,GCC
+OM,Oman,Asia,Middle East,GCC
+QA,Qatar,Asia,Middle East,GCC
+SA,Saudi Arabia,Asia,Middle East,GCC
+AE,United Arab Emirates,Asia,Middle East,GCC
+IL,Israel,Asia,Middle East,Levant
+JO,Jordan,Asia,Middle East,Levant
+LB,Lebanon,Asia,Middle East,Levant
+PS,Palestine,Asia,Middle East,Levant
+SY,Syria,Asia,Middle East,Levant
+AF,Afghanistan,Asia,Middle East,Jihadist 4
+IR,Iran,Asia,Middle East,Jihadist 4
+IQ,Iraq,Asia,Middle East,Jihadist 4
+YE,Yemen,Asia,Middle East,Jihadist 4
+BD,Bangladesh,Asia,South Asia,
+BT,Bhutan,Asia,South Asia,
+IN,India,Asia,South Asia,
+MV,Maldives,Asia,South Asia,
+NP,Nepal,Asia,South Asia,
+PK,Pakistan,Asia,South Asia,
+LK,Sri Lanka,Asia,South Asia,
+AM,Armenia,Asia,South Caucasus,
+AZ,Azerbaijan,Asia,South Caucasus,
+GE,Georgia,Asia,South Caucasus,
+KH,Cambodia,Asia,Southeast Asia,Mekong 5
+LA,Laos,Asia,Southeast Asia,Mekong 5
+MM,Myanmar,Asia,Southeast Asia,Mekong 5
+TH,Thailand,Asia,Southeast Asia,Mekong 5
+VN,Vietnam,Asia,Southeast Asia,Mekong 5
+BN,Brunei,Asia,Southeast Asia,Maritime 6
+ID,Indonesia,Asia,Southeast Asia,Maritime 6
+MY,Malaysia,Asia,Southeast Asia,Maritime 6
+PH,Philippines,Asia,Southeast Asia,Maritime 6
+SG,Singapore,Asia,Southeast Asia,Maritime 6
+TL,Timor-Leste,Asia,Southeast Asia,Maritime 6
+DK,Denmark,Europe,Nordic,
+FI,Finland,Europe,Nordic,
+IS,Iceland,Europe,Nordic,
+NO,Norway,Europe,Nordic,
+SE,Sweden,Europe,Nordic,
+IE,Ireland,Europe,British Isles,
+GB,United Kingdom,Europe,British Isles,
+BE,Belgium,Europe,Western Europe,Benelux
+LU,Luxembourg,Europe,Western Europe,Benelux
+NL,Netherlands,Europe,Western Europe,Benelux
+FR,France,Europe,Western Europe,Powerhouse
+DE,Germany,Europe,Western Europe,Powerhouse
+LI,Liechtenstein,Europe,Western Europe,Powerhouse
+MC,Monaco,Europe,Western Europe,Powerhouse
+CH,Switzerland,Europe,Western Europe,Powerhouse
+AD,Andorra,Europe,Southern Europe,
+IT,Italy,Europe,Southern Europe,
+PT,Portugal,Europe,Southern Europe,
+SM,San Marino,Europe,Southern Europe,
+ES,Spain,Europe,Southern Europe,
+VA,Vatican City,Europe,Southern Europe,
+CY,Cyprus,Europe,Mediterranean,
+GR,Greece,Europe,Mediterranean,
+MT,Malta,Europe,Mediterranean,
+TR,Turkey,Europe,Mediterranean,
+AT,Austria,Europe,Central Europe,
+CZ,Czechia,Europe,Central Europe,
+HU,Hungary,Europe,Central Europe,
+PL,Poland,Europe,Central Europe,
+SK,Slovakia,Europe,Central Europe,
+EE,Estonia,Europe,Eastern Europe,Baltics
+LV,Latvia,Europe,Eastern Europe,Baltics
+LT,Lithuania,Europe,Eastern Europe,Baltics
+BY,Belarus,Europe,Eastern Europe,Ruslands
+RU,Russia,Europe,Eastern Europe,Ruslands
+UA,Ukraine,Europe,Eastern Europe,Ruslands
+BG,Bulgaria,Europe,Eastern Europe,Dacia 3
+MD,Moldova,Europe,Eastern Europe,Dacia 3
+RO,Romania,Europe,Eastern Europe,Dacia 3
+AL,Albania,Europe,Eastern Europe,Balkans
+BA,Bosnia & Herzegovina,Europe,Eastern Europe,Balkans
+HR,Croatia,Europe,Eastern Europe,Balkans
+XK,Kosovo,Europe,Eastern Europe,Balkans
+ME,Montenegro,Europe,Eastern Europe,Balkans
+MK,North Macedonia,Europe,Eastern Europe,Balkans
+RS,Serbia,Europe,Eastern Europe,Balkans
+SI,Slovenia,Europe,Eastern Europe,Balkans
+BS,Bahamas,North America,Caribbean,Greater Antilles
+CU,Cuba,North America,Caribbean,Greater Antilles
+DO,Dominican Republic,North America,Caribbean,Greater Antilles
+JM,Jamaica,North America,Caribbean,Greater Antilles
+AG,Antigua & Barbuda,North America,Caribbean,Lesser Antilles
+BB,Barbados,North America,Caribbean,Lesser Antilles
+DM,Dominica,North America,Caribbean,Lesser Antilles
+GD,Grenada,North America,Caribbean,Lesser Antilles
+KN,Saint Kitts & Nevis,North America,Caribbean,Lesser Antilles
+LC,Saint Lucia,North America,Caribbean,Lesser Antilles
+VC,Saint Vincent & the Grenadines,North America,Caribbean,Lesser Antilles
+TT,Trinidad & Tobago,North America,Caribbean,Lesser Antilles
+BZ,Belize,North America,Central America,
+CR,Costa Rica,North America,Central America,
+SV,El Salvador,North America,Central America,
+GT,Guatemala,North America,Central America,
+HN,Honduras,North America,Central America,
+NI,Nicaragua,North America,Central America,
+PA,Panama,North America,Central America,
+CA,Canada,North America,NA Big 3,
+MX,Mexico,North America,NA Big 3,
+US,United States,North America,NA Big 3,
+HT,Haiti,North America,Caribbean,Greater Antilles
+AR,Argentina,South America,,
+BO,Bolivia,South America,,
+BR,Brazil,South America,,
+CL,Chile,South America,,
+CO,Colombia,South America,,
+EC,Ecuador,South America,,
+GY,Guyana,South America,,
+PY,Paraguay,South America,,
+PE,Peru,South America,,
+SR,Suriname,South America,,
+UY,Uruguay,South America,,
+VE,Venezuela,South America,,
+AU,Australia,Oceania,OC Big 4,
+FJ,Fiji,Oceania,OC Big 4,
+KI,Kiribati,Oceania,Pacific Islands,
+MH,Marshall Islands,Oceania,Pacific Islands,
+FM,Micronesia,Oceania,Pacific Islands,
+NR,Nauru,Oceania,Pacific Islands,
+NZ,New Zealand,Oceania,OC Big 4,
+PW,Palau,Oceania,Pacific Islands,
+PG,Papua New Guinea,Oceania,OC Big 4,
+WS,Samoa,Oceania,Pacific Islands,
+SB,Solomon Islands,Oceania,Pacific Islands,
+TO,Tonga,Oceania,Pacific Islands,
+TV,Tuvalu,Oceania,Pacific Islands,
+VU,Vanuatu,Oceania,Pacific Islands,

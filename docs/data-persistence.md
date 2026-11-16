@@ -1,5 +1,7 @@
 # CSV, database and restart consistency
 
+For current field ownership and the versioned read contract, start with [BACKEND_ARCHITECTURE.md](BACKEND_ARCHITECTURE.md). The owner-supplied `data/reference/country-geography.csv` replaces old country/city classifications; raw source ledgers remain evidence. Saved database edits remain authoritative between reviewed repository snapshots. Periodic DB-to-repo export is [designed for later](REPO_CHECKPOINTS.md), not implemented or scheduled.
+
 The authoritative approved data is tracked in Git: `data/cities.csv`,
 `city-visit-history.csv`, `city-visit-periods.csv`, `countries.csv`, `country-visit-history.csv` and
 `country-visit-periods.csv`. The city source ledgers reproduce 174 visited cities,

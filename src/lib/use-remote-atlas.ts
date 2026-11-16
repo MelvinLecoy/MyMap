@@ -12,6 +12,10 @@ import {
   readStatusOverrides,
 } from "./status-storage";
 import type { AtlasData, MapStatus } from "./types";
+import {
+  invalidateCollectionReads,
+  loadCollectionPart,
+} from "./collection-snapshot";
 
 export interface StatusImport {
   id: string;
@@ -50,8 +54,11 @@ export function useRemoteAtlas(
   const fetching = useRef(false);
   const fetchAgain = useRef(false);
   const writeVersion = useRef(0);
+  const snapshotFingerprint = useRef("");
 
   const replaceRows = useCallback((next: CityRow[]) => {
+    // A confirmed local write invalidates the last complete read fingerprint.
+    snapshotFingerprint.current = "";
     rowsRef.current = next;
     setRows(next);
   }, []);
@@ -65,13 +72,17 @@ export function useRemoteAtlas(
     fetching.current = true;
     const version = writeVersion.current;
     try {
-      const result = await client.rpc("atlas_city_snapshot");
-      if (result.error) throw result.error;
-      const snapshot = readCitySnapshot(result.data);
+      const snapshot = readCitySnapshot(
+        await loadCollectionPart(client, "cities"),
+      );
       if (alive.current && version === writeVersion.current) {
-        replaceRows(snapshot.cities);
-        setVisits(snapshot.visits);
-        setPeriods(snapshot.periods);
+        const fingerprint = JSON.stringify(snapshot);
+        if (fingerprint !== snapshotFingerprint.current) {
+          replaceRows(snapshot.cities);
+          setVisits(snapshot.visits);
+          setPeriods(snapshot.periods);
+          snapshotFingerprint.current = fingerprint;
+        }
         setReady(true);
         setLoadError("");
       }
@@ -193,6 +204,7 @@ export function useRemoteAtlas(
           .single();
         if (error || !data) throw error ?? new Error("No saved row");
         fromCityRow(data as CityRow);
+        invalidateCollectionReads(client);
         if (alive.current) {
           replaceRows(
             rowsRef.current.map((row) =>
@@ -201,6 +213,7 @@ export function useRemoteAtlas(
           );
         }
       } catch {
+        invalidateCollectionReads(client);
         if (alive.current) {
           setSaveError({
             id,
@@ -283,6 +296,7 @@ export function useRemoteAtlas(
             return [row.id, row];
           }),
         );
+        invalidateCollectionReads(client);
         if (alive.current) {
           replaceRows(rowsRef.current.map((row) => updated.get(row.id) ?? row));
         }
@@ -301,6 +315,7 @@ export function useRemoteAtlas(
           /* Confirmed database saves remain valid if browser storage is unavailable. */
         }
       } catch {
+        invalidateCollectionReads(client);
         await refresh();
         throw new Error(
           "Nothing was imported. A city may have changed; close this window, refresh, and review again.",

@@ -1,5 +1,7 @@
 # Supabase-backed atlas
 
+The current backend contract is documented in [BACKEND_ARCHITECTURE.md](BACKEND_ARCHITECTURE.md). `atlas_collection_snapshot()` combines all public city, country and place data at one database revision; the frontend shares in-flight reads and preserves the legacy reader fallback for deployments without this function. Catalog/state views inherit RLS and are read-only. Existing editor writes, authentication and old RPCs remain supported. Country/city geography is owned by the repository's final categorization workbook. Periodic repository writeback and future product features remain inactive.
+
 Cities, counted visits and actual stays load through `atlas_city_snapshot()`.
 `city_visits` stores six-day visit groups and `city_visit_periods` preserves their
 individual stays and exact half-day durations. See

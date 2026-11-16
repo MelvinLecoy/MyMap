@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { CountrySeed } from "./countries";
 import { fromCountrySnapshot } from "./country-cloud-data";
+import { loadCollectionPart } from "./collection-snapshot";
 
 export function useRemoteCountries(
   initial: CountrySeed[],
@@ -10,13 +11,13 @@ export function useRemoteCountries(
   const [countries, setCountries] = useState(initial);
   const [error, setError] = useState("");
   const alive = useRef(true),
-    fetching = useRef(false);
+    fetching = useRef(false),
+    fingerprint = useRef("");
   const refresh = useCallback(async () => {
     if (!client || fetching.current) return;
     fetching.current = true;
     try {
-      const { data, error } = await client.rpc("atlas_country_snapshot");
-      if (error) throw error;
+      const data = await loadCollectionPart(client, "countries");
       const next = fromCountrySnapshot(data);
       if (
         next.length !== initial.length ||
@@ -24,7 +25,11 @@ export function useRemoteCountries(
       )
         throw new Error("Incomplete country snapshot.");
       if (alive.current) {
-        setCountries(next);
+        const key = JSON.stringify(next);
+        if (key !== fingerprint.current) {
+          fingerprint.current = key;
+          setCountries(next);
+        }
         setError("");
       }
     } catch {

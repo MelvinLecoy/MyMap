@@ -68,8 +68,10 @@ export default function CountryDetail({
         >
           <div className="country-detail-heading" ref={headingRef}>
             <div className="country-detail-identity">
-              <p className="detail-geography">
-                {country.continent || "Country"}
+              <p className="detail-geography" aria-label="Geography">
+                {[country.continent, country.region, country.subregion]
+                  .filter(Boolean)
+                  .join(" / ") || "Country"}
               </p>
               <h1>
                 {nameParts.map((part, index) =>

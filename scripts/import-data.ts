@@ -1,10 +1,11 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { importCities } from "./importer.js";
+import { importCities, readCSV } from "./importer.js";
 import { importCountryHistory } from "./country-importer.js";
 import countryStarter from "../data/countries.sample.json";
 import { importPlaces } from "./place-importer";
 import { importCountryReference } from "./country-reference-importer";
 import countryReferenceSources from "../data/sources/country-reference.json";
+import { importCountryGeography } from "./country-geography-importer";
 const demo =
   process.argv.includes("--demo") ||
   (process.argv.includes("--demo-fallback") && !existsSync("data/cities.csv"));
@@ -17,6 +18,18 @@ if (!demo && !existsSync("data/cities.csv")) {
 try {
   const optional = (path: string) =>
     existsSync(path) ? readFileSync(path, "utf8") : undefined;
+  const geography = importCountryGeography(
+    readFileSync("data/reference/country-geography.csv", "utf8"),
+    readCSV(readFileSync("data/countries.csv", "utf8"), [
+      "CountryCode",
+      "Country",
+      "Is195",
+    ]).map(({ values: row }) => ({
+      code: row.countrycode,
+      name: row.country,
+      is195: row.is195 === "1",
+    })),
+  );
   const { data, issues } = importCities(
     readFileSync(demo ? "fixtures/cities.demo.csv" : "data/cities.csv", "utf8"),
     {
@@ -31,6 +44,7 @@ try {
       cityPeriods: demo
         ? undefined
         : readFileSync("data/city-visit-periods.csv", "utf8"),
+      countryGeography: geography,
     },
   );
   mkdirSync("src/generated", { recursive: true });
@@ -56,6 +70,10 @@ try {
       throw new Error("City and place IDs must be distinct.");
   }
   writeFileSync(
+    "src/generated/country-geography.json",
+    JSON.stringify({ countries: geography }) + "\n",
+  );
+  writeFileSync(
     "src/generated/countries.json",
     JSON.stringify({ sample: demo, countries: countryHistory }, null, 2) + "\n",
   );
@@ -66,7 +84,21 @@ try {
         readFileSync("data/country-metrics.csv", "utf8"),
         readFileSync("data/country-metric-medians.csv", "utf8"),
         readFileSync("data/country-highlights.csv", "utf8"),
-        countryHistory,
+        // Published reference coverage is independent of the demo collection.
+        demo
+          ? [
+              ...geography.map(({ code, name, continent }) => ({
+                code,
+                name,
+                continent,
+                visit: "unknown",
+              })),
+              ...countryStarter.countries.filter(
+                (country) =>
+                  !geography.some((row) => row.code === country.code),
+              ),
+            ]
+          : countryHistory,
         countryReferenceSources.sources,
         readFileSync("data/country-comparison-regions.csv", "utf8"),
       ),

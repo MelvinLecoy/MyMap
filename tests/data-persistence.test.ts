@@ -160,6 +160,53 @@ test("approved main-branch changes synchronize atomically, survive a new read, r
     seoul.lastVisited = "2025-07-20";
     await db.exec(seedSql(previous.map(toCityRow)));
     await db.exec(`begin;${citySeedSql(previous, true)}commit;`);
+    // The frozen historical additions create these rows using the old taxonomy.
+    // Provision their catalog separately, then apply the explicit approved
+    // geography transition before asking the history-only sync for CSV equality.
+    const revisedCatalog = cityCollection()
+      .filter((city) => ["austin-usa", "san-antonio-usa"].includes(city.id))
+      .map((city) => ({
+        ...toCityRow(city),
+        visit_status: "not-visited" as const,
+        last_visited: null,
+      }));
+    await db.exec(
+      seedSql(
+        revisedCatalog.map((city) => ({
+          ...city,
+          continent: "America",
+          region: "North America",
+          subregion: "",
+        })),
+      ),
+    );
+    const beforeGeography = await load();
+    await db.exec(seedSql(revisedCatalog));
+    const afterGeography = await load();
+    assert.deepEqual(afterGeography.countries, beforeGeography.countries);
+    assert.deepEqual(
+      afterGeography.cities.visits,
+      beforeGeography.cities.visits,
+    );
+    for (const old of beforeGeography.cities.cities) {
+      const current = afterGeography.cities.cities.find(
+        (city) => city.id === old.id,
+      )!;
+      const approved = revisedCatalog.find((city) => city.id === old.id);
+      for (const [key, value] of Object.entries(old))
+        if (
+          !approved ||
+          !["continent", "region", "subregion", "updated_at"].includes(key)
+        )
+          assert.deepEqual(
+            (current as unknown as Record<string, unknown>)[key],
+            value,
+            `${old.id}:${key}`,
+          );
+      if (approved)
+        for (const key of ["continent", "region", "subregion"] as const)
+          assert.equal(current[key], approved[key], `${old.id}:${key}`);
+    }
     const before = await load();
     assert.equal(verifyData(before).counts.cityDays, 248);
     assert.equal(verifyData(before).matches, false);

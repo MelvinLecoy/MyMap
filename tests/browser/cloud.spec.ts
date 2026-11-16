@@ -2,7 +2,8 @@ import { test, expect, type BrowserContext } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { parse } from "csv-parse/sync";
 import { toCityRow, type CityRow } from "../../src/lib/cloud-data";
-import type { AtlasData } from "../../src/lib/types";
+import type { AtlasData, Place } from "../../src/lib/types";
+import type { PlaceRow } from "../../src/lib/places";
 import { COLLECTION_STATUS_STORAGE_KEY } from "../../src/lib/status-storage";
 import { toCountrySnapshot } from "../../src/lib/country-cloud-data";
 import {
@@ -67,7 +68,12 @@ function store() {
         { ...toCityRow(city), updated_at: "2026-11-12T00:00:00.000Z" },
       ]),
     ),
+    placeRows: new Map(
+      (atlas.places ?? []).map((place) => [place.id, placeRow(place)]),
+    ),
     failRead: false,
+    unifiedSnapshot: false,
+    collectionReads: 0,
     cityVisits: toCityVisitRows(atlas.cities),
     cityPeriods: toCityPeriodRows(atlas.cities),
     countrySnapshot: toCountrySnapshot(countrySeeds),
@@ -90,6 +96,16 @@ function store() {
     logoutError: false,
     logoutGate: null as Promise<void> | null,
     logoutCalls: 0,
+  };
+}
+function placeRow(place: Place): PlaceRow {
+  const { country: _country, country_code: _code, ...row } = toCityRow(place);
+  return {
+    ...row,
+    countries: place.countries,
+    outline: place.outline,
+    outline_source: place.outlineSource,
+    updated_at: "2026-11-12T00:00:00.000Z",
   };
 }
 type Store = ReturnType<typeof store>;
@@ -189,6 +205,30 @@ async function backend(
         },
       });
     if (method === "OPTIONS") return reply({});
+    // Exercise the rolling-deployment path until the combined RPC is installed.
+    if (url.pathname === "/rest/v1/rpc/atlas_collection_snapshot") {
+      state.collectionReads++;
+      if (!state.unifiedSnapshot)
+        return reply({ code: "PGRST202", message: "Function not found" }, 404);
+      if (state.failRead || state.failCountryRead)
+        return reply({ message: "unavailable" }, 503);
+      return reply({
+        version: 1,
+        cities: {
+          cities: [...state.rows.values()].sort((a, b) =>
+            a.id.localeCompare(b.id),
+          ),
+          visits: state.cityVisits,
+          periods: state.cityPeriods,
+        },
+        countries: state.countrySnapshot,
+        places: [...state.placeRows.values()],
+      });
+    }
+    if (url.pathname === "/rest/v1/rpc/atlas_places_snapshot")
+      return state.failRead
+        ? reply({ message: "unavailable" }, 503)
+        : reply([...state.placeRows.values()]);
     if (url.pathname === "/rest/v1/rpc/atlas_country_snapshot")
       return state.failCountryRead
         ? reply({ message: "unavailable" }, 503)
@@ -299,6 +339,24 @@ async function backend(
       state.rows.set(cityId, next);
       return reply(next);
     }
+    if (url.pathname === "/rest/v1/places" && method === "PATCH") {
+      if (caller !== ownerId) return reply({ code: "42501" }, 403);
+      if (state.failWrite) return reply({ message: "unavailable" }, 503);
+      const placeId = url.searchParams.get("id")?.slice(3) ?? "";
+      const row = state.placeRows.get(placeId);
+      if (
+        !row ||
+        row.updated_at !== url.searchParams.get("updated_at")?.slice(3)
+      )
+        return reply({ code: "PGRST116", message: "stale update" }, 406);
+      const next = {
+        ...row,
+        map_status: request.postDataJSON().map_status,
+        updated_at: new Date(Date.parse(row.updated_at!) + 1000).toISOString(),
+      };
+      state.placeRows.set(placeId, next);
+      return reply(next);
+    }
     return reply({ message: "Unexpected mock endpoint" }, 404);
   });
 }
@@ -317,6 +375,164 @@ test("visitors see saved data and cannot use browser overrides to change the pub
     page.getByRole("button", { name: "Editor", exact: true }),
   ).toHaveAttribute("aria-pressed", "false");
   await expect(page.getByText("Loading latest…")).toHaveCount(0);
+});
+
+test("combined collection reads preserve editor revisions, anonymous access and authoritative geography", async ({
+  browser,
+  context,
+  page,
+  baseURL,
+}) => {
+  const state = store();
+  state.unifiedSnapshot = true;
+  const london = state.rows.get("london-uk")!;
+  Object.assign(london, {
+    continent: "Stale continent",
+    region: "Stale region",
+    subregion: "Stale subregion",
+  });
+  state.countrySnapshot.countries.find(
+    (country) => country.code === "GB",
+  )!.continent = "Stale continent";
+  const legacyRequests: string[] = [];
+  context.on("request", (request) => {
+    if (/\/rpc\/atlas_(city|country|places)_snapshot$/.test(request.url()))
+      legacyRequests.push(request.url());
+  });
+  await backend(context, state, ownerId);
+  await page.goto("/?city=london-uk");
+  const picker = page.getByLabel("Map status", { exact: true });
+  await expect(picker).toBeEnabled();
+  await expect(page.locator(".city-detail .detail-geography")).toHaveText(
+    "Europe / British Isles",
+  );
+  const history = await page.locator(".city-statistics dd").allTextContents();
+  await picker.selectOption("Not Started");
+  await expect
+    .poll(() => state.rows.get("london-uk")!.map_status)
+    .toBe("Not Started");
+  await expect(picker).toBeEnabled();
+
+  // A new revision with identical visible data must still refresh the row used
+  // for the next optimistic update, rather than being treated as a cached read.
+  state.rows.set(
+    "london-uk",
+    changed(state.rows.get("london-uk")!, "Not Started"),
+  );
+  const response = page.waitForResponse((result) =>
+    result.url().endsWith("/rpc/atlas_collection_snapshot"),
+  );
+  await page.evaluate(() => window.dispatchEvent(new Event("focus")));
+  await response;
+  await picker.selectOption("Update");
+  await expect
+    .poll(() => state.rows.get("london-uk")!.map_status)
+    .toBe("Update");
+  await expect(picker).toBeEnabled();
+  await expect(page.locator(".city-statistics dd")).toHaveText(history);
+  await expect(
+    page.getByText("Status wasn’t saved.", { exact: false }),
+  ).toHaveCount(0);
+  expect(legacyRequests).toEqual([]);
+  expect(state.collectionReads).toBeGreaterThanOrEqual(2);
+
+  const visitorContext = await browser.newContext();
+  try {
+    await backend(visitorContext, state);
+    const visitor = await visitorContext.newPage();
+    await visitor.goto(`${baseURL}/?city=london-uk`);
+    await expect(visitor.getByLabel("Map status", { exact: true })).toHaveValue(
+      "Update",
+    );
+    await expect(
+      visitor.getByLabel("Map status", { exact: true }),
+    ).toBeDisabled();
+    await expect(visitor.locator(".city-detail .detail-geography")).toHaveText(
+      "Europe / British Isles",
+    );
+    await visitor.goto(`${baseURL}/?panel=countries&country=GB`);
+    await expect(
+      visitor.locator(".country-detail .detail-geography"),
+    ).toHaveText("Europe / British Isles");
+  } finally {
+    await visitorContext.close();
+  }
+});
+
+test("place saves retain displayed revisions, reject concurrent edits and accept revision-only refreshes", async ({
+  context,
+  page,
+}) => {
+  const state = store();
+  state.unifiedSnapshot = true;
+  const initial = structuredClone(state.placeRows.get("patagonia")!);
+  const placeGets: string[] = [];
+  context.on("request", (request) => {
+    if (
+      request.method() === "GET" &&
+      new URL(request.url()).pathname === "/rest/v1/places"
+    )
+      placeGets.push(request.url());
+  });
+  await backend(context, state, ownerId);
+  await page.goto("/?city=patagonia");
+  const picker = page.getByLabel("Map status", { exact: true });
+  await expect(picker).toBeEnabled();
+  await expect(picker).toHaveValue("Not Started");
+  const refresh = async () => {
+    const response = page.waitForResponse((result) =>
+      result.url().endsWith("/rpc/atlas_collection_snapshot"),
+    );
+    await page.evaluate(() => window.dispatchEvent(new Event("focus")));
+    await (await response).finished();
+    await page.evaluate(async () => {
+      for (let i = 0; i < 2; i++) await new Promise(requestAnimationFrame);
+    });
+  };
+  const serverEdit = (status: CityRow["map_status"]) => {
+    const before = state.placeRows.get("patagonia")!;
+    const next = {
+      ...before,
+      map_status: status,
+      updated_at: new Date(Date.parse(before.updated_at!) + 1000).toISOString(),
+    };
+    state.placeRows.set("patagonia", next);
+    return next;
+  };
+  await picker.selectOption("Update");
+  await expect
+    .poll(() => state.placeRows.get("patagonia")!.map_status)
+    .toBe("Update");
+  await expect(picker).toBeEnabled();
+  await refresh();
+
+  const concurrent = serverEdit("Complete");
+  await expect(picker).toHaveValue("Update");
+  await picker.selectOption("Unfinished");
+  await expect(
+    page.getByText("Status wasn’t saved.", { exact: false }),
+  ).toBeVisible();
+  await expect(picker).toHaveValue("Complete");
+  await expect(picker).toBeEnabled();
+  expect(state.placeRows.get("patagonia")).toEqual(concurrent);
+
+  serverEdit("Complete");
+  await refresh();
+  await expect(picker).toHaveValue("Complete");
+  await picker.selectOption("Not Started");
+  await expect
+    .poll(() => state.placeRows.get("patagonia")!.map_status)
+    .toBe("Not Started");
+  await expect(picker).toBeEnabled();
+  await expect(
+    page.getByText("Status wasn’t saved.", { exact: false }),
+  ).toHaveCount(0);
+  const saved = state.placeRows.get("patagonia")!;
+  expect(saved.countries).toEqual(initial.countries);
+  expect(saved.outline).toEqual(initial.outline);
+  expect(saved.visit_status).toBe(initial.visit_status);
+  expect(saved.notes).toBe(initial.notes);
+  expect(placeGets).toEqual([]);
 });
 
 test("current approved history survives a cold load, reload and unavailable database", async ({
@@ -390,8 +606,12 @@ test("saving a city's map status updates progress and filters while retaining it
       exact: true,
     })
     .click();
+  const allRows = [...state.rows.values(), ...state.placeRows.values()];
+  const complete = allRows.filter(
+    (row) => row.map_status === "Complete",
+  ).length;
   await expect(page.locator(".city-map-progress-heading")).toContainText(
-    "254 / 343 complete",
+    `${complete} / ${allRows.length} complete`,
   );
   await expect(page.locator(".city-overview-totals dd")).toHaveText([
     "174",
@@ -400,7 +620,7 @@ test("saving a city's map status updates progress and filters while retaining it
   ]);
   await page
     .getByRole("group", { name: "Map progress filters" })
-    .getByRole("button", { name: "Complete 254", exact: true })
+    .getByRole("button", { name: `Complete ${complete}`, exact: true })
     .click();
   await page.getByLabel("Search cities and countries").fill("Shanghai");
   const row = page.locator(".city-row");
@@ -770,7 +990,7 @@ test("live city history survives saves and reloads, refreshes coherently, and re
   await backend(context, state, ownerId);
   await page.goto("/?city=london-uk");
   const history = page.locator(".city-visit-list");
-  await expect(history.locator(":scope > li")).toHaveCount(4);
+  await expect(history.locator(".visit-timeline-entry")).toHaveCount(4);
   await expect(history).toContainText("2.5 days");
   const picker = page.getByLabel("Map status", { exact: true });
   await expect(picker).toBeEnabled();
@@ -1442,10 +1662,16 @@ test("country history reads the database snapshot rather than the build-time tot
   shortenAustralia(state);
   await backend(context, state);
   await page.goto("/?panel=countries&country=AU");
-  await expect(page.locator(".country-statistics dd")).toHaveText(["2", "13"]);
-  await expect(page.locator(".country-visit-list > li").last()).toContainText(
-    "23 August 2026",
-  );
+  await expect(page.locator(".country-statistics dd")).toHaveText([
+    "2",
+    "13",
+    "5",
+  ]);
+  await expect(
+    page.locator(
+      '.country-visit-list .visit-timeline-entry[data-visit-number="2"]',
+    ),
+  ).toContainText("23 August 2026");
   await expect(page.getByLabel("Actual stays for visit 1")).toBeVisible();
   await expect(
     page
@@ -1462,20 +1688,32 @@ test("country outages retain a usable snapshot, retry recovers, and failed refre
   state.failCountryRead = true;
   await backend(context, state);
   await page.goto("/?panel=countries&country=AU");
-  await expect(page.locator(".country-statistics dd")).toHaveText(["2", "14"]);
+  await expect(page.locator(".country-statistics dd")).toHaveText([
+    "2",
+    "14",
+    "5",
+  ]);
   await expect(
     page.getByText("Couldn’t refresh country history.", { exact: false }),
   ).toBeVisible();
   shortenAustralia(state);
   state.failCountryRead = false;
   await page.getByRole("button", { name: "Retry", exact: true }).click();
-  await expect(page.locator(".country-statistics dd")).toHaveText(["2", "13"]);
+  await expect(page.locator(".country-statistics dd")).toHaveText([
+    "2",
+    "13",
+    "5",
+  ]);
   state.failCountryRead = true;
   await page.evaluate(() => window.dispatchEvent(new Event("focus")));
   await expect(
     page.getByText("Couldn’t refresh country history.", { exact: false }),
   ).toBeVisible();
-  await expect(page.locator(".country-statistics dd")).toHaveText(["2", "13"]);
+  await expect(page.locator(".country-statistics dd")).toHaveText([
+    "2",
+    "13",
+    "5",
+  ]);
 });
 
 test("legacy responses group consistently and a broken period snapshot retains the last confirmed history", async ({
@@ -1502,11 +1740,15 @@ test("legacy responses group consistently and a broken period snapshot retains t
   );
   await page.goto("/?city=shanghai-china");
   await expect(page.locator(".city-statistics dd")).toHaveText(["1", "2.5"]);
-  await expect(
-    page
-      .getByRole("list", { name: "Stays for visit 1", exact: true })
-      .locator("li"),
-  ).toHaveText(["30 – 31 August 2026 (1.5 days)", "1 September 2026"]);
+  const stays = page.getByRole("list", {
+    name: "Stays for visit 1",
+    exact: true,
+  });
+  await expect(stays.locator(".visit-period")).toHaveCount(2);
+  await expect(stays.locator(".visit-period .visually-hidden")).toContainText([
+    "30 – 31 August 2026, 1.5 days",
+    "1 September 2026, 1 day",
+  ]);
   const picker = page.getByLabel("Map status", { exact: true });
   await expect(picker).toBeEnabled();
   legacy = false;

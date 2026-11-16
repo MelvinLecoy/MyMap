@@ -190,6 +190,8 @@ Google controls the embedded content and access. Set the original My Map to **An
 
 ## Persistent saving with Supabase
 
+Read [the backend architecture and ownership guide](docs/BACKEND_ARCHITECTURE.md) before changing schemas, source CSVs or hydration. Country and city classification now comes from the owner's authoritative [country geography CSV](data/reference/country-geography.csv), derived reproducibly from the archived categorization workbook. Database reads share a versioned coherent snapshot, with compatible legacy readers and the existing authenticated write paths. Periodic database-to-repository export remains [future work](docs/REPO_CHECKPOINTS.md); it is not activated.
+
 Country history uses three linked CSVs and database tables so a counted visit
 can contain several actual stay periods. The country panel reads database
 history when configured, with a bundled fallback. Recorded visits/days are

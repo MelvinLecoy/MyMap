@@ -2,6 +2,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { fromPlaceRow, type PlaceRow } from "./places";
 import type { MapStatus, Place } from "./types";
+import {
+  invalidateCollectionReads,
+  loadCollectionPart,
+} from "./collection-snapshot";
 
 export function useRemotePlaces(
   initial: Place[],
@@ -18,6 +22,7 @@ export function useRemotePlaces(
   } | null>(null);
   const alive = useRef(true),
     fetching = useRef(false),
+    rowsRef = useRef(new Map<string, PlaceRow>()),
     writeVersion = useRef(0),
     fingerprint = useRef<string | null>(null),
     pendingIds = useRef(new Set<string>());
@@ -28,12 +33,12 @@ export function useRemotePlaces(
     fetching.current = true;
     const version = writeVersion.current;
     try {
-      const { data, error } = await client.rpc("atlas_places_snapshot");
-      if (error || !Array.isArray(data))
-        throw error ?? new Error("Invalid place snapshot");
-      const next = (data as PlaceRow[]).map(fromPlaceRow),
+      const data = await loadCollectionPart(client, "places");
+      const next = data.map(fromPlaceRow),
         key = JSON.stringify(next);
       if (alive.current && version === writeVersion.current) {
+        // Even an otherwise identical row can carry a new concurrency revision.
+        rowsRef.current = new Map(data.map((row) => [row.id, row]));
         if (key !== fingerprint.current) {
           fingerprint.current = key;
           setPlaces(next);
@@ -82,21 +87,24 @@ export function useRemotePlaces(
       setPending((current) => ({ ...current, [id]: status }));
       setSaveError(null);
       try {
-        const { data: before, error: readError } = await client
-          .from("places")
-          .select("updated_at")
-          .eq("id", id)
-          .single();
-        if (readError || !before)
-          throw readError ?? new Error("Place not found");
+        const before = rowsRef.current.get(id);
+        if (!before?.updated_at)
+          throw new Error("The displayed place has no confirmed revision.");
         const { data, error } = await client
           .from("places")
           .update({ map_status: status })
           .eq("id", id)
           .eq("updated_at", before.updated_at)
-          .select("id")
+          .select("id,updated_at")
           .single();
-        if (error || !data) throw error ?? new Error("Place changed");
+        if (error || !data || typeof data.updated_at !== "string")
+          throw error ?? new Error("Place changed");
+        invalidateCollectionReads(client);
+        rowsRef.current.set(id, {
+          ...before,
+          map_status: status,
+          updated_at: data.updated_at,
+        });
         writeVersion.current++;
         fingerprint.current = "";
         if (alive.current)
@@ -107,6 +115,7 @@ export function useRemotePlaces(
           );
         void refresh();
       } catch {
+        invalidateCollectionReads(client);
         writeVersion.current++;
         if (alive.current)
           setSaveError({
