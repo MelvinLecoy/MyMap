@@ -52,7 +52,7 @@ export interface VisitCaptionLayout {
 }
 type Measure = (text: string) => number;
 
-/** Keep cities whole and measure their zero-padding outlines and 1px gaps. */
+/** Measure each capsule's borders, 1px horizontal padding and 1px gaps. */
 export function cityCaptionOptions(
   names: readonly string[],
   measure: Measure,
@@ -67,7 +67,7 @@ export function cityCaptionOptions(
         ? names
             .slice(start, end)
             .reduce(
-              (sum, name) => sum + measure(name) + (outlined ? 2 : 0),
+              (sum, name) => sum + measure(name) + (outlined ? 4 : 0),
               0,
             ) + (outlined ? end - start - 1 : 0)
         : 0,

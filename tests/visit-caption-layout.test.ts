@@ -80,7 +80,7 @@ test("caption partitions balance whole outlined cities with 1px gaps", () => {
   assert.deepEqual(option.lines.flat(), names);
   assert.ok(
     option.width >=
-      measure("Bath") + measure("Cardiff") + measure("Southampton") + 6 + 2,
+      measure("Bath") + measure("Cardiff") + measure("Southampton") + 12 + 2,
   );
 });
 
@@ -92,7 +92,7 @@ test("spare width produces one caption line and a supporting longer segment", ()
   assert.ok(layout.blocks[0].width > 76);
   assert.ok(
     layout.blocks[0].width >=
-      cities.reduce((sum, city) => sum + measure(city) + 2, 0) +
+      cities.reduce((sum, city) => sum + measure(city) + 4, 0) +
         cities.length -
         1,
   );

@@ -3227,7 +3227,7 @@ test("country visit captions use the left month column or measured centered segm
     await page
       .locator(".visit-city-chip")
       .evaluateAll((cities) =>
-        cities.every((city) => getComputedStyle(city).padding === "0px"),
+        cities.every((city) => getComputedStyle(city).padding === "0px 1px"),
       ),
   ).toBe(true);
   expect(
