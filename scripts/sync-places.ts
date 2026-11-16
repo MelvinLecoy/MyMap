@@ -156,17 +156,22 @@ if (
       const result = await query(
         "select public.atlas_places_snapshot() as places;",
       );
-      const actual = (result[0].places as PlaceRow[]).map(fromPlaceRow);
+      // RPCs sort by display name; source CSV order is not a data difference.
+      const byId = (a: Place, b: Place) => a.id.localeCompare(b.id);
+      const actual = (result[0].places as PlaceRow[])
+        .map(fromPlaceRow)
+        .sort(byId);
+      const expected = [...approvedPlaces].sort(byId);
       if (
         !isDeepStrictEqual(
           actual.map(placeReferenceData),
-          approvedPlaces.map(placeReferenceData),
+          expected.map(placeReferenceData),
         )
       )
         throw new Error(
           "Place reference CSVs, boundaries and database do not match.",
         );
-      if (verify && !isDeepStrictEqual(actual, approvedPlaces))
+      if (verify && !isDeepStrictEqual(actual, expected))
         throw new Error(
           "Saved place state differs from its repository snapshot. The database edits were preserved; review them before a future repository checkpoint.",
         );

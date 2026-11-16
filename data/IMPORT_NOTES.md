@@ -28,6 +28,8 @@ The new sourced outlines are Bali province, Algarve/Faro district, the Santorini
 
 Validation for this batch: all 130 unit tests passed, including rollback/repeat/conflicting-edit PostgreSQL scenarios and geographic inclusion/exclusion checks. The production build, source normalization, final country taxonomy and five new source-outline reproductions passed. Six focused browser cases covered all 32 supplied city/place profiles at 320/601/1440px, lazy embeds, Patagonia's embed/viewer links, real globe selection and unchanged 9px city targets; the authenticated place save/revision regression also passed. The scoped import was rehearsed against the live database with rollback before publication.
 
+After publication, all 64 read-only production profile checks at 320/1440px passed with no JavaScript or transport errors and one shared live snapshot request. Live city/country, geography and all-place verifiers matched the repository; recorded visits/days stayed unchanged. Place verification compares records by stable ID because the RPC's display-name order can differ from the source sheet's order.
+
 ## Reviewed matching decisions
 
 - **Iguazu and Lofoten remain unplaced**, as requested. They remain searchable and their My Maps links work independently of the globe position. Their two missing-location import warnings are intentional.
