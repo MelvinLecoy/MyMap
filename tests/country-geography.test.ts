@@ -127,7 +127,7 @@ test("taxonomy imports reject incomplete, duplicate, unknown and malformed refer
 
 test("all current city classifications match their country and Svalbard remains unspecified by the new source", () => {
   const rows = readCSV(readCollectionCsv("data/cities.csv"));
-  assert.equal(rows.length, 343);
+  assert.equal(rows.length, 361);
   for (const { values: row } of rows) {
     if (row.countrycode === "SJ") {
       assert.equal(row.continent, "Europe");

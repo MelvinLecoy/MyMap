@@ -16,7 +16,7 @@ import {
 } from "../src/lib/places";
 import { toCityRow } from "../src/lib/cloud-data";
 
-const patagonia = approvedPlaces[0];
+const patagonia = approvedPlaces.find((place) => place.id === "patagonia")!;
 const asRow = (): PlaceRow => ({
   ...toCityRow(patagonia),
   countries: patagonia.countries,
@@ -24,27 +24,30 @@ const asRow = (): PlaceRow => ({
   outline_source: patagonia.outlineSource,
 });
 
-test("Patagonia is a distinct place spanning both countries with no invented map or visit history", () => {
-  assert.equal(approvedPlaces.length, 1);
+test("Patagonia is a distinct place spanning both countries with its approved map and no invented visit history", () => {
+  assert.equal(approvedPlaces.length, 11);
   assert.equal(patagonia.kind, "place");
   assert.equal(patagonia.name, "Patagonia");
   assert.deepEqual(patagonia.countries, [
     { code: "AR", name: "Argentina" },
     { code: "CL", name: "Chile" },
   ]);
-  assert.equal(patagonia.map, null);
-  assert.equal(patagonia.status, "Not Started");
+  assert.equal(
+    new URL(patagonia.map!.embedUrl).searchParams.get("mid"),
+    "1hadnWp8gzZjqdMb0s4Hjydp3EoWysmc",
+  );
+  assert.equal(patagonia.status, "Complete");
   assert.equal(patagonia.visit, "unknown");
   assert.deepEqual(patagonia.visits, []);
   assert.equal(
-    outlineContains(patagonia.outline, patagonia.coordinates!),
+    outlineContains(patagonia.outline!, patagonia.coordinates!),
     true,
   );
-  assert.equal(outlineContains(patagonia.outline, [-72.3, -50.34]), true);
-  assert.equal(outlineContains(patagonia.outline, [-72.5, -51.72]), true);
-  assert.equal(outlineContains(patagonia.outline, [-58.38, -34.6]), false);
-  assert.equal(outlineContains(patagonia.outline, [-70.67, -33.45]), false);
-  assert.equal(outlineContains(patagonia.outline, [-65, -65]), false);
+  assert.equal(outlineContains(patagonia.outline!, [-72.3, -50.34]), true);
+  assert.equal(outlineContains(patagonia.outline!, [-72.5, -51.72]), true);
+  assert.equal(outlineContains(patagonia.outline!, [-58.38, -34.6]), false);
+  assert.equal(outlineContains(patagonia.outline!, [-70.67, -33.45]), false);
+  assert.equal(outlineContains(patagonia.outline!, [-65, -65]), false);
   const bounds = placeBounds(patagonia)!;
   assert.ok(bounds[0][0] < -73 && bounds[0][1] < -55 && bounds[1][1] > -40);
   const metadata = JSON.parse(
@@ -76,8 +79,9 @@ test("place parsing rejects missing countries, broken outlines and pins outside 
     /inside its outline/,
   );
   const row = asRow();
-  if (row.outline.type === "MultiPolygon") row.outline.coordinates[0][0].pop();
-  else row.outline.coordinates[0].pop();
+  if (row.outline!.type === "MultiPolygon")
+    row.outline!.coordinates[0][0].pop();
+  else row.outline!.coordinates[0].pop();
   assert.throws(() => fromPlaceRow(row), /invalid place/);
 });
 
@@ -104,7 +108,7 @@ test("place persistence is separate from city records and enforces public-read o
     await db.exec(
       readFileSync("supabase/migrations/202611150001_places.sql", "utf8"),
     );
-    await db.exec(placeSeedSql());
+    await db.exec(placeSeedSql([patagonia]));
     assert.deepEqual(
       (await db.query("select * from public.cities")).rows,
       before.rows,
@@ -113,7 +117,7 @@ test("place persistence is separate from city records and enforces public-read o
     const result = await db.query<{ places: PlaceRow[] }>(
       "select public.atlas_places_snapshot() as places",
     );
-    assert.deepEqual(result.rows[0].places.map(fromPlaceRow), approvedPlaces);
+    assert.deepEqual(result.rows[0].places.map(fromPlaceRow), [patagonia]);
     await assert.rejects(
       db.exec(
         "update public.places set map_status='Complete' where id='patagonia'",
@@ -144,7 +148,7 @@ test("place persistence is separate from city records and enforces public-read o
       await db.query(`select ${editableColumns} from public.places`)
     ).rows;
     const beforeRefresh = (await db.query("select * from public.places")).rows;
-    await db.exec(placeSeedSql());
+    await db.exec(placeSeedSql([patagonia]));
     assert.deepEqual(
       (await db.query("select * from public.places")).rows,
       beforeRefresh,

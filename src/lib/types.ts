@@ -54,7 +54,7 @@ export interface PlaceCountry {
 export interface Place extends City {
   kind: "place";
   countries: PlaceCountry[];
-  outline: Polygon | MultiPolygon;
+  outline: Polygon | MultiPolygon | null;
   outlineSource: string;
 }
 export interface AtlasData {

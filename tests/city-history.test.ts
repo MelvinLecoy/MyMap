@@ -144,7 +144,7 @@ test("all approved screenshot entries survive, with only the approved correction
     history.reduce((n, v) => n + v.days_spent, 0),
     401,
   );
-  assert.equal(cities.length, 343);
+  assert.equal(cities.length, 361);
   assert.equal(cities.filter((c) => c.visit === "visited").length, 174);
   assert.deepEqual(cityVisitSummary(find("auckland-new-zealand").visits!), {
     visits: 2,
@@ -197,8 +197,8 @@ test("owner-provided additional city stays are exact and preserve the original s
   }
   for (const id of ["austin-usa", "san-antonio-usa"]) {
     const city = find(id);
-    assert.equal(city.status, "Not Started");
-    assert.equal(city.map, null);
+    assert.equal(city.status, "Unfinished");
+    assert.ok(city.map?.embedUrl.endsWith("&ehbc=2E312F"));
     assert.ok(city.coordinates, id);
   }
 });
@@ -255,7 +255,7 @@ test("new city stays migrate idempotently without modifying existing map statuse
         ).rows[0].result,
       );
     const result = await snapshot();
-    assert.equal(result.cities.length, 343);
+    assert.equal(result.cities.length, 361);
     assert.equal(result.visits.length, 222);
     assert.equal(result.periods.length, 235);
     assert.equal(
@@ -454,7 +454,7 @@ test("PostgreSQL imports city history atomically, preserves countries and edits,
     assert.equal(
       (await db.query<{ n: number }>("select count(*)::int as n from cities"))
         .rows[0].n,
-      321,
+      339,
     );
     assert.equal(
       (
@@ -466,7 +466,7 @@ test("PostgreSQL imports city history atomically, preserves countries and edits,
     );
     await db.exec(sql);
     const imported = await fetch();
-    assert.equal(imported.cities.length, 343);
+    assert.equal(imported.cities.length, 361);
     assert.equal(imported.visits.length, 222);
     assert.equal(imported.periods.length, 235);
     assert.equal(

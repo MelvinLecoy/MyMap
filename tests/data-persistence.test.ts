@@ -24,7 +24,7 @@ test("current CSVs agree across city/country tables and detect changed fields, m
     ),
   );
   assert.deepEqual(report.counts, {
-    cities: 343,
+    cities: 361,
     visitedCities: 174,
     cityVisits: 222,
     cityStays: 235,

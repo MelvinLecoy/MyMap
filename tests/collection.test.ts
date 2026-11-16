@@ -25,11 +25,11 @@ test("the canonical collection has stable identities and reproduces every curren
     readFileSync("data/collection-info.json", "utf8"),
   );
   assert.equal(metadata.schemaVersion, 2);
-  assert.equal(metadata.records, 343);
-  assert.equal(normalized.length, 343);
+  assert.equal(metadata.records, 361);
+  assert.equal(normalized.length, 361);
   assert.equal(
     new Set(normalized.map(({ values: row }) => row.cityid)).size,
-    343,
+    361,
   );
   for (const { values: row } of normalized) {
     const city = data.cities.find((city) => city.id === row.cityid)!;
@@ -50,21 +50,20 @@ test("the canonical collection has stable identities and reproduces every curren
       );
   }
   assert.equal(data.demo, false);
-  assert.equal(new Set(data.cities.map((city) => city.id)).size, 343);
+  assert.equal(new Set(data.cities.map((city) => city.id)).size, 361);
   const mapIds = data.cities
     .filter((c) => c.map)
     .map((city) => {
       assert.ok(city.map);
       return new URL(city.map.embedUrl).searchParams.get("mid");
     });
-  assert.equal(new Set(mapIds).size, 321);
+  assert.equal(new Set(mapIds).size, 342);
   assert.deepEqual(
     data.cities
       .filter((c) => !c.map)
       .map((c) => c.id)
       .sort(),
     [
-      "austin-usa",
       "basel-switzerland",
       "bath-uk",
       "cologne-germany",
@@ -80,9 +79,7 @@ test("the canonical collection has stable identities and reproduces every curren
       "lugano-switzerland",
       "niagara-falls-usa",
       "portsmouth-uk",
-      "reykjavik-iceland",
       "rome-italy",
-      "san-antonio-usa",
       "southampton-uk",
       "sunshine-coast-australia",
       "vatican-city-vatican-city",
@@ -146,14 +143,14 @@ test("the real collection contains only approved city visits and no sample notes
   assert.ok(data.countries.every((country) => !country.color));
   assert.equal(
     data.cities.filter((city) => city.status === "Complete").length,
-    219,
+    223,
   );
   assert.equal(
     data.cities.filter((city) => city.status === "Unfinished").length,
-    28,
+    44,
   );
   assert.equal(
     data.cities.filter((city) => city.status === "Not Started").length,
-    83,
+    80,
   );
 });

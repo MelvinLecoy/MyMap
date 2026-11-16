@@ -83,7 +83,7 @@ export function placeSeedSql(places: Place[] = approvedPlaces) {
         place.lastVisited,
         place.notes,
         place.pinColor,
-        JSON.stringify(place.outline),
+        place.outline ? JSON.stringify(place.outline) : null,
         place.outlineSource,
       ];
       return (

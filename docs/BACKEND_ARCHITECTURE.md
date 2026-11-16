@@ -130,6 +130,12 @@ Apply commands are explicit: `architecture:apply` installs the additive schema w
 
 All public record shapes, RPCs and supported editor permissions are preserved by the concise-storage migration; redundant physical columns and the superseded maintained aggregate CSV were removed. Keep old readers available through deployment/rollback overlap. A client rollback can continue reading the old APIs after the additive migration. Reverting application code does not require reverting approved geography data.
 
+## November 16 city/place map batch
+
+The approved batch adds city/place catalogs and maps without changing history or country records. See [data/IMPORT_NOTES.md](../data/IMPORT_NOTES.md) for matching, status vocabulary, source geometry and deferred boundaries. A place CSV stores one `Link`, and the viewer URL remains derived. Migration `202611160003_optional_place_outlines.sql` permits a SQL-null outline for a located place whose boundary is pending. Null is explicit missing geometry; existing non-null validation, associations, map states and selection styling remain intact. The updated reader omits null outlines from polygon layers and focuses their pins directly. Deploy that reader before committing new nullable records. This is a deliberate extension of the place record contract; old deployed readers must be replaced before publication.
+
+The batch operator rehearses with rollback, guards existing map state, checks country/history equality and every approved row, and preserves revisions on a repeat. It records the new immutable migration checksum in the existing private ledger. No periodic export, additional product state or place-city membership is enabled.
+
 ## Future entity model
 
 The following is the target design, **not implemented features**. Migrate behind existing adapters with explicit data/permission tests when each feature is requested.

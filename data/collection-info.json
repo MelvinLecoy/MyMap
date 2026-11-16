@@ -1,7 +1,10 @@
 {
-  "records": 343,
-  "locatedRecords": 341,
-  "unplacedByRequest": ["Iguazu", "Lofoten"],
+  "records": 361,
+  "locatedRecords": 359,
+  "unplacedByRequest": [
+    "Iguazu",
+    "Lofoten"
+  ],
   "countryLabelOverridesApprovedByUser": {
     "Longyearbyen": "Svalbard",
     "Sevastopol": "Ukraine"
@@ -22,6 +25,8 @@
     "country-visit-history.csv",
     "country-visit-periods.csv",
     "reference/country-geography.csv",
-    "reference/country-labels.csv"
+    "reference/country-labels.csv",
+    "places.csv",
+    "place-countries.csv"
   ]
 }

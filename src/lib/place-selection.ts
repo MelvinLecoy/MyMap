@@ -11,6 +11,13 @@ export function focusPlace(map: MapInstance, place: Place, duration: number) {
       duration,
       essential: false,
     });
+  else if (place.coordinates)
+    map.flyTo({
+      center: place.coordinates,
+      zoom: 5,
+      duration,
+      essential: false,
+    });
 }
 
 const selected: ExpressionSpecification = [

@@ -35,6 +35,7 @@ async function database() {
     "202611130003_country_half_days.sql",
     "202611140002_city_visit_periods.sql",
     "202611150001_places.sql",
+    "202611160003_optional_place_outlines.sql",
   ])
     await db.exec(readFileSync("supabase/migrations/" + file, "utf8"));
   await db.exec(

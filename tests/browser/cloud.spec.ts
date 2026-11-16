@@ -478,7 +478,7 @@ test("place saves retain displayed revisions, reject concurrent edits and accept
   await page.goto("/?city=patagonia");
   const picker = page.getByLabel("Map status", { exact: true });
   await expect(picker).toBeEnabled();
-  await expect(picker).toHaveValue("Not Started");
+  await expect(picker).toHaveValue("Complete");
   const refresh = async () => {
     const response = page.waitForResponse((result) =>
       result.url().endsWith("/rpc/atlas_collection_snapshot"),
@@ -931,9 +931,9 @@ test("the editor can export every city with saved statuses and nullable coordina
     columns: true,
     bom: true,
   }) as Array<Record<string, string>>;
-  expect(rows).toHaveLength(343);
+  expect(rows).toHaveLength(361);
   expect(rows.find((c) => c.CityId === "moscow-russia")!.Status).toBe("Update");
-  expect(rows.filter((c) => c.Latitude && c.Longitude)).toHaveLength(341);
+  expect(rows.filter((c) => c.Latitude && c.Longitude)).toHaveLength(359);
   expect(rows.find((c) => c.CityId === "london-uk")!.RecordedDaysSpent).toBe(
     "6.5",
   );

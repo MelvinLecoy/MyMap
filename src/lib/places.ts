@@ -27,7 +27,7 @@ export function outlinePositions(outline: Polygon | MultiPolygon): Position[] {
 }
 
 export function placeBounds(place: Place) {
-  return positionBounds(outlinePositions(place.outline));
+  return place.outline ? positionBounds(outlinePositions(place.outline)) : null;
 }
 
 export function outlineContains(
@@ -56,7 +56,7 @@ export function outlineContains(
 
 export interface PlaceRow extends Omit<CityRow, "country" | "country_code"> {
   countries: PlaceCountry[];
-  outline: Polygon | MultiPolygon;
+  outline: Polygon | MultiPolygon | null;
   outline_source: string;
 }
 
@@ -103,7 +103,7 @@ export function fromPlaceRow(row: PlaceRow): Place {
     ) ||
     new Set(row.countries.map((country) => country.code)).size !==
       row.countries.length ||
-    !validOutline(row.outline)
+    (row.outline !== null && !validOutline(row.outline))
   )
     throw new Error("The saved collection contains an invalid place.");
   const base = fromCityRow({
@@ -113,7 +113,7 @@ export function fromPlaceRow(row: PlaceRow): Place {
   });
   if (!base.coordinates)
     throw new Error("A place needs a representative pin position.");
-  if (!outlineContains(row.outline, base.coordinates))
+  if (row.outline && !outlineContains(row.outline, base.coordinates))
     throw new Error("A place pin must be inside its outline.");
   return {
     ...base,
@@ -142,11 +142,17 @@ export function placeOutlineFeatures(
 ): FeatureCollection<Polygon | MultiPolygon> {
   return {
     type: "FeatureCollection",
-    features: places.map((place) => ({
-      type: "Feature",
-      id: place.id,
-      geometry: place.outline,
-      properties: { id: place.id, name: place.name },
-    })),
+    features: places.flatMap((place) =>
+      place.outline
+        ? [
+            {
+              type: "Feature",
+              id: place.id,
+              geometry: place.outline,
+              properties: { id: place.id, name: place.name },
+            },
+          ]
+        : [],
+    ),
   };
 }

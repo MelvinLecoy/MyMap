@@ -27,7 +27,8 @@ The six unused catalog/state views from the previous stage were removed. Existin
 
 - `cities.csv` stores city facts and independent visit-status/date overrides. It does not repeat country labels/classification, recorded totals or historical LastVisited.
 - `reference/country-geography.csv` remains the owner's final workbook authority. `reference/country-labels.csv` contains eleven display/fallback exceptions, preserving UK/USA and Svalbard behavior without copying labels into every city.
-- `coordinates.csv` remains active: its 319 reviewed positions do not overlap the 22 inline city positions. GeoNames provenance and attribution are retained.
+- `coordinates.csv` remains active: its 319 reviewed positions do not overlap the 40 inline city positions. GeoNames provenance and attribution are retained.
+- `places.csv` stores one canonical `Link`; viewer URLs are derived. A null outline means a boundary is pending while its location, map and country associations remain usable. See the November 16 batch in `data/IMPORT_NOTES.md` for definitions and pending scope checks.
 - `city-visit-periods.csv` stores actual stays with `DaysSpentOverride` only when the inclusive date duration is wrong. Counted visits are generated in memory.
 - `countries.csv` keeps membership and independent collection facts. Names/classification and recorded totals are joined/calculated.
 - `country-visit-history.csv` keeps visit identities, notes and date/day overrides. Period-backed summaries are derived; the US undated visit remains intact.

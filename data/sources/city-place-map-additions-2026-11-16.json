@@ -1,0 +1,241 @@
+{
+  "source": "data/sources/city-place-map-additions-2026-11-16.csv",
+  "sourceStatusVocabulary": "Display labels: Complete -> Complete; Usable -> Update; Update -> Unfinished.",
+  "skip": [
+    "Country rows",
+    "Interlaken"
+  ],
+  "cities": [
+    {
+      "name": "Piran",
+      "id": "piran-slovenia",
+      "countryCode": "SI",
+      "existing": false,
+      "geonameId": 3193341
+    },
+    {
+      "name": "San Antonio",
+      "id": "san-antonio-usa",
+      "countryCode": "US",
+      "existing": true,
+      "previousMapStatus": "Not Started",
+      "previousMapUrl": null
+    },
+    {
+      "name": "Austin",
+      "id": "austin-usa",
+      "countryCode": "US",
+      "existing": true,
+      "previousMapStatus": "Not Started",
+      "previousMapUrl": null
+    },
+    {
+      "name": "Maribor",
+      "id": "maribor-slovenia",
+      "countryCode": "SI",
+      "existing": false,
+      "geonameId": 3195506
+    },
+    {
+      "name": "Kamakura",
+      "id": "kamakura-japan",
+      "countryCode": "JP",
+      "existing": false,
+      "geonameId": 1860672
+    },
+    {
+      "name": "El Calafate",
+      "id": "el-calafate-argentina",
+      "countryCode": "AR",
+      "existing": false,
+      "geonameId": 3858677
+    },
+    {
+      "name": "El Chalten",
+      "id": "el-chalten-argentina",
+      "countryCode": "AR",
+      "existing": false,
+      "geonameId": 6690180
+    },
+    {
+      "name": "Punta Arenas",
+      "id": "punta-arenas-chile",
+      "countryCode": "CL",
+      "existing": false,
+      "geonameId": 3874787
+    },
+    {
+      "name": "Puerto Natales",
+      "id": "puerto-natales-chile",
+      "countryCode": "CL",
+      "existing": false,
+      "geonameId": 3874958
+    },
+    {
+      "name": "Reykjavik",
+      "id": "reykjavik-iceland",
+      "countryCode": "IS",
+      "existing": true,
+      "previousMapStatus": "Not Started",
+      "previousMapUrl": null
+    },
+    {
+      "name": "Windhoek",
+      "id": "windhoek-namibia",
+      "countryCode": "NA",
+      "existing": false,
+      "geonameId": 3352136
+    },
+    {
+      "name": "Walvis Bay",
+      "id": "walvis-bay-namibia",
+      "countryCode": "NA",
+      "existing": false,
+      "geonameId": 3359638
+    },
+    {
+      "name": "Gitega",
+      "id": "gitega-burundi",
+      "countryCode": "BI",
+      "existing": false,
+      "geonameId": 426272
+    },
+    {
+      "name": "Bujumbura",
+      "id": "bujumbura-burundi",
+      "countryCode": "BI",
+      "existing": false,
+      "geonameId": 425378
+    },
+    {
+      "name": "Paphos",
+      "id": "paphos-cyprus",
+      "countryCode": "CY",
+      "existing": false,
+      "geonameId": 146214
+    },
+    {
+      "name": "Limassol",
+      "id": "limassol-cyprus",
+      "countryCode": "CY",
+      "existing": false,
+      "geonameId": 146384
+    },
+    {
+      "name": "Nicosia",
+      "id": "nicosia-cyprus",
+      "countryCode": "CY",
+      "existing": false,
+      "geonameId": 146268
+    },
+    {
+      "name": "Larnaca",
+      "id": "larnaca-cyprus",
+      "countryCode": "CY",
+      "existing": false,
+      "geonameId": 146400
+    },
+    {
+      "name": "Ramallah",
+      "id": "ramallah-palestine",
+      "countryCode": "PS",
+      "existing": false,
+      "geonameId": 282239
+    },
+    {
+      "name": "Hebron",
+      "id": "hebron-palestine",
+      "countryCode": "PS",
+      "existing": false,
+      "geonameId": 285066
+    },
+    {
+      "name": "Bethlehem",
+      "id": "bethlehem-palestine",
+      "countryCode": "PS",
+      "existing": false,
+      "geonameId": 284315
+    }
+  ],
+  "places": [
+    {
+      "id": "patagonia",
+      "name": "Patagonia",
+      "existing": true,
+      "outlineStatus": "verified",
+      "locationDefinition": "Existing approved Patagonia representative point and outline.",
+      "previousMapStatus": "Not Started",
+      "previousMapUrl": null
+    },
+    {
+      "id": "torres-del-paine",
+      "name": "Torres del Paine",
+      "existing": false,
+      "outlineStatus": "pending",
+      "locationDefinition": "Torres del Paine National Park; boundary pending a verifiable source."
+    },
+    {
+      "id": "fuji",
+      "name": "Fuji",
+      "existing": false,
+      "outlineStatus": "pending",
+      "locationDefinition": "Mount Fuji and Fuji Five Lakes area, as confirmed by the owner. Representative pin at Mount Fuji summit; combined boundary pending source verification."
+    },
+    {
+      "id": "izu",
+      "name": "Izu",
+      "existing": false,
+      "outlineStatus": "pending",
+      "locationDefinition": "Izu Peninsula; boundary pending a verifiable source."
+    },
+    {
+      "id": "lake-atitlan",
+      "name": "Lake Atitlan",
+      "existing": false,
+      "outlineStatus": "pending",
+      "locationDefinition": "Lake Atitlan waterbody and surrounding destinations; boundary pending a verifiable source."
+    },
+    {
+      "id": "bali",
+      "name": "Bali",
+      "existing": false,
+      "outlineStatus": "verified",
+      "locationDefinition": "Bali province, including its associated coastal islands."
+    },
+    {
+      "id": "algarve",
+      "name": "Algarve",
+      "existing": false,
+      "outlineStatus": "verified",
+      "locationDefinition": "Faro district, corresponding to the Algarve region."
+    },
+    {
+      "id": "santorini",
+      "name": "Santorini",
+      "existing": false,
+      "outlineStatus": "verified",
+      "locationDefinition": "Santorini island group: complete Greek coastline components within 25.25–25.55°E, 36.3–36.5°N. The caldera water is excluded."
+    },
+    {
+      "id": "komodo",
+      "name": "Komodo",
+      "existing": false,
+      "outlineStatus": "verified",
+      "locationDefinition": "Komodo island only: the complete Indonesian coastline component containing the representative point. Excludes Rinca, Padar and the wider national park."
+    },
+    {
+      "id": "cappadocia",
+      "name": "Cappadocia",
+      "existing": false,
+      "outlineStatus": "approximate",
+      "locationDefinition": "Approximate broad Cappadocia scope from the owner's screenshot: dissolved union of Nevşehir (TR-50), Aksaray (TR-68), Niğde (TR-51) and Kayseri (TR-38). Generalized province-based geographic interpretation, not an official historical-region boundary or an exact copy of Google's outline."
+    },
+    {
+      "id": "atacama",
+      "name": "Atacama",
+      "existing": false,
+      "outlineStatus": "pending",
+      "locationDefinition": "Desert destinations around San Pedro de Atacama, as confirmed by the owner. Pin at San Pedro de Atacama; excludes the broad Atacama Desert and administrative Atacama Region."
+    }
+  ]
+}

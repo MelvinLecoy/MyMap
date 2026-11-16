@@ -2,7 +2,7 @@
 
 A responsive, static travel globe inspired by the supplied reference: an airy Coastal palette with off-white panels, pale blue water, light neutral land, mint visited countries, and mint actions with dark text, plus city pins, a searchable collection, and focused city details. The map and city panel fill the browser window, with no outer header, navigation, footer, or page margins. Built with React, TypeScript, Vite, and MapLibre GL JS. The static CSV version runs without a backend. Optional Supabase integration adds owner sign-in and persistent status saves across devices; see [docs/supabase.md](docs/supabase.md).
 
-The repository includes the current **343-city collection**, **174 visited cities** and **341 located cities**. Canonical CSVs store each fact once; country labels/geography and visit summaries are derived during import. Iguazu and Lofoten are intentionally unplaced. See [data/IMPORT_NOTES.md](data/IMPORT_NOTES.md) for matching decisions and provenance.
+The repository includes **361 cities**, **174 visited cities**, **359 located cities**, and **11 places**. Canonical CSVs store each fact once; country labels/geography and visit summaries are derived during import. Iguazu and Lofoten are intentionally unplaced. See [data/IMPORT_NOTES.md](data/IMPORT_NOTES.md) for matching decisions and provenance.
 
 ## Run on a Mac
 
@@ -63,7 +63,7 @@ Latitude,Longitude,CityId,CountryCode,Visited,LastVisited,PinColor,Notes
 - **Latitude / Longitude**: valid city-center coordinates; zeros are valid. GeoJSON uses `[longitude, latitude]`. An incomplete/invalid pair warns. Missing coordinates keep the city in the list with a location label.
 - **CityId**: optional stable letters/numbers/hyphens/underscores, including Unicode. Otherwise a deterministic city-and-country slug is generated (`Kyiv,Ukraine` → `kyiv-ukraine`). Accents are folded; non-Latin names remain usable. Row reordering never changes IDs. Duplicate resulting IDs stop import; assign explicit IDs to disambiguate same-name cities in one country.
 - **CountryCode**: optional ISO 3166-1 alpha-2. Otherwise country names resolve locally with `i18n-iso-countries`. Aliases include Russia, Czechia/Czech Republic, Turkey/Türkiye, UK, USA, South/North Korea, Taiwan, Ivory Coast, Bolivia, Iran, Moldova, Tanzania, Venezuela, Laos, and Palestine. Kosovo uses the explicit atlas override `XK`. Unmapped countries warn, while retaining the city and its display name.
-- **Link**: a plain HTTPS Google My Maps URL or a quoted iframe from Google. The importer reads only a single iframe `src` as inert data; it never renders your iframe HTML. Only exact `google.com`, `www.google.com`, and `maps.google.com` hosts and `/maps/d/[u/N/]embed` or `viewer` paths are accepted. Map IDs must be nonempty URL-safe letters, numbers, `_` or `-`. Embed settings `ll`, `z`, `ehbc`, and `noprof` are retained. `ll` stays a saved camera setting and is **not** used as city coordinates. Invalid links warn and disable that city's map action without removing the city.
+- **Link**: a plain HTTPS Google My Maps URL or a quoted iframe from Google. The importer reads only a single iframe `src` as inert data; it never renders your iframe HTML. Only exact `google.com`, `www.google.com`, and `maps.google.com` hosts and `/maps/d/[u/N/]embed`, `viewer` or `edit` paths are accepted. Shared edit links automatically become canonical `/maps/d/embed?mid=ID&ehbc=2E312F`; `usp=sharing` is discarded and the viewer URL is derived. Explicit embed settings `ll`, `z`, `ehbc`, and `noprof` are retained. Map IDs must be nonempty URL-safe letters, numbers, `_` or `-`. `ll` stays a saved camera setting and is **not** used as city coordinates. Invalid links warn and disable that city's map action without removing the city.
 
 The CSV parser supports BOM, CRLF, empty lines, quoted commas, doubled quotes, and multiline cells. Region/subregion labels and accents are preserved. Warnings include source row numbers and are also saved to `.cache/import-diagnostics.json`, outside public assets.
 
@@ -157,7 +157,7 @@ The canonical sources are `data/places.csv`, `data/place-countries.csv`, and the
 
 `npm run build` imports the place CSVs into the bundled fallback. Use `npm run places:verify-migration` to check the additive database migration in a rolled-back transaction, `npm run places:apply` to save an approved batch to the separate `places` and `place_countries` tables, and `npm run places:verify-live` to compare saved records and geometry with the sources. The public snapshot reads both countries atomically; editor permissions govern map-status changes. Ship the CSVs, outline, database batch and site together.
 
-Patagonia initially has no attached map and no inferred visit history. Its representative pin is inside the broad outline. Additional places can have one or several countries and their own Polygon or MultiPolygon boundary.
+The November 16 sheet attaches Patagonia's map and adds ten places using the same pin/profile styles. Places can have one or several countries and a Polygon/MultiPolygon boundary. Where a boundary is pending, the outline is null and the pin/map remain usable; selection focuses on the representative point. Map status does not imply a visit. See [data/IMPORT_NOTES.md](data/IMPORT_NOTES.md) for this batch, deferred boundaries and automatic edit-link conversion.
 
 ## Map label typography
 
@@ -230,7 +230,7 @@ npx playwright install chromium
 CHROMIUM_PATH='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' npm run test:browser
 ```
 
-The browser suite selects the included real collection after a normal build. It checks all 321 entries, source statuses, the supplied country history and independent city visits, country/continent filters, reviewed coordinates and aliases, Nice and Vienna's distinct map links, intentional missing positions, layouts down to 320px, saved-status isolation and tab synchronization, and the WebGL fallback. For the existing camera, pin selection, notes/date, history, and blocked-storage regression suite, run `npm run build:demo` followed by `npm run test:browser`; finish with `npm run build` to restore the real collection.
+The browser suite selects the included real collection after a normal build. It checks the full city/place catalog, source statuses, the supplied country history and independent city visits, country/continent filters, reviewed coordinates and aliases, distinct map links, intentional missing positions, layouts down to 320px, saved-status isolation and tab synchronization, and the WebGL fallback. For the existing camera, pin selection, notes/date, history, and blocked-storage regression suite, run `npm run build:demo` followed by `npm run test:browser`; finish with `npm run build` to restore the real collection.
 
 Unit tests compare the prepared collection with the latest uploaded source and cover coordinate provenance, URL validation, CSV edge cases, stable/duplicate IDs, visits/dates, typography, and independent country/pin colors. External-provider and live Google embed availability remain separate network-dependent checks.
 

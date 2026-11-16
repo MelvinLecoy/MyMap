@@ -20,6 +20,105 @@ const mapCount = (status: string) =>
   entries.filter((entry) => entry.status === status).length;
 const backName = `All cities (${data.cities.length})`;
 
+for (const width of [320, 601, 1440]) {
+  test(`approved city/place map additions retain profiles, links and compact layout at ${width}px`, async ({
+    page,
+  }) => {
+    test.setTimeout(120_000);
+    await withoutGlobe(page);
+    await page.setViewportSize({ width, height: 1000 });
+    const ledger = JSON.parse(
+      readFileSync(
+        "data/sources/city-place-map-additions-2026-11-16.json",
+        "utf8",
+      ),
+    ) as {
+      cities: { id: string; name: string }[];
+      places: { id: string; name: string }[];
+    };
+    const errors: string[] = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+    for (const [kind, records] of [
+      ["city", ledger.cities],
+      ["place", ledger.places],
+    ] as const) {
+      for (const record of records) {
+        await page.goto(`/?${kind}=${record.id}`);
+        await expect(
+          page.getByRole("heading", { name: record.name, exact: true }),
+        ).toBeVisible();
+        await expect(
+          page.getByRole("button", { name: "View My Map", exact: true }),
+        ).toBeVisible();
+        expect(await page.locator("iframe").count()).toBe(0);
+        expect(
+          await page.evaluate(
+            () => document.documentElement.scrollWidth <= innerWidth,
+          ),
+          record.id,
+        ).toBe(true);
+      }
+    }
+    await page.route("https://www.google.com/maps/d/embed**", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "text/html",
+        body: "<p>Map viewer fixture</p>",
+      }),
+    );
+    await page.goto("/?place=fuji");
+    await page
+      .getByRole("button", { name: "View My Map", exact: true })
+      .click();
+    await expect(page.locator("iframe")).toHaveAttribute(
+      "src",
+      /\/embed\?mid=1_dsF6m3ZuNn--UVQpebr6SS9IdjXvlI&ehbc=2E312F/,
+    );
+    await page.goto("/?place=patagonia");
+    await page.getByRole("button", { name: "View My Map", exact: true }).click();
+    await expect(page.locator("iframe")).toHaveAttribute("src", "https://www.google.com/maps/d/embed?mid=1hadnWp8gzZjqdMb0s4Hjydp3EoWysmc&ehbc=2E312F");
+    await expect(page.getByRole("link", { name: "Open in Google My Maps" })).toHaveAttribute("href", "https://www.google.com/maps/d/viewer?mid=1hadnWp8gzZjqdMb0s4Hjydp3EoWysmc");
+    expect(errors).toEqual([]);
+  });
+}
+
+test("an outlined place and a pending-boundary place keep Patagonia globe selection; pending pins remain clickable", async ({
+  page,
+}) => {
+  test.setTimeout(90_000);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.route("https://tiles.openfreemap.org/**", (route) =>
+    route.abort(),
+  );
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("/?place=cappadocia");
+  const globe = page.getByTestId("map-canvas");
+  await expect(globe).toHaveAttribute("data-ready", "true", { timeout: 30_000 });
+  await expect(globe).toHaveAttribute("data-selected-place", "cappadocia");
+  await page.goto("/?place=komodo");
+  await expect(globe).toHaveAttribute("data-ready", "true", {
+    timeout: 30_000,
+  });
+  await expect(globe).toHaveAttribute("data-selected-place", "komodo");
+  await page.goto("/?place=fuji");
+  await expect(globe).toHaveAttribute("data-ready", "true", {
+    timeout: 30_000,
+  });
+  await expect(globe).toHaveAttribute("data-selected-place", "fuji");
+  await expect(page.locator(".coordinates")).toContainText("35.4° N");
+  await page.getByRole("button", { name: backName, exact: true }).click();
+  await expect(globe).toHaveAttribute("data-selected-place", "");
+  const box = (await globe.boundingBox())!;
+  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+  await expect(
+    page.getByRole("heading", { name: "Fuji", exact: true }),
+  ).toBeVisible();
+  await expect(globe).toHaveAttribute("data-selected-place", "fuji");
+  expect(errors).toEqual([]);
+});
+
+
 test("city overview, compact visit rows, map progress filters and city details use the same history", async ({
   page,
 }) => {
@@ -1270,7 +1369,7 @@ test("the default globe loads cities and places with approved city visits and no
 }) => {
   await page.goto("/");
   await expect(page.locator(".city-row")).toHaveCount(entries.length);
-  await expect(page.locator(".city-total")).toHaveText("343");
+  await expect(page.locator(".city-total")).toHaveText("361");
   await expect(page.locator(".visit-marker-not-yet")).toHaveCount(
     entries.filter((entry) => !["visited", "planned"].includes(entry.visit))
       .length,
@@ -1699,8 +1798,8 @@ test("the Countries tab has labelled counts, independent filters, and reloadable
   await withoutGlobe(page);
   await page.goto("/");
   const tabs = page.getByRole("tablist", { name: "Collection view" });
-  await expect(page.locator(".collection-count-main")).toHaveText("343 cities");
-  await expect(page.locator(".collection-count small")).toHaveText("1 place");
+  await expect(page.locator(".collection-count-main")).toHaveText("361 cities");
+  await expect(page.locator(".collection-count small")).toHaveText("11 places");
   await page.getByLabel("Search cities and countries").fill("Adelaide");
   await expect(page.locator(".collection-count")).toHaveText("1 city");
   await tabs.getByRole("tab", { name: "Countries", exact: true }).click();
@@ -1841,8 +1940,8 @@ test("Patagonia reuses the city row and profile with both countries and preserve
   await expect(
     page.locator(".city-overview-totals .scoreboard-stat-value"),
   ).toHaveText(["174", "222", "401"]);
-  await expect(page.locator(".collection-count-main")).toHaveText("343 cities");
-  await expect(page.locator(".collection-count small")).toHaveText("1 place");
+  await expect(page.locator(".collection-count-main")).toHaveText("361 cities");
+  await expect(page.locator(".collection-count small")).toHaveText("11 places");
   const patagonia = page.locator(".city-row").filter({
     has: page.locator(".city-row-name", { hasText: /^Patagonia$/ }),
   });
@@ -1850,7 +1949,7 @@ test("Patagonia reuses the city row and profile with both countries and preserve
   await expect(
     patagonia.locator(".entry-country > span:last-child"),
   ).toHaveText(["Argentina", "Chile"]);
-  await expect(patagonia.locator(".status")).toHaveText("Not Started");
+  await expect(patagonia.locator(".status")).toHaveText("Complete");
   await expect(patagonia).toHaveAttribute("href", /place=patagonia/);
   await patagonia.click();
   await expect(page).toHaveURL(/place=patagonia/);
@@ -1861,9 +1960,6 @@ test("Patagonia reuses the city row and profile with both countries and preserve
   await expect(page.locator(".detail-country")).toContainText("Chile");
   await expect(
     page.getByRole("button", { name: "View My Map", exact: true }),
-  ).toHaveCount(0);
-  await expect(
-    page.getByText("A map in the making", { exact: true }),
   ).toBeVisible();
   await page.reload();
   await expect(
@@ -1886,7 +1982,7 @@ test("Patagonia reuses the city row and profile with both countries and preserve
       page.getByRole("heading", { name, exact: true }),
     ).toBeVisible();
     await expect(page.locator(".country-cities-heading")).toContainText(
-      "1 place",
+      code === "CL" ? "3 places" : "1 place",
     );
     const row = page
       .locator(".city-row")
@@ -2108,7 +2204,7 @@ test("area labels follow city visibility and city pin hover and click targets ar
   expect(styles.pins.layout["text-field"]).toBeUndefined();
   expect(styles.hover).toEqual([]);
   await page
-    .getByRole("button", { name: "All cities (343)", exact: true })
+    .getByRole("button", { name: "All cities (361)", exact: true })
     .click();
   const box = (await globe.boundingBox())!;
   const near = { x: box.x + box.width / 2, y: box.y + box.height / 2 - 8 };
@@ -2121,7 +2217,7 @@ test("area labels follow city visibility and city pin hover and click targets ar
   await page.mouse.click(near.x, near.y);
   await expect(page).toHaveURL(/city=nassau-bahamas/);
   await page
-    .getByRole("button", { name: "All cities (343)", exact: true })
+    .getByRole("button", { name: "All cities (361)", exact: true })
     .click();
   await page.mouse.click(far.x, far.y);
   await expect(page).not.toHaveURL(/city=nassau-bahamas/);
@@ -2152,7 +2248,7 @@ test("striped-country selection and city pins retain click priority without coun
   await expect(globe).toHaveAttribute("data-ready", "true", { timeout: 30000 });
   await expect(page.locator(".coordinates")).toContainText("64.1° N");
   await page
-    .getByRole("button", { name: "All cities (343)", exact: true })
+    .getByRole("button", { name: "All cities (361)", exact: true })
     .click();
   box = (await globe.boundingBox())!;
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);

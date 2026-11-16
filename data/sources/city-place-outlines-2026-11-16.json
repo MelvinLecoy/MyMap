@@ -1,0 +1,88 @@
+[
+  {
+    "placeId": "bali",
+    "name": "Bali",
+    "url": "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson/ne_10m_admin_1_states_provinces.geojson",
+    "sha256": "22d0e3ad85eb3e27f17cabf8ba2d50e554fbc27a87796ff891d958185da62fb5",
+    "selector": {
+      "property": "iso_3166_2",
+      "value": "ID-BA"
+    },
+    "outline": "public/places/bali.geojson",
+    "definition": "Bali province, including its associated coastal islands.",
+    "license": "Natural Earth, public domain",
+    "geometrySha256": "5b4ce15418beba36673c8be77d06e9b4c628e88cc49ec900b362faf0de7c3ca7"
+  },
+  {
+    "placeId": "algarve",
+    "name": "Algarve",
+    "url": "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson/ne_10m_admin_1_states_provinces.geojson",
+    "sha256": "22d0e3ad85eb3e27f17cabf8ba2d50e554fbc27a87796ff891d958185da62fb5",
+    "selector": {
+      "property": "iso_3166_2",
+      "value": "PT-08"
+    },
+    "outline": "public/places/algarve.geojson",
+    "definition": "Faro district, corresponding to the Algarve region.",
+    "license": "Natural Earth, public domain",
+    "geometrySha256": "6170005a2de9cf9ca32148e6480851b0cf1a851f3bee21bb754c99bf6d687795"
+  },
+  {
+    "placeId": "santorini",
+    "name": "Santorini",
+    "url": "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson/ne_10m_admin_0_countries.geojson",
+    "sha256": "239eec57ac17f100a11e2536cffc56752c318b50ae765b0918ff7aab4ce8f255",
+    "selector": {
+      "property": "ADM0_A3",
+      "value": "GRC",
+      "componentsWithin": [
+        25.25,
+        36.3,
+        25.55,
+        36.5
+      ]
+    },
+    "outline": "public/places/santorini.geojson",
+    "definition": "Santorini island group: complete Greek coastline components within 25.25–25.55°E, 36.3–36.5°N. The caldera water is excluded.",
+    "license": "Natural Earth, public domain",
+    "geometrySha256": "3a81f9603853f96d7fb09be096d4055c311f1c3e086769bbe1dac30053f5ee0a"
+  },
+  {
+    "placeId": "komodo",
+    "name": "Komodo",
+    "url": "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson/ne_10m_admin_0_countries.geojson",
+    "sha256": "239eec57ac17f100a11e2536cffc56752c318b50ae765b0918ff7aab4ce8f255",
+    "selector": {
+      "property": "ADM0_A3",
+      "value": "IDN",
+      "componentContaining": [
+        119.488,
+        -8.548
+      ]
+    },
+    "outline": "public/places/komodo.geojson",
+    "definition": "Komodo island only: the complete Indonesian coastline component containing the representative point. Excludes Rinca, Padar and the wider national park.",
+    "license": "Natural Earth, public domain",
+    "geometrySha256": "9d47ebf514a646a2806cdb507ef728f72a0f47067e5fd33b20b66821f99e98d0"
+  },
+  {
+    "placeId": "cappadocia",
+    "name": "Cappadocia",
+    "url": "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson/ne_10m_admin_1_states_provinces.geojson",
+    "sha256": "22d0e3ad85eb3e27f17cabf8ba2d50e554fbc27a87796ff891d958185da62fb5",
+    "selector": {
+      "property": "iso_3166_2",
+      "values": [
+        "TR-50",
+        "TR-68",
+        "TR-51",
+        "TR-38"
+      ]
+    },
+    "dissolve": true,
+    "outline": "public/places/cappadocia.geojson",
+    "definition": "Approximate broad Cappadocia scope from the owner's screenshot: dissolved union of Nevşehir (TR-50), Aksaray (TR-68), Niğde (TR-51) and Kayseri (TR-38). Generalized province-based geographic interpretation, not an official historical-region boundary or an exact copy of Google's outline.",
+    "license": "Natural Earth, public domain",
+    "geometrySha256": "aa866800cd1cdce1a67ebe5143f4a0c8710077a1daf5c7be7cf7e84f68eeabfb"
+  }
+]

@@ -13,8 +13,8 @@ import { importCities } from "../scripts/importer.js";
 test("the database collection and CSV exports preserve IDs, links, statuses and missing positions", () => {
   const rows = collectionRows();
   const cities = rows.map(fromCityRow);
-  assert.equal(cities.length, 343);
-  assert.equal(cities.filter((c) => c.coordinates).length, 341);
+  assert.equal(cities.length, 361);
+  assert.equal(cities.filter((c) => c.coordinates).length, 359);
   assert.deepEqual(cities.map(toCityRow), rows);
   const edited = cities.find((c) => c.id === "moscow-russia")!;
   edited.status = "Update";

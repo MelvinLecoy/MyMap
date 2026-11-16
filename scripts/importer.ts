@@ -121,9 +121,9 @@ export function parseMapLink(input: string): City["map"] {
     throw new Error(
       "Use an HTTPS Google My Maps URL on google.com, www.google.com, or maps.google.com.",
     );
-  if (!/^\/maps\/d\/(?:u\/\d+\/)?(?:embed|viewer)\/?$/.test(url.pathname))
+  if (!/^\/maps\/d\/(?:u\/\d+\/)?(?:embed|viewer|edit)\/?$/.test(url.pathname))
     throw new Error(
-      "This is not a recognized Google My Maps embed or viewer path.",
+      "This is not a recognized Google My Maps embed, viewer or edit path.",
     );
   const mid = url.searchParams.get("mid");
   if (
@@ -139,6 +139,8 @@ export function parseMapLink(input: string): City["map"] {
     const value = url.searchParams.get(name);
     if (value) embed.searchParams.set(name, value);
   }
+  if (/\/edit\/?$/.test(url.pathname) && !embed.searchParams.has("ehbc"))
+    embed.searchParams.set("ehbc", "2E312F");
   return {
     embedUrl: embed.href,
     viewerUrl: `https://www.google.com/maps/d/viewer?mid=${encodeURIComponent(mid)}`,

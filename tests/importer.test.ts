@@ -79,6 +79,29 @@ test("URL and inert iframe produce canonical safe URLs, preserving embed setting
     "https://www.google.com/maps/d/viewer?mid=abc",
   );
 });
+test("shared edit links automatically become canonical embeds without sharing parameters", () => {
+  for (const path of ["edit", "u/0/edit", "u/3/edit/"]) {
+    const input = `https://www.google.com/maps/d/${path}?mid=abc_123-x&usp=sharing`;
+    const map = parseMapLink(input)!;
+    assert.deepEqual(map, {
+      embedUrl: "https://www.google.com/maps/d/embed?mid=abc_123-x&ehbc=2E312F",
+      viewerUrl: "https://www.google.com/maps/d/viewer?mid=abc_123-x",
+    });
+    assert.deepEqual(parseMapLink(map.embedUrl), map);
+    const city = importCities(
+      csv([row().replace(",,0,0,PL", `,${input},0,0,PL`)]),
+    ).data.cities[0];
+    assert.deepEqual(city.map, map);
+  }
+  const configured = parseMapLink(
+    "https://google.com/maps/d/u/0/edit?mid=abc&ehbc=FFFFFF&z=5&usp=sharing",
+  )!;
+  assert.equal(new URL(configured.embedUrl).searchParams.get("ehbc"), "FFFFFF");
+  assert.equal(new URL(configured.embedUrl).searchParams.get("z"), "5");
+  assert.throws(() =>
+    parseMapLink("https://google.com/maps/d/edit?mid=a&mid=b"),
+  );
+});
 test("reject deceptive hosts, arbitrary URLs, credentials, duplicate src and invalid IDs", () => {
   for (const link of [
     "https://www.google.com.evil.com/maps/d/embed?mid=abc",
