@@ -11,6 +11,7 @@ import { Globe2, LocateFixed, Maximize2, Compass, MapPin } from "lucide-react";
 import {
   asset,
   cityFeatures,
+  countryBorderColor,
   countryFillOpacity,
   fillColors,
   initialZoom,
@@ -269,7 +270,7 @@ export default function Globe({
           type: "line",
           source: "atlas-countries",
           paint: {
-            "line-color": MAP_COLORS.boundary,
+            "line-color": countryBorderColor(current.current.mapLayer),
             "line-opacity": 0.9,
             "line-width": [
               "interpolate",
@@ -859,6 +860,12 @@ export default function Globe({
           </div>
           <MapLayerControl value={mapLayer} onChange={setMapLayer} />
           <div className="map-legend" aria-label="Map legend">
+            {mapLayer === "standard" && (
+              <span>
+                <i className="legend-country" />
+                Visited country
+              </span>
+            )}
             <span>
               <i
                 className="legend-pin"
@@ -912,7 +919,7 @@ export default function Globe({
                     className="legend-country"
                     style={{
                       backgroundColor: MAP_COLORS.unvisitedCountry,
-                      borderColor: MAP_COLORS.boundary,
+                      borderColor: countryBorderColor(mapLayer),
                     }}
                   />
                   Never

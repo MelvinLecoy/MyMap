@@ -1,7 +1,11 @@
 import type { ExpressionSpecification, Map as MapInstance } from "maplibre-gl";
-import { countryFillOpacity, fillColors, type MapLayer } from "./map-style";
+import {
+  countryBorderColor,
+  countryFillOpacity,
+  fillColors,
+  type MapLayer,
+} from "./map-style";
 import { countryStripeLayers } from "./country-stripes";
-import { MAP_COLORS } from "./palette";
 import type { CountryVisit } from "./types";
 
 const selectedState: ExpressionSpecification = [
@@ -29,6 +33,11 @@ export function restoreCountryPaint(
     countryFillOpacity(countries),
   );
   map.setPaintProperty("atlas-borders", "line-opacity", 0.9);
+  map.setPaintProperty(
+    "atlas-borders",
+    "line-color",
+    countryBorderColor(layer),
+  );
   for (const stripe of countryStripeLayers(countries, layer === "standard")) {
     map.setFilter(stripe.id, stripe.filter ?? null);
     map.setLayoutProperty(stripe.id, "visibility", stripe.layout!.visibility);
@@ -141,7 +150,7 @@ function createHighlight(
       type: "line",
       source: "atlas-countries",
       paint: {
-        "line-color": MAP_COLORS.boundary,
+        "line-color": countryBorderColor(activeLayer, true),
         "line-width": 1.25,
         "line-opacity": onlySelected(0.85),
         "line-translate": [0, 0],
@@ -180,6 +189,16 @@ function createHighlight(
   ) {
     activeLayer = layer;
     if (disposed || !map.getLayer(`atlas-${kind}-land`)) return;
+    map.setPaintProperty(
+      "atlas-borders",
+      "line-color",
+      countryBorderColor(activeLayer),
+    );
+    map.setPaintProperty(
+      `atlas-${kind}-outline`,
+      "line-color",
+      countryBorderColor(activeLayer, true),
+    );
     map.setPaintProperty(
       "atlas-land",
       "fill-color",

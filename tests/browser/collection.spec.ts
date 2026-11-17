@@ -99,9 +99,10 @@ test("map controls and visit-history layers work across screen sizes without cha
     await trigger.click();
     await page.getByRole("radio", { name: /^Standard/ }).check();
     await expect(globe).toHaveAttribute("data-layer", "standard");
-    await expect(swatches.nth(1)).toHaveCSS("background-color", "rgb(38, 120, 79)");
+    await expect(swatches.nth(1)).toHaveCSS("background-color", "rgb(99, 178, 138)");
     await expect(swatches.nth(1)).not.toHaveCSS("background-image", "none");
     await expect(swatches).toHaveCount(4);
+    await expect(page.locator(".map-legend")).toContainText("Visited country");
     await expect(page.locator(".map-legend")).not.toContainText("Never");
     await page
       .getByRole("heading", { name: "Afghanistan", exact: true })

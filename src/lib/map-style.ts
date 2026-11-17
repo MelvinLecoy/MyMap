@@ -145,6 +145,14 @@ export function cityFeatures(cities: City[]): FeatureCollection<Point> {
 }
 export type MapLayer = "standard" | "last-visit";
 
+export function countryBorderColor(layer: MapLayer, selected = false) {
+  return layer === "last-visit"
+    ? MAP_COLORS.historyBoundary
+    : selected
+      ? MAP_COLORS.cityLabel
+      : MAP_COLORS.boundary;
+}
+
 export function fillColors(
   countries: CountryVisit[],
   layer: MapLayer = "standard",
@@ -160,7 +168,7 @@ export function fillColors(
       c.visited
         ? layer === "last-visit"
           ? (VISIT_YEAR_COLORS[countryVisitYear(c.lastVisited) ?? ""] ??
-            MAP_COLORS.visitedCountry)
+            VISIT_YEAR_COLORS[2026])
           : c.color || MAP_COLORS.visitedCountry
         : layer === "last-visit"
           ? unvisited

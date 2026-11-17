@@ -200,10 +200,10 @@ test("history layer uses solid panel year colours and greys unvisited and uncata
     );
   };
   for (const [code, color] of Object.entries({
-    CA: MAP_COLORS.visitedCountry,
+    CA: VISIT_YEAR_COLORS[2026],
     FR: VISIT_YEAR_COLORS[2024],
-    GB: MAP_COLORS.visitedCountry,
-    US: MAP_COLORS.visitedCountry,
+    GB: VISIT_YEAR_COLORS[2026],
+    US: VISIT_YEAR_COLORS[2026],
     IE: "#dfbf00",
     NL: VISIT_YEAR_COLORS[2023],
     IT: VISIT_YEAR_COLORS[2023],
@@ -213,7 +213,8 @@ test("history layer uses solid panel year colours and greys unvisited and uncata
     assert.equal(evaluate("last-visit", code), MAP_COLORS.unvisitedCountry);
   assert.equal(evaluate("standard", "AF"), "#abcdef");
   assert.equal(evaluate("standard", "CA"), "#123456");
-  assert.equal(evaluate("standard", "IE"), MAP_COLORS.visitedCountry);
+  assert.equal(evaluate("standard", "IE"), "#63b28a");
+  assert.equal(evaluate("standard", "US"), "#63b28a");
   assert.equal(evaluate("standard", "ZZ"), MAP_COLORS.land);
   assert.equal(fillColors([], "last-visit"), MAP_COLORS.unvisitedCountry);
   assert.equal(fillColors([]), MAP_COLORS.land);
@@ -293,6 +294,11 @@ test("selected country and responsive paint restoration retain the chosen layer 
         fillColors(visited, "last-visit"),
       );
     selection.updateCountries(countries, "standard");
+    assert.equal(layers.get("atlas-borders").paint["line-color"], "#6b7772");
+    assert.equal(
+      layers.get("atlas-selected-outline").paint["line-color"],
+      "#213e4a",
+    );
     for (const stripe of countryStripeLayers(countries)) {
       assert.equal(layers.get(stripe.id).layout.visibility, "visible");
       assert.equal(
@@ -307,6 +313,7 @@ test("selected country and responsive paint restoration retain the chosen layer 
       );
     selection.destroy();
     restoreCountryPaint(map, countries, "last-visit");
+    assert.equal(layers.get("atlas-borders").paint["line-color"], "#000000");
     for (const stripe of countryStripeLayers(countries))
       assert.equal(layers.get(stripe.id).layout.visibility, "none");
     assert.deepEqual(
