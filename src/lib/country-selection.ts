@@ -141,7 +141,7 @@ function createHighlight(
       type: "line",
       source: "atlas-countries",
       paint: {
-        "line-color": MAP_COLORS.cityLabel,
+        "line-color": MAP_COLORS.boundary,
         "line-width": 1.25,
         "line-opacity": onlySelected(0.85),
         "line-translate": [0, 0],

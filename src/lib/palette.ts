@@ -3,9 +3,10 @@
 export const MAP_COLORS = {
   water: "#c5e4ec",
   land: "#edf0e6",
-  visitedCountry: "#63b28a",
+  visitedCountry: "#26784f",
+  placeArea: "#63b28a",
   unvisitedCountry: "#bfc6c4",
-  boundary: "#6b7772",
+  boundary: "#000000",
   adminBoundary: "#a8bdb0",
   grid: "#a6c1bc",
   label: "#344f54",

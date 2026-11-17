@@ -861,30 +861,6 @@ export default function Globe({
           <div className="map-legend" aria-label="Map legend">
             <span>
               <i
-                className="legend-country"
-                style={{
-                  backgroundColor:
-                    mapLayer === "last-visit"
-                      ? VISIT_YEAR_COLORS[2026]
-                      : undefined,
-                }}
-              />
-              Visited country
-            </span>
-            {mapLayer === "last-visit" && (
-              <span>
-                <i
-                  className="legend-country"
-                  style={{
-                    backgroundColor: MAP_COLORS.unvisitedCountry,
-                    borderColor: MAP_COLORS.boundary,
-                  }}
-                />
-                Unvisited country
-              </span>
-            )}
-            <span>
-              <i
                 className="legend-pin"
                 style={{ backgroundColor: MAP_COLORS.pinVisited }}
               />
@@ -930,6 +906,18 @@ export default function Globe({
                   </span>
                 );
               })}
+              {mapLayer === "last-visit" && (
+                <span>
+                  <i
+                    className="legend-country"
+                    style={{
+                      backgroundColor: MAP_COLORS.unvisitedCountry,
+                      borderColor: MAP_COLORS.boundary,
+                    }}
+                  />
+                  Never
+                </span>
+              )}
             </div>
           </div>
           <div className="coordinates">

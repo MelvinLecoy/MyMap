@@ -50,9 +50,10 @@ test("map controls and visit-history layers work across screen sizes without cha
     await expect(swatches.nth(0)).toHaveCSS("background-color", "rgb(38, 120, 79)");
     await expect(swatches.nth(1)).toHaveCSS("background-color", "rgb(223, 191, 0)");
     expect(await swatches.evaluateAll((nodes) => nodes.every((node) => getComputedStyle(node).backgroundImage === "none"))).toBe(true);
-    await expect(page.locator(".map-legend")).toContainText(
-      "Unvisited country",
-    );
+    await expect(swatches).toHaveCount(5);
+    await expect(swatches.nth(4)).toHaveCSS("background-color", "rgb(191, 198, 196)");
+    await expect(page.locator(".map-year-legend")).toContainText("Never");
+    await expect(page.locator(".map-legend")).not.toContainText(/Visited country|Unvisited country/);
     expect(await page.locator(".city-panel").innerText()).toBe(panel);
     expect(await page.locator(".coordinates").textContent()).toBe(position);
     await page.keyboard.press("Escape");
@@ -98,11 +99,10 @@ test("map controls and visit-history layers work across screen sizes without cha
     await trigger.click();
     await page.getByRole("radio", { name: /^Standard/ }).check();
     await expect(globe).toHaveAttribute("data-layer", "standard");
-    await expect(swatches.nth(1)).toHaveCSS("background-color", "rgb(99, 178, 138)");
+    await expect(swatches.nth(1)).toHaveCSS("background-color", "rgb(38, 120, 79)");
     await expect(swatches.nth(1)).not.toHaveCSS("background-image", "none");
-    await expect(page.locator(".map-legend")).not.toContainText(
-      "Unvisited country",
-    );
+    await expect(swatches).toHaveCount(4);
+    await expect(page.locator(".map-legend")).not.toContainText("Never");
     await page
       .getByRole("heading", { name: "Afghanistan", exact: true })
       .click();

@@ -1,6 +1,7 @@
 import type { Map as MapInstance, ExpressionSpecification } from "maplibre-gl";
 import type { Place } from "./types";
 import { placeBounds } from "./places";
+import { MAP_COLORS } from "./palette";
 
 export function focusPlace(map: MapInstance, place: Place, duration: number) {
   const bounds = placeBounds(place);
@@ -88,7 +89,7 @@ export function createPlaceSelection(
     type: "fill",
     source: "atlas-place-outlines",
     paint: {
-      "fill-color": "#63b28a",
+      "fill-color": MAP_COLORS.placeArea,
       "fill-opacity": opacity(0.1),
       "fill-translate-anchor": "viewport",
       "fill-translate-transition": { duration: 0 },

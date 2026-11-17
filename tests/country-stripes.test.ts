@@ -200,10 +200,10 @@ test("history layer uses solid panel year colours and greys unvisited and uncata
     );
   };
   for (const [code, color] of Object.entries({
-    CA: VISIT_YEAR_COLORS[2026],
+    CA: MAP_COLORS.visitedCountry,
     FR: VISIT_YEAR_COLORS[2024],
-    GB: VISIT_YEAR_COLORS[2026],
-    US: VISIT_YEAR_COLORS[2026],
+    GB: MAP_COLORS.visitedCountry,
+    US: MAP_COLORS.visitedCountry,
     IE: "#dfbf00",
     NL: VISIT_YEAR_COLORS[2023],
     IT: VISIT_YEAR_COLORS[2023],
@@ -269,6 +269,10 @@ test("selected country and responsive paint restoration retain the chosen layer 
       "last-visit",
     );
     selection.setSelectedCountry("AF");
+    assert.equal(
+      layers.get("atlas-selected-outline").paint["line-color"],
+      "#000000",
+    );
     for (const stripe of countryStripeLayers(countries)) {
       assert.equal(layers.get(stripe.id).layout.visibility, "none");
       assert.equal(
