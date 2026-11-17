@@ -7,7 +7,7 @@ const layers: { id: MapLayer; name: string; description: string }[] = [
   {
     id: "last-visit",
     name: "Last visit history",
-    description: "Unvisited countries in grey",
+    description: "Year colours · unvisited grey",
   },
 ];
 

@@ -2,11 +2,16 @@ import type { FillLayerSpecification } from "maplibre-gl";
 import { COUNTRY_STRIPE_COLORS } from "./palette";
 import type { CountryVisit } from "./types";
 
-export function countryStripeYear(date?: string | null) {
+export function countryVisitYear(date?: string | null) {
   if (!date || !/^\d{4}(?:-|$)/.test(date)) return null;
   const year = Number(date.slice(0, 4));
-  if (year > 0 && year <= 2023) return "2023";
-  return year === 2024 || year === 2025 ? String(year) : null;
+  if (year <= 0) return null;
+  return year <= 2023 ? "2023" : String(year);
+}
+
+export function countryStripeYear(date?: string | null) {
+  const year = countryVisitYear(date);
+  return year && COUNTRY_STRIPE_COLORS[year] ? year : null;
 }
 
 export function countryStripeImage(color: string) {
@@ -25,11 +30,13 @@ export function countryStripeImage(color: string) {
 
 export function countryStripeLayers(
   countries: CountryVisit[],
+  visible = true,
 ): FillLayerSpecification[] {
   return Object.keys(COUNTRY_STRIPE_COLORS).map((year) => ({
     id: "atlas-visit-stripes-" + year,
     type: "fill",
     source: "atlas-countries",
+    layout: { visibility: visible ? "visible" : "none" },
     filter: [
       "in",
       ["get", "code"],

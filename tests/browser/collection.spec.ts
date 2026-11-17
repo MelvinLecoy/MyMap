@@ -46,6 +46,10 @@ test("map controls and visit-history layers work across screen sizes without cha
     const position = await page.locator(".coordinates").textContent();
     await page.getByRole("radio", { name: /Last visit history/ }).check();
     await expect(globe).toHaveAttribute("data-layer", "last-visit");
+    const swatches = page.locator(".map-year-legend i");
+    await expect(swatches.nth(0)).toHaveCSS("background-color", "rgb(38, 120, 79)");
+    await expect(swatches.nth(1)).toHaveCSS("background-color", "rgb(223, 191, 0)");
+    expect(await swatches.evaluateAll((nodes) => nodes.every((node) => getComputedStyle(node).backgroundImage === "none"))).toBe(true);
     await expect(page.locator(".map-legend")).toContainText(
       "Unvisited country",
     );
@@ -94,6 +98,8 @@ test("map controls and visit-history layers work across screen sizes without cha
     await trigger.click();
     await page.getByRole("radio", { name: /^Standard/ }).check();
     await expect(globe).toHaveAttribute("data-layer", "standard");
+    await expect(swatches.nth(1)).toHaveCSS("background-color", "rgb(99, 178, 138)");
+    await expect(swatches.nth(1)).not.toHaveCSS("background-image", "none");
     await expect(page.locator(".map-legend")).not.toContainText(
       "Unvisited country",
     );

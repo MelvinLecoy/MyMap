@@ -1,5 +1,6 @@
 import { bilingualPlaceName, providerTypography } from "./map-typography";
-import { MAP_COLORS } from "./palette";
+import { MAP_COLORS, VISIT_YEAR_COLORS } from "./palette";
+import { countryVisitYear } from "./country-stripes";
 import type { ExpressionSpecification, StyleSpecification } from "maplibre-gl";
 import type { City, CountryVisit } from "./types";
 import type { FeatureCollection, Point } from "geojson";
@@ -157,7 +158,10 @@ export function fillColors(
     ...countries.flatMap((c) => [
       c.code,
       c.visited
-        ? c.color || MAP_COLORS.visitedCountry
+        ? layer === "last-visit"
+          ? (VISIT_YEAR_COLORS[countryVisitYear(c.lastVisited) ?? ""] ??
+            MAP_COLORS.visitedCountry)
+          : c.color || MAP_COLORS.visitedCountry
         : layer === "last-visit"
           ? unvisited
           : c.color || unvisited,

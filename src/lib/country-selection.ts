@@ -29,9 +29,10 @@ export function restoreCountryPaint(
     countryFillOpacity(countries),
   );
   map.setPaintProperty("atlas-borders", "line-opacity", 0.9);
-  for (const layer of countryStripeLayers(countries)) {
-    map.setFilter(layer.id, layer.filter ?? null);
-    map.setPaintProperty(layer.id, "fill-opacity", 1);
+  for (const stripe of countryStripeLayers(countries, layer === "standard")) {
+    map.setFilter(stripe.id, stripe.filter ?? null);
+    map.setLayoutProperty(stripe.id, "visibility", stripe.layout!.visibility);
+    map.setPaintProperty(stripe.id, "fill-opacity", 1);
   }
 }
 
@@ -114,7 +115,10 @@ function createHighlight(
     },
     beforeId,
   );
-  for (const layer of countryStripeLayers(countries)) {
+  for (const layer of countryStripeLayers(
+    countries,
+    activeLayer === "standard",
+  )) {
     map.addLayer(
       {
         ...layer,
@@ -203,8 +207,9 @@ function createHighlight(
       "fill-opacity",
       onlySelected(countryFillOpacity(next)),
     );
-    for (const layer of countryStripeLayers(next)) {
+    for (const layer of countryStripeLayers(next, activeLayer === "standard")) {
       map.setFilter(layer.id, layer.filter ?? null);
+      map.setLayoutProperty(layer.id, "visibility", layer.layout!.visibility);
       map.setPaintProperty(layer.id, "fill-opacity", [
         "case",
         selectedState,
@@ -212,6 +217,11 @@ function createHighlight(
         1,
       ]);
       map.setFilter(`atlas-${kind}-${layer.id}`, layer.filter ?? null);
+      map.setLayoutProperty(
+        `atlas-${kind}-${layer.id}`,
+        "visibility",
+        layer.layout!.visibility,
+      );
     }
   }
   function setCountry(code: string | null, immediate = false) {

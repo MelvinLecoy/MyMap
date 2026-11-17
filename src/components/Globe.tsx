@@ -21,7 +21,11 @@ import {
 } from "../lib/map-style";
 import MapLayerControl from "./MapLayerControl";
 import { LABEL_FONTS, LABEL_SIZES } from "../lib/map-typography";
-import { COUNTRY_STRIPE_COLORS, MAP_COLORS } from "../lib/palette";
+import {
+  COUNTRY_STRIPE_COLORS,
+  MAP_COLORS,
+  VISIT_YEAR_COLORS,
+} from "../lib/palette";
 import {
   countryStripeImage,
   countryStripeLayers,
@@ -216,7 +220,10 @@ export default function Globe({
           map.addImage(name, countryStripeImage(color), { pixelRatio: 2 });
         }
       }
-      for (const layer of countryStripeLayers(current.current.countries)) {
+      for (const layer of countryStripeLayers(
+        current.current.countries,
+        current.current.mapLayer === "standard",
+      )) {
         map.addLayer(layer, firstLabel);
       }
       map.addLayer(
@@ -853,7 +860,15 @@ export default function Globe({
           <MapLayerControl value={mapLayer} onChange={setMapLayer} />
           <div className="map-legend" aria-label="Map legend">
             <span>
-              <i className="legend-country" />
+              <i
+                className="legend-country"
+                style={{
+                  backgroundColor:
+                    mapLayer === "last-visit"
+                      ? VISIT_YEAR_COLORS[2026]
+                      : undefined,
+                }}
+              />
               Visited country
             </span>
             {mapLayer === "last-visit" && (
@@ -899,12 +914,16 @@ export default function Globe({
                     <i
                       className="legend-country"
                       style={{
-                        backgroundColor: MAP_COLORS.visitedCountry,
-                        backgroundImage: color
-                          ? "repeating-linear-gradient(135deg, " +
-                            color +
-                            " 0 1px, transparent 1px 3px)"
-                          : undefined,
+                        backgroundColor:
+                          mapLayer === "last-visit"
+                            ? VISIT_YEAR_COLORS[year]
+                            : MAP_COLORS.visitedCountry,
+                        backgroundImage:
+                          mapLayer === "standard" && color
+                            ? "repeating-linear-gradient(135deg, " +
+                              color +
+                              " 0 1px, transparent 1px 3px)"
+                            : undefined,
                       }}
                     />
                     {year === "2023" ? "≤2023" : year}
