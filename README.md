@@ -97,7 +97,7 @@ npm run data:resolve-coordinates
 npm run data:resolve-coordinates -- /path/to/geonames
 ```
 
-The command matches missing locations by country and normalized primary, ASCII, or alternate city name. It saves **only unique** matches to `data/coordinates.csv` (`CityId,Latitude,Longitude`), preserves previously saved coordinates, and reports ambiguous/missing matches for manual review. It does not make per-city geocoding requests. Explicit valid coordinates in the main CSV always win. GeoNames is credited when a coordinates sidecar is used; its data is CC BY 4.0.
+The command matches missing locations by country and normalized primary, ASCII, or alternate city name. It saves **only unique** matches to `data/coordinates.csv` (`CityId,Latitude,Longitude`), preserves previously saved coordinates, and reports ambiguous/missing matches for manual review. It does not make per-city geocoding requests. Explicit valid coordinates in the main CSV always win. GeoNames is credited below for the coordinates sidecar; its data is CC BY 4.0.
 
 ## Globe and map data
 
@@ -237,6 +237,6 @@ Unit tests compare the prepared collection with the latest uploaded source and c
 ## Credits
 
 - [Natural Earth](https://www.naturalearthdata.com/), public-domain geographic data.
-- [OpenFreeMap](https://openfreemap.org/) and [OpenStreetMap contributors](https://www.openstreetmap.org/copyright), optional basemap; provider attribution remains visible.
+- [OpenFreeMap](https://openfreemap.org/), [OpenMapTiles](https://openmaptiles.org/), and [OpenStreetMap contributors](https://www.openstreetmap.org/copyright), optional basemap.
 - [GeoNames](https://www.geonames.org/export/), CC BY 4.0, when using the optional local coordinate resolver.
 - Map label fonts: Noto Serif, Inter, and Roboto Condensed, under the SIL Open Font License. Legacy Open Sans glyphs from the MapLibre demo atlas remain bundled; DM Sans and Manrope from Fontsource are used in the interface. Fonts and licenses are bundled locally. See `assets/fonts/manifest.json` and `public/fonts/`.

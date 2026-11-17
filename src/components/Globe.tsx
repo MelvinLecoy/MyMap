@@ -58,7 +58,6 @@ interface Props {
   onSelect: (id: string) => void;
   onSelectCountry: (code: string) => void;
   countryCodes: string[];
-  geonames: boolean;
   viewControl?: ReactNode;
 }
 export default function Globe({
@@ -70,7 +69,6 @@ export default function Globe({
   onSelect,
   onSelectCountry,
   countryCodes,
-  geonames,
   viewControl,
 }: Props) {
   const container = useRef<HTMLDivElement>(null);
@@ -135,20 +133,6 @@ export default function Globe({
       return;
     }
     mapRef.current = map;
-    map.addControl(
-      new maplibregl.AttributionControl({
-        compact: false,
-        customAttribution: [
-          '<a href="https://www.naturalearthdata.com/" target="_blank" rel="noreferrer">Natural Earth</a>',
-          ...(geonames
-            ? [
-                '<a href="https://www.geonames.org/" target="_blank" rel="noreferrer">GeoNames</a>',
-              ]
-            : []),
-        ],
-      }),
-      "bottom-right",
-    );
     const canvas = map.getCanvas();
     const pointerPoint = { x: 0, y: 0 };
     let pointerFrame = 0;
@@ -655,7 +639,7 @@ export default function Globe({
       map.remove();
       mapRef.current = null;
     };
-  }, [geonames]);
+  }, []);
   useEffect(() => {
     const map = mapRef.current;
     const source = map?.getSource("atlas-cities") as GeoJSONSource | undefined;

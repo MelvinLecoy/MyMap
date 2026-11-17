@@ -556,7 +556,6 @@ export default function App() {
             onSelect={(id) => navigate(id)}
             onSelectCountry={openCountry}
             countryCodes={countriesInView.map((country) => country.code)}
-            geonames={data.geonames}
             viewControl={
               cloud.enabled ? (
                 <AccessModeSwitch
