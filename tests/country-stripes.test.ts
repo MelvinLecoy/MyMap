@@ -26,7 +26,12 @@ import {
   MAP_COLORS,
   VISIT_YEAR_COLORS,
 } from "../src/lib/palette";
-import { countryFillOpacity, fillColors } from "../src/lib/map-style";
+import {
+  countryFillOpacity,
+  fillColors,
+  type MapLayer,
+} from "../src/lib/map-style";
+import { TESTING_PLANNED_COUNTRY_CODES } from "../src/lib/testing-layer";
 import {
   createCountrySelection,
   restoreCountryPaint,
@@ -223,7 +228,6 @@ test("history layer uses solid panel year colours and greys unvisited and uncata
     assert.equal(evaluate("testing", country.code), "#63b28a");
   for (const code of ["AF", "ZZ"])
     assert.equal(evaluate("testing", code), evaluate("standard", code));
-  assert.equal(fillColors([], "testing"), MAP_COLORS.land);
   assert.equal(fillColors([], "last-visit"), MAP_COLORS.unvisitedCountry);
   assert.equal(fillColors([]), MAP_COLORS.land);
   assert.deepEqual(countries, before);
@@ -238,6 +242,83 @@ test("history layer uses solid panel year colours and greys unvisited and uncata
       (stripe) => stripe.layout?.visibility === "none",
     ),
   );
+});
+
+test("Testing plans cover exactly the approved countries, override visits and leave the other layers unchanged", () => {
+  const planned = [
+    "RU",
+    "UA",
+    "BY",
+    "VE",
+    "CU",
+    "PY",
+    "AG",
+    "BB",
+    "DM",
+    "GD",
+    "KN",
+    "LC",
+    "VC",
+  ];
+  assert.deepEqual(
+    [...TESTING_PLANNED_COUNTRY_CODES].sort(),
+    [...planned].sort(),
+  );
+  const countries: CountryVisit[] = [
+    { code: "RU", visited: true, color: "#123456", lastVisited: "2025" },
+    { code: "UA", visited: false, color: null },
+    { code: "CA", visited: true, color: null, lastVisited: "2026" },
+    { code: "TT", visited: false, color: null },
+  ];
+  const before = structuredClone(countries);
+  const compile = (layer: MapLayer, rows = countries) => {
+    const fill = createExpression(
+      fillColors(rows, layer) as ExpressionSpecification,
+    );
+    const opacity = createExpression(countryFillOpacity(rows, layer));
+    assert.equal(fill.result, "success");
+    assert.equal(opacity.result, "success");
+    if (fill.result !== "success" || opacity.result !== "success")
+      throw new Error("Invalid planned paint");
+    return (code: string) => {
+      const feature = { type: 3 as const, geometry: [], properties: { code } };
+      return {
+        color: fill.value.evaluate({ zoom: 2 }, feature),
+        opacity: opacity.value.evaluate({ zoom: 2 }, feature),
+      };
+    };
+  };
+  const testing = compile("testing"),
+    emptyTesting = compile("testing", []);
+  const mapCodes = new Set(
+    JSON.parse(
+      readFileSync("public/atlas/countries.geojson", "utf8"),
+    ).features.map(
+      (feature: { properties: { code: string } }) => feature.properties.code,
+    ),
+  );
+  for (const code of planned) {
+    assert.ok(mapCodes.has(code), `Missing planned-country outline: ${code}`);
+    assert.deepEqual(testing(code), { color: "#8b5cf6", opacity: 1 });
+    assert.deepEqual(emptyTesting(code), { color: "#8b5cf6", opacity: 1 });
+  }
+  for (const code of ["TT", "HT", "DO", "JM", "BS", "PR", "ZZ"])
+    assert.deepEqual(testing(code), { color: MAP_COLORS.land, opacity: 0.95 });
+  assert.deepEqual(testing("CA"), { color: "#63b28a", opacity: 1 });
+  assert.deepEqual(compile("standard")("RU"), { color: "#123456", opacity: 1 });
+  assert.deepEqual(compile("last-visit")("RU"), {
+    color: VISIT_YEAR_COLORS[2025],
+    opacity: 1,
+  });
+  assert.deepEqual(compile("standard")("UA"), {
+    color: MAP_COLORS.land,
+    opacity: 0.95,
+  });
+  assert.deepEqual(compile("last-visit")("UA"), {
+    color: MAP_COLORS.unvisitedCountry,
+    opacity: 0.95,
+  });
+  assert.deepEqual(countries, before);
 });
 
 test("selected country and responsive paint restoration retain the chosen layer through data changes", () => {

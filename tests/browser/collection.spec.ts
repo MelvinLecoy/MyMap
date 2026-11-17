@@ -110,7 +110,9 @@ test("map controls and visit-history layers work across screen sizes without cha
     await page.getByRole("radio", { name: /^Testing/ }).check();
     await expect(globe).toHaveAttribute("data-layer", "testing");
     await expect(page.locator(".map-year-legend")).toHaveCount(0);
-    await expect(page.locator(".map-legend .legend-country")).toHaveCSS("background-color", "rgb(99, 178, 138)");
+    await expect(page.locator(".map-legend .legend-country").nth(0)).toHaveCSS("background-color", "rgb(99, 178, 138)");
+    await expect(page.locator(".map-legend .legend-country").nth(1)).toHaveCSS("background-color", "rgb(139, 92, 246)");
+    await expect(page.locator(".map-legend")).toContainText("Planned");
     expect(await page.locator(".city-panel").innerText()).toBe(panel);
     expect(await page.locator(".coordinates").textContent()).toBe(position);
     await page.getByRole("radio", { name: /Last visit history/ }).check();

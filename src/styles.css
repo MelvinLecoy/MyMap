@@ -413,6 +413,9 @@ h2 {
 .map-layer-preview--testing::before {
   background: var(--visited-country);
 }
+.map-layer-preview--testing::after {
+  background: #8b5cf6;
+}
 .map-layer-label {
   flex: 1;
   min-width: 0;

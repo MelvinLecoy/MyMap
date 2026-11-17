@@ -1,6 +1,7 @@
 import { bilingualPlaceName, providerTypography } from "./map-typography";
 import { MAP_COLORS, VISIT_YEAR_COLORS } from "./palette";
 import { countryVisitYear } from "./country-stripes";
+import { TESTING_PLANNED_COUNTRY_CODES } from "./testing-layer";
 import type { ExpressionSpecification, StyleSpecification } from "maplibre-gl";
 import type { City, CountryVisit } from "./types";
 import type { FeatureCollection, Point } from "geojson";
@@ -159,43 +160,47 @@ export function fillColors(
 ): string | unknown[] {
   const unvisited =
     layer === "last-visit" ? MAP_COLORS.unvisitedCountry : MAP_COLORS.land;
-  if (!countries.length) return unvisited;
-  return [
-    "match",
-    ["get", "code"],
-    ...countries.flatMap((c) => [
-      c.code,
-      c.visited
-        ? layer === "last-visit"
-          ? (VISIT_YEAR_COLORS[countryVisitYear(c.lastVisited) ?? ""] ??
-            VISIT_YEAR_COLORS[2026])
-          : layer === "testing"
-            ? MAP_COLORS.visitedCountry
-            : c.color || MAP_COLORS.visitedCountry
-        : layer === "last-visit"
-          ? unvisited
-          : c.color || unvisited,
-    ]),
-    unvisited,
-  ];
+  const colors: string | unknown[] = countries.length
+    ? [
+        "match",
+        ["get", "code"],
+        ...countries.flatMap((c) => [
+          c.code,
+          c.visited
+            ? layer === "last-visit"
+              ? (VISIT_YEAR_COLORS[countryVisitYear(c.lastVisited) ?? ""] ??
+                VISIT_YEAR_COLORS[2026])
+              : layer === "testing"
+                ? MAP_COLORS.visitedCountry
+                : c.color || MAP_COLORS.visitedCountry
+            : layer === "last-visit"
+              ? unvisited
+              : c.color || unvisited,
+        ]),
+        unvisited,
+      ]
+    : unvisited;
+  return layer === "testing"
+    ? [
+        "case",
+        [
+          "in",
+          ["get", "code"],
+          ["literal", [...TESTING_PLANNED_COUNTRY_CODES]],
+        ],
+        MAP_COLORS.plannedCountry,
+        colors,
+      ]
+    : colors;
 }
 
 export function countryFillOpacity(
   countries: CountryVisit[],
+  layer: MapLayer = "standard",
 ): ExpressionSpecification {
-  return [
-    "case",
-    [
-      "in",
-      ["get", "code"],
-      [
-        "literal",
-        countries
-          .filter((country) => country.visited)
-          .map((country) => country.code),
-      ],
-    ],
-    1,
-    0.95,
-  ];
+  const opaque = countries
+    .filter((country) => country.visited)
+    .map((country) => country.code);
+  if (layer === "testing") opaque.push(...TESTING_PLANNED_COUNTRY_CODES);
+  return ["case", ["in", ["get", "code"], ["literal", opaque]], 1, 0.95];
 }

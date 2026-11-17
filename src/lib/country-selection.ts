@@ -30,7 +30,7 @@ export function restoreCountryPaint(
   map.setPaintProperty(
     "atlas-land",
     "fill-opacity",
-    countryFillOpacity(countries),
+    countryFillOpacity(countries, layer),
   );
   map.setPaintProperty("atlas-borders", "line-opacity", 0.9);
   map.setPaintProperty(
@@ -115,7 +115,9 @@ function createHighlight(
           countries,
           activeLayer,
         ) as ExpressionSpecification,
-        "fill-opacity": onlySelected(countryFillOpacity(countries)),
+        "fill-opacity": onlySelected(
+          countryFillOpacity(countries, activeLayer),
+        ),
         "fill-translate": [0, 0],
         "fill-translate-anchor": "viewport",
         "fill-translate-transition": transition,
@@ -208,7 +210,7 @@ function createHighlight(
       "case",
       selectedState,
       0,
-      countryFillOpacity(next),
+      countryFillOpacity(next, activeLayer),
     ]);
     map.setPaintProperty("atlas-borders", "line-opacity", [
       "case",
@@ -224,7 +226,7 @@ function createHighlight(
     map.setPaintProperty(
       `atlas-${kind}-land`,
       "fill-opacity",
-      onlySelected(countryFillOpacity(next)),
+      onlySelected(countryFillOpacity(next, activeLayer)),
     );
     for (const layer of countryStripeLayers(next, activeLayer === "standard")) {
       map.setFilter(layer.id, layer.filter ?? null);

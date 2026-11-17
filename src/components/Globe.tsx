@@ -210,7 +210,10 @@ export default function Globe({
               current.current.countries,
               current.current.mapLayer,
             ) as ExpressionSpecification,
-            "fill-opacity": countryFillOpacity(current.current.countries),
+            "fill-opacity": countryFillOpacity(
+              current.current.countries,
+              current.current.mapLayer,
+            ),
           },
         },
         firstLabel,
@@ -864,6 +867,15 @@ export default function Globe({
               <span>
                 <i className="legend-country" />
                 Visited country
+              </span>
+            )}
+            {mapLayer === "testing" && (
+              <span>
+                <i
+                  className="legend-country"
+                  style={{ backgroundColor: MAP_COLORS.plannedCountry }}
+                />
+                Planned
               </span>
             )}
             <span>

@@ -12,7 +12,7 @@ const layers: { id: MapLayer; name: string; description: string }[] = [
   {
     id: "testing",
     name: "Testing",
-    description: "Visited countries in green",
+    description: "Visited green · planned purple",
   },
 ];
 
