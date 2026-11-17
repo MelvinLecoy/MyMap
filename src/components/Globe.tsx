@@ -137,7 +137,7 @@ export default function Globe({
     mapRef.current = map;
     map.addControl(
       new maplibregl.AttributionControl({
-        compact: true,
+        compact: false,
         customAttribution: [
           '<a href="https://www.naturalearthdata.com/" target="_blank" rel="noreferrer">Natural Earth</a>',
           ...(geonames
