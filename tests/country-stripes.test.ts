@@ -188,7 +188,10 @@ test("history layer uses solid panel year colours and greys unvisited and uncata
     { code: "AF", visited: false, color: "#abcdef", lastVisited: "2025" },
   ];
   const before = structuredClone(countries);
-  const evaluate = (layer: "standard" | "last-visit", code: string) => {
+  const evaluate = (
+    layer: "standard" | "last-visit" | "testing",
+    code: string,
+  ) => {
     const expression = createExpression(
       fillColors(countries, layer) as ExpressionSpecification,
     );
@@ -216,6 +219,11 @@ test("history layer uses solid panel year colours and greys unvisited and uncata
   assert.equal(evaluate("standard", "IE"), "#63b28a");
   assert.equal(evaluate("standard", "US"), "#63b28a");
   assert.equal(evaluate("standard", "ZZ"), MAP_COLORS.land);
+  for (const country of countries.filter((country) => country.visited))
+    assert.equal(evaluate("testing", country.code), "#63b28a");
+  for (const code of ["AF", "ZZ"])
+    assert.equal(evaluate("testing", code), evaluate("standard", code));
+  assert.equal(fillColors([], "testing"), MAP_COLORS.land);
   assert.equal(fillColors([], "last-visit"), MAP_COLORS.unvisitedCountry);
   assert.equal(fillColors([]), MAP_COLORS.land);
   assert.deepEqual(countries, before);
@@ -293,6 +301,24 @@ test("selected country and responsive paint restoration retain the chosen layer 
         layers.get(id).paint["fill-color"],
         fillColors(visited, "last-visit"),
       );
+    selection.updateCountries(visited, "testing");
+    for (const id of ["atlas-land", "atlas-selected-land"])
+      assert.deepEqual(
+        layers.get(id).paint["fill-color"],
+        fillColors(visited, "testing"),
+      );
+    assert.equal(layers.get("atlas-borders").paint["line-color"], "#6b7772");
+    assert.equal(
+      layers.get("atlas-selected-outline").paint["line-color"],
+      "#213e4a",
+    );
+    for (const stripe of countryStripeLayers(visited)) {
+      assert.equal(layers.get(stripe.id).layout.visibility, "none");
+      assert.equal(
+        layers.get(`atlas-selected-${stripe.id}`).layout.visibility,
+        "none",
+      );
+    }
     selection.updateCountries(countries, "standard");
     assert.equal(layers.get("atlas-borders").paint["line-color"], "#6b7772");
     assert.equal(

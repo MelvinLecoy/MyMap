@@ -46,6 +46,7 @@ test("map controls and visit-history layers work across screen sizes without cha
     const position = await page.locator(".coordinates").textContent();
     await page.getByRole("radio", { name: /Last visit history/ }).check();
     await expect(globe).toHaveAttribute("data-layer", "last-visit");
+    const historyLegend = await page.locator(".map-legend").innerText();
     const swatches = page.locator(".map-year-legend i");
     await expect(swatches.nth(0)).toHaveCSS("background-color", "rgb(38, 120, 79)");
     await expect(swatches.nth(1)).toHaveCSS("background-color", "rgb(223, 191, 0)");
@@ -104,6 +105,24 @@ test("map controls and visit-history layers work across screen sizes without cha
     await expect(swatches).toHaveCount(4);
     await expect(page.locator(".map-legend")).toContainText("Visited country");
     await expect(page.locator(".map-legend")).not.toContainText("Never");
+    const standardLegend = await page.locator(".map-legend").innerText();
+    await expect(page.getByRole("radio")).toHaveCount(3);
+    await page.getByRole("radio", { name: /^Testing/ }).check();
+    await expect(globe).toHaveAttribute("data-layer", "testing");
+    await expect(page.locator(".map-year-legend")).toHaveCount(0);
+    await expect(page.locator(".map-legend .legend-country")).toHaveCSS("background-color", "rgb(99, 178, 138)");
+    expect(await page.locator(".city-panel").innerText()).toBe(panel);
+    expect(await page.locator(".coordinates").textContent()).toBe(position);
+    await page.getByRole("radio", { name: /Last visit history/ }).check();
+    await expect(globe).toHaveAttribute("data-layer", "last-visit");
+    expect(await page.locator(".map-legend").innerText()).toBe(historyLegend);
+    await expect(swatches.nth(0)).toHaveCSS("background-color", "rgb(38, 120, 79)");
+    await expect(swatches.nth(1)).toHaveCSS("background-color", "rgb(223, 191, 0)");
+    await page.getByRole("radio", { name: /^Standard/ }).check();
+    await expect(globe).toHaveAttribute("data-layer", "standard");
+    expect(await page.locator(".map-legend").innerText()).toBe(standardLegend);
+    await expect(swatches.nth(1)).toHaveCSS("background-color", "rgb(99, 178, 138)");
+    await expect(swatches.nth(1)).not.toHaveCSS("background-image", "none");
     await page
       .getByRole("heading", { name: "Afghanistan", exact: true })
       .click();

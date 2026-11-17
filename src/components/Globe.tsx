@@ -860,7 +860,7 @@ export default function Globe({
           </div>
           <MapLayerControl value={mapLayer} onChange={setMapLayer} />
           <div className="map-legend" aria-label="Map legend">
-            {mapLayer === "standard" && (
+            {mapLayer !== "last-visit" && (
               <span>
                 <i className="legend-country" />
                 Visited country
@@ -879,53 +879,55 @@ export default function Globe({
                 Place
               </span>
             )}
-            <div
-              className="map-year-legend"
-              aria-label="Country last visit year"
-            >
-              <span className="legend-year-caption">Last visit</span>
-              {[
-                "2026",
-                ...Object.keys(COUNTRY_STRIPE_COLORS).sort().reverse(),
-              ].map((year) => {
-                const color = COUNTRY_STRIPE_COLORS[year];
-                return (
-                  <span
-                    key={year}
-                    title={year === "2023" ? "2023 or earlier" : undefined}
-                  >
+            {mapLayer !== "testing" && (
+              <div
+                className="map-year-legend"
+                aria-label="Country last visit year"
+              >
+                <span className="legend-year-caption">Last visit</span>
+                {[
+                  "2026",
+                  ...Object.keys(COUNTRY_STRIPE_COLORS).sort().reverse(),
+                ].map((year) => {
+                  const color = COUNTRY_STRIPE_COLORS[year];
+                  return (
+                    <span
+                      key={year}
+                      title={year === "2023" ? "2023 or earlier" : undefined}
+                    >
+                      <i
+                        className="legend-country"
+                        style={{
+                          backgroundColor:
+                            mapLayer === "last-visit"
+                              ? VISIT_YEAR_COLORS[year]
+                              : MAP_COLORS.visitedCountry,
+                          backgroundImage:
+                            mapLayer === "standard" && color
+                              ? "repeating-linear-gradient(135deg, " +
+                                color +
+                                " 0 1px, transparent 1px 3px)"
+                              : undefined,
+                        }}
+                      />
+                      {year === "2023" ? "≤2023" : year}
+                    </span>
+                  );
+                })}
+                {mapLayer === "last-visit" && (
+                  <span>
                     <i
                       className="legend-country"
                       style={{
-                        backgroundColor:
-                          mapLayer === "last-visit"
-                            ? VISIT_YEAR_COLORS[year]
-                            : MAP_COLORS.visitedCountry,
-                        backgroundImage:
-                          mapLayer === "standard" && color
-                            ? "repeating-linear-gradient(135deg, " +
-                              color +
-                              " 0 1px, transparent 1px 3px)"
-                            : undefined,
+                        backgroundColor: MAP_COLORS.unvisitedCountry,
+                        borderColor: countryBorderColor(mapLayer),
                       }}
                     />
-                    {year === "2023" ? "≤2023" : year}
+                    Never
                   </span>
-                );
-              })}
-              {mapLayer === "last-visit" && (
-                <span>
-                  <i
-                    className="legend-country"
-                    style={{
-                      backgroundColor: MAP_COLORS.unvisitedCountry,
-                      borderColor: countryBorderColor(mapLayer),
-                    }}
-                  />
-                  Never
-                </span>
-              )}
-            </div>
+                )}
+              </div>
+            )}
           </div>
           <div className="coordinates">
             <Compass size={12} />

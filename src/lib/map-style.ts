@@ -143,7 +143,7 @@ export function cityFeatures(cities: City[]): FeatureCollection<Point> {
     ),
   };
 }
-export type MapLayer = "standard" | "last-visit";
+export type MapLayer = "standard" | "last-visit" | "testing";
 
 export function countryBorderColor(layer: MapLayer, selected = false) {
   return layer === "last-visit"
@@ -169,7 +169,9 @@ export function fillColors(
         ? layer === "last-visit"
           ? (VISIT_YEAR_COLORS[countryVisitYear(c.lastVisited) ?? ""] ??
             VISIT_YEAR_COLORS[2026])
-          : c.color || MAP_COLORS.visitedCountry
+          : layer === "testing"
+            ? MAP_COLORS.visitedCountry
+            : c.color || MAP_COLORS.visitedCountry
         : layer === "last-visit"
           ? unvisited
           : c.color || unvisited,

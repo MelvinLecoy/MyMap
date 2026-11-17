@@ -9,6 +9,11 @@ const layers: { id: MapLayer; name: string; description: string }[] = [
     name: "Last visit history",
     description: "Year colours · unvisited grey",
   },
+  {
+    id: "testing",
+    name: "Testing",
+    description: "Visited countries in green",
+  },
 ];
 
 export default function MapLayerControl({
