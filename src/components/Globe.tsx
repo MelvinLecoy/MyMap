@@ -15,7 +15,6 @@ import {
   Maximize2,
   Compass,
   MapPin,
-  MousePointer2,
 } from "lucide-react";
 import {
   asset,
@@ -106,8 +105,6 @@ export default function Globe({
   const [unavailable, setUnavailable] = useState(false);
   const [regional, setRegional] = useState(false);
   const [position, setPosition] = useState("43.0° N  /  25.0° E");
-  const [provider, setProvider] = useState(false);
-  const [hint, setHint] = useState(true);
   useEffect(() => {
     if (!container.current) return;
     providerLabels.current = [];
@@ -460,7 +457,6 @@ export default function Globe({
       cancelPointerPick();
       setCursor("");
     };
-    map.on("dragstart", () => setHint(false));
     const pickCityFeature = (
       point: { x: number; y: number },
       cityRadius = 9,
@@ -610,7 +606,6 @@ export default function Globe({
               layer.type === "symbol",
           );
           map.setStyle(simplified);
-          setProvider(true);
         }
       })
       .catch(() => {
@@ -745,7 +740,6 @@ export default function Globe({
         duration: motionDuration(1400),
         essential: false,
       });
-      setHint(false);
     };
     void focusCountry();
     return () => {
@@ -769,7 +763,6 @@ export default function Globe({
     previousCity.current = selected.id;
     if (isPlace(selected)) {
       focusPlace(map, selected, motionDuration(1400));
-      setHint(false);
       return;
     }
     map.flyTo({
@@ -778,7 +771,6 @@ export default function Globe({
       duration: motionDuration(1400),
       essential: false,
     });
-    setHint(false);
   }, [selected, ready]);
   const reset = () => {
     mapRef.current?.flyTo({
@@ -793,7 +785,6 @@ export default function Globe({
       pitch: 0,
       duration: motionDuration(1200),
     });
-    setHint(true);
   };
   const fullscreen = () => {
     const parent = container.current?.parentElement;
@@ -817,13 +808,6 @@ export default function Globe({
             {regional ? "Regional view" : "Globe view"}
           </span>
         )}
-        <span
-          className="map-live-dot"
-          title={provider ? "OpenFreeMap atlas" : "Bundled Natural Earth atlas"}
-        >
-          <i />
-          {provider ? "OPENFREEMAP ATLAS" : "NATURAL EARTH ATLAS"}
-        </span>
       </div>
       {!unavailable && !ready && (
         <div className="map-loading">
@@ -928,14 +912,6 @@ export default function Globe({
               })}
             </div>
           </div>
-          {!regional && hint && (
-            <div className="globe-hint">
-              <MousePointer2 size={13} />
-              <span>
-                Drag to explore <b>·</b> Scroll to get closer
-              </span>
-            </div>
-          )}
           <div className="coordinates">
             <Compass size={12} />
             {position}
