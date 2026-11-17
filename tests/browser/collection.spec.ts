@@ -20,6 +20,112 @@ const mapCount = (status: string) =>
   entries.filter((entry) => entry.status === status).length;
 const backName = `All cities (${data.cities.length})`;
 
+test("map controls and visit-history layers work across screen sizes without changing the side panel", async ({
+  page,
+}) => {
+  test.setTimeout(90_000);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.route("https://tiles.openfreemap.org/**", (route) =>
+    route.abort(),
+  );
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("/?country=AF&panel=countries");
+  const globe = page.getByTestId("map-canvas");
+  await expect(globe).toHaveAttribute("data-ready", "true", {
+    timeout: 30_000,
+  });
+  const trigger = page.getByRole("button", { name: "Map layers", exact: true });
+  await expect(
+    page.getByRole("button", { name: /^Zoom (in|out)$/ }),
+  ).toHaveCount(0);
+  for (const width of [1440, 900, 760, 601, 390, 320]) {
+    await page.setViewportSize({ width, height: 800 });
+    await trigger.click();
+    const panel = await page.locator(".city-panel").innerText();
+    const position = await page.locator(".coordinates").textContent();
+    await page.getByRole("radio", { name: /Last visit history/ }).check();
+    await expect(globe).toHaveAttribute("data-layer", "last-visit");
+    await expect(page.locator(".map-legend")).toContainText(
+      "Unvisited country",
+    );
+    expect(await page.locator(".city-panel").innerText()).toBe(panel);
+    expect(await page.locator(".coordinates").textContent()).toBe(position);
+    await page.keyboard.press("Escape");
+    await expect(trigger).toBeFocused();
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
+    const layout = await page.evaluate(() => {
+      const bounds = (selector: string) =>
+        document.querySelector(selector)!.getBoundingClientRect();
+      const map = bounds(".map-canvas");
+      const fullscreen = bounds(".fullscreen-control");
+      const access = bounds(".access-mode-control, .map-view-badge");
+      const legend = bounds(".map-legend");
+      const layers = bounds(".map-layer-trigger");
+      const reset = bounds(".map-controls");
+      return {
+        fullscreenTopLeft:
+          fullscreen.left - map.left <= 25 && fullscreen.top - map.top <= 30,
+        accessTopRight:
+          map.right - access.right <= 25 &&
+          access.top - map.top <= 32 &&
+          Math.abs(
+            access.top + access.height / 2 - fullscreen.top - fullscreen.height / 2,
+          ) < 2 &&
+          access.left > fullscreen.right,
+        verticalLegend:
+          legend.left - map.left <= 25 &&
+          Math.abs(legend.top + legend.height / 2 - map.top - map.height / 2) <
+            2,
+        layersBottomRight:
+          map.right - layers.right <= 25 && map.bottom - layers.bottom <= 25,
+        legendClearsReset: legend.bottom + 8 <= reset.top,
+        noOverflow: document.documentElement.scrollWidth <= innerWidth,
+      };
+    });
+    expect(layout, String(width)).toEqual({
+      fullscreenTopLeft: true,
+      accessTopRight: true,
+      verticalLegend: true,
+      layersBottomRight: true,
+      legendClearsReset: true,
+      noOverflow: true,
+    });
+    await trigger.click();
+    await page.getByRole("radio", { name: /^Standard/ }).check();
+    await expect(globe).toHaveAttribute("data-layer", "standard");
+    await expect(page.locator(".map-legend")).not.toContainText(
+      "Unvisited country",
+    );
+    await page
+      .getByRole("heading", { name: "Afghanistan", exact: true })
+      .click();
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
+  }
+  await page.setViewportSize({ width: 1440, height: 800 });
+  await trigger.click();
+  await page.getByRole("radio", { name: /^Standard/ }).focus();
+  await page.keyboard.press("ArrowDown");
+  await expect(globe).toHaveAttribute("data-layer", "last-visit");
+  await page.keyboard.press("Escape");
+  await page.getByRole("button", { name: "Toggle map fullscreen" }).click();
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        document.fullscreenElement?.contains(
+          document.querySelector('[data-testid="map-canvas"]'),
+        ),
+      ),
+    )
+    .toBe(true);
+  await expect(globe).toHaveAttribute("data-layer", "last-visit");
+  await page.getByRole("button", { name: "Toggle map fullscreen" }).click();
+  await expect
+    .poll(() => page.evaluate(() => document.fullscreenElement === null))
+    .toBe(true);
+  expect(errors).toEqual([]);
+});
+
 for (const width of [320, 601, 1440]) {
   test(`approved city/place map additions retain profiles, links and compact layout at ${width}px`, async ({
     page,

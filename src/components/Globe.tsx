@@ -7,15 +7,7 @@ import maplibregl, {
   type SymbolLayerSpecification,
   type MapMouseEvent,
 } from "maplibre-gl";
-import {
-  Plus,
-  Minus,
-  Globe2,
-  LocateFixed,
-  Maximize2,
-  Compass,
-  MapPin,
-} from "lucide-react";
+import { Globe2, LocateFixed, Maximize2, Compass, MapPin } from "lucide-react";
 import {
   asset,
   cityFeatures,
@@ -25,7 +17,9 @@ import {
   localStyle,
   MAP_CONFIG,
   simplifyProviderStyle,
+  type MapLayer,
 } from "../lib/map-style";
+import MapLayerControl from "./MapLayerControl";
 import { LABEL_FONTS, LABEL_SIZES } from "../lib/map-typography";
 import { COUNTRY_STRIPE_COLORS, MAP_COLORS } from "../lib/palette";
 import {
@@ -81,6 +75,7 @@ export default function Globe({
   );
   const previousPlaces = useRef<Place[]>([]);
   const configurePointerRef = useRef<(() => void) | null>(null);
+  const [mapLayer, setMapLayer] = useState<MapLayer>("standard");
   const current = useRef({
     cities,
     places,
@@ -90,6 +85,7 @@ export default function Globe({
     onSelect,
     onSelectCountry,
     countryCodes: new Set(countryCodes),
+    mapLayer,
   });
   current.current = {
     cities,
@@ -100,6 +96,7 @@ export default function Globe({
     onSelect,
     onSelectCountry,
     countryCodes: new Set(countryCodes),
+    mapLayer,
   };
   const [ready, setReady] = useState(false);
   const [unavailable, setUnavailable] = useState(false);
@@ -206,6 +203,7 @@ export default function Globe({
           paint: {
             "fill-color": fillColors(
               current.current.countries,
+              current.current.mapLayer,
             ) as ExpressionSpecification,
             "fill-opacity": countryFillOpacity(current.current.countries),
           },
@@ -553,7 +551,11 @@ export default function Globe({
         clearPointer();
         countrySelection.current?.destroy();
         countrySelection.current = null;
-        restoreCountryPaint(map, current.current.countries);
+        restoreCountryPaint(
+          map,
+          current.current.countries,
+          current.current.mapLayer,
+        );
         return;
       }
       if (!map.getLayer("atlas-land")) return;
@@ -566,6 +568,7 @@ export default function Globe({
           current.current.countries,
           firstLabel,
           motionDuration,
+          current.current.mapLayer,
         );
       }
       countrySelection.current.setSelectedCountry(
@@ -675,9 +678,9 @@ export default function Globe({
     const map = mapRef.current;
     if (!ready || !map?.getLayer("atlas-land")) return;
     if (countrySelection.current)
-      countrySelection.current.updateCountries(countries);
-    else restoreCountryPaint(map, countries);
-  }, [countries, ready]);
+      countrySelection.current.updateCountries(countries, mapLayer);
+    else restoreCountryPaint(map, countries, mapLayer);
+  }, [countries, ready, mapLayer]);
   useEffect(() => {
     configurePointerRef.current?.();
   }, [ready]);
@@ -798,10 +801,20 @@ export default function Globe({
         ref={container}
         data-testid="map-canvas"
         data-ready={ready}
+        data-layer={mapLayer}
         data-selected-country={selected ? "" : (selectedCountry ?? "")}
         data-selected-place={selected && isPlace(selected) ? selected.id : ""}
       />
       <div className="map-topline">
+        {!unavailable && (
+          <button
+            className="fullscreen-control"
+            aria-label="Toggle map fullscreen"
+            onClick={fullscreen}
+          >
+            <Maximize2 size={17} />
+          </button>
+        )}
         {viewControl ?? (
           <span className="map-view-badge">
             <Globe2 size={15} />
@@ -828,24 +841,6 @@ export default function Globe({
       {!unavailable && (
         <>
           <div className="map-controls">
-            <div className="zoom-controls">
-              <button
-                aria-label="Zoom in"
-                onClick={() =>
-                  mapRef.current?.zoomIn({ duration: motionDuration(350) })
-                }
-              >
-                <Plus size={20} />
-              </button>
-              <button
-                aria-label="Zoom out"
-                onClick={() =>
-                  mapRef.current?.zoomOut({ duration: motionDuration(350) })
-                }
-              >
-                <Minus size={20} />
-              </button>
-            </div>
             <button
               className="map-control-single"
               aria-label="Return to globe"
@@ -855,18 +850,24 @@ export default function Globe({
               <LocateFixed size={19} />
             </button>
           </div>
-          <button
-            className="fullscreen-control"
-            aria-label="Toggle map fullscreen"
-            onClick={fullscreen}
-          >
-            <Maximize2 size={17} />
-          </button>
+          <MapLayerControl value={mapLayer} onChange={setMapLayer} />
           <div className="map-legend" aria-label="Map legend">
             <span>
               <i className="legend-country" />
               Visited country
             </span>
+            {mapLayer === "last-visit" && (
+              <span>
+                <i
+                  className="legend-country"
+                  style={{
+                    backgroundColor: MAP_COLORS.unvisitedCountry,
+                    borderColor: MAP_COLORS.boundary,
+                  }}
+                />
+                Unvisited country
+              </span>
+            )}
             <span>
               <i
                 className="legend-pin"

@@ -5,7 +5,11 @@ import {
   createExpression,
   validateStyleMin,
 } from "@maplibre/maplibre-gl-style-spec";
-import type { ExpressionSpecification, StyleSpecification } from "maplibre-gl";
+import type {
+  ExpressionSpecification,
+  Map as MapInstance,
+  StyleSpecification,
+} from "maplibre-gl";
 import {
   buildCountryRecords,
   latestCountryVisit,
@@ -19,6 +23,10 @@ import {
 } from "../src/lib/country-stripes";
 import { COUNTRY_STRIPE_COLORS, MAP_COLORS } from "../src/lib/palette";
 import { countryFillOpacity, fillColors } from "../src/lib/map-style";
+import {
+  createCountrySelection,
+  restoreCountryPaint,
+} from "../src/lib/country-selection";
 import type { CountryVisit } from "../src/lib/types";
 
 test("country stripes use the latest actual stay and preserve existing country fills", () => {
@@ -161,6 +169,105 @@ test("every visited year has the same solid green base while unvisited land keep
       opacity.value.evaluate({ zoom: 2 }, feature),
       country.visited ? 1 : 0.95,
     );
+  }
+});
+
+test("history layer greys unvisited and uncatalogued countries while retaining visited fills and year stripes", () => {
+  const countries: CountryVisit[] = [
+    { code: "CA", visited: true, color: "#123456", lastVisited: "2026" },
+    { code: "FR", visited: true, color: null, lastVisited: "2024" },
+    { code: "GB", visited: true, color: null, lastVisited: null },
+    { code: "AF", visited: false, color: "#abcdef", lastVisited: "2025" },
+  ];
+  const before = structuredClone(countries);
+  const evaluate = (layer: "standard" | "last-visit", code: string) => {
+    const expression = createExpression(
+      fillColors(countries, layer) as ExpressionSpecification,
+    );
+    assert.equal(expression.result, "success");
+    if (expression.result !== "success") throw new Error("Invalid fill");
+    return expression.value.evaluate(
+      { zoom: 2 },
+      { type: 3, geometry: [], properties: { code } },
+    );
+  };
+  for (const country of countries.filter((country) => country.visited))
+    assert.equal(
+      evaluate("last-visit", country.code),
+      evaluate("standard", country.code),
+    );
+  for (const code of ["AF", "ZZ"])
+    assert.equal(evaluate("last-visit", code), MAP_COLORS.unvisitedCountry);
+  assert.equal(evaluate("standard", "AF"), "#abcdef");
+  assert.equal(evaluate("standard", "ZZ"), MAP_COLORS.land);
+  assert.equal(fillColors([], "last-visit"), MAP_COLORS.unvisitedCountry);
+  assert.equal(fillColors([]), MAP_COLORS.land);
+  assert.deepEqual(countries, before);
+  assert.deepEqual(countryStripeLayers(countries), countryStripeLayers(before));
+});
+
+test("selected country and responsive paint restoration retain the chosen layer through data changes", () => {
+  const countries: CountryVisit[] = [
+    { code: "AF", visited: false, color: null },
+  ];
+  const layers = new Map<string, any>([
+    ["atlas-land", { paint: {} }],
+    ["atlas-borders", { paint: {} }],
+    ...countryStripeLayers(countries).map(
+      (layer) => [layer.id, structuredClone(layer)] as [string, any],
+    ),
+  ]);
+  const map = {
+    getLayer: (id: string) => layers.get(id),
+    getSource: () => ({}),
+    addLayer: (layer: any) => layers.set(layer.id, layer),
+    removeLayer: (id: string) => layers.delete(id),
+    setPaintProperty: (id: string, key: string, value: unknown) => {
+      layers.get(id).paint[key] = value;
+    },
+    setFilter: (id: string, value: unknown) => {
+      layers.get(id).filter = value;
+    },
+    setFeatureState: () => {},
+  } as unknown as MapInstance;
+  const previousCancel = globalThis.cancelAnimationFrame;
+  globalThis.cancelAnimationFrame = () => {};
+  try {
+    const selection = createCountrySelection(
+      map,
+      countries,
+      undefined,
+      () => 0,
+      "last-visit",
+    );
+    selection.setSelectedCountry("AF");
+    for (const id of ["atlas-land", "atlas-selected-land"])
+      assert.deepEqual(
+        layers.get(id).paint["fill-color"],
+        fillColors(countries, "last-visit"),
+      );
+    const visited = [{ ...countries[0], visited: true, lastVisited: "2025" }];
+    selection.updateCountries(visited);
+    for (const id of ["atlas-land", "atlas-selected-land"])
+      assert.deepEqual(
+        layers.get(id).paint["fill-color"],
+        fillColors(visited, "last-visit"),
+      );
+    selection.updateCountries(countries, "standard");
+    for (const id of ["atlas-land", "atlas-selected-land"])
+      assert.deepEqual(
+        layers.get(id).paint["fill-color"],
+        fillColors(countries),
+      );
+    selection.destroy();
+    restoreCountryPaint(map, countries, "last-visit");
+    assert.deepEqual(
+      layers.get("atlas-land").paint["fill-color"],
+      fillColors(countries, "last-visit"),
+    );
+  } finally {
+    if (previousCancel) globalThis.cancelAnimationFrame = previousCancel;
+    else Reflect.deleteProperty(globalThis, "cancelAnimationFrame");
   }
 });
 

@@ -1,5 +1,5 @@
 import type { ExpressionSpecification, Map as MapInstance } from "maplibre-gl";
-import { countryFillOpacity, fillColors } from "./map-style";
+import { countryFillOpacity, fillColors, type MapLayer } from "./map-style";
 import { countryStripeLayers } from "./country-stripes";
 import { MAP_COLORS } from "./palette";
 import type { CountryVisit } from "./types";
@@ -15,9 +15,14 @@ const uniformPaintOptions = { validate: false };
 export function restoreCountryPaint(
   map: MapInstance,
   countries: CountryVisit[],
+  layer: MapLayer = "standard",
 ) {
   if (!map.getLayer("atlas-land")) return;
-  map.setPaintProperty("atlas-land", "fill-color", fillColors(countries));
+  map.setPaintProperty(
+    "atlas-land",
+    "fill-color",
+    fillColors(countries, layer),
+  );
   map.setPaintProperty(
     "atlas-land",
     "fill-opacity",
@@ -37,7 +42,9 @@ function createHighlight(
   beforeId: string | undefined,
   duration: (milliseconds: number) => number,
   kind: "selected",
+  layer: MapLayer,
 ) {
+  let activeLayer = layer;
   const flag = "countrySelected";
   const ownState: ExpressionSpecification = [
     "boolean",
@@ -94,7 +101,10 @@ function createHighlight(
       type: "fill",
       source: "atlas-countries",
       paint: {
-        "fill-color": fillColors(countries) as ExpressionSpecification,
+        "fill-color": fillColors(
+          countries,
+          activeLayer,
+        ) as ExpressionSpecification,
         "fill-opacity": onlySelected(countryFillOpacity(countries)),
         "fill-translate": [0, 0],
         "fill-translate-anchor": "viewport",
@@ -160,9 +170,17 @@ function createHighlight(
         { [flag]: value },
       );
   }
-  function updateCountries(next: CountryVisit[]) {
+  function updateCountries(
+    next: CountryVisit[],
+    layer: MapLayer = activeLayer,
+  ) {
+    activeLayer = layer;
     if (disposed || !map.getLayer(`atlas-${kind}-land`)) return;
-    map.setPaintProperty("atlas-land", "fill-color", fillColors(next));
+    map.setPaintProperty(
+      "atlas-land",
+      "fill-color",
+      fillColors(next, activeLayer),
+    );
     map.setPaintProperty("atlas-land", "fill-opacity", [
       "case",
       selectedState,
@@ -175,7 +193,11 @@ function createHighlight(
       0,
       0.9,
     ]);
-    map.setPaintProperty(`atlas-${kind}-land`, "fill-color", fillColors(next));
+    map.setPaintProperty(
+      `atlas-${kind}-land`,
+      "fill-color",
+      fillColors(next, activeLayer),
+    );
     map.setPaintProperty(
       `atlas-${kind}-land`,
       "fill-opacity",
@@ -248,6 +270,7 @@ export function createCountrySelection(
   countries: CountryVisit[],
   beforeId: string | undefined,
   duration: (milliseconds: number) => number,
+  layer: MapLayer = "standard",
 ) {
   const selection = createHighlight(
     map,
@@ -255,6 +278,7 @@ export function createCountrySelection(
     beforeId,
     duration,
     "selected",
+    layer,
   );
   let selected: string | null = null;
   return {
@@ -263,8 +287,8 @@ export function createCountrySelection(
       selected = code;
       selection.setCountry(code, true);
     },
-    updateCountries(next: CountryVisit[]) {
-      selection.updateCountries(next);
+    updateCountries(next: CountryVisit[], layer?: MapLayer) {
+      selection.updateCountries(next, layer);
     },
     destroy() {
       selection.destroy();

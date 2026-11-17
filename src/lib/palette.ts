@@ -4,6 +4,7 @@ export const MAP_COLORS = {
   water: "#c5e4ec",
   land: "#edf0e6",
   visitedCountry: "#63b28a",
+  unvisitedCountry: "#bfc6c4",
   boundary: "#6b7772",
   adminBoundary: "#a8bdb0",
   grid: "#a6c1bc",

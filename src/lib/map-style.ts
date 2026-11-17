@@ -142,16 +142,27 @@ export function cityFeatures(cities: City[]): FeatureCollection<Point> {
     ),
   };
 }
-export function fillColors(countries: CountryVisit[]): string | unknown[] {
-  if (!countries.length) return MAP_COLORS.land;
+export type MapLayer = "standard" | "last-visit";
+
+export function fillColors(
+  countries: CountryVisit[],
+  layer: MapLayer = "standard",
+): string | unknown[] {
+  const unvisited =
+    layer === "last-visit" ? MAP_COLORS.unvisitedCountry : MAP_COLORS.land;
+  if (!countries.length) return unvisited;
   return [
     "match",
     ["get", "code"],
     ...countries.flatMap((c) => [
       c.code,
-      c.color || (c.visited ? MAP_COLORS.visitedCountry : MAP_COLORS.land),
+      c.visited
+        ? c.color || MAP_COLORS.visitedCountry
+        : layer === "last-visit"
+          ? unvisited
+          : c.color || unvisited,
     ]),
-    MAP_COLORS.land,
+    unvisited,
   ];
 }
 

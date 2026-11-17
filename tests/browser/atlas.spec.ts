@@ -359,9 +359,11 @@ test("camera supports dragging, continuous zoom and reset", async ({
   await page.mouse.up();
   await page.waitForTimeout(900);
   await expect(page.locator(".coordinates")).not.toHaveText(initial!);
-  await page
-    .getByRole("button", { name: "Zoom in", exact: true })
-    .click({ clickCount: 3, delay: 400 });
+  await canvas.focus();
+  for (let i = 0; i < 3; i++) {
+    await page.keyboard.press("+");
+    await page.waitForTimeout(400);
+  }
   await expect(page.locator(".map-view-badge")).toContainText("Regional view");
   await page.getByRole("button", { name: "Return to globe" }).click();
   await expect(page.locator(".map-view-badge")).toContainText("Globe view");
