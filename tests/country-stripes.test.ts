@@ -181,6 +181,7 @@ test("history layer uses solid panel year colours and greys unvisited and uncata
     { code: "CA", visited: true, color: "#123456", lastVisited: "2026" },
     { code: "FR", visited: true, color: null, lastVisited: "2024" },
     { code: "GB", visited: true, color: null, lastVisited: null },
+    { code: "US", visited: true, color: null },
     { code: "IE", visited: true, color: null, lastVisited: "2025-09-01" },
     { code: "NL", visited: true, color: null, lastVisited: "2023" },
     { code: "IT", visited: true, color: null, lastVisited: "2021-03" },
@@ -201,7 +202,8 @@ test("history layer uses solid panel year colours and greys unvisited and uncata
   for (const [code, color] of Object.entries({
     CA: VISIT_YEAR_COLORS[2026],
     FR: VISIT_YEAR_COLORS[2024],
-    GB: MAP_COLORS.visitedCountry,
+    GB: VISIT_YEAR_COLORS[2026],
+    US: VISIT_YEAR_COLORS[2026],
     IE: "#dfbf00",
     NL: VISIT_YEAR_COLORS[2023],
     IT: VISIT_YEAR_COLORS[2023],

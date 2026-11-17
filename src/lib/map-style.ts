@@ -160,7 +160,7 @@ export function fillColors(
       c.visited
         ? layer === "last-visit"
           ? (VISIT_YEAR_COLORS[countryVisitYear(c.lastVisited) ?? ""] ??
-            MAP_COLORS.visitedCountry)
+            VISIT_YEAR_COLORS[2026])
           : c.color || MAP_COLORS.visitedCountry
         : layer === "last-visit"
           ? unvisited
